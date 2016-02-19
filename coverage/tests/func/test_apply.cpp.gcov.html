@@ -1,0 +1,609 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - coverage.info.cleaned - tests/func/test_apply.cpp</title>
+  <link rel="stylesheet" type="text/css" href="../../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../../index.html">top level</a> - <a href="index.html">tests/func</a> - test_apply.cpp<span style="font-size: 80%;"> (source / <a href="test_apply.cpp.func.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">coverage.info.cleaned</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">160</td>
+            <td class="headerCovTableEntry">164</td>
+            <td class="headerCovTableEntryHi">97.6 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2016-02-19</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">60</td>
+            <td class="headerCovTableEntry">62</td>
+            <td class="headerCovTableEntryHi">96.8 %</td>
+          </tr>
+          <tr><td><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : //</a>
+<span class="lineNum">       2 </span>            : // Copyright (C) 2011-15 DyND Developers
+<span class="lineNum">       3 </span>            : // BSD 2-Clause License, see LICENSE.txt
+<span class="lineNum">       4 </span>            : //
+<span class="lineNum">       5 </span>            : 
+<span class="lineNum">       6 </span>            : #include &lt;iostream&gt;
+<span class="lineNum">       7 </span>            : #include &lt;stdexcept&gt;
+<span class="lineNum">       8 </span>            : #include &lt;algorithm&gt;
+<span class="lineNum">       9 </span>            : #include &lt;cmath&gt;
+<span class="lineNum">      10 </span>            : 
+<span class="lineNum">      11 </span>            : #include &quot;inc_gtest.hpp&quot;
+<span class="lineNum">      12 </span>            : #include &quot;dynd_assertions.hpp&quot;
+<span class="lineNum">      13 </span>            : #include &quot;../test_memory_new.hpp&quot;
+<span class="lineNum">      14 </span>            : 
+<span class="lineNum">      15 </span>            : #include &lt;dynd/array.hpp&gt;
+<span class="lineNum">      16 </span>            : #include &lt;dynd/callable.hpp&gt;
+<span class="lineNum">      17 </span>            : 
+<span class="lineNum">      18 </span>            : using namespace std;
+<span class="lineNum">      19 </span>            : using namespace dynd;
+<span class="lineNum">      20 </span>            : 
+<span class="lineNum">      21 </span>            : #if defined(_WIN32) &amp;&amp; defined(DYND_CUDA)
+<span class="lineNum">      22 </span>            : // Workaround for CUDA NVCC bug where it deduces a reference to a function
+<span class="lineNum">      23 </span>            : // pointer instead of a function pointer in decltype.
+<span class="lineNum">      24 </span>            : template &lt;typename T&gt;
+<span class="lineNum">      25 </span>            : struct cuda_decltype_workaround {
+<span class="lineNum">      26 </span>            :   typedef std::remove_reference&lt;std::remove_pointer&lt;T&gt;::type&gt;::type *type;
+<span class="lineNum">      27 </span>            : };
+<span class="lineNum">      28 </span>            : #define CUDA_DECLTYPE_WORKAROUND(x) cuda_decltype_workaround&lt;decltype(x)&gt;::type
+<span class="lineNum">      29 </span>            : #else
+<span class="lineNum">      30 </span>            : #define CUDA_DECLTYPE_WORKAROUND(x) decltype(x)
+<span class="lineNum">      31 </span>            : #endif
+<a name="32"><span class="lineNum">      32 </span>            : </a>
+<span class="lineNum">      33 </span>            : template &lt;typename T&gt;
+<span class="lineNum">      34 </span><span class="lineCov">          4 : class Apply : public Memory&lt;T&gt; {</span>
+<a name="35"><span class="lineNum">      35 </span>            : };</a>
+<span class="lineNum">      36 </span>            : 
+<span class="lineNum">      37 </span><span class="lineCov">          1 : TYPED_TEST_CASE_P(Apply);</span>
+<span class="lineNum">      38 </span>            : 
+<span class="lineNum">      39 </span>            : template &lt;kernel_request_t kernreq, typename func_type&gt;
+<span class="lineNum">      40 </span>            : struct func_wrapper;
+<span class="lineNum">      41 </span>            : 
+<span class="lineNum">      42 </span>            : #if !(defined(_MSC_VER) &amp;&amp; _MSC_VER == 1800)
+<span class="lineNum">      43 </span>            : #define FUNC_WRAPPER(KERNREQ, ...)                                                                                     \
+<span class="lineNum">      44 </span>            :   template &lt;typename R, typename... A&gt;                                                                                 \
+<span class="lineNum">      45 </span>            :   struct func_wrapper&lt;KERNREQ, R (*)(A...)&gt; {                                                                          \
+<span class="lineNum">      46 </span>            :     R (*func)(A...);                                                                                                   \
+<span class="lineNum">      47 </span>            :                                                                                                                        \
+<span class="lineNum">      48 </span>            :     DYND_CUDA_HOST_DEVICE func_wrapper(R (*func)(A...)) : func(func) {}                                                \
+<span class="lineNum">      49 </span>            :                                                                                                                        \
+<span class="lineNum">      50 </span>            :     __VA_ARGS__ R operator()(A... a) const { return (*func)(a...); }                                                   \
+<span class="lineNum">      51 </span>            :   };
+<span class="lineNum">      52 </span>            : #else
+<span class="lineNum">      53 </span>            : // Workaround for MSVC 2013 variadic template bug
+<span class="lineNum">      54 </span>            : // https://connect.microsoft.com/VisualStudio/Feedback/Details/1034062
+<span class="lineNum">      55 </span>            : #define FUNC_WRAPPER(KERNREQ, ...)                                                                                     \
+<span class="lineNum">      56 </span>            :   template &lt;typename R&gt;                                                                                                \
+<span class="lineNum">      57 </span>            :   struct func_wrapper&lt;KERNREQ, R (*)()&gt; {                                                                              \
+<span class="lineNum">      58 </span>            :     R (*func)();                                                                                                       \
+<span class="lineNum">      59 </span>            :                                                                                                                        \
+<span class="lineNum">      60 </span>            :     DYND_CUDA_HOST_DEVICE func_wrapper(R (*func)()) : func(func) {}                                                    \
+<span class="lineNum">      61 </span>            :                                                                                                                        \
+<span class="lineNum">      62 </span>            :     __VA_ARGS__ R operator()() const { return (*func)(); }                                                             \
+<span class="lineNum">      63 </span>            :   };                                                                                                                   \
+<span class="lineNum">      64 </span>            :                                                                                                                        \
+<span class="lineNum">      65 </span>            :   template &lt;typename R, typename A0&gt;                                                                                   \
+<span class="lineNum">      66 </span>            :   struct func_wrapper&lt;KERNREQ, R (*)(A0)&gt; {                                                                            \
+<span class="lineNum">      67 </span>            :     R (*func)(A0);                                                                                                     \
+<span class="lineNum">      68 </span>            :                                                                                                                        \
+<span class="lineNum">      69 </span>            :     DYND_CUDA_HOST_DEVICE func_wrapper(R (*func)(A0)) : func(func) {}                                                  \
+<span class="lineNum">      70 </span>            :                                                                                                                        \
+<span class="lineNum">      71 </span>            :     __VA_ARGS__ R operator()(A0 a0) const { return (*func)(a0); }                                                      \
+<span class="lineNum">      72 </span>            :   };                                                                                                                   \
+<span class="lineNum">      73 </span>            :                                                                                                                        \
+<span class="lineNum">      74 </span>            :   template &lt;typename R, typename A0, typename A1&gt;                                                                      \
+<span class="lineNum">      75 </span>            :   struct func_wrapper&lt;KERNREQ, R (*)(A0, A1)&gt; {                                                                        \
+<span class="lineNum">      76 </span>            :     R (*func)(A0, A1);                                                                                                 \
+<span class="lineNum">      77 </span>            :                                                                                                                        \
+<span class="lineNum">      78 </span>            :     DYND_CUDA_HOST_DEVICE func_wrapper(R (*func)(A0, A1)) : func(func) {}                                              \
+<span class="lineNum">      79 </span>            :                                                                                                                        \
+<span class="lineNum">      80 </span>            :     __VA_ARGS__ R operator()(A0 a0, A1 a1) const { return (*func)(a0, a1); }                                           \
+<span class="lineNum">      81 </span>            :   };                                                                                                                   \
+<span class="lineNum">      82 </span>            :                                                                                                                        \
+<span class="lineNum">      83 </span>            :   template &lt;typename R, typename A0, typename A1, typename A2&gt;                                                         \
+<span class="lineNum">      84 </span>            :   struct func_wrapper&lt;KERNREQ, R (*)(A0, A1, A2)&gt; {                                                                    \
+<span class="lineNum">      85 </span>            :     R (*func)(A0, A1, A2);                                                                                             \
+<span class="lineNum">      86 </span>            :                                                                                                                        \
+<span class="lineNum">      87 </span>            :     DYND_CUDA_HOST_DEVICE func_wrapper(R (*func)(A0, A1, A2)) : func(func) {}                                          \
+<span class="lineNum">      88 </span>            :                                                                                                                        \
+<span class="lineNum">      89 </span>            :     __VA_ARGS__ R operator()(A0 a0, A1 a1, A2 a2) const { return (*func)(a0, a1, a2); }                                \
+<span class="lineNum">      90 </span>            :   }
+<a name="91"><span class="lineNum">      91 </span>            : #endif</a>
+<span class="lineNum">      92 </span>            : 
+<span class="lineNum">      93 </span><span class="lineCov">         40 : FUNC_WRAPPER(kernel_request_host);</span>
+<span class="lineNum">      94 </span>            : 
+<span class="lineNum">      95 </span>            : #ifdef DYND_CUDA
+<span class="lineNum">      96 </span>            : FUNC_WRAPPER(kernel_request_cuda_device, __device__);
+<span class="lineNum">      97 </span>            : #endif
+<span class="lineNum">      98 </span>            : 
+<span class="lineNum">      99 </span>            : #undef FUNC_WRAPPER
+<span class="lineNum">     100 </span>            : 
+<span class="lineNum">     101 </span>            : #define GET_HOST_FUNC(NAME)                                                                                            \
+<span class="lineNum">     102 </span>            :   template &lt;kernel_request_t kernreq&gt;                                                                                  \
+<span class="lineNum">     103 </span>            :   typename std::enable_if&lt;kernreq == kernel_request_host, CUDA_DECLTYPE_WORKAROUND(&amp;NAME)&gt;::type get_##NAME()          \
+<span class="lineNum">     104 </span>            :   {                                                                                                                    \
+<span class="lineNum">     105 </span>            :     return &amp;NAME;                                                                                                      \
+<span class="lineNum">     106 </span>            :   }
+<span class="lineNum">     107 </span>            : 
+<span class="lineNum">     108 </span>            : #define HOST_FUNC_AS_CALLABLE(NAME)                                                                                    \
+<span class="lineNum">     109 </span>            :   template &lt;kernel_request_t kernreq&gt;                                                                                  \
+<span class="lineNum">     110 </span>            :   struct NAME##_as_callable;                                                                                           \
+<span class="lineNum">     111 </span>            :                                                                                                                        \
+<span class="lineNum">     112 </span>            :   template &lt;&gt;                                                                                                          \
+<span class="lineNum">     113 </span>            :   struct NAME##_as_callable&lt;kernel_request_host&gt;                                                                       \
+<span class="lineNum">     114 </span>            :       : func_wrapper&lt;kernel_request_host, CUDA_DECLTYPE_WORKAROUND(&amp;NAME)&gt; {                                           \
+<span class="lineNum">     115 </span>            :     NAME##_as_callable()                                                                                               \
+<span class="lineNum">     116 </span>            :         : func_wrapper&lt;kernel_request_host, CUDA_DECLTYPE_WORKAROUND(&amp;NAME)&gt;(get_##NAME&lt;kernel_request_host&gt;())        \
+<span class="lineNum">     117 </span>            :     {                                                                                                                  \
+<span class="lineNum">     118 </span>            :     }                                                                                                                  \
+<span class="lineNum">     119 </span>            :   }
+<span class="lineNum">     120 </span>            : 
+<span class="lineNum">     121 </span>            : #ifdef __CUDA_ARCH__
+<span class="lineNum">     122 </span>            : #define GET_CUDA_DEVICE_FUNC_BODY(NAME) return &amp;NAME;
+<span class="lineNum">     123 </span>            : #else
+<span class="lineNum">     124 </span>            : #define GET_CUDA_DEVICE_FUNC_BODY(NAME)                                                                                \
+<span class="lineNum">     125 </span>            :   CUDA_DECLTYPE_WORKAROUND(&amp;NAME) func;                                                                                \
+<span class="lineNum">     126 </span>            :   CUDA_DECLTYPE_WORKAROUND(&amp;NAME) * cuda_device_func;                                                                  \
+<span class="lineNum">     127 </span>            :   cuda_throw_if_not_success(cudaMalloc(&amp;cuda_device_func, sizeof(CUDA_DECLTYPE_WORKAROUND(&amp;NAME))));                   \
+<span class="lineNum">     128 </span>            :   get_cuda_device_##NAME&lt;&lt;&lt;1, 1&gt;&gt;&gt;(reinterpret_cast&lt;void *&gt;(cuda_device_func));                                        \
+<span class="lineNum">     129 </span>            :   cuda_throw_if_not_success(                                                                                           \
+<span class="lineNum">     130 </span>            :       cudaMemcpy(&amp;func, cuda_device_func, sizeof(CUDA_DECLTYPE_WORKAROUND(&amp;NAME)), cudaMemcpyDeviceToHost));           \
+<span class="lineNum">     131 </span>            :   cuda_throw_if_not_success(cudaFree(cuda_device_func));                                                               \
+<span class="lineNum">     132 </span>            :   return func;
+<span class="lineNum">     133 </span>            : #endif
+<span class="lineNum">     134 </span>            : 
+<span class="lineNum">     135 </span>            : #ifdef __CUDACC__
+<span class="lineNum">     136 </span>            : 
+<span class="lineNum">     137 </span>            : #define GET_CUDA_DEVICE_FUNC(NAME)                                                                                     \
+<span class="lineNum">     138 </span>            :   __global__ void get_cuda_device_##NAME(void *res)                                                                    \
+<span class="lineNum">     139 </span>            :   {                                                                                                                    \
+<span class="lineNum">     140 </span>            :     *reinterpret_cast&lt;CUDA_DECLTYPE_WORKAROUND(&amp;NAME) *&gt;(res) = &amp;NAME;                                                 \
+<span class="lineNum">     141 </span>            :   }                                                                                                                    \
+<span class="lineNum">     142 </span>            :                                                                                                                        \
+<span class="lineNum">     143 </span>            :   template &lt;kernel_request_t kernreq&gt;                                                                                  \
+<span class="lineNum">     144 </span>            :   DYND_CUDA_HOST_DEVICE typename std::enable_if&lt;kernreq == kernel_request_cuda_device,                                 \
+<span class="lineNum">     145 </span>            :                                                 CUDA_DECLTYPE_WORKAROUND(&amp;NAME)&gt;::type get_##NAME()                    \
+<span class="lineNum">     146 </span>            :   {                                                                                                                    \
+<span class="lineNum">     147 </span>            :     GET_CUDA_DEVICE_FUNC_BODY(NAME)                                                                                    \
+<span class="lineNum">     148 </span>            :   }
+<span class="lineNum">     149 </span>            : 
+<span class="lineNum">     150 </span>            : #define CUDA_DEVICE_FUNC_AS_CALLABLE(NAME)                                                                             \
+<span class="lineNum">     151 </span>            :   template &lt;kernel_request_t kernreq&gt;                                                                                  \
+<span class="lineNum">     152 </span>            :   struct NAME##_as_callable;                                                                                           \
+<span class="lineNum">     153 </span>            :                                                                                                                        \
+<span class="lineNum">     154 </span>            :   template &lt;&gt;                                                                                                          \
+<span class="lineNum">     155 </span>            :   struct NAME##_as_callable&lt;kernel_request_cuda_device&gt;                                                                \
+<span class="lineNum">     156 </span>            :       : func_wrapper&lt;kernel_request_cuda_device, CUDA_DECLTYPE_WORKAROUND(&amp;NAME)&gt; {                                    \
+<span class="lineNum">     157 </span>            :     DYND_CUDA_HOST_DEVICE NAME##_as_callable()                                                                         \
+<span class="lineNum">     158 </span>            :         : func_wrapper&lt;kernel_request_cuda_device, CUDA_DECLTYPE_WORKAROUND(&amp;NAME)&gt;(                                   \
+<span class="lineNum">     159 </span>            :               get_##NAME&lt;kernel_request_cuda_device&gt;())                                                                \
+<span class="lineNum">     160 </span>            :     {                                                                                                                  \
+<span class="lineNum">     161 </span>            :     }                                                                                                                  \
+<span class="lineNum">     162 </span>            :   }
+<span class="lineNum">     163 </span>            : 
+<span class="lineNum">     164 </span>            : #endif
+<span class="lineNum">     165 </span>            : 
+<span class="lineNum">     166 </span>            : #ifdef __CUDACC__
+<span class="lineNum">     167 </span>            : #define GET_CUDA_HOST_DEVICE_FUNC(NAME)                                                                                \
+<span class="lineNum">     168 </span>            :   GET_HOST_FUNC(NAME)                                                                                                  \
+<span class="lineNum">     169 </span>            :   GET_CUDA_DEVICE_FUNC(NAME)
+<span class="lineNum">     170 </span>            : #define CUDA_HOST_DEVICE_FUNC_AS_CALLABLE(NAME)                                                                        \
+<span class="lineNum">     171 </span>            :   HOST_FUNC_AS_CALLABLE(NAME);                                                                                         \
+<span class="lineNum">     172 </span>            :   CUDA_DEVICE_FUNC_AS_CALLABLE(NAME)
+<span class="lineNum">     173 </span>            : #else
+<span class="lineNum">     174 </span>            : #define GET_CUDA_HOST_DEVICE_FUNC GET_HOST_FUNC
+<span class="lineNum">     175 </span>            : #define CUDA_HOST_DEVICE_FUNC_AS_CALLABLE HOST_FUNC_AS_CALLABLE
+<a name="176"><span class="lineNum">     176 </span>            : #endif</a>
+<span class="lineNum">     177 </span>            : 
+<a name="178"><span class="lineNum">     178 </span><span class="lineCov">         10 : int func0(int x, int y) { return 2 * (x - y); }</span></a>
+<a name="179"><span class="lineNum">     179 </span>            : </a>
+<span class="lineNum">     180 </span><span class="lineCov">          7 : GET_HOST_FUNC(func0)</span>
+<span class="lineNum">     181 </span><span class="lineCov">          4 : HOST_FUNC_AS_CALLABLE(func0);</span>
+<span class="lineNum">     182 </span>            : 
+<span class="lineNum">     183 </span>            : #ifdef __CUDACC__
+<span class="lineNum">     184 </span>            : 
+<span class="lineNum">     185 </span>            : __device__ double func1(double x, int y) { return x + 2.75 * y; }
+<span class="lineNum">     186 </span>            : 
+<span class="lineNum">     187 </span>            : GET_CUDA_DEVICE_FUNC(func1)
+<span class="lineNum">     188 </span>            : CUDA_DEVICE_FUNC_AS_CALLABLE(func1);
+<span class="lineNum">     189 </span>            : 
+<a name="190"><span class="lineNum">     190 </span>            : #endif</a>
+<span class="lineNum">     191 </span>            : 
+<a name="192"><span class="lineNum">     192 </span><span class="lineCov">          4 : DYND_CUDA_HOST_DEVICE float func2(const float(&amp;x)[3]) { return x[0] + x[1] + x[2]; }</span></a>
+<a name="193"><span class="lineNum">     193 </span>            : </a>
+<span class="lineNum">     194 </span><span class="lineCov">          3 : GET_CUDA_HOST_DEVICE_FUNC(func2)</span>
+<a name="195"><span class="lineNum">     195 </span><span class="lineCov">          2 : CUDA_HOST_DEVICE_FUNC_AS_CALLABLE(func2);</span></a>
+<span class="lineNum">     196 </span>            : 
+<a name="197"><span class="lineNum">     197 </span><span class="lineCov">          4 : DYND_CUDA_HOST_DEVICE unsigned int func3() { return 12U; }</span></a>
+<a name="198"><span class="lineNum">     198 </span>            : </a>
+<span class="lineNum">     199 </span><span class="lineCov">          3 : GET_CUDA_HOST_DEVICE_FUNC(func3)</span>
+<a name="200"><span class="lineNum">     200 </span><span class="lineCov">          2 : CUDA_HOST_DEVICE_FUNC_AS_CALLABLE(func3);</span></a>
+<span class="lineNum">     201 </span>            : 
+<span class="lineNum">     202 </span><span class="lineCov">          3 : DYND_CUDA_HOST_DEVICE double func4(const double(&amp;x)[3], const double(&amp;y)[3])</span>
+<span class="lineNum">     203 </span>            : {
+<span class="lineNum">     204 </span><span class="lineCov">          3 :   return x[0] * y[0] + x[1] * y[1] + x[2] * y[2];</span>
+<a name="205"><span class="lineNum">     205 </span>            : }</a>
+<a name="206"><span class="lineNum">     206 </span>            : </a>
+<span class="lineNum">     207 </span><span class="lineCov">          3 : GET_CUDA_HOST_DEVICE_FUNC(func4);</span>
+<a name="208"><span class="lineNum">     208 </span><span class="lineCov">          2 : CUDA_HOST_DEVICE_FUNC_AS_CALLABLE(func4);</span></a>
+<span class="lineNum">     209 </span>            : 
+<span class="lineNum">     210 </span><span class="lineNoCov">          0 : DYND_CUDA_HOST_DEVICE long func5(const long(&amp;x)[2][3]) { return x[0][0] + x[0][1] + x[1][2]; }</span>
+<span class="lineNum">     211 </span>            : 
+<span class="lineNum">     212 </span>            : GET_CUDA_HOST_DEVICE_FUNC(func5);
+<a name="213"><span class="lineNum">     213 </span>            : CUDA_HOST_DEVICE_FUNC_AS_CALLABLE(func5);</a>
+<span class="lineNum">     214 </span>            : 
+<a name="215"><span class="lineNum">     215 </span><span class="lineCov">         13 : DYND_CUDA_HOST_DEVICE int func6(int x, int y, int z) { return x * y - z; }</span></a>
+<a name="216"><span class="lineNum">     216 </span>            : </a>
+<span class="lineNum">     217 </span><span class="lineCov">          9 : GET_CUDA_HOST_DEVICE_FUNC(func6);</span>
+<a name="218"><span class="lineNum">     218 </span><span class="lineCov">          5 : CUDA_HOST_DEVICE_FUNC_AS_CALLABLE(func6);</span></a>
+<span class="lineNum">     219 </span>            : 
+<a name="220"><span class="lineNum">     220 </span><span class="lineCov">         13 : DYND_CUDA_HOST_DEVICE double func7(int x, int y, double z) { return (x % y) * z; }</span></a>
+<a name="221"><span class="lineNum">     221 </span>            : </a>
+<span class="lineNum">     222 </span><span class="lineCov">          9 : GET_CUDA_HOST_DEVICE_FUNC(func7);</span>
+<span class="lineNum">     223 </span><span class="lineCov">          5 : CUDA_HOST_DEVICE_FUNC_AS_CALLABLE(func7);</span>
+<span class="lineNum">     224 </span>            : 
+<span class="lineNum">     225 </span>            : template &lt;kernel_request_t kernreq&gt;
+<a name="226"><span class="lineNum">     226 </span>            : class callable0 {</a>
+<span class="lineNum">     227 </span>            : public:
+<span class="lineNum">     228 </span><span class="lineCov">          3 :   DYND_CUDA_HOST_DEVICE double operator()(double x) const { return 10 * x; }</span>
+<span class="lineNum">     229 </span>            : };
+<span class="lineNum">     230 </span>            : 
+<span class="lineNum">     231 </span>            : template &lt;kernel_request_t kernreq&gt;
+<span class="lineNum">     232 </span>            : class callable1 {
+<span class="lineNum">     233 </span>            :   int m_x, m_y;
+<a name="234"><span class="lineNum">     234 </span>            : </a>
+<a name="235"><span class="lineNum">     235 </span>            : public:</a>
+<span class="lineNum">     236 </span><span class="lineCov">          1 :   DYND_CUDA_HOST_DEVICE callable1(int x, int y) : m_x(x + 2), m_y(y + 3) {}</span>
+<span class="lineNum">     237 </span><span class="lineCov">          1 :   DYND_CUDA_HOST_DEVICE int operator()(int z) const { return m_x * m_y - z; }</span>
+<span class="lineNum">     238 </span>            : };
+<span class="lineNum">     239 </span>            : 
+<span class="lineNum">     240 </span>            : template &lt;kernel_request_t kernreq&gt;
+<span class="lineNum">     241 </span>            : class callable2 {
+<span class="lineNum">     242 </span>            :   int m_z;
+<a name="243"><span class="lineNum">     243 </span>            : </a>
+<a name="244"><span class="lineNum">     244 </span>            : public:</a>
+<span class="lineNum">     245 </span><span class="lineCov">          5 :   DYND_CUDA_HOST_DEVICE callable2(int z = 7) : m_z(z) {}</span>
+<span class="lineNum">     246 </span><span class="lineCov">          5 :   DYND_CUDA_HOST_DEVICE int operator()(int x, int y) const { return 2 * (x - y) + m_z; }</span>
+<span class="lineNum">     247 </span>            : };
+<span class="lineNum">     248 </span>            : 
+<span class="lineNum">     249 </span>            : #undef GET_HOST_FUNC
+<span class="lineNum">     250 </span>            : #undef HOST_FUNC_AS_CALLABLE
+<span class="lineNum">     251 </span>            : 
+<span class="lineNum">     252 </span>            : #ifdef __CUDACC__
+<span class="lineNum">     253 </span>            : 
+<span class="lineNum">     254 </span>            : #undef GET_CUDA_DEVICE_FUNC
+<span class="lineNum">     255 </span>            : #undef CUDA_DEVICE_FUNC_AS_CALLABLE
+<span class="lineNum">     256 </span>            : 
+<span class="lineNum">     257 </span>            : #endif
+<span class="lineNum">     258 </span>            : 
+<span class="lineNum">     259 </span>            : #undef GET_CUDA_HOST_DEVICE_FUNC
+<a name="260"><span class="lineNum">     260 </span>            : #undef CUDA_HOST_DEVICE_FUNC_AS_CALLABLE</a>
+<span class="lineNum">     261 </span>            : 
+<span class="lineNum">     262 </span><span class="lineCov">          5 : TEST(Apply, Function)</span>
+<span class="lineNum">     263 </span>            : {
+<span class="lineNum">     264 </span>            :   typedef Apply&lt;HostKernelRequest&gt; TestFixture;
+<span class="lineNum">     265 </span>            : 
+<span class="lineNum">     266 </span><span class="lineCov">          2 :   nd::callable af;</span>
+<span class="lineNum">     267 </span>            : 
+<span class="lineNum">     268 </span><span class="lineCov">          1 :   af = nd::functional::apply&lt;kernel_request_host, decltype(&amp;func0), &amp;func0&gt;();</span>
+<span class="lineNum">     269 </span><span class="lineCov">          1 :   EXPECT_ARRAY_EQ(TestFixture::To(4), af(TestFixture::To(5), TestFixture::To(3)));</span>
+<span class="lineNum">     270 </span>            : 
+<span class="lineNum">     271 </span><span class="lineCov">          1 :   af = nd::functional::apply&lt;kernel_request_host, decltype(&amp;func2), &amp;func2&gt;();</span>
+<span class="lineNum">     272 </span><span class="lineCov">          1 :   EXPECT_ARRAY_EQ(TestFixture::To(13.6f), af(TestFixture::To({3.9f, -7.0f, 16.7f})));</span>
+<span class="lineNum">     273 </span>            : 
+<span class="lineNum">     274 </span><span class="lineCov">          1 :   af = nd::functional::apply&lt;kernel_request_host, decltype(&amp;func3), &amp;func3&gt;();</span>
+<span class="lineNum">     275 </span><span class="lineCov">          1 :   EXPECT_ARRAY_EQ(TestFixture::To(12U), af());</span>
+<span class="lineNum">     276 </span>            : 
+<span class="lineNum">     277 </span>            :   /*
+<span class="lineNum">     278 </span>            :   af = nd::functional::apply&lt;kernel_request_host, decltype(&amp;func4), &amp;func4&gt;();
+<span class="lineNum">     279 </span>            :   std::cout &lt;&lt; af.get_array_type() &lt;&lt; std::endl;
+<span class="lineNum">     280 </span>            :   EXPECT_ARRAY_EQ(TestFixture::To(166.765), af(nd::array({9.14, -2.7, 15.32}),
+<span class="lineNum">     281 </span>            :                                              nd::array({0.0, 0.65, 11.0})));
+<span class="lineNum">     282 </span>            : 
+<span class="lineNum">     283 </span>            :     af = nd::functional::apply&lt;kernel_request_host,
+<span class="lineNum">     284 </span>            :     decltype(&amp;func5), &amp;func5&gt;();
+<span class="lineNum">     285 </span>            :     EXPECT_ARRAY_EQ(TestFixture::To(1251L), af(TestFixture::To({{1242L, 23L, -5L},
+<span class="lineNum">     286 </span>            :     {925L, -836L, -14L}})));
+<span class="lineNum">     287 </span>            :     */
+<span class="lineNum">     288 </span>            : 
+<span class="lineNum">     289 </span><span class="lineCov">          1 :   af = nd::functional::apply&lt;kernel_request_host, decltype(&amp;func6), &amp;func6&gt;();</span>
+<span class="lineNum">     290 </span><span class="lineCov">          1 :   EXPECT_ARRAY_EQ(TestFixture::To(8), af(TestFixture::To(3), TestFixture::To(5), TestFixture::To(7)));</span>
+<span class="lineNum">     291 </span>            : 
+<span class="lineNum">     292 </span><span class="lineCov">          1 :   af = nd::functional::apply&lt;kernel_request_host, decltype(&amp;func7), &amp;func7&gt;();</span>
+<span class="lineNum">     293 </span><span class="lineCov">          1 :   EXPECT_ARRAY_EQ(TestFixture::To(36.3), af(TestFixture::To(38), TestFixture::To(5), TestFixture::To(12.1)));</span>
+<a name="294"><span class="lineNum">     294 </span><span class="lineCov">          1 : }</span></a>
+<span class="lineNum">     295 </span>            : 
+<span class="lineNum">     296 </span><span class="lineCov">          5 : TEST(Apply, FunctionWithKeywords)</span>
+<span class="lineNum">     297 </span>            : {
+<span class="lineNum">     298 </span>            :   typedef Apply&lt;HostKernelRequest&gt; TestFixture;
+<span class="lineNum">     299 </span>            : 
+<span class="lineNum">     300 </span><span class="lineCov">          2 :   nd::callable af;</span>
+<span class="lineNum">     301 </span>            : 
+<span class="lineNum">     302 </span><span class="lineCov">          1 :   af = nd::functional::apply&lt;decltype(&amp;func0), &amp;func0&gt;(&quot;y&quot;);</span>
+<span class="lineNum">     303 </span><span class="lineCov">          1 :   EXPECT_ARRAY_EQ(TestFixture::To(4), af({TestFixture::To(5)}, {{&quot;y&quot;, TestFixture::To(3)}}));</span>
+<span class="lineNum">     304 </span>            : 
+<span class="lineNum">     305 </span><span class="lineCov">          1 :   af = nd::functional::apply&lt;decltype(&amp;func0), &amp;func0&gt;(&quot;x&quot;, &quot;y&quot;);</span>
+<span class="lineNum">     306 </span><span class="lineCov">          1 :   EXPECT_ARRAY_EQ(TestFixture::To(4), af({}, {{&quot;x&quot;, TestFixture::To(5)}, {&quot;y&quot;, TestFixture::To(3)}}));</span>
+<span class="lineNum">     307 </span>            : 
+<span class="lineNum">     308 </span><span class="lineCov">          1 :   af = nd::functional::apply&lt;decltype(&amp;func6), &amp;func6&gt;(&quot;z&quot;);</span>
+<span class="lineNum">     309 </span><span class="lineCov">          1 :   EXPECT_ARRAY_EQ(TestFixture::To(8), af({TestFixture::To(3), TestFixture::To(5)}, {{&quot;z&quot;, TestFixture::To(7)}}));</span>
+<span class="lineNum">     310 </span>            : 
+<span class="lineNum">     311 </span><span class="lineCov">          1 :   af = nd::functional::apply&lt;decltype(&amp;func6), &amp;func6&gt;(&quot;y&quot;, &quot;z&quot;);</span>
+<span class="lineNum">     312 </span><span class="lineCov">          1 :   EXPECT_ARRAY_EQ(TestFixture::To(8), af({TestFixture::To(3)}, {{&quot;y&quot;, TestFixture::To(5)}, {&quot;z&quot;, TestFixture::To(7)}}));</span>
+<span class="lineNum">     313 </span>            : 
+<span class="lineNum">     314 </span><span class="lineCov">          1 :   af = nd::functional::apply&lt;decltype(&amp;func6), &amp;func6&gt;(&quot;x&quot;, &quot;y&quot;, &quot;z&quot;);</span>
+<span class="lineNum">     315 </span><span class="lineCov">          1 :   EXPECT_ARRAY_EQ(TestFixture::To(8),</span>
+<span class="lineNum">     316 </span><span class="lineNoCov">          0 :                   af({}, {{&quot;x&quot;, TestFixture::To(3)}, {&quot;y&quot;, TestFixture::To(5)}, {&quot;z&quot;, TestFixture::To(7)}}));</span>
+<span class="lineNum">     317 </span>            : 
+<span class="lineNum">     318 </span><span class="lineCov">          1 :   af = nd::functional::apply&lt;decltype(&amp;func7), &amp;func7&gt;(&quot;z&quot;);</span>
+<span class="lineNum">     319 </span><span class="lineCov">          1 :   EXPECT_ARRAY_EQ(TestFixture::To(36.3), af({TestFixture::To(38), TestFixture::To(5)}, {{&quot;z&quot;, TestFixture::To(12.1)}}));</span>
+<span class="lineNum">     320 </span>            : 
+<span class="lineNum">     321 </span><span class="lineCov">          1 :   af = nd::functional::apply&lt;decltype(&amp;func7), &amp;func7&gt;(&quot;y&quot;, &quot;z&quot;);</span>
+<span class="lineNum">     322 </span><span class="lineCov">          1 :   EXPECT_ARRAY_EQ(TestFixture::To(36.3),</span>
+<span class="lineNum">     323 </span><span class="lineNoCov">          0 :                   af({TestFixture::To(38)}, {{&quot;y&quot;, TestFixture::To(5)}, {&quot;z&quot;, TestFixture::To(12.1)}}));</span>
+<span class="lineNum">     324 </span>            : 
+<span class="lineNum">     325 </span><span class="lineCov">          1 :   af = nd::functional::apply&lt;decltype(&amp;func7), &amp;func7&gt;(&quot;x&quot;, &quot;y&quot;, &quot;z&quot;);</span>
+<span class="lineNum">     326 </span><span class="lineCov">          1 :   EXPECT_ARRAY_EQ(TestFixture::To(36.3),</span>
+<span class="lineNum">     327 </span><span class="lineNoCov">          0 :                   af({}, {{&quot;x&quot;, TestFixture::To(38)}, {&quot;y&quot;, TestFixture::To(5)}, {&quot;z&quot;, TestFixture::To(12.1)}}));</span>
+<span class="lineNum">     328 </span><span class="lineCov">          1 : }</span>
+<a name="329"><span class="lineNum">     329 </span>            : </a>
+<span class="lineNum">     330 </span>            : struct struct0 {
+<span class="lineNum">     331 </span><span class="lineCov">          1 :   int func0(int x, int y, int z) { return x + y * z; }</span>
+<a name="332"><span class="lineNum">     332 </span>            : };</a>
+<span class="lineNum">     333 </span>            : 
+<span class="lineNum">     334 </span><span class="lineCov">          5 : TEST(Apply, MemberFunction)</span>
+<span class="lineNum">     335 </span>            : {
+<span class="lineNum">     336 </span><span class="lineCov">          1 :   struct0 *s0 = new struct0;</span>
+<span class="lineNum">     337 </span>            : 
+<span class="lineNum">     338 </span><span class="lineCov">          2 :   nd::callable af = nd::functional::apply(s0, &amp;struct0::func0);</span>
+<span class="lineNum">     339 </span><span class="lineCov">          1 :   EXPECT_ARRAY_EQ(nd::array(7), af(1, 2, 3));</span>
+<span class="lineNum">     340 </span>            : 
+<span class="lineNum">     341 </span><span class="lineCov">          1 :   delete s0;</span>
+<a name="342"><span class="lineNum">     342 </span><span class="lineCov">          1 : }</span></a>
+<span class="lineNum">     343 </span>            : 
+<span class="lineNum">     344 </span><span class="lineCov">          5 : TYPED_TEST_P(Apply, Callable)</span>
+<span class="lineNum">     345 </span>            : {
+<span class="lineNum">     346 </span><span class="lineCov">          2 :   nd::callable af;</span>
+<span class="lineNum">     347 </span>            : 
+<span class="lineNum">     348 </span>            :   if (TestFixture::KernelRequest == kernel_request_host) {
+<span class="lineNum">     349 </span><span class="lineCov">          1 :     af = nd::functional::apply&lt;kernel_request_host&gt;(get_func0&lt;kernel_request_host&gt;());</span>
+<span class="lineNum">     350 </span><span class="lineCov">          1 :     EXPECT_ARRAY_EQ(TestFixture::To(4), af(TestFixture::To(5), TestFixture::To(3)));</span>
+<span class="lineNum">     351 </span>            : 
+<span class="lineNum">     352 </span><span class="lineCov">          1 :     af = nd::functional::apply&lt;kernel_request_host&gt;(func0_as_callable&lt;kernel_request_host&gt;());</span>
+<span class="lineNum">     353 </span><span class="lineCov">          1 :     EXPECT_ARRAY_EQ(TestFixture::To(4), af(TestFixture::To(5), TestFixture::To(3)));</span>
+<span class="lineNum">     354 </span>            : 
+<span class="lineNum">     355 </span><span class="lineCov">          1 :     af = nd::functional::apply&lt;kernel_request_host, func0_as_callable&lt;kernel_request_host&gt;&gt;();</span>
+<span class="lineNum">     356 </span><span class="lineCov">          1 :     EXPECT_ARRAY_EQ(TestFixture::To(4), af(TestFixture::To(5), TestFixture::To(3)));</span>
+<span class="lineNum">     357 </span>            :   }
+<span class="lineNum">     358 </span>            : 
+<span class="lineNum">     359 </span>            : #ifdef __CUDACC__
+<span class="lineNum">     360 </span>            :   if (TestFixture::KernelRequest == kernel_request_cuda_device) {
+<span class="lineNum">     361 </span>            :     af = nd::functional::apply&lt;kernel_request_cuda_device&gt;(get_func1&lt;kernel_request_cuda_device&gt;());
+<span class="lineNum">     362 </span>            :     EXPECT_ARRAY_EQ(TestFixture::To(58.25), af(TestFixture::To(3.25), TestFixture::To(20)));
+<span class="lineNum">     363 </span>            : 
+<span class="lineNum">     364 </span>            :     af = nd::functional::apply&lt;kernel_request_cuda_device&gt;(func1_as_callable&lt;kernel_request_cuda_device&gt;());
+<span class="lineNum">     365 </span>            :     EXPECT_ARRAY_EQ(TestFixture::To(58.25), af(TestFixture::To(3.25), TestFixture::To(20)));
+<span class="lineNum">     366 </span>            : 
+<span class="lineNum">     367 </span>            :     af = nd::functional::apply&lt;kernel_request_cuda_device, func1_as_callable&lt;kernel_request_cuda_device&gt;&gt;();
+<span class="lineNum">     368 </span>            :     EXPECT_ARRAY_EQ(TestFixture::To(58.25), af(TestFixture::To(3.25), TestFixture::To(20)));
+<span class="lineNum">     369 </span>            :   }
+<span class="lineNum">     370 </span>            : #endif
+<span class="lineNum">     371 </span>            : 
+<span class="lineNum">     372 </span><span class="lineCov">          1 :   af = nd::functional::apply&lt;TestFixture::KernelRequest&gt;(get_func2&lt;TestFixture::KernelRequest&gt;());</span>
+<span class="lineNum">     373 </span><span class="lineCov">          1 :   EXPECT_ARRAY_EQ(TestFixture::To(13.6f), af(TestFixture::To({3.9f, -7.0f, 16.7f})));</span>
+<span class="lineNum">     374 </span>            : 
+<span class="lineNum">     375 </span><span class="lineCov">          1 :   af = nd::functional::apply&lt;TestFixture::KernelRequest&gt;(func2_as_callable&lt;TestFixture::KernelRequest&gt;());</span>
+<span class="lineNum">     376 </span><span class="lineCov">          1 :   EXPECT_ARRAY_EQ(TestFixture::To(13.6f), af(TestFixture::To({3.9f, -7.0f, 16.7f})));</span>
+<span class="lineNum">     377 </span>            : 
+<span class="lineNum">     378 </span><span class="lineCov">          1 :   af = nd::functional::apply&lt;TestFixture::KernelRequest, func2_as_callable&lt;TestFixture::KernelRequest&gt;&gt;();</span>
+<span class="lineNum">     379 </span><span class="lineCov">          1 :   EXPECT_ARRAY_EQ(TestFixture::To(13.6f), af(TestFixture::To({3.9f, -7.0f, 16.7f})));</span>
+<span class="lineNum">     380 </span>            : 
+<span class="lineNum">     381 </span><span class="lineCov">          1 :   af = nd::functional::apply&lt;TestFixture::KernelRequest&gt;(get_func3&lt;TestFixture::KernelRequest&gt;());</span>
+<span class="lineNum">     382 </span><span class="lineCov">          1 :   EXPECT_ARRAY_EQ(TestFixture::To(12U), af());</span>
+<span class="lineNum">     383 </span>            : 
+<span class="lineNum">     384 </span><span class="lineCov">          1 :   af = nd::functional::apply&lt;TestFixture::KernelRequest&gt;(func3_as_callable&lt;TestFixture::KernelRequest&gt;());</span>
+<span class="lineNum">     385 </span><span class="lineCov">          1 :   EXPECT_ARRAY_EQ(TestFixture::To(12U), af());</span>
+<span class="lineNum">     386 </span>            : 
+<span class="lineNum">     387 </span><span class="lineCov">          1 :   af = nd::functional::apply&lt;TestFixture::KernelRequest, func3_as_callable&lt;TestFixture::KernelRequest&gt;&gt;();</span>
+<span class="lineNum">     388 </span><span class="lineCov">          1 :   EXPECT_ARRAY_EQ(TestFixture::To(12U), af());</span>
+<span class="lineNum">     389 </span>            : 
+<span class="lineNum">     390 </span><span class="lineCov">          1 :   af = nd::functional::apply&lt;TestFixture::KernelRequest&gt;(get_func4&lt;TestFixture::KernelRequest&gt;());</span>
+<span class="lineNum">     391 </span><span class="lineCov">          1 :   EXPECT_ARRAY_EQ(TestFixture::To(167.451),</span>
+<span class="lineNum">     392 </span>            :                   af(TestFixture::To({9.25, -2.7, 15.375}), TestFixture::To({0.0, 0.62, 11.0})));
+<span class="lineNum">     393 </span>            : 
+<span class="lineNum">     394 </span><span class="lineCov">          1 :   af = nd::functional::apply&lt;TestFixture::KernelRequest&gt;(func4_as_callable&lt;TestFixture::KernelRequest&gt;());</span>
+<span class="lineNum">     395 </span><span class="lineCov">          1 :   EXPECT_ARRAY_EQ(TestFixture::To(167.451),</span>
+<span class="lineNum">     396 </span>            :                   af(TestFixture::To({9.25, -2.7, 15.375}), TestFixture::To({0.0, 0.62, 11.0})));
+<span class="lineNum">     397 </span>            : 
+<span class="lineNum">     398 </span><span class="lineCov">          1 :   af = nd::functional::apply&lt;TestFixture::KernelRequest, func4_as_callable&lt;TestFixture::KernelRequest&gt;&gt;();</span>
+<span class="lineNum">     399 </span><span class="lineCov">          1 :   EXPECT_ARRAY_EQ(TestFixture::To(167.451),</span>
+<span class="lineNum">     400 </span>            :                   af(TestFixture::To({9.25, -2.7, 15.375}), TestFixture::To({0.0, 0.62, 11.0})));
+<span class="lineNum">     401 </span>            : 
+<span class="lineNum">     402 </span><span class="lineCov">          1 :   af = nd::functional::apply&lt;TestFixture::KernelRequest&gt;(get_func6&lt;TestFixture::KernelRequest&gt;());</span>
+<span class="lineNum">     403 </span><span class="lineCov">          1 :   EXPECT_ARRAY_EQ(TestFixture::To(8), af(TestFixture::To(3), TestFixture::To(5), TestFixture::To(7)));</span>
+<span class="lineNum">     404 </span>            : 
+<span class="lineNum">     405 </span><span class="lineCov">          1 :   af = nd::functional::apply&lt;TestFixture::KernelRequest&gt;(func6_as_callable&lt;TestFixture::KernelRequest&gt;());</span>
+<span class="lineNum">     406 </span><span class="lineCov">          1 :   EXPECT_ARRAY_EQ(TestFixture::To(8), af(TestFixture::To(3), TestFixture::To(5), TestFixture::To(7)));</span>
+<span class="lineNum">     407 </span>            : 
+<span class="lineNum">     408 </span><span class="lineCov">          1 :   af = nd::functional::apply&lt;TestFixture::KernelRequest, func6_as_callable&lt;TestFixture::KernelRequest&gt;&gt;();</span>
+<span class="lineNum">     409 </span><span class="lineCov">          1 :   EXPECT_ARRAY_EQ(TestFixture::To(8), af(TestFixture::To(3), TestFixture::To(5), TestFixture::To(7)));</span>
+<span class="lineNum">     410 </span>            : 
+<span class="lineNum">     411 </span><span class="lineCov">          1 :   af = nd::functional::apply&lt;TestFixture::KernelRequest&gt;(get_func7&lt;TestFixture::KernelRequest&gt;());</span>
+<span class="lineNum">     412 </span><span class="lineCov">          1 :   EXPECT_ARRAY_EQ(TestFixture::To(36.3), af(TestFixture::To(38), TestFixture::To(5), TestFixture::To(12.1)));</span>
+<span class="lineNum">     413 </span>            : 
+<span class="lineNum">     414 </span><span class="lineCov">          1 :   af = nd::functional::apply&lt;TestFixture::KernelRequest&gt;(func7_as_callable&lt;TestFixture::KernelRequest&gt;());</span>
+<span class="lineNum">     415 </span><span class="lineCov">          1 :   EXPECT_ARRAY_EQ(TestFixture::To(36.3), af(TestFixture::To(38), TestFixture::To(5), TestFixture::To(12.1)));</span>
+<span class="lineNum">     416 </span>            : 
+<span class="lineNum">     417 </span><span class="lineCov">          1 :   af = nd::functional::apply&lt;TestFixture::KernelRequest, func7_as_callable&lt;TestFixture::KernelRequest&gt;&gt;();</span>
+<span class="lineNum">     418 </span><span class="lineCov">          1 :   EXPECT_ARRAY_EQ(TestFixture::To(36.3), af(TestFixture::To(38), TestFixture::To(5), TestFixture::To(12.1)));</span>
+<span class="lineNum">     419 </span>            : 
+<span class="lineNum">     420 </span><span class="lineCov">          1 :   af = nd::functional::apply&lt;TestFixture::KernelRequest&gt;(callable0&lt;TestFixture::KernelRequest&gt;());</span>
+<span class="lineNum">     421 </span><span class="lineCov">          1 :   EXPECT_ARRAY_EQ(TestFixture::To(475.0), af(TestFixture::To(47.5)));</span>
+<span class="lineNum">     422 </span>            : 
+<span class="lineNum">     423 </span><span class="lineCov">          1 :   af = nd::functional::apply&lt;TestFixture::KernelRequest, callable0&lt;TestFixture::KernelRequest&gt;&gt;();</span>
+<span class="lineNum">     424 </span><span class="lineCov">          1 :   EXPECT_ARRAY_EQ(TestFixture::To(475.0), af(TestFixture::To(47.5)));</span>
+<span class="lineNum">     425 </span>            : 
+<span class="lineNum">     426 </span><span class="lineCov">          1 :   af = nd::functional::apply&lt;TestFixture::KernelRequest&gt;(callable2&lt;TestFixture::KernelRequest&gt;());</span>
+<span class="lineNum">     427 </span><span class="lineCov">          1 :   EXPECT_ARRAY_EQ(TestFixture::To(11), af(TestFixture::To(5), TestFixture::To(3)));</span>
+<span class="lineNum">     428 </span>            : 
+<span class="lineNum">     429 </span><span class="lineCov">          1 :   af = nd::functional::apply&lt;TestFixture::KernelRequest, callable2&lt;TestFixture::KernelRequest&gt;&gt;();</span>
+<span class="lineNum">     430 </span><span class="lineCov">          1 :   EXPECT_ARRAY_EQ(TestFixture::To(11), af(TestFixture::To(5), TestFixture::To(3)));</span>
+<a name="431"><span class="lineNum">     431 </span><span class="lineCov">          1 : }</span></a>
+<span class="lineNum">     432 </span>            : 
+<span class="lineNum">     433 </span><span class="lineCov">          5 : TYPED_TEST_P(Apply, CallableWithKeywords)</span>
+<span class="lineNum">     434 </span>            : {
+<span class="lineNum">     435 </span><span class="lineCov">          2 :   nd::callable af;</span>
+<span class="lineNum">     436 </span>            : 
+<span class="lineNum">     437 </span>            :   if (TestFixture::KernelRequest == kernel_request_host) {
+<span class="lineNum">     438 </span><span class="lineCov">          1 :     af = nd::functional::apply&lt;kernel_request_host&gt;(get_func0&lt;kernel_request_host&gt;(), &quot;y&quot;);</span>
+<span class="lineNum">     439 </span><span class="lineCov">          1 :     EXPECT_ARRAY_EQ(TestFixture::To(4), af({TestFixture::To(5)}, {{&quot;y&quot;, TestFixture::To(3)}}));</span>
+<span class="lineNum">     440 </span>            : 
+<span class="lineNum">     441 </span><span class="lineCov">          1 :     af = nd::functional::apply&lt;kernel_request_host&gt;(get_func0&lt;kernel_request_host&gt;(), &quot;x&quot;, &quot;y&quot;);</span>
+<span class="lineNum">     442 </span><span class="lineCov">          1 :     EXPECT_ARRAY_EQ(TestFixture::To(4), af({}, {{&quot;x&quot;, TestFixture::To(5)}, {&quot;y&quot;, TestFixture::To(3)}}));</span>
+<span class="lineNum">     443 </span>            : 
+<span class="lineNum">     444 </span><span class="lineCov">          1 :     af = nd::functional::apply(func0_as_callable&lt;kernel_request_host&gt;(), &quot;y&quot;);</span>
+<span class="lineNum">     445 </span><span class="lineCov">          1 :     EXPECT_ARRAY_EQ(TestFixture::To(4), af({5}, {{&quot;y&quot;, TestFixture::To(3)}}));</span>
+<span class="lineNum">     446 </span>            : 
+<span class="lineNum">     447 </span><span class="lineCov">          1 :     af = nd::functional::apply(func0_as_callable&lt;kernel_request_host&gt;(), &quot;x&quot;, &quot;y&quot;);</span>
+<span class="lineNum">     448 </span><span class="lineCov">          1 :     EXPECT_ARRAY_EQ(TestFixture::To(4), af({}, {{&quot;x&quot;, TestFixture::To(5)}, {&quot;y&quot;, TestFixture::To(3)}}));</span>
+<span class="lineNum">     449 </span>            :   }
+<span class="lineNum">     450 </span>            : 
+<span class="lineNum">     451 </span>            : #ifdef __CUDACC__
+<span class="lineNum">     452 </span>            :   if (TestFixture::KernelRequest == kernel_request_cuda_device) {
+<span class="lineNum">     453 </span>            :     af = nd::functional::apply&lt;kernel_request_cuda_device&gt;(get_func1&lt;kernel_request_cuda_device&gt;(), &quot;y&quot;);
+<span class="lineNum">     454 </span>            :     EXPECT_ARRAY_EQ(TestFixture::To(58.25), af({TestFixture::To(3.25)}, {{&quot;y&quot;, TestFixture::To(20)}}));
+<span class="lineNum">     455 </span>            : 
+<span class="lineNum">     456 </span>            :     af = nd::functional::apply&lt;kernel_request_cuda_device&gt;(get_func1&lt;kernel_request_cuda_device&gt;(), &quot;x&quot;, &quot;y&quot;);
+<span class="lineNum">     457 </span>            :     EXPECT_ARRAY_EQ(TestFixture::To(58.25), af({}, {{&quot;x&quot;, TestFixture::To(3.25)}, {&quot;y&quot;, TestFixture::To(20)}}));
+<span class="lineNum">     458 </span>            : 
+<span class="lineNum">     459 </span>            :     af = nd::functional::apply&lt;kernel_request_cuda_device&gt;(func1_as_callable&lt;kernel_request_cuda_device&gt;(), &quot;y&quot;);
+<span class="lineNum">     460 </span>            :     EXPECT_ARRAY_EQ(TestFixture::To(58.25), af({TestFixture::To(3.25)}, {{&quot;y&quot;, TestFixture::To(20)}}));
+<span class="lineNum">     461 </span>            : 
+<span class="lineNum">     462 </span>            :     af = nd::functional::apply&lt;kernel_request_cuda_device&gt;(func1_as_callable&lt;kernel_request_cuda_device&gt;(), &quot;x&quot;, &quot;y&quot;);
+<span class="lineNum">     463 </span>            :     EXPECT_ARRAY_EQ(TestFixture::To(58.25), af({}, {{&quot;x&quot;, TestFixture::To(3.25)}, {&quot;y&quot;, TestFixture::To(20)}}));
+<span class="lineNum">     464 </span>            :   }
+<span class="lineNum">     465 </span>            : #endif
+<span class="lineNum">     466 </span>            : 
+<span class="lineNum">     467 </span><span class="lineCov">          1 :   af = nd::functional::apply&lt;TestFixture::KernelRequest&gt;(get_func6&lt;TestFixture::KernelRequest&gt;(), &quot;z&quot;);</span>
+<span class="lineNum">     468 </span><span class="lineCov">          1 :   EXPECT_ARRAY_EQ(TestFixture::To(8), af({TestFixture::To(3), TestFixture::To(5)}, {{&quot;z&quot;, TestFixture::To(7)}}));</span>
+<span class="lineNum">     469 </span>            : 
+<span class="lineNum">     470 </span><span class="lineCov">          1 :   af = nd::functional::apply&lt;TestFixture::KernelRequest&gt;(get_func6&lt;TestFixture::KernelRequest&gt;(), &quot;y&quot;, &quot;z&quot;);</span>
+<span class="lineNum">     471 </span><span class="lineCov">          1 :   EXPECT_ARRAY_EQ(TestFixture::To(8), af({TestFixture::To(3)}, {{&quot;y&quot;, TestFixture::To(5)}, {&quot;z&quot;, TestFixture::To(7)}}));</span>
+<span class="lineNum">     472 </span>            : 
+<span class="lineNum">     473 </span><span class="lineCov">          1 :   af = nd::functional::apply&lt;TestFixture::KernelRequest&gt;(get_func6&lt;TestFixture::KernelRequest&gt;(), &quot;x&quot;, &quot;y&quot;, &quot;z&quot;);</span>
+<span class="lineNum">     474 </span><span class="lineCov">          1 :   EXPECT_ARRAY_EQ(TestFixture::To(8),</span>
+<span class="lineNum">     475 </span>            :                   af({}, {{&quot;x&quot;, TestFixture::To(3)}, {&quot;y&quot;, TestFixture::To(5)}, {&quot;z&quot;, TestFixture::To(7)}}));
+<span class="lineNum">     476 </span>            : 
+<span class="lineNum">     477 </span><span class="lineCov">          1 :   af = nd::functional::apply&lt;TestFixture::KernelRequest&gt;(func6_as_callable&lt;TestFixture::KernelRequest&gt;(), &quot;z&quot;);</span>
+<span class="lineNum">     478 </span><span class="lineCov">          1 :   EXPECT_ARRAY_EQ(TestFixture::To(8), af({TestFixture::To(3), TestFixture::To(5)}, {{&quot;z&quot;, TestFixture::To(7)}}));</span>
+<span class="lineNum">     479 </span>            : 
+<span class="lineNum">     480 </span><span class="lineCov">          1 :   af = nd::functional::apply&lt;TestFixture::KernelRequest&gt;(func6_as_callable&lt;TestFixture::KernelRequest&gt;(), &quot;y&quot;, &quot;z&quot;);</span>
+<span class="lineNum">     481 </span><span class="lineCov">          1 :   EXPECT_ARRAY_EQ(TestFixture::To(8), af({TestFixture::To(3)}, {{&quot;y&quot;, TestFixture::To(5)}, {&quot;z&quot;, TestFixture::To(7)}}));</span>
+<span class="lineNum">     482 </span>            : 
+<span class="lineNum">     483 </span><span class="lineCov">          1 :   af =</span>
+<span class="lineNum">     484 </span>            :       nd::functional::apply&lt;TestFixture::KernelRequest&gt;(func6_as_callable&lt;TestFixture::KernelRequest&gt;(), &quot;x&quot;, &quot;y&quot;, &quot;z&quot;);
+<span class="lineNum">     485 </span><span class="lineCov">          1 :   EXPECT_ARRAY_EQ(TestFixture::To(8),</span>
+<span class="lineNum">     486 </span>            :                   af({}, {{&quot;x&quot;, TestFixture::To(3)}, {&quot;y&quot;, TestFixture::To(5)}, {&quot;z&quot;, TestFixture::To(7)}}));
+<span class="lineNum">     487 </span>            : 
+<span class="lineNum">     488 </span><span class="lineCov">          1 :   af = nd::functional::apply&lt;TestFixture::KernelRequest&gt;(get_func7&lt;TestFixture::KernelRequest&gt;(), &quot;z&quot;);</span>
+<span class="lineNum">     489 </span><span class="lineCov">          1 :   EXPECT_ARRAY_EQ(TestFixture::To(36.3), af({TestFixture::To(38), TestFixture::To(5)}, {{&quot;z&quot;, TestFixture::To(12.1)}}));</span>
+<span class="lineNum">     490 </span>            : 
+<span class="lineNum">     491 </span><span class="lineCov">          1 :   af = nd::functional::apply&lt;TestFixture::KernelRequest&gt;(get_func7&lt;TestFixture::KernelRequest&gt;(), &quot;y&quot;, &quot;z&quot;);</span>
+<span class="lineNum">     492 </span><span class="lineCov">          1 :   EXPECT_ARRAY_EQ(TestFixture::To(36.3),</span>
+<span class="lineNum">     493 </span>            :                   af({TestFixture::To(38)}, {{&quot;y&quot;, TestFixture::To(5)}, {&quot;z&quot;, TestFixture::To(12.1)}}));
+<span class="lineNum">     494 </span>            : 
+<span class="lineNum">     495 </span><span class="lineCov">          1 :   af = nd::functional::apply&lt;TestFixture::KernelRequest&gt;(get_func7&lt;TestFixture::KernelRequest&gt;(), &quot;x&quot;, &quot;y&quot;, &quot;z&quot;);</span>
+<span class="lineNum">     496 </span><span class="lineCov">          1 :   EXPECT_ARRAY_EQ(TestFixture::To(36.3),</span>
+<span class="lineNum">     497 </span>            :                   af({}, {{&quot;x&quot;, TestFixture::To(38)}, {&quot;y&quot;, TestFixture::To(5)}, {&quot;z&quot;, TestFixture::To(12.1)}}));
+<span class="lineNum">     498 </span>            : 
+<span class="lineNum">     499 </span><span class="lineCov">          1 :   af = nd::functional::apply&lt;TestFixture::KernelRequest&gt;(func7_as_callable&lt;TestFixture::KernelRequest&gt;(), &quot;z&quot;);</span>
+<span class="lineNum">     500 </span><span class="lineCov">          1 :   EXPECT_ARRAY_EQ(TestFixture::To(36.3), af({TestFixture::To(38), TestFixture::To(5)}, {{&quot;z&quot;, TestFixture::To(12.1)}}));</span>
+<span class="lineNum">     501 </span>            : 
+<span class="lineNum">     502 </span><span class="lineCov">          1 :   af = nd::functional::apply&lt;TestFixture::KernelRequest&gt;(func7_as_callable&lt;TestFixture::KernelRequest&gt;(), &quot;y&quot;, &quot;z&quot;);</span>
+<span class="lineNum">     503 </span><span class="lineCov">          1 :   EXPECT_ARRAY_EQ(TestFixture::To(36.3),</span>
+<span class="lineNum">     504 </span>            :                   af({TestFixture::To(38)}, {{&quot;y&quot;, TestFixture::To(5)}, {&quot;z&quot;, TestFixture::To(12.1)}}));
+<span class="lineNum">     505 </span>            : 
+<span class="lineNum">     506 </span><span class="lineCov">          1 :   af =</span>
+<span class="lineNum">     507 </span>            :       nd::functional::apply&lt;TestFixture::KernelRequest&gt;(func7_as_callable&lt;TestFixture::KernelRequest&gt;(), &quot;x&quot;, &quot;y&quot;, &quot;z&quot;);
+<span class="lineNum">     508 </span><span class="lineCov">          1 :   EXPECT_ARRAY_EQ(TestFixture::To(36.3),</span>
+<span class="lineNum">     509 </span>            :                   af({}, {{&quot;x&quot;, TestFixture::To(38)}, {&quot;y&quot;, TestFixture::To(5)}, {&quot;z&quot;, TestFixture::To(12.1)}}));
+<span class="lineNum">     510 </span>            : 
+<span class="lineNum">     511 </span><span class="lineCov">          1 :   af = nd::functional::apply&lt;TestFixture::KernelRequest&gt;(callable0&lt;TestFixture::KernelRequest&gt;(), &quot;x&quot;);</span>
+<span class="lineNum">     512 </span><span class="lineCov">          1 :   EXPECT_ARRAY_EQ(TestFixture::To(475.0), af({}, {{&quot;x&quot;, TestFixture::To(47.5)}}));</span>
+<span class="lineNum">     513 </span>            : 
+<span class="lineNum">     514 </span><span class="lineCov">          1 :   af = nd::functional::apply&lt;TestFixture::KernelRequest, callable1&lt;TestFixture::KernelRequest&gt;, int, int&gt;(&quot;x&quot;, &quot;y&quot;);</span>
+<span class="lineNum">     515 </span><span class="lineCov">          1 :   EXPECT_ARRAY_EQ(TestFixture::To(28),</span>
+<span class="lineNum">     516 </span>            :                   af({TestFixture::To(2)}, {{&quot;x&quot;, TestFixture::To(1)}, {&quot;y&quot;, TestFixture::To(7)}}));
+<span class="lineNum">     517 </span>            : 
+<span class="lineNum">     518 </span><span class="lineCov">          1 :   af = nd::functional::apply&lt;TestFixture::KernelRequest&gt;(callable2&lt;TestFixture::KernelRequest&gt;(), &quot;y&quot;);</span>
+<span class="lineNum">     519 </span><span class="lineCov">          1 :   EXPECT_ARRAY_EQ(TestFixture::To(11), af({TestFixture::To(5)}, {{&quot;y&quot;, TestFixture::To(3)}}));</span>
+<span class="lineNum">     520 </span>            : 
+<span class="lineNum">     521 </span><span class="lineCov">          1 :   af = nd::functional::apply&lt;TestFixture::KernelRequest&gt;(callable2&lt;TestFixture::KernelRequest&gt;(), &quot;x&quot;, &quot;y&quot;);</span>
+<span class="lineNum">     522 </span><span class="lineCov">          1 :   EXPECT_ARRAY_EQ(TestFixture::To(11), af({}, {{&quot;x&quot;, TestFixture::To(5)}, {&quot;y&quot;, TestFixture::To(3)}}));</span>
+<span class="lineNum">     523 </span>            : 
+<span class="lineNum">     524 </span><span class="lineCov">          1 :   af = nd::functional::apply&lt;TestFixture::KernelRequest, callable2&lt;TestFixture::KernelRequest&gt;, int&gt;(&quot;z&quot;);</span>
+<span class="lineNum">     525 </span><span class="lineCov">          1 :   EXPECT_ARRAY_EQ(TestFixture::To(8), af({TestFixture::To(5), TestFixture::To(3)}, {{&quot;z&quot;, TestFixture::To(4)}}));</span>
+<span class="lineNum">     526 </span><span class="lineCov">          1 : }</span>
+<span class="lineNum">     527 </span>            : 
+<a name="528"><span class="lineNum">     528 </span><span class="lineCov">          1 : REGISTER_TYPED_TEST_CASE_P(Apply, Callable, CallableWithKeywords);</span></a>
+<span class="lineNum">     529 </span>            : 
+<span class="lineNum">     530 </span><span class="lineCov">          3 : INSTANTIATE_TYPED_TEST_CASE_P(HostMemory, Apply, HostKernelRequest);</span>
+<span class="lineNum">     531 </span>            : #ifdef DYND_CUDA
+<span class="lineNum">     532 </span>            : INSTANTIATE_TYPED_TEST_CASE_P(CUDADeviceMemory, Apply, CUDADeviceKernelRequest);
+<span class="lineNum">     533 </span>            : #endif
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.10</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

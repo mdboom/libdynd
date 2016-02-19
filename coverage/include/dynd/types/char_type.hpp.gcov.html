@@ -1,0 +1,137 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - coverage.info.cleaned - include/dynd/types/char_type.hpp</title>
+  <link rel="stylesheet" type="text/css" href="../../../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../../../index.html">top level</a> - <a href="index.html">include/dynd/types</a> - char_type.hpp<span style="font-size: 80%;"> (source / <a href="char_type.hpp.func.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">coverage.info.cleaned</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">2</td>
+            <td class="headerCovTableEntry">7</td>
+            <td class="headerCovTableEntryLo">28.6 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2016-02-19</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">2</td>
+            <td class="headerCovTableEntry">5</td>
+            <td class="headerCovTableEntryLo">40.0 %</td>
+          </tr>
+          <tr><td><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : //</a>
+<span class="lineNum">       2 </span>            : // Copyright (C) 2011-15 DyND Developers
+<span class="lineNum">       3 </span>            : // BSD 2-Clause License, see LICENSE.txt
+<span class="lineNum">       4 </span>            : //
+<span class="lineNum">       5 </span>            : // The char type represents a single character of a specified encoding.
+<span class="lineNum">       6 </span>            : // Its canonical type, datashape &quot;char&quot; is a unicode codepoint stored
+<span class="lineNum">       7 </span>            : // as a 32-bit integer (effectively UTF-32).
+<span class="lineNum">       8 </span>            : //
+<span class="lineNum">       9 </span>            : 
+<span class="lineNum">      10 </span>            : #pragma once
+<span class="lineNum">      11 </span>            : 
+<span class="lineNum">      12 </span>            : #include &lt;dynd/type.hpp&gt;
+<span class="lineNum">      13 </span>            : #include &lt;dynd/string_encodings.hpp&gt;
+<span class="lineNum">      14 </span>            : 
+<span class="lineNum">      15 </span>            : namespace dynd {
+<span class="lineNum">      16 </span>            : namespace ndt {
+<span class="lineNum">      17 </span>            : 
+<span class="lineNum">      18 </span>            :   class DYND_API char_type : public base_type {
+<span class="lineNum">      19 </span>            :     // This encoding can be ascii, latin1, ucs2, or utf32.
+<span class="lineNum">      20 </span>            :     // Not a variable-sized encoding.
+<span class="lineNum">      21 </span>            :     string_encoding_t m_encoding;
+<span class="lineNum">      22 </span>            : 
+<span class="lineNum">      23 </span>            :   public:
+<span class="lineNum">      24 </span>            :     char_type(string_encoding_t encoding = string_encoding_utf_32);
+<span class="lineNum">      25 </span>            : 
+<a name="26"><span class="lineNum">      26 </span>            :     virtual ~char_type();</a>
+<span class="lineNum">      27 </span>            : 
+<span class="lineNum">      28 </span><span class="lineCov">          3 :     string_encoding_t get_encoding() const { return m_encoding; }</span>
+<span class="lineNum">      29 </span>            : 
+<span class="lineNum">      30 </span>            :     /** Alignment of the string data being pointed to. */
+<span class="lineNum">      31 </span>            :     size_t get_target_alignment() const { return string_encoding_char_size_table[m_encoding]; }
+<span class="lineNum">      32 </span>            : 
+<span class="lineNum">      33 </span>            :     // Retrieves the character as a unicode code point
+<span class="lineNum">      34 </span>            :     uint32_t get_code_point(const char *data) const;
+<span class="lineNum">      35 </span>            :     // Sets the character as a unicode code point
+<span class="lineNum">      36 </span>            :     void set_code_point(char *out_data, uint32_t cp);
+<span class="lineNum">      37 </span>            : 
+<span class="lineNum">      38 </span>            :     void print_data(std::ostream &amp;o, const char *arrmeta, const char *data) const;
+<span class="lineNum">      39 </span>            : 
+<span class="lineNum">      40 </span>            :     void print_type(std::ostream &amp;o) const;
+<span class="lineNum">      41 </span>            : 
+<span class="lineNum">      42 </span>            :     type get_canonical_type() const;
+<span class="lineNum">      43 </span>            : 
+<span class="lineNum">      44 </span>            :     bool is_lossless_assignment(const type &amp;dst_tp, const type &amp;src_tp) const;
+<span class="lineNum">      45 </span>            : 
+<a name="46"><span class="lineNum">      46 </span>            :     bool operator==(const base_type &amp;rhs) const;</a>
+<a name="47"><span class="lineNum">      47 </span>            : </a>
+<span class="lineNum">      48 </span><span class="lineNoCov">          0 :     void arrmeta_default_construct(char *DYND_UNUSED(arrmeta), bool DYND_UNUSED(blockref_alloc)) const {}</span>
+<span class="lineNum">      49 </span><span class="lineNoCov">          0 :     void arrmeta_copy_construct(char *DYND_UNUSED(dst_arrmeta), const char *DYND_UNUSED(src_arrmeta),</span>
+<span class="lineNum">      50 </span>            :                                 const intrusive_ptr&lt;memory_block_data&gt; &amp;DYND_UNUSED(embedded_reference)) const
+<a name="51"><span class="lineNum">      51 </span>            :     {</a>
+<a name="52"><span class="lineNum">      52 </span><span class="lineNoCov">          0 :     }</span></a>
+<span class="lineNum">      53 </span><span class="lineCov">          1 :     void arrmeta_destruct(char *DYND_UNUSED(arrmeta)) const {}</span>
+<span class="lineNum">      54 </span><span class="lineNoCov">          0 :     void arrmeta_debug_print(const char *DYND_UNUSED(arrmeta), std::ostream &amp;DYND_UNUSED(o),</span>
+<span class="lineNum">      55 </span>            :                              const std::string &amp;DYND_UNUSED(indent)) const
+<span class="lineNum">      56 </span>            :     {
+<span class="lineNum">      57 </span><span class="lineNoCov">          0 :     }</span>
+<span class="lineNum">      58 </span>            :   };
+<span class="lineNum">      59 </span>            : 
+<span class="lineNum">      60 </span>            : } // namespace dynd::ndt
+<span class="lineNum">      61 </span>            : } // namespace dynd
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.10</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

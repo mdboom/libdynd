@@ -1,0 +1,201 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - coverage.info.cleaned - include/dynd/special.hpp</title>
+  <link rel="stylesheet" type="text/css" href="../../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../../index.html">top level</a> - <a href="index.html">include/dynd</a> - special.hpp<span style="font-size: 80%;"> (source / <a href="special.hpp.func.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">coverage.info.cleaned</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">37</td>
+            <td class="headerCovTableEntry">37</td>
+            <td class="headerCovTableEntryHi">100.0 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2016-02-19</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">17</td>
+            <td class="headerCovTableEntry">17</td>
+            <td class="headerCovTableEntryHi">100.0 %</td>
+          </tr>
+          <tr><td><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : //</a>
+<span class="lineNum">       2 </span>            : // Copyright (C) 2011-15 DyND Developers
+<span class="lineNum">       3 </span>            : // BSD 2-Clause License, see LICENSE.txt
+<span class="lineNum">       4 </span>            : //
+<span class="lineNum">       5 </span>            : 
+<span class="lineNum">       6 </span>            : #pragma once
+<span class="lineNum">       7 </span>            : 
+<span class="lineNum">       8 </span>            : #include &lt;dynd/array.hpp&gt;
+<span class="lineNum">       9 </span>            : #include &lt;dynd/cephes.hpp&gt;
+<span class="lineNum">      10 </span>            : #include &lt;dynd/math.hpp&gt;
+<span class="lineNum">      11 </span>            : 
+<span class="lineNum">      12 </span>            : namespace dynd {
+<span class="lineNum">      13 </span>            : 
+<span class="lineNum">      14 </span>            : DYND_API double factorial(int n);
+<span class="lineNum">      15 </span>            : DYND_API double factorial2(int n);
+<span class="lineNum">      16 </span>            : 
+<a name="17"><span class="lineNum">      17 </span>            : DYND_API double factorial_ratio(int m, int n);</a>
+<span class="lineNum">      18 </span>            : 
+<span class="lineNum">      19 </span><span class="lineCov">        159 : inline double gamma(double x) {</span>
+<span class="lineNum">      20 </span><span class="lineCov">        159 :     return cephes_Gamma(x);</span>
+<a name="21"><span class="lineNum">      21 </span>            : }</a>
+<span class="lineNum">      22 </span>            : 
+<span class="lineNum">      23 </span><span class="lineCov">        103 : inline double lgamma(double x) {</span>
+<span class="lineNum">      24 </span><span class="lineCov">        103 :     return cephes_lgam(x);</span>
+<a name="25"><span class="lineNum">      25 </span>            : }</a>
+<span class="lineNum">      26 </span>            : 
+<span class="lineNum">      27 </span><span class="lineCov">         21 : inline void airy(double (&amp;res)[2][2], double x) {</span>
+<span class="lineNum">      28 </span><span class="lineCov">         21 :     cephes_airy(x, &amp;res[0][0], &amp;res[0][1], &amp;res[1][0], &amp;res[1][1]);</span>
+<span class="lineNum">      29 </span><span class="lineCov">         21 : }</span>
+<span class="lineNum">      30 </span>            : 
+<span class="lineNum">      31 </span>            : inline void airy_ai(double (&amp;res)[2], double x) {
+<span class="lineNum">      32 </span>            :     double tmp[2];
+<span class="lineNum">      33 </span>            :     cephes_airy(x, &amp;res[0], &amp;res[1], &amp;tmp[0], &amp;tmp[1]);
+<span class="lineNum">      34 </span>            : }
+<span class="lineNum">      35 </span>            : 
+<span class="lineNum">      36 </span>            : inline void airy_bi(double (&amp;res)[2], double x) {
+<span class="lineNum">      37 </span>            :     double tmp[2];
+<span class="lineNum">      38 </span>            :     cephes_airy(x, &amp;tmp[0], &amp;tmp[1], &amp;res[0], &amp;res[1]);
+<a name="39"><span class="lineNum">      39 </span>            : }</a>
+<span class="lineNum">      40 </span>            : 
+<span class="lineNum">      41 </span><span class="lineCov">         21 : inline double bessel_j0(double x) {</span>
+<span class="lineNum">      42 </span><span class="lineCov">         21 :     return cephes_j0(x);</span>
+<a name="43"><span class="lineNum">      43 </span>            : }</a>
+<span class="lineNum">      44 </span>            : 
+<span class="lineNum">      45 </span><span class="lineCov">         21 : inline double bessel_j1(double x) {</span>
+<span class="lineNum">      46 </span><span class="lineCov">         21 :     return cephes_j1(x);</span>
+<a name="47"><span class="lineNum">      47 </span>            : }</a>
+<span class="lineNum">      48 </span>            : 
+<span class="lineNum">      49 </span><span class="lineCov">        405 : inline double bessel_j(double nu, double x) {</span>
+<span class="lineNum">      50 </span><span class="lineCov">        405 :     return cephes_jv(nu, x);</span>
+<a name="51"><span class="lineNum">      51 </span>            : }</a>
+<span class="lineNum">      52 </span>            : 
+<span class="lineNum">      53 </span><span class="lineCov">         44 : inline double sph_bessel_j0(double x) {</span>
+<span class="lineNum">      54 </span><span class="lineCov">         44 :     if (x == 0.0) {</span>
+<span class="lineNum">      55 </span><span class="lineCov">          2 :         return 1.0;</span>
+<span class="lineNum">      56 </span>            :     }
+<span class="lineNum">      57 </span>            : 
+<span class="lineNum">      58 </span><span class="lineCov">         42 :     return std::sin(x) / x;</span>
+<span class="lineNum">      59 </span>            : }
+<span class="lineNum">      60 </span>            : 
+<span class="lineNum">      61 </span>            : DYND_API double sph_bessel_j(double nu, double x);
+<span class="lineNum">      62 </span>            : 
+<span class="lineNum">      63 </span>            : inline double riccati_bessel_j(double nu, double x) {
+<span class="lineNum">      64 </span>            :     return std::sqrt(dynd::_pi_by_2&lt;double&gt;() * x) * bessel_j(nu + 0.5, x);
+<a name="65"><span class="lineNum">      65 </span>            : }</a>
+<span class="lineNum">      66 </span>            : 
+<span class="lineNum">      67 </span><span class="lineCov">         16 : inline double bessel_y0(double x) {</span>
+<span class="lineNum">      68 </span><span class="lineCov">         16 :     return cephes_y0(x);</span>
+<a name="69"><span class="lineNum">      69 </span>            : }</a>
+<span class="lineNum">      70 </span>            : 
+<span class="lineNum">      71 </span><span class="lineCov">         16 : inline double bessel_y1(double x) {</span>
+<span class="lineNum">      72 </span><span class="lineCov">         16 :     return cephes_y1(x);</span>
+<a name="73"><span class="lineNum">      73 </span>            : }</a>
+<span class="lineNum">      74 </span>            : 
+<span class="lineNum">      75 </span><span class="lineCov">        486 : inline double bessel_y(double nu, double x) {</span>
+<span class="lineNum">      76 </span><span class="lineCov">        486 :     return cephes_yv(nu, x);</span>
+<a name="77"><span class="lineNum">      77 </span>            : }</a>
+<span class="lineNum">      78 </span>            : 
+<span class="lineNum">      79 </span><span class="lineCov">         15 : inline double sph_bessel_y0(double x) {</span>
+<span class="lineNum">      80 </span><span class="lineCov">         15 :     return -std::cos(x) / x;</span>
+<a name="81"><span class="lineNum">      81 </span>            : }</a>
+<span class="lineNum">      82 </span>            : 
+<span class="lineNum">      83 </span><span class="lineCov">        270 : inline double sph_bessel_y(double nu, double x) {</span>
+<span class="lineNum">      84 </span><span class="lineCov">        270 :     return std::sqrt(dynd::_pi_by_2&lt;double&gt;() / x) * bessel_y(nu + 0.5, x);</span>
+<span class="lineNum">      85 </span>            : }
+<span class="lineNum">      86 </span>            : 
+<span class="lineNum">      87 </span>            : inline double riccati_bessel_y(double nu, double x) {
+<span class="lineNum">      88 </span>            :     return -std::sqrt(dynd::_pi_by_2&lt;double&gt;() * x) * bessel_y(nu + 0.5, x);
+<a name="89"><span class="lineNum">      89 </span>            : }</a>
+<span class="lineNum">      90 </span>            : 
+<span class="lineNum">      91 </span><span class="lineCov">         72 : inline complex&lt;double&gt; hankel_h1(double nu, double x) {</span>
+<span class="lineNum">      92 </span><span class="lineCov">         72 :     return complex&lt;double&gt;(bessel_j(nu, x), bessel_y(nu, x));</span>
+<a name="93"><span class="lineNum">      93 </span>            : }</a>
+<span class="lineNum">      94 </span>            : 
+<span class="lineNum">      95 </span><span class="lineCov">         90 : inline complex&lt;double&gt; sph_hankel_h1(double nu, double x) {</span>
+<span class="lineNum">      96 </span><span class="lineCov">         90 :     return complex&lt;double&gt;(sph_bessel_j(nu, x), sph_bessel_y(nu, x));</span>
+<span class="lineNum">      97 </span>            : }
+<span class="lineNum">      98 </span>            : 
+<span class="lineNum">      99 </span>            : inline complex&lt;double&gt; riccati_hankel_h1(double nu, double x) {
+<span class="lineNum">     100 </span>            :     return complex&lt;double&gt;(riccati_bessel_j(nu, x), -riccati_bessel_y(nu, x));
+<a name="101"><span class="lineNum">     101 </span>            : }</a>
+<span class="lineNum">     102 </span>            : 
+<span class="lineNum">     103 </span><span class="lineCov">         72 : inline complex&lt;double&gt; hankel_h2(double nu, double x) {</span>
+<span class="lineNum">     104 </span><span class="lineCov">         72 :     return complex&lt;double&gt;(bessel_j(nu, x), -bessel_y(nu, x));</span>
+<a name="105"><span class="lineNum">     105 </span>            : }</a>
+<span class="lineNum">     106 </span>            : 
+<span class="lineNum">     107 </span><span class="lineCov">         90 : inline complex&lt;double&gt; sph_hankel_h2(double nu, double x) {</span>
+<span class="lineNum">     108 </span><span class="lineCov">         90 :     return complex&lt;double&gt;(sph_bessel_j(nu, x), -sph_bessel_y(nu, x));</span>
+<span class="lineNum">     109 </span>            : }
+<span class="lineNum">     110 </span>            : 
+<span class="lineNum">     111 </span>            : inline complex&lt;double&gt; riccati_hankel_h2(double nu, double x) {
+<span class="lineNum">     112 </span>            :     return complex&lt;double&gt;(riccati_bessel_j(nu, x), riccati_bessel_y(nu, x));
+<a name="113"><span class="lineNum">     113 </span>            : }</a>
+<span class="lineNum">     114 </span>            : 
+<span class="lineNum">     115 </span><span class="lineCov">         42 : inline double struve_h(double nu, double x) {</span>
+<span class="lineNum">     116 </span><span class="lineCov">         42 :     return cephes_struve(nu, x);</span>
+<span class="lineNum">     117 </span>            : }
+<span class="lineNum">     118 </span>            : 
+<span class="lineNum">     119 </span>            : DYND_API double legendre_p_next(int l, double x, double pls1, double pl);
+<span class="lineNum">     120 </span>            : DYND_API double legendre_p(int l, double x);
+<span class="lineNum">     121 </span>            : 
+<span class="lineNum">     122 </span>            : DYND_API double assoc_legendre_p_next(int l, int m, double x, double pl, double pls1);
+<span class="lineNum">     123 </span>            : DYND_API double assoc_legendre_p(int l, int m, double x);
+<span class="lineNum">     124 </span>            : 
+<span class="lineNum">     125 </span>            : } // namespace dynd
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.10</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

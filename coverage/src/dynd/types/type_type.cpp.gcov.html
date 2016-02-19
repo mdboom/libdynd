@@ -1,0 +1,159 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - coverage.info.cleaned - src/dynd/types/type_type.cpp</title>
+  <link rel="stylesheet" type="text/css" href="../../../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../../../index.html">top level</a> - <a href="index.html">src/dynd/types</a> - type_type.cpp<span style="font-size: 80%;"> (source / <a href="type_type.cpp.func.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">coverage.info.cleaned</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">33</td>
+            <td class="headerCovTableEntry">36</td>
+            <td class="headerCovTableEntryHi">91.7 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2016-02-19</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">15</td>
+            <td class="headerCovTableEntry">16</td>
+            <td class="headerCovTableEntryHi">93.8 %</td>
+          </tr>
+          <tr><td><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : //</a>
+<span class="lineNum">       2 </span>            : // Copyright (C) 2011-15 DyND Developers
+<span class="lineNum">       3 </span>            : // BSD 2-Clause License, see LICENSE.txt
+<span class="lineNum">       4 </span>            : //
+<span class="lineNum">       5 </span>            : 
+<span class="lineNum">       6 </span>            : #include &lt;dynd/array.hpp&gt;
+<span class="lineNum">       7 </span>            : #include &lt;dynd/types/type_type.hpp&gt;
+<span class="lineNum">       8 </span>            : #include &lt;dynd/memblock/pod_memory_block.hpp&gt;
+<span class="lineNum">       9 </span>            : 
+<span class="lineNum">      10 </span>            : #include &lt;algorithm&gt;
+<span class="lineNum">      11 </span>            : 
+<span class="lineNum">      12 </span>            : using namespace std;
+<a name="13"><span class="lineNum">      13 </span>            : using namespace dynd;</a>
+<span class="lineNum">      14 </span>            : 
+<span class="lineNum">      15 </span><span class="lineCov">         46 : ndt::type_type::type_type()</span>
+<span class="lineNum">      16 </span>            :     : base_type(dynd::type_id, type_kind, sizeof(ndt::type), sizeof(ndt::type),
+<span class="lineNum">      17 </span><span class="lineCov">         46 :                 type_flag_zeroinit | type_flag_destructor, 0, 0, 0)</span>
+<span class="lineNum">      18 </span>            : {
+<a name="19"><span class="lineNum">      19 </span><span class="lineCov">         46 : }</span></a>
+<span class="lineNum">      20 </span>            : 
+<span class="lineNum">      21 </span><span class="lineCov">          3 : ndt::type_type::type_type(const type &amp;pattern_tp)</span>
+<span class="lineNum">      22 </span>            :     : base_type(dynd::type_id, type_kind, sizeof(ndt::type), sizeof(ndt::type),
+<span class="lineNum">      23 </span>            :                 type_flag_zeroinit | type_flag_destructor, 0, 0, 0),
+<span class="lineNum">      24 </span><span class="lineCov">          4 :       m_pattern_tp(pattern_tp)</span>
+<span class="lineNum">      25 </span>            : {
+<span class="lineNum">      26 </span><span class="lineCov">          3 :   if (!m_pattern_tp.is_symbolic()) {</span>
+<span class="lineNum">      27 </span><span class="lineCov">          1 :     throw type_error(&quot;type_type must have a symbolic type for a pattern&quot;);</span>
+<span class="lineNum">      28 </span>            :   }
+<a name="29"><span class="lineNum">      29 </span><span class="lineCov">          2 : }</span></a>
+<span class="lineNum">      30 </span>            : 
+<a name="31"><span class="lineNum">      31 </span><span class="lineCov">         96 : ndt::type_type::~type_type() {}</span></a>
+<span class="lineNum">      32 </span>            : 
+<span class="lineNum">      33 </span><span class="lineCov">         14 : void ndt::type_type::print_data(std::ostream &amp;o, const char *DYND_UNUSED(arrmeta), const char *data) const</span>
+<span class="lineNum">      34 </span>            : {
+<span class="lineNum">      35 </span><span class="lineCov">         14 :   o &lt;&lt; *reinterpret_cast&lt;const ndt::type *&gt;(data);</span>
+<a name="36"><span class="lineNum">      36 </span><span class="lineCov">         14 : }</span></a>
+<span class="lineNum">      37 </span>            : 
+<span class="lineNum">      38 </span><span class="lineCov">         10 : void ndt::type_type::print_type(std::ostream &amp;o) const</span>
+<span class="lineNum">      39 </span>            : {
+<span class="lineNum">      40 </span><span class="lineCov">         10 :   o &lt;&lt; &quot;type&quot;;</span>
+<span class="lineNum">      41 </span><span class="lineCov">         10 :   if (!m_pattern_tp.is_null()) {</span>
+<span class="lineNum">      42 </span><span class="lineCov">          1 :     o &lt;&lt; &quot; | &quot; &lt;&lt; m_pattern_tp;</span>
+<span class="lineNum">      43 </span>            :   }
+<a name="44"><span class="lineNum">      44 </span><span class="lineCov">         10 : }</span></a>
+<span class="lineNum">      45 </span>            : 
+<span class="lineNum">      46 </span><span class="lineCov">          6 : bool ndt::type_type::operator==(const base_type &amp;rhs) const</span>
+<span class="lineNum">      47 </span>            : {
+<span class="lineNum">      48 </span><span class="lineCov">          6 :   if (this == &amp;rhs) {</span>
+<span class="lineNum">      49 </span><span class="lineNoCov">          0 :     return true;</span>
+<span class="lineNum">      50 </span>            :   }
+<span class="lineNum">      51 </span><span class="lineCov">          6 :   else if (rhs.get_id() != type_id) {</span>
+<span class="lineNum">      52 </span><span class="lineNoCov">          0 :     return false;</span>
+<span class="lineNum">      53 </span>            :   }
+<span class="lineNum">      54 </span>            :   else {
+<span class="lineNum">      55 </span><span class="lineCov">          6 :     return m_pattern_tp == static_cast&lt;const type_type *&gt;(&amp;rhs)-&gt;m_pattern_tp;</span>
+<span class="lineNum">      56 </span>            :   }
+<a name="57"><span class="lineNum">      57 </span>            : }</a>
+<span class="lineNum">      58 </span>            : 
+<a name="59"><span class="lineNum">      59 </span><span class="lineCov">        112 : void ndt::type_type::arrmeta_default_construct(char *DYND_UNUSED(arrmeta), bool DYND_UNUSED(blockref_alloc)) const {}</span></a>
+<span class="lineNum">      60 </span>            : 
+<span class="lineNum">      61 </span><span class="lineCov">         75 : void ndt::type_type::arrmeta_copy_construct(</span>
+<span class="lineNum">      62 </span>            :     char *DYND_UNUSED(dst_arrmeta), const char *DYND_UNUSED(src_arrmeta),
+<span class="lineNum">      63 </span>            :     const intrusive_ptr&lt;memory_block_data&gt; &amp;DYND_UNUSED(embedded_reference)) const
+<span class="lineNum">      64 </span>            : {
+<a name="65"><span class="lineNum">      65 </span><span class="lineCov">         75 : }</span></a>
+<span class="lineNum">      66 </span>            : 
+<a name="67"><span class="lineNum">      67 </span><span class="lineNoCov">          0 : void ndt::type_type::arrmeta_reset_buffers(char *DYND_UNUSED(arrmeta)) const {}</span></a>
+<span class="lineNum">      68 </span>            : 
+<a name="69"><span class="lineNum">      69 </span><span class="lineCov">          3 : void ndt::type_type::arrmeta_finalize_buffers(char *DYND_UNUSED(arrmeta)) const {}</span></a>
+<span class="lineNum">      70 </span>            : 
+<a name="71"><span class="lineNum">      71 </span><span class="lineCov">       1870 : void ndt::type_type::arrmeta_destruct(char *DYND_UNUSED(arrmeta)) const {}</span></a>
+<span class="lineNum">      72 </span>            : 
+<span class="lineNum">      73 </span><span class="lineCov">       2021 : void ndt::type_type::data_destruct(const char *DYND_UNUSED(arrmeta), char *data) const</span>
+<span class="lineNum">      74 </span>            : {
+<span class="lineNum">      75 </span><span class="lineCov">       2021 :   reinterpret_cast&lt;type *&gt;(data)-&gt;~type();</span>
+<a name="76"><span class="lineNum">      76 </span><span class="lineCov">       2021 : }</span></a>
+<span class="lineNum">      77 </span>            : 
+<span class="lineNum">      78 </span><span class="lineCov">        106 : void ndt::type_type::data_destruct_strided(const char *arrmeta, char *data, intptr_t stride, size_t count) const</span>
+<span class="lineNum">      79 </span>            : {
+<span class="lineNum">      80 </span><span class="lineCov">        434 :   for (size_t i = 0; i != count; ++i, data += stride) {</span>
+<a name="81"><span class="lineNum">      81 </span><span class="lineCov">        328 :     data_destruct(arrmeta, data);</span></a>
+<span class="lineNum">      82 </span>            :   }
+<span class="lineNum">      83 </span><span class="lineCov">        109 : }</span>
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.10</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

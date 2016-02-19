@@ -1,0 +1,141 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - coverage.info.cleaned - include/dynd/types/typevar_type.hpp</title>
+  <link rel="stylesheet" type="text/css" href="../../../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../../../index.html">top level</a> - <a href="index.html">include/dynd/types</a> - typevar_type.hpp<span style="font-size: 80%;"> (source / <a href="typevar_type.hpp.func.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">coverage.info.cleaned</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">3</td>
+            <td class="headerCovTableEntry">3</td>
+            <td class="headerCovTableEntryHi">100.0 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2016-02-19</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">4</td>
+            <td class="headerCovTableEntry">4</td>
+            <td class="headerCovTableEntryHi">100.0 %</td>
+          </tr>
+          <tr><td><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : //</a>
+<span class="lineNum">       2 </span>            : // Copyright (C) 2011-15 DyND Developers
+<span class="lineNum">       3 </span>            : // BSD 2-Clause License, see LICENSE.txt
+<span class="lineNum">       4 </span>            : //
+<span class="lineNum">       5 </span>            : 
+<span class="lineNum">       6 </span>            : #pragma once
+<span class="lineNum">       7 </span>            : 
+<span class="lineNum">       8 </span>            : #include &lt;vector&gt;
+<span class="lineNum">       9 </span>            : #include &lt;string&gt;
+<span class="lineNum">      10 </span>            : 
+<span class="lineNum">      11 </span>            : #include &lt;dynd/array.hpp&gt;
+<span class="lineNum">      12 </span>            : 
+<span class="lineNum">      13 </span>            : namespace dynd {
+<span class="lineNum">      14 </span>            : namespace ndt {
+<span class="lineNum">      15 </span>            : 
+<span class="lineNum">      16 </span>            :   class DYND_API typevar_type : public base_type {
+<span class="lineNum">      17 </span>            :     std::string m_name;
+<span class="lineNum">      18 </span>            : 
+<span class="lineNum">      19 </span>            :   public:
+<a name="20"><span class="lineNum">      20 </span>            :     typevar_type(const std::string &amp;name);</a>
+<span class="lineNum">      21 </span>            : 
+<a name="22"><span class="lineNum">      22 </span><span class="lineCov">        528 :     virtual ~typevar_type() {}</span></a>
+<span class="lineNum">      23 </span>            : 
+<span class="lineNum">      24 </span><span class="lineCov">         88 :     const std::string &amp;get_name() const { return m_name; }</span>
+<span class="lineNum">      25 </span>            : 
+<span class="lineNum">      26 </span>            :     void get_vars(std::unordered_set&lt;std::string&gt; &amp;vars) const;
+<span class="lineNum">      27 </span>            : 
+<span class="lineNum">      28 </span>            :     void print_data(std::ostream &amp;o, const char *arrmeta, const char *data) const;
+<span class="lineNum">      29 </span>            : 
+<span class="lineNum">      30 </span>            :     void print_type(std::ostream &amp;o) const;
+<span class="lineNum">      31 </span>            : 
+<span class="lineNum">      32 </span>            :     type apply_linear_index(intptr_t nindices, const irange *indices, size_t current_i, const type &amp;root_tp,
+<span class="lineNum">      33 </span>            :                             bool leading_dimension) const;
+<span class="lineNum">      34 </span>            :     intptr_t apply_linear_index(intptr_t nindices, const irange *indices, const char *arrmeta, const type &amp;result_tp,
+<span class="lineNum">      35 </span>            :                                 char *out_arrmeta, const intrusive_ptr&lt;memory_block_data&gt; &amp;embedded_reference,
+<span class="lineNum">      36 </span>            :                                 size_t current_i, const type &amp;root_tp, bool leading_dimension, char **inout_data,
+<span class="lineNum">      37 </span>            :                                 intrusive_ptr&lt;memory_block_data&gt; &amp;inout_dataref) const;
+<span class="lineNum">      38 </span>            : 
+<span class="lineNum">      39 </span>            :     bool is_lossless_assignment(const type &amp;dst_tp, const type &amp;src_tp) const;
+<span class="lineNum">      40 </span>            : 
+<span class="lineNum">      41 </span>            :     bool operator==(const base_type &amp;rhs) const;
+<span class="lineNum">      42 </span>            : 
+<span class="lineNum">      43 </span>            :     void arrmeta_default_construct(char *arrmeta, bool blockref_alloc) const;
+<span class="lineNum">      44 </span>            :     void arrmeta_copy_construct(char *dst_arrmeta, const char *src_arrmeta,
+<span class="lineNum">      45 </span>            :                                 const intrusive_ptr&lt;memory_block_data&gt; &amp;embedded_reference) const;
+<span class="lineNum">      46 </span>            :     void arrmeta_destruct(char *arrmeta) const;
+<span class="lineNum">      47 </span>            : 
+<span class="lineNum">      48 </span>            :     bool match(const char *arrmeta, const type &amp;candidate_tp, const char *candidate_arrmeta,
+<span class="lineNum">      49 </span>            :                std::map&lt;std::string, type&gt; &amp;tp_vars) const;
+<span class="lineNum">      50 </span>            : 
+<span class="lineNum">      51 </span>            :     std::map&lt;std::string, nd::callable&gt; get_dynamic_type_properties() const;
+<a name="52"><span class="lineNum">      52 </span>            : </a>
+<span class="lineNum">      53 </span>            :     /** Makes a typevar type with the specified types */
+<span class="lineNum">      54 </span><span class="lineCov">        269 :     static type make(const std::string &amp;name) { return type(new typevar_type(name), false); }</span>
+<span class="lineNum">      55 </span>            :   }; // class typevar_type
+<span class="lineNum">      56 </span>            : 
+<span class="lineNum">      57 </span>            :   std::vector&lt;ndt::type&gt; make_typevar_range(const char *name, intptr_t count);
+<span class="lineNum">      58 </span>            : 
+<span class="lineNum">      59 </span>            :   /**
+<span class="lineNum">      60 </span>            :    * Checks if the provided string range is a valid typevar name.
+<span class="lineNum">      61 </span>            :    */
+<span class="lineNum">      62 </span>            :   bool is_valid_typevar_name(const char *begin, const char *end);
+<span class="lineNum">      63 </span>            : 
+<span class="lineNum">      64 </span>            : } // namespace dynd::ndt
+<span class="lineNum">      65 </span>            : } // namespace dynd
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.10</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

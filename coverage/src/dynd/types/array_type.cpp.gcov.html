@@ -1,0 +1,130 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - coverage.info.cleaned - src/dynd/types/array_type.cpp</title>
+  <link rel="stylesheet" type="text/css" href="../../../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../../../index.html">top level</a> - <a href="index.html">src/dynd/types</a> - array_type.cpp<span style="font-size: 80%;"> (source / <a href="array_type.cpp.func.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">coverage.info.cleaned</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">10</td>
+            <td class="headerCovTableEntry">23</td>
+            <td class="headerCovTableEntryLo">43.5 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2016-02-19</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">7</td>
+            <td class="headerCovTableEntry">11</td>
+            <td class="headerCovTableEntryLo">63.6 %</td>
+          </tr>
+          <tr><td><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : //</a>
+<span class="lineNum">       2 </span>            : // Copyright (C) 2011-15 DyND Developers
+<span class="lineNum">       3 </span>            : // BSD 2-Clause License, see LICENSE.txt
+<span class="lineNum">       4 </span>            : //
+<span class="lineNum">       5 </span>            : 
+<span class="lineNum">       6 </span>            : #include &lt;dynd/array.hpp&gt;
+<span class="lineNum">       7 </span>            : #include &lt;dynd/types/array_type.hpp&gt;
+<span class="lineNum">       8 </span>            : 
+<span class="lineNum">       9 </span>            : using namespace std;
+<a name="10"><span class="lineNum">      10 </span>            : using namespace dynd;</a>
+<span class="lineNum">      11 </span>            : 
+<span class="lineNum">      12 </span><span class="lineCov">          2 : ndt::array_type::array_type(const type &amp;value_tp)</span>
+<span class="lineNum">      13 </span>            :     : base_expr_type(array_id, expr_kind, sizeof(nd::array), sizeof(nd::array),
+<span class="lineNum">      14 </span>            :                      inherited_flags(value_tp.get_flags(), type_flag_construct | type_flag_destructor),
+<span class="lineNum">      15 </span><span class="lineCov">          2 :                      value_tp.get_arrmeta_size(), value_tp.get_ndim()),</span>
+<span class="lineNum">      16 </span><span class="lineCov">          2 :       m_value_tp(value_tp)</span>
+<span class="lineNum">      17 </span>            : {
+<a name="18"><span class="lineNum">      18 </span><span class="lineCov">          2 : }</span></a>
+<span class="lineNum">      19 </span>            : 
+<a name="20"><span class="lineNum">      20 </span><span class="lineCov">          4 : ndt::array_type::~array_type() {}</span></a>
+<span class="lineNum">      21 </span>            : 
+<span class="lineNum">      22 </span><span class="lineCov">          1 : bool ndt::array_type::operator==(const base_type &amp;rhs) const</span>
+<span class="lineNum">      23 </span>            : {
+<span class="lineNum">      24 </span><span class="lineCov">          1 :   if (this == &amp;rhs) {</span>
+<span class="lineNum">      25 </span><span class="lineNoCov">          0 :     return true;</span>
+<span class="lineNum">      26 </span>            :   }
+<span class="lineNum">      27 </span>            : 
+<span class="lineNum">      28 </span><span class="lineCov">          1 :   return rhs.get_id() == array_id;</span>
+<a name="29"><span class="lineNum">      29 </span>            : }</a>
+<span class="lineNum">      30 </span>            : 
+<a name="31"><span class="lineNum">      31 </span><span class="lineNoCov">          0 : void ndt::array_type::data_construct(const char *DYND_UNUSED(arrmeta), char *data) const { new (data) nd::array(); }</span></a>
+<span class="lineNum">      32 </span>            : 
+<span class="lineNum">      33 </span><span class="lineNoCov">          0 : void ndt::array_type::data_destruct(const char *DYND_UNUSED(arrmeta), char *data) const</span>
+<span class="lineNum">      34 </span>            : {
+<span class="lineNum">      35 </span><span class="lineNoCov">          0 :   reinterpret_cast&lt;nd::array *&gt;(data)-&gt;~array();</span>
+<a name="36"><span class="lineNum">      36 </span><span class="lineNoCov">          0 : }</span></a>
+<span class="lineNum">      37 </span>            : 
+<span class="lineNum">      38 </span><span class="lineNoCov">          0 : void ndt::array_type::print_data(std::ostream &amp;o, const char *DYND_UNUSED(arrmeta), const char *data) const</span>
+<span class="lineNum">      39 </span>            : {
+<span class="lineNum">      40 </span><span class="lineNoCov">          0 :   const nd::array &amp;a = *reinterpret_cast&lt;const nd::array *&gt;(data);</span>
+<span class="lineNum">      41 </span><span class="lineNoCov">          0 :   if (a.is_null()) {</span>
+<span class="lineNum">      42 </span><span class="lineNoCov">          0 :     o &lt;&lt; &quot;null&quot;;</span>
+<span class="lineNum">      43 </span>            :   }
+<span class="lineNum">      44 </span>            :   else {
+<span class="lineNum">      45 </span><span class="lineNoCov">          0 :     a.get_type().print_data(o, a.get()-&gt;metadata(), a.cdata());</span>
+<span class="lineNum">      46 </span>            :   }
+<a name="47"><span class="lineNum">      47 </span><span class="lineNoCov">          0 : }</span></a>
+<span class="lineNum">      48 </span>            : 
+<a name="49"><span class="lineNum">      49 </span><span class="lineCov">          1 : void ndt::array_type::print_type(ostream &amp;o) const { o &lt;&lt; &quot;array[&quot; &lt;&lt; m_value_tp &lt;&lt; &quot;]&quot;; }</span></a>
+<span class="lineNum">      50 </span>            : 
+<span class="lineNum">      51 </span><span class="lineNoCov">          0 : ndt::type ndt::array_type::with_replaced_storage_type(const type &amp;) const</span>
+<a name="52"><span class="lineNum">      52 </span>            : {</a>
+<span class="lineNum">      53 </span><span class="lineNoCov">          0 :   throw runtime_error(&quot;TODO: implement array_type::with_replaced_storage_type&quot;);</span>
+<span class="lineNum">      54 </span><span class="lineCov">          3 : }</span>
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.10</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

@@ -1,0 +1,327 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - coverage.info.cleaned - src/dynd/types/datetime_parser.cpp</title>
+  <link rel="stylesheet" type="text/css" href="../../../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../../../index.html">top level</a> - <a href="index.html">src/dynd/types</a> - datetime_parser.cpp<span style="font-size: 80%;"> (source / <a href="datetime_parser.cpp.func.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">coverage.info.cleaned</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">1</td>
+            <td class="headerCovTableEntry">121</td>
+            <td class="headerCovTableEntryLo">0.8 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2016-02-19</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">2</td>
+            <td class="headerCovTableEntry">7</td>
+            <td class="headerCovTableEntryLo">28.6 %</td>
+          </tr>
+          <tr><td><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : //</a>
+<span class="lineNum">       2 </span>            : // Copyright (C) 2011-15 DyND Developers
+<span class="lineNum">       3 </span>            : // BSD 2-Clause License, see LICENSE.txt
+<span class="lineNum">       4 </span>            : //
+<span class="lineNum">       5 </span>            : 
+<span class="lineNum">       6 </span>            : #include &lt;string&gt;
+<span class="lineNum">       7 </span>            : 
+<span class="lineNum">       8 </span>            : #include &lt;dynd/parse.hpp&gt;
+<span class="lineNum">       9 </span>            : #include &lt;dynd/types/date_parser.hpp&gt;
+<span class="lineNum">      10 </span>            : #include &lt;dynd/types/time_parser.hpp&gt;
+<span class="lineNum">      11 </span>            : #include &lt;dynd/types/datetime_parser.hpp&gt;
+<span class="lineNum">      12 </span>            : #include &lt;dynd/types/datetime_util.hpp&gt;
+<span class="lineNum">      13 </span>            : 
+<span class="lineNum">      14 </span>            : using namespace std;
+<span class="lineNum">      15 </span>            : using namespace dynd;
+<a name="16"><span class="lineNum">      16 </span>            : </a>
+<span class="lineNum">      17 </span>            : // Fri Dec 19 15:10:11 1997, Fri 19 Dec 15:10:11 1997
+<span class="lineNum">      18 </span><span class="lineNoCov">          0 : static bool parse_postgres_datetime(const char *&amp;begin, const char *end, datetime_struct &amp;out_dt)</span>
+<span class="lineNum">      19 </span>            : {
+<span class="lineNum">      20 </span><span class="lineNoCov">          0 :   saved_begin_state sbs(begin);</span>
+<span class="lineNum">      21 </span>            : 
+<span class="lineNum">      22 </span>            :   // &quot;Fri &quot;
+<span class="lineNum">      23 </span>            :   int weekday;
+<span class="lineNum">      24 </span><span class="lineNoCov">          0 :   if (!parse_str_weekday_no_ws(begin, end, weekday)) {</span>
+<span class="lineNum">      25 </span><span class="lineNoCov">          0 :     return sbs.fail();</span>
+<span class="lineNum">      26 </span>            :   }
+<span class="lineNum">      27 </span><span class="lineNoCov">          0 :   if (!skip_required_whitespace(begin, end)) {</span>
+<span class="lineNum">      28 </span><span class="lineNoCov">          0 :     return sbs.fail();</span>
+<span class="lineNum">      29 </span>            :   }
+<span class="lineNum">      30 </span>            :   // &quot;Dec 19 &quot; or &quot;19 Dec &quot;
+<span class="lineNum">      31 </span>            :   int month, day;
+<span class="lineNum">      32 </span><span class="lineNoCov">          0 :   if (parse_1or2digit_int_no_ws(begin, end, day)) {</span>
+<span class="lineNum">      33 </span><span class="lineNoCov">          0 :     if (!skip_required_whitespace(begin, end)) {</span>
+<span class="lineNum">      34 </span><span class="lineNoCov">          0 :       return sbs.fail();</span>
+<span class="lineNum">      35 </span>            :     }
+<span class="lineNum">      36 </span><span class="lineNoCov">          0 :     if (!parse_str_month_no_ws(begin, end, month)) {</span>
+<span class="lineNum">      37 </span><span class="lineNoCov">          0 :       return sbs.fail();</span>
+<span class="lineNum">      38 </span>            :     }
+<span class="lineNum">      39 </span>            :   }
+<span class="lineNum">      40 </span><span class="lineNoCov">          0 :   else if (parse_str_month_no_ws(begin, end, month)) {</span>
+<span class="lineNum">      41 </span><span class="lineNoCov">          0 :     if (!skip_required_whitespace(begin, end)) {</span>
+<span class="lineNum">      42 </span><span class="lineNoCov">          0 :       return sbs.fail();</span>
+<span class="lineNum">      43 </span>            :     }
+<span class="lineNum">      44 </span><span class="lineNoCov">          0 :     if (!parse_1or2digit_int_no_ws(begin, end, day)) {</span>
+<span class="lineNum">      45 </span><span class="lineNoCov">          0 :       return sbs.fail();</span>
+<span class="lineNum">      46 </span>            :     }
+<span class="lineNum">      47 </span>            :   }
+<span class="lineNum">      48 </span>            :   else {
+<span class="lineNum">      49 </span><span class="lineNoCov">          0 :     return sbs.fail();</span>
+<span class="lineNum">      50 </span>            :   }
+<span class="lineNum">      51 </span><span class="lineNoCov">          0 :   if (!skip_required_whitespace(begin, end)) {</span>
+<span class="lineNum">      52 </span><span class="lineNoCov">          0 :     return sbs.fail();</span>
+<span class="lineNum">      53 </span>            :   }
+<span class="lineNum">      54 </span>            :   // &quot;15:10:11 &quot;
+<span class="lineNum">      55 </span><span class="lineNoCov">          0 :   if (!parse_time_no_tz(begin, end, out_dt.hmst)) {</span>
+<span class="lineNum">      56 </span><span class="lineNoCov">          0 :     return sbs.fail();</span>
+<span class="lineNum">      57 </span>            :   }
+<span class="lineNum">      58 </span><span class="lineNoCov">          0 :   if (!skip_required_whitespace(begin, end)) {</span>
+<span class="lineNum">      59 </span><span class="lineNoCov">          0 :     return sbs.fail();</span>
+<span class="lineNum">      60 </span>            :   }
+<span class="lineNum">      61 </span>            :   // &quot;1997&quot;
+<span class="lineNum">      62 </span>            :   int year;
+<span class="lineNum">      63 </span><span class="lineNoCov">          0 :   if (!parse_4digit_int_no_ws(begin, end, year)) {</span>
+<span class="lineNum">      64 </span><span class="lineNoCov">          0 :     return sbs.fail();</span>
+<span class="lineNum">      65 </span>            :   }
+<span class="lineNum">      66 </span><span class="lineNoCov">          0 :   if (date_ymd::is_valid(year, month, day)) {</span>
+<span class="lineNum">      67 </span><span class="lineNoCov">          0 :     out_dt.ymd.year = year;</span>
+<span class="lineNum">      68 </span><span class="lineNoCov">          0 :     out_dt.ymd.month = month;</span>
+<span class="lineNum">      69 </span><span class="lineNoCov">          0 :     out_dt.ymd.day = day;</span>
+<span class="lineNum">      70 </span><span class="lineNoCov">          0 :     if (out_dt.ymd.get_weekday() != weekday) {</span>
+<span class="lineNum">      71 </span><span class="lineNoCov">          0 :       return sbs.fail();</span>
+<span class="lineNum">      72 </span>            :     }
+<span class="lineNum">      73 </span><span class="lineNoCov">          0 :     return sbs.succeed();</span>
+<span class="lineNum">      74 </span>            :   }
+<span class="lineNum">      75 </span>            :   else {
+<span class="lineNum">      76 </span><span class="lineNoCov">          0 :     return sbs.fail();</span>
+<span class="lineNum">      77 </span>            :   }
+<span class="lineNum">      78 </span>            : }
+<a name="79"><span class="lineNum">      79 </span>            : </a>
+<span class="lineNum">      80 </span>            : // 19971219151011
+<span class="lineNum">      81 </span><span class="lineNoCov">          0 : static bool parse_iso8601_nodashes_datetime(const char *&amp;begin, const char *end, datetime_struct &amp;out_dt)</span>
+<span class="lineNum">      82 </span>            : {
+<span class="lineNum">      83 </span><span class="lineNoCov">          0 :   saved_begin_state sbs(begin);</span>
+<span class="lineNum">      84 </span>            :   // YYYY
+<span class="lineNum">      85 </span>            :   int year;
+<span class="lineNum">      86 </span><span class="lineNoCov">          0 :   if (!parse_4digit_int_no_ws(begin, end, year)) {</span>
+<span class="lineNum">      87 </span><span class="lineNoCov">          0 :     return sbs.fail();</span>
+<span class="lineNum">      88 </span>            :   }
+<span class="lineNum">      89 </span>            :   // MM
+<span class="lineNum">      90 </span>            :   int month;
+<span class="lineNum">      91 </span><span class="lineNoCov">          0 :   if (!parse_2digit_int_no_ws(begin, end, month)) {</span>
+<span class="lineNum">      92 </span><span class="lineNoCov">          0 :     return sbs.fail();</span>
+<span class="lineNum">      93 </span>            :   }
+<span class="lineNum">      94 </span>            :   // DD
+<span class="lineNum">      95 </span>            :   int day;
+<span class="lineNum">      96 </span><span class="lineNoCov">          0 :   if (!parse_2digit_int_no_ws(begin, end, day)) {</span>
+<span class="lineNum">      97 </span><span class="lineNoCov">          0 :     return sbs.fail();</span>
+<span class="lineNum">      98 </span>            :   }
+<span class="lineNum">      99 </span>            :   // Validate the date
+<span class="lineNum">     100 </span><span class="lineNoCov">          0 :   if (!date_ymd::is_valid(year, month, day)) {</span>
+<span class="lineNum">     101 </span><span class="lineNoCov">          0 :     return sbs.fail();</span>
+<span class="lineNum">     102 </span>            :   }
+<span class="lineNum">     103 </span>            : 
+<span class="lineNum">     104 </span>            :   // HH
+<span class="lineNum">     105 </span><span class="lineNoCov">          0 :   bool done = false;</span>
+<span class="lineNum">     106 </span>            :   int hour;
+<span class="lineNum">     107 </span><span class="lineNoCov">          0 :   if (!parse_2digit_int_no_ws(begin, end, hour)) {</span>
+<span class="lineNum">     108 </span><span class="lineNoCov">          0 :     hour = 0;</span>
+<span class="lineNum">     109 </span><span class="lineNoCov">          0 :     done = true;</span>
+<span class="lineNum">     110 </span>            :   }
+<span class="lineNum">     111 </span>            :   // MM
+<span class="lineNum">     112 </span>            :   int minute;
+<span class="lineNum">     113 </span><span class="lineNoCov">          0 :   if (!done &amp;&amp; !parse_2digit_int_no_ws(begin, end, minute)) {</span>
+<span class="lineNum">     114 </span><span class="lineNoCov">          0 :     minute = 0;</span>
+<span class="lineNum">     115 </span><span class="lineNoCov">          0 :     done = true;</span>
+<span class="lineNum">     116 </span>            :   }
+<span class="lineNum">     117 </span>            :   // SS
+<span class="lineNum">     118 </span>            :   int second;
+<span class="lineNum">     119 </span><span class="lineNoCov">          0 :   if (!done &amp;&amp; !parse_2digit_int_no_ws(begin, end, second)) {</span>
+<span class="lineNum">     120 </span><span class="lineNoCov">          0 :     second = 0;</span>
+<span class="lineNum">     121 </span><span class="lineNoCov">          0 :     done = true;</span>
+<span class="lineNum">     122 </span>            :   }
+<span class="lineNum">     123 </span>            :   // .SS*
+<span class="lineNum">     124 </span><span class="lineNoCov">          0 :   int tick = 0;</span>
+<span class="lineNum">     125 </span><span class="lineNoCov">          0 :   if (!parse_token_no_ws(begin, end, '.')) {</span>
+<span class="lineNum">     126 </span><span class="lineNoCov">          0 :     done = true;</span>
+<span class="lineNum">     127 </span>            :   }
+<span class="lineNum">     128 </span><span class="lineNoCov">          0 :   if (!done &amp;&amp; begin &lt; end &amp;&amp; isdigit(*begin)) {</span>
+<span class="lineNum">     129 </span><span class="lineNoCov">          0 :     tick = (*begin - '0');</span>
+<span class="lineNum">     130 </span><span class="lineNoCov">          0 :     ++begin;</span>
+<span class="lineNum">     131 </span><span class="lineNoCov">          0 :     for (int i = 1; i &lt; 7; ++i) {</span>
+<span class="lineNum">     132 </span><span class="lineNoCov">          0 :       tick *= 10;</span>
+<span class="lineNum">     133 </span><span class="lineNoCov">          0 :       if (begin &lt; end &amp;&amp; isdigit(*begin)) {</span>
+<span class="lineNum">     134 </span><span class="lineNoCov">          0 :         tick += (*begin - '0');</span>
+<span class="lineNum">     135 </span><span class="lineNoCov">          0 :         ++begin;</span>
+<span class="lineNum">     136 </span>            :       }
+<span class="lineNum">     137 </span>            :     }
+<span class="lineNum">     138 </span>            :     // Swallow any additional decimal digits, truncating to ticks
+<span class="lineNum">     139 </span><span class="lineNoCov">          0 :     while (begin &lt; end &amp;&amp; isdigit(*begin)) {</span>
+<span class="lineNum">     140 </span><span class="lineNoCov">          0 :       ++begin;</span>
+<span class="lineNum">     141 </span>            :     }
+<span class="lineNum">     142 </span>            :   }
+<span class="lineNum">     143 </span>            : 
+<span class="lineNum">     144 </span>            :   // Validate the time
+<span class="lineNum">     145 </span><span class="lineNoCov">          0 :   if (!time_hmst::is_valid(hour, minute, second, tick)) {</span>
+<span class="lineNum">     146 </span><span class="lineNoCov">          0 :     return sbs.fail();</span>
+<span class="lineNum">     147 </span>            :   }
+<span class="lineNum">     148 </span>            : 
+<span class="lineNum">     149 </span><span class="lineNoCov">          0 :   out_dt.ymd.year = year;</span>
+<span class="lineNum">     150 </span><span class="lineNoCov">          0 :   out_dt.ymd.month = month;</span>
+<span class="lineNum">     151 </span><span class="lineNoCov">          0 :   out_dt.ymd.day = day;</span>
+<span class="lineNum">     152 </span><span class="lineNoCov">          0 :   out_dt.hmst.hour = hour;</span>
+<span class="lineNum">     153 </span><span class="lineNoCov">          0 :   out_dt.hmst.minute = minute;</span>
+<span class="lineNum">     154 </span><span class="lineNoCov">          0 :   out_dt.hmst.second = second;</span>
+<span class="lineNum">     155 </span><span class="lineNoCov">          0 :   out_dt.hmst.tick = tick;</span>
+<span class="lineNum">     156 </span><span class="lineNoCov">          0 :   return sbs.succeed();</span>
+<span class="lineNum">     157 </span>            : }
+<span class="lineNum">     158 </span>            : 
+<a name="159"><span class="lineNum">     159 </span>            : // &lt;date&gt; T &lt;time&gt;, &lt;date&gt;:&lt;time&gt;, &lt;date&gt; &lt;time&gt;</a>
+<span class="lineNum">     160 </span>            : // optionally followed by a timezone specifier
+<span class="lineNum">     161 </span><span class="lineNoCov">          0 : static bool parse_date_time_datetime(const char *&amp;begin, const char *end, datetime_struct &amp;out_dt,</span>
+<span class="lineNum">     162 </span>            :                                      date_parse_order_t ambig, int century_window, const char *&amp;out_tz_begin,
+<span class="lineNum">     163 </span>            :                                      const char *&amp;out_tz_end)
+<span class="lineNum">     164 </span>            : {
+<span class="lineNum">     165 </span><span class="lineNoCov">          0 :   saved_begin_state sbs(begin);</span>
+<span class="lineNum">     166 </span>            : 
+<span class="lineNum">     167 </span><span class="lineNoCov">          0 :   if (!parse_date(begin, end, out_dt.ymd, ambig, century_window)) {</span>
+<span class="lineNum">     168 </span><span class="lineNoCov">          0 :     return sbs.fail();</span>
+<span class="lineNum">     169 </span>            :   }
+<span class="lineNum">     170 </span>            :   // &quot;T&quot;, &quot;:', or whitespace may separate a date and a time
+<span class="lineNum">     171 </span><span class="lineNoCov">          0 :   if (parse_token(begin, end, 'T')) {</span>
+<span class="lineNum">     172 </span>            :     // Allow whitespace around the T
+<span class="lineNum">     173 </span><span class="lineNoCov">          0 :     skip_whitespace(begin, end);</span>
+<span class="lineNum">     174 </span>            :   }
+<span class="lineNum">     175 </span><span class="lineNoCov">          0 :   else if (!parse_token_no_ws(begin, end, ':')) {</span>
+<span class="lineNum">     176 </span><span class="lineNoCov">          0 :     if (!skip_required_whitespace(begin, end)) {</span>
+<span class="lineNum">     177 </span><span class="lineNoCov">          0 :       out_dt.hmst.set_to_zero();</span>
+<span class="lineNum">     178 </span><span class="lineNoCov">          0 :       return sbs.succeed();</span>
+<span class="lineNum">     179 </span>            :     }
+<span class="lineNum">     180 </span><span class="lineNoCov">          0 :     if (begin == end) {</span>
+<span class="lineNum">     181 </span>            :       // If there was just the date, set the rest to zero
+<span class="lineNum">     182 </span><span class="lineNoCov">          0 :       out_dt.hmst.set_to_zero();</span>
+<span class="lineNum">     183 </span><span class="lineNoCov">          0 :       return sbs.succeed();</span>
+<span class="lineNum">     184 </span>            :     }
+<span class="lineNum">     185 </span>            :   }
+<span class="lineNum">     186 </span><span class="lineNoCov">          0 :   if (!parse_time(begin, end, out_dt.hmst, out_tz_begin, out_tz_end)) {</span>
+<span class="lineNum">     187 </span>            :     // In most cases we don't accept just an hour as a time, but for
+<span class="lineNum">     188 </span>            :     // ISO dash-formatted dates, we do, so try again as that.
+<span class="lineNum">     189 </span><span class="lineNoCov">          0 :     begin = sbs.saved_begin();</span>
+<span class="lineNum">     190 </span><span class="lineNoCov">          0 :     if (!parse_iso8601_dashes_date(begin, end, out_dt.ymd)) {</span>
+<span class="lineNum">     191 </span><span class="lineNoCov">          0 :       return sbs.fail();</span>
+<span class="lineNum">     192 </span>            :     }
+<span class="lineNum">     193 </span>            :     // Either a &quot;T&quot; or whitespace may separate a date and a time
+<span class="lineNum">     194 </span><span class="lineNoCov">          0 :     if (!parse_token_no_ws(begin, end, 'T') &amp;&amp; !skip_required_whitespace(begin, end)) {</span>
+<span class="lineNum">     195 </span><span class="lineNoCov">          0 :       return sbs.fail();</span>
+<span class="lineNum">     196 </span>            :     }
+<span class="lineNum">     197 </span>            :     int hour;
+<span class="lineNum">     198 </span>            :     // Require a 2 digit hour followed by a non-digit
+<span class="lineNum">     199 </span><span class="lineNoCov">          0 :     if (!parse_2digit_int_no_ws(begin, end, hour) || (begin &lt; end &amp;&amp; isdigit(*begin))) {</span>
+<span class="lineNum">     200 </span><span class="lineNoCov">          0 :       return sbs.fail();</span>
+<span class="lineNum">     201 </span>            :     }
+<span class="lineNum">     202 </span><span class="lineNoCov">          0 :     if (time_hmst::is_valid(hour, 0, 0, 0)) {</span>
+<span class="lineNum">     203 </span><span class="lineNoCov">          0 :       out_dt.hmst.hour = hour;</span>
+<span class="lineNum">     204 </span><span class="lineNoCov">          0 :       out_dt.hmst.minute = 0;</span>
+<span class="lineNum">     205 </span><span class="lineNoCov">          0 :       out_dt.hmst.second = 0;</span>
+<span class="lineNum">     206 </span><span class="lineNoCov">          0 :       out_dt.hmst.tick = 0;</span>
+<span class="lineNum">     207 </span><span class="lineNoCov">          0 :       return sbs.succeed();</span>
+<span class="lineNum">     208 </span>            :     }
+<span class="lineNum">     209 </span>            :     else {
+<span class="lineNum">     210 </span><span class="lineNoCov">          0 :       return sbs.fail();</span>
+<span class="lineNum">     211 </span>            :     }
+<span class="lineNum">     212 </span>            :   }
+<span class="lineNum">     213 </span><span class="lineNoCov">          0 :   return sbs.succeed();</span>
+<a name="214"><span class="lineNum">     214 </span>            : }</a>
+<span class="lineNum">     215 </span>            : 
+<span class="lineNum">     216 </span><span class="lineNoCov">          0 : bool dynd::parse_datetime(const char *&amp;begin, const char *end, date_parse_order_t ambig, int century_window,</span>
+<span class="lineNum">     217 </span>            :                           datetime_struct &amp;out_dt, const char *&amp;out_tz_begin, const char *&amp;out_tz_end)
+<span class="lineNum">     218 </span>            : {
+<span class="lineNum">     219 </span><span class="lineNoCov">          0 :   if (parse_date_time_datetime(begin, end, out_dt, ambig, century_window, out_tz_begin, out_tz_end)) {</span>
+<span class="lineNum">     220 </span>            :     // &lt;date&gt;T&lt;time&gt;, &lt;date&gt; &lt;time&gt;
+<span class="lineNum">     221 </span>            :   }
+<span class="lineNum">     222 </span><span class="lineNoCov">          0 :   else if (parse_postgres_datetime(begin, end, out_dt)) {</span>
+<span class="lineNum">     223 </span>            :     // Fri Dec 19 15:10:11 1997, Fri 19 Dec 15:10:11 1997
+<span class="lineNum">     224 </span>            :   }
+<span class="lineNum">     225 </span><span class="lineNoCov">          0 :   else if (parse_iso8601_nodashes_datetime(begin, end, out_dt)) {</span>
+<span class="lineNum">     226 </span>            :     // 19971219151011
+<span class="lineNum">     227 </span>            :   }
+<span class="lineNum">     228 </span>            :   else {
+<span class="lineNum">     229 </span><span class="lineNoCov">          0 :     return false;</span>
+<span class="lineNum">     230 </span>            :   }
+<span class="lineNum">     231 </span><span class="lineNoCov">          0 :   return true;</span>
+<a name="232"><span class="lineNum">     232 </span>            : }</a>
+<span class="lineNum">     233 </span>            : 
+<span class="lineNum">     234 </span><span class="lineNoCov">          0 : bool dynd::string_to_datetime(const char *begin, const char *end, date_parse_order_t ambig, int century_window,</span>
+<span class="lineNum">     235 </span>            :                               assign_error_mode errmode, datetime_struct &amp;out_dt, const char *&amp;out_tz_begin,
+<span class="lineNum">     236 </span>            :                               const char *&amp;out_tz_end)
+<span class="lineNum">     237 </span>            : {
+<span class="lineNum">     238 </span>            :   datetime_struct dt;
+<span class="lineNum">     239 </span><span class="lineNoCov">          0 :   skip_whitespace(begin, end);</span>
+<span class="lineNum">     240 </span><span class="lineNoCov">          0 :   if (!parse_datetime(begin, end, ambig, century_window, dt, out_tz_begin, out_tz_end)) {</span>
+<span class="lineNum">     241 </span><span class="lineNoCov">          0 :     return false;</span>
+<span class="lineNum">     242 </span>            :   }
+<span class="lineNum">     243 </span><span class="lineNoCov">          0 :   skip_whitespace(begin, end);</span>
+<span class="lineNum">     244 </span><span class="lineNoCov">          0 :   if (begin == end || errmode == assign_error_nocheck) {</span>
+<span class="lineNum">     245 </span><span class="lineNoCov">          0 :     out_dt = dt;</span>
+<span class="lineNum">     246 </span><span class="lineNoCov">          0 :     return true;</span>
+<span class="lineNum">     247 </span>            :   }
+<span class="lineNum">     248 </span>            :   else {
+<a name="249"><span class="lineNum">     249 </span><span class="lineNoCov">          0 :     return false;</span></a>
+<span class="lineNum">     250 </span>            :   }
+<span class="lineNum">     251 </span><span class="lineCov">          3 : }</span>
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.10</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

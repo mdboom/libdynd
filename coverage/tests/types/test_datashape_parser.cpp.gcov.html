@@ -1,0 +1,888 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - coverage.info.cleaned - tests/types/test_datashape_parser.cpp</title>
+  <link rel="stylesheet" type="text/css" href="../../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../../index.html">top level</a> - <a href="index.html">tests/types</a> - test_datashape_parser.cpp<span style="font-size: 80%;"> (source / <a href="test_datashape_parser.cpp.func.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">coverage.info.cleaned</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">391</td>
+            <td class="headerCovTableEntry">430</td>
+            <td class="headerCovTableEntryHi">90.9 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2016-02-19</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">87</td>
+            <td class="headerCovTableEntry">87</td>
+            <td class="headerCovTableEntryHi">100.0 %</td>
+          </tr>
+          <tr><td><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : //</a>
+<span class="lineNum">       2 </span>            : // Copyright (C) 2011-15 DyND Developers
+<span class="lineNum">       3 </span>            : // BSD 2-Clause License, see LICENSE.txt
+<span class="lineNum">       4 </span>            : //
+<span class="lineNum">       5 </span>            : 
+<span class="lineNum">       6 </span>            : #include &lt;iostream&gt;
+<span class="lineNum">       7 </span>            : #include &lt;sstream&gt;
+<span class="lineNum">       8 </span>            : #include &lt;stdexcept&gt;
+<span class="lineNum">       9 </span>            : #include &quot;inc_gtest.hpp&quot;
+<span class="lineNum">      10 </span>            : #include &quot;dynd_assertions.hpp&quot;
+<span class="lineNum">      11 </span>            : 
+<span class="lineNum">      12 </span>            : #include &lt;dynd/callable.hpp&gt;
+<span class="lineNum">      13 </span>            : #include &lt;dynd/types/datashape_parser.hpp&gt;
+<span class="lineNum">      14 </span>            : #include &lt;dynd/types/fixed_dim_kind_type.hpp&gt;
+<span class="lineNum">      15 </span>            : #include &lt;dynd/types/fixed_dim_type.hpp&gt;
+<span class="lineNum">      16 </span>            : #include &lt;dynd/types/c_contiguous_type.hpp&gt;
+<span class="lineNum">      17 </span>            : #include &lt;dynd/types/var_dim_type.hpp&gt;
+<span class="lineNum">      18 </span>            : #include &lt;dynd/types/struct_type.hpp&gt;
+<span class="lineNum">      19 </span>            : #include &lt;dynd/types/date_type.hpp&gt;
+<span class="lineNum">      20 </span>            : #include &lt;dynd/types/string_type.hpp&gt;
+<span class="lineNum">      21 </span>            : #include &lt;dynd/types/fixed_string_type.hpp&gt;
+<span class="lineNum">      22 </span>            : #include &lt;dynd/types/option_type.hpp&gt;
+<span class="lineNum">      23 </span>            : #include &lt;dynd/types/typevar_constructed_type.hpp&gt;
+<span class="lineNum">      24 </span>            : 
+<span class="lineNum">      25 </span>            : using namespace std;
+<a name="26"><span class="lineNum">      26 </span>            : using namespace dynd;</a>
+<span class="lineNum">      27 </span>            : 
+<span class="lineNum">      28 </span><span class="lineCov">          5 : TEST(DataShapeParser, Basic)</span>
+<span class="lineNum">      29 </span>            : {
+<span class="lineNum">      30 </span><span class="lineCov">          1 :   EXPECT_EQ(ndt::make_type&lt;void&gt;(), ndt::type(&quot;void&quot;));</span>
+<span class="lineNum">      31 </span><span class="lineCov">          1 :   EXPECT_EQ(ndt::make_type&lt;bool1&gt;(), ndt::type(&quot;bool&quot;));</span>
+<span class="lineNum">      32 </span><span class="lineCov">          1 :   EXPECT_EQ(ndt::make_type&lt;int8&gt;(), ndt::type(&quot;int8&quot;));</span>
+<span class="lineNum">      33 </span><span class="lineCov">          1 :   EXPECT_EQ(ndt::make_type&lt;int16&gt;(), ndt::type(&quot;int16&quot;));</span>
+<span class="lineNum">      34 </span><span class="lineCov">          1 :   EXPECT_EQ(ndt::make_type&lt;int32&gt;(), ndt::type(&quot;int32&quot;));</span>
+<span class="lineNum">      35 </span><span class="lineCov">          1 :   EXPECT_EQ(ndt::make_type&lt;int64&gt;(), ndt::type(&quot;int64&quot;));</span>
+<span class="lineNum">      36 </span><span class="lineCov">          1 :   EXPECT_EQ(ndt::make_type&lt;int128&gt;(), ndt::type(&quot;int128&quot;));</span>
+<span class="lineNum">      37 </span><span class="lineCov">          1 :   EXPECT_EQ(ndt::make_type&lt;intptr_t&gt;(), ndt::type(&quot;intptr&quot;));</span>
+<span class="lineNum">      38 </span><span class="lineCov">          1 :   EXPECT_EQ(ndt::make_type&lt;uint8&gt;(), ndt::type(&quot;uint8&quot;));</span>
+<span class="lineNum">      39 </span><span class="lineCov">          1 :   EXPECT_EQ(ndt::make_type&lt;uint16&gt;(), ndt::type(&quot;uint16&quot;));</span>
+<span class="lineNum">      40 </span><span class="lineCov">          1 :   EXPECT_EQ(ndt::make_type&lt;uint32&gt;(), ndt::type(&quot;uint32&quot;));</span>
+<span class="lineNum">      41 </span><span class="lineCov">          1 :   EXPECT_EQ(ndt::make_type&lt;uint64&gt;(), ndt::type(&quot;uint64&quot;));</span>
+<span class="lineNum">      42 </span><span class="lineCov">          1 :   EXPECT_EQ(ndt::make_type&lt;uint128&gt;(), ndt::type(&quot;uint128&quot;));</span>
+<span class="lineNum">      43 </span><span class="lineCov">          1 :   EXPECT_EQ(ndt::make_type&lt;uintptr_t&gt;(), ndt::type(&quot;uintptr&quot;));</span>
+<span class="lineNum">      44 </span><span class="lineCov">          1 :   EXPECT_EQ(ndt::make_type&lt;float16&gt;(), ndt::type(&quot;float16&quot;));</span>
+<span class="lineNum">      45 </span><span class="lineCov">          1 :   EXPECT_EQ(ndt::make_type&lt;float32&gt;(), ndt::type(&quot;float32&quot;));</span>
+<span class="lineNum">      46 </span><span class="lineCov">          1 :   EXPECT_EQ(ndt::make_type&lt;float64&gt;(), ndt::type(&quot;float64&quot;));</span>
+<span class="lineNum">      47 </span><span class="lineCov">          1 :   EXPECT_EQ(ndt::make_type&lt;float128&gt;(), ndt::type(&quot;float128&quot;));</span>
+<span class="lineNum">      48 </span><span class="lineCov">          1 :   EXPECT_EQ(ndt::make_type&lt;dynd::complex&lt;float&gt;&gt;(), ndt::type(&quot;complex64&quot;));</span>
+<span class="lineNum">      49 </span><span class="lineCov">          1 :   EXPECT_EQ(ndt::make_type&lt;dynd::complex&lt;double&gt;&gt;(), ndt::type(&quot;complex128&quot;));</span>
+<span class="lineNum">      50 </span><span class="lineCov">          1 :   EXPECT_EQ(ndt::make_type&lt;dynd::complex&lt;float&gt;&gt;(), ndt::type(&quot;complex[float32]&quot;));</span>
+<span class="lineNum">      51 </span><span class="lineCov">          1 :   EXPECT_EQ(ndt::make_type&lt;dynd::complex&lt;double&gt;&gt;(), ndt::type(&quot;complex[float64]&quot;));</span>
+<span class="lineNum">      52 </span>            :   // Aliases for some of the above types
+<span class="lineNum">      53 </span><span class="lineCov">          1 :   EXPECT_EQ(ndt::make_type&lt;int32_t&gt;(), ndt::type(&quot;int&quot;));</span>
+<span class="lineNum">      54 </span><span class="lineCov">          1 :   EXPECT_EQ(ndt::make_type&lt;double&gt;(), ndt::type(&quot;real&quot;));</span>
+<span class="lineNum">      55 </span><span class="lineCov">          1 :   EXPECT_EQ(ndt::make_type&lt;dynd::complex&lt;double&gt;&gt;(), ndt::type(&quot;complex&quot;));</span>
+<a name="56"><span class="lineNum">      56 </span><span class="lineCov">          1 : }</span></a>
+<span class="lineNum">      57 </span>            : 
+<span class="lineNum">      58 </span><span class="lineCov">          5 : TEST(DataShapeParser, BasicThrow)</span>
+<span class="lineNum">      59 </span>            : {
+<span class="lineNum">      60 </span><span class="lineCov">          2 :   EXPECT_THROW(ndt::type(&quot;boot&quot;), runtime_error);</span>
+<span class="lineNum">      61 </span><span class="lineCov">          2 :   EXPECT_THROW(ndt::type(&quot;int33&quot;), runtime_error);</span>
+<a name="62"><span class="lineNum">      62 </span><span class="lineCov">          1 : }</span></a>
+<span class="lineNum">      63 </span>            : 
+<span class="lineNum">      64 </span><span class="lineCov">          5 : TEST(DataShapeParser, StringAtoms)</span>
+<span class="lineNum">      65 </span>            : {
+<span class="lineNum">      66 </span>            :   // Default string
+<span class="lineNum">      67 </span><span class="lineCov">          1 :   EXPECT_EQ(ndt::make_type&lt;ndt::string_type&gt;(), ndt::type(&quot;string&quot;));</span>
+<span class="lineNum">      68 </span>            :   // String with size
+<span class="lineNum">      69 </span><span class="lineCov">          1 :   EXPECT_EQ(ndt::fixed_string_type::make(1, string_encoding_utf_8), ndt::type(&quot;fixed_string[1]&quot;));</span>
+<span class="lineNum">      70 </span><span class="lineCov">          1 :   EXPECT_EQ(ndt::fixed_string_type::make(100, string_encoding_utf_8), ndt::type(&quot;fixed_string[100]&quot;));</span>
+<span class="lineNum">      71 </span>            :   // String with size and encoding
+<span class="lineNum">      72 </span><span class="lineCov">          1 :   EXPECT_EQ(ndt::fixed_string_type::make(1, string_encoding_ascii), ndt::type(&quot;fixed_string[1, 'A']&quot;));</span>
+<span class="lineNum">      73 </span><span class="lineCov">          1 :   EXPECT_EQ(ndt::fixed_string_type::make(10, string_encoding_utf_8), ndt::type(&quot;fixed_string[10, 'U8']&quot;));</span>
+<span class="lineNum">      74 </span><span class="lineCov">          1 :   EXPECT_EQ(ndt::fixed_string_type::make(1000, string_encoding_utf_16), ndt::type(&quot;fixed_string[1000,'U16']&quot;));</span>
+<span class="lineNum">      75 </span>            : 
+<span class="lineNum">      76 </span>            :   // String with encoding -- change to fixed_string or delete?
+<span class="lineNum">      77 </span>            :   /*
+<span class="lineNum">      78 </span>            :     EXPECT_EQ(ndt::make_type&lt;ndt::string_type&gt;(string_encoding_ascii),
+<span class="lineNum">      79 </span>            :               ndt::type(&quot;string['A']&quot;));
+<span class="lineNum">      80 </span>            :     EXPECT_EQ(ndt::make_type&lt;ndt::string_type&gt;(string_encoding_ascii),
+<span class="lineNum">      81 </span>            :               ndt::type(&quot;string['ascii']&quot;));
+<span class="lineNum">      82 </span>            :     EXPECT_EQ(ndt::make_type&lt;ndt::string_type&gt;(string_encoding_utf_8),
+<span class="lineNum">      83 </span>            :               ndt::type(&quot;string['U8']&quot;));
+<span class="lineNum">      84 </span>            :     EXPECT_EQ(ndt::make_type&lt;ndt::string_type&gt;(string_encoding_utf_8),
+<span class="lineNum">      85 </span>            :               ndt::type(&quot;string['utf8']&quot;));
+<span class="lineNum">      86 </span>            :     EXPECT_EQ(ndt::make_type&lt;ndt::string_type&gt;(string_encoding_utf_8),
+<span class="lineNum">      87 </span>            :               ndt::type(&quot;string['utf-8']&quot;));
+<span class="lineNum">      88 </span>            :     EXPECT_EQ(ndt::make_type&lt;ndt::string_type&gt;(string_encoding_utf_16),
+<span class="lineNum">      89 </span>            :               ndt::type(&quot;string['U16']&quot;));
+<span class="lineNum">      90 </span>            :     EXPECT_EQ(ndt::make_type&lt;ndt::string_type&gt;(string_encoding_utf_16),
+<span class="lineNum">      91 </span>            :               ndt::type(&quot;string['utf16']&quot;));
+<span class="lineNum">      92 </span>            :     EXPECT_EQ(ndt::make_type&lt;ndt::string_type&gt;(string_encoding_utf_16),
+<span class="lineNum">      93 </span>            :               ndt::type(&quot;string['utf-16']&quot;));
+<span class="lineNum">      94 </span>            :     EXPECT_EQ(ndt::make_type&lt;ndt::string_type&gt;(string_encoding_utf_32),
+<span class="lineNum">      95 </span>            :               ndt::type(&quot;string['U32']&quot;));
+<span class="lineNum">      96 </span>            :     EXPECT_EQ(ndt::make_type&lt;ndt::string_type&gt;(string_encoding_utf_32),
+<span class="lineNum">      97 </span>            :               ndt::type(&quot;string['utf32']&quot;));
+<span class="lineNum">      98 </span>            :     EXPECT_EQ(ndt::make_type&lt;ndt::string_type&gt;(string_encoding_utf_32),
+<span class="lineNum">      99 </span>            :               ndt::type(&quot;string['utf-32']&quot;));
+<span class="lineNum">     100 </span>            :     EXPECT_EQ(ndt::make_type&lt;ndt::string_type&gt;(string_encoding_ucs_2),
+<span class="lineNum">     101 </span>            :               ndt::type(&quot;string['ucs2']&quot;));
+<span class="lineNum">     102 </span>            :     EXPECT_EQ(ndt::make_type&lt;ndt::string_type&gt;(string_encoding_ucs_2),
+<span class="lineNum">     103 </span>            :               ndt::type(&quot;string['ucs-2']&quot;));
+<span class="lineNum">     104 </span>            :   */
+<a name="105"><span class="lineNum">     105 </span><span class="lineCov">          1 : }</span></a>
+<span class="lineNum">     106 </span>            : 
+<span class="lineNum">     107 </span><span class="lineCov">          5 : TEST(DataShapeParser, Option)</span>
+<span class="lineNum">     108 </span>            : {
+<span class="lineNum">     109 </span><span class="lineCov">          1 :   EXPECT_EQ(ndt::make_fixed_dim_kind(ndt::make_type&lt;ndt::option_type&gt;(ndt::make_type&lt;bool1&gt;())),</span>
+<span class="lineNum">     110 </span><span class="lineNoCov">          0 :             ndt::type(&quot;Fixed * option[bool]&quot;));</span>
+<span class="lineNum">     111 </span><span class="lineCov">          1 :   EXPECT_EQ(ndt::make_fixed_dim_kind(ndt::make_type&lt;ndt::option_type&gt;(ndt::make_type&lt;bool1&gt;())),</span>
+<span class="lineNum">     112 </span><span class="lineNoCov">          0 :             ndt::type(&quot;Fixed * ?bool&quot;));</span>
+<span class="lineNum">     113 </span><span class="lineCov">          1 :   EXPECT_EQ(</span>
+<span class="lineNum">     114 </span>            :       ndt::make_fixed_dim_kind(ndt::make_type&lt;ndt::option_type&gt;(ndt::make_fixed_dim_kind(ndt::make_type&lt;float&gt;()))),
+<span class="lineNum">     115 </span><span class="lineNoCov">          0 :       ndt::type(&quot;Fixed * option[Fixed * float32]&quot;));</span>
+<span class="lineNum">     116 </span><span class="lineCov">          1 :   EXPECT_EQ(</span>
+<span class="lineNum">     117 </span>            :       ndt::make_fixed_dim_kind(ndt::make_type&lt;ndt::option_type&gt;(ndt::make_fixed_dim_kind(ndt::make_type&lt;float&gt;()))),
+<span class="lineNum">     118 </span><span class="lineNoCov">          0 :       ndt::type(&quot;Fixed * ?Fixed * float32&quot;));</span>
+<span class="lineNum">     119 </span><span class="lineCov">          1 :   EXPECT_EQ(ndt::struct_type::make({&quot;x&quot;, &quot;y&quot;}, {ndt::make_type&lt;ndt::option_type&gt;(ndt::make_type&lt;int32_t&gt;()),</span>
+<span class="lineNum">     120 </span>            :                                                 ndt::make_type&lt;ndt::option_type&gt;(ndt::make_type&lt;int64_t&gt;())}),
+<span class="lineNum">     121 </span><span class="lineNoCov">          0 :             ndt::type(&quot;{x : ?int32, y : ?int64}&quot;));</span>
+<a name="122"><span class="lineNum">     122 </span><span class="lineCov">          1 : }</span></a>
+<span class="lineNum">     123 </span>            : 
+<span class="lineNum">     124 </span><span class="lineCov">          5 : TEST(DataShapeParser, StridedDim)</span>
+<span class="lineNum">     125 </span>            : {
+<span class="lineNum">     126 </span><span class="lineCov">          1 :   EXPECT_EQ(ndt::make_fixed_dim_kind(ndt::make_type&lt;bool1&gt;()), ndt::type(&quot;Fixed * bool&quot;));</span>
+<span class="lineNum">     127 </span><span class="lineCov">          1 :   EXPECT_EQ(ndt::make_fixed_dim_kind(ndt::make_type&lt;float&gt;(), 2), ndt::type(&quot;Fixed * Fixed * float32&quot;));</span>
+<span class="lineNum">     128 </span><span class="lineCov">          1 :   EXPECT_EQ(ndt::type(&quot;Fixed * Fixed * float32&quot;), ndt::type(&quot;Fixed**2 * float32&quot;));</span>
+<a name="129"><span class="lineNum">     129 </span><span class="lineCov">          1 : }</span></a>
+<span class="lineNum">     130 </span>            : 
+<span class="lineNum">     131 </span><span class="lineCov">          5 : TEST(DataShapeParser, FixedDim)</span>
+<span class="lineNum">     132 </span>            : {
+<span class="lineNum">     133 </span><span class="lineCov">          1 :   EXPECT_EQ(ndt::make_fixed_dim(3, ndt::make_type&lt;bool1&gt;()), ndt::type(&quot;3 * bool&quot;));</span>
+<span class="lineNum">     134 </span><span class="lineCov">          1 :   EXPECT_EQ(ndt::make_fixed_dim(3, ndt::make_type&lt;bool1&gt;()), ndt::type(&quot;fixed[3] * bool&quot;));</span>
+<span class="lineNum">     135 </span><span class="lineCov">          1 :   EXPECT_EQ(ndt::make_fixed_dim(4, ndt::make_fixed_dim(3, ndt::make_type&lt;float&gt;())), ndt::type(&quot;4 * 3 * float32&quot;));</span>
+<span class="lineNum">     136 </span><span class="lineCov">          1 :   EXPECT_EQ(ndt::type(&quot;7 * 7 * 7 * float32&quot;), ndt::type(&quot;7**3 * float32&quot;));</span>
+<a name="137"><span class="lineNum">     137 </span><span class="lineCov">          1 : }</span></a>
+<span class="lineNum">     138 </span>            : 
+<span class="lineNum">     139 </span><span class="lineCov">          5 : TEST(DataShapeParser, CContiguous)</span>
+<span class="lineNum">     140 </span>            : {
+<span class="lineNum">     141 </span><span class="lineCov">          1 :   EXPECT_EQ(ndt::c_contiguous_type::make(ndt::make_fixed_dim(3, ndt::make_type&lt;bool1&gt;())), ndt::type(&quot;C[3 * bool]&quot;));</span>
+<span class="lineNum">     142 </span><span class="lineCov">          1 :   EXPECT_EQ(ndt::c_contiguous_type::make(make_fixed_dim(4, ndt::make_fixed_dim(3, ndt::make_type&lt;float&gt;()))),</span>
+<span class="lineNum">     143 </span><span class="lineNoCov">          0 :             ndt::type(&quot;C[4 * 3 * float32]&quot;));</span>
+<a name="144"><span class="lineNum">     144 </span><span class="lineCov">          1 : }</span></a>
+<span class="lineNum">     145 </span>            : 
+<span class="lineNum">     146 </span><span class="lineCov">          5 : TEST(DataShapeParser, VarDim)</span>
+<span class="lineNum">     147 </span>            : {
+<span class="lineNum">     148 </span><span class="lineCov">          1 :   EXPECT_EQ(ndt::var_dim_type::make(ndt::make_type&lt;bool1&gt;()), ndt::type(&quot;var * bool&quot;));</span>
+<span class="lineNum">     149 </span><span class="lineCov">          1 :   EXPECT_EQ(ndt::var_dim_type::make(ndt::var_dim_type::make(ndt::make_type&lt;float&gt;())),</span>
+<span class="lineNum">     150 </span><span class="lineNoCov">          0 :             ndt::type(&quot;var * var * float32&quot;));</span>
+<span class="lineNum">     151 </span><span class="lineCov">          1 :   EXPECT_EQ(ndt::type(&quot;var * var * var * var * var * float32&quot;), ndt::type(&quot;var**5 * float32&quot;));</span>
+<a name="152"><span class="lineNum">     152 </span><span class="lineCov">          1 : }</span></a>
+<span class="lineNum">     153 </span>            : 
+<span class="lineNum">     154 </span><span class="lineCov">          5 : TEST(DataShapeParser, StridedFixedDim)</span>
+<span class="lineNum">     155 </span>            : {
+<span class="lineNum">     156 </span><span class="lineCov">          1 :   EXPECT_EQ(ndt::make_fixed_dim_kind(ndt::make_fixed_dim(3, ndt::make_type&lt;float&gt;())),</span>
+<span class="lineNum">     157 </span><span class="lineNoCov">          0 :             ndt::type(&quot;Fixed * 3 * float32&quot;));</span>
+<span class="lineNum">     158 </span><span class="lineCov">          1 :   EXPECT_EQ(ndt::make_fixed_dim(3, ndt::make_fixed_dim_kind(ndt::make_type&lt;float&gt;())),</span>
+<span class="lineNum">     159 </span><span class="lineNoCov">          0 :             ndt::type(&quot;3 * Fixed * float32&quot;));</span>
+<a name="160"><span class="lineNum">     160 </span><span class="lineCov">          1 : }</span></a>
+<span class="lineNum">     161 </span>            : 
+<span class="lineNum">     162 </span><span class="lineCov">          5 : TEST(DataShapeParser, StridedVarFixedDim)</span>
+<span class="lineNum">     163 </span>            : {
+<span class="lineNum">     164 </span><span class="lineCov">          1 :   EXPECT_EQ(ndt::make_fixed_dim_kind(ndt::var_dim_type::make(ndt::make_fixed_dim(3, ndt::make_type&lt;float&gt;()))),</span>
+<span class="lineNum">     165 </span><span class="lineNoCov">          0 :             ndt::type(&quot;Fixed * var * 3 * float32&quot;));</span>
+<a name="166"><span class="lineNum">     166 </span><span class="lineCov">          1 : }</span></a>
+<span class="lineNum">     167 </span>            : 
+<span class="lineNum">     168 </span><span class="lineCov">          5 : TEST(DataShapeParser, TypeVarConstructed)</span>
+<span class="lineNum">     169 </span>            : {
+<span class="lineNum">     170 </span><span class="lineCov">          1 :   EXPECT_EQ(ndt::typevar_constructed_type::make(&quot;T&quot;, ndt::type(&quot;int32&quot;)), ndt::type(&quot;T[int32]&quot;));</span>
+<span class="lineNum">     171 </span><span class="lineCov">          1 :   EXPECT_EQ(ndt::typevar_constructed_type::make(&quot;T&quot;, ndt::type(&quot;10 * A&quot;)), ndt::type(&quot;T[10 * A]&quot;));</span>
+<span class="lineNum">     172 </span><span class="lineCov">          1 :   EXPECT_EQ(ndt::typevar_constructed_type::make(&quot;T&quot;, ndt::type(&quot;Dims... * int32&quot;)), ndt::type(&quot;T[Dims... * int32]&quot;));</span>
+<a name="173"><span class="lineNum">     173 </span><span class="lineCov">          1 : }</span></a>
+<span class="lineNum">     174 </span>            : 
+<span class="lineNum">     175 </span><span class="lineCov">          5 : TEST(DataShapeParser, RecordOneField)</span>
+<span class="lineNum">     176 </span>            : {
+<span class="lineNum">     177 </span><span class="lineCov">          1 :   EXPECT_EQ(ndt::struct_type::make({&quot;val&quot;}, {ndt::make_type&lt;float&gt;()}), ndt::type(&quot;{ val : float32 }&quot;));</span>
+<span class="lineNum">     178 </span><span class="lineCov">          1 :   EXPECT_EQ(ndt::struct_type::make({&quot;val&quot;}, {ndt::make_type&lt;float&gt;()}), ndt::type(&quot;{ val : float32 , }&quot;));</span>
+<a name="179"><span class="lineNum">     179 </span><span class="lineCov">          1 : }</span></a>
+<span class="lineNum">     180 </span>            : 
+<span class="lineNum">     181 </span><span class="lineCov">          5 : TEST(DataShapeParser, RecordTwoFields)</span>
+<span class="lineNum">     182 </span>            : {
+<span class="lineNum">     183 </span><span class="lineCov">          1 :   EXPECT_EQ(ndt::struct_type::make({&quot;val&quot;, &quot;id&quot;}, {ndt::make_type&lt;float&gt;(), ndt::make_type&lt;int64_t&gt;()}),</span>
+<span class="lineNum">     184 </span>            :             ndt::type(&quot;{\n&quot;
+<span class="lineNum">     185 </span>            :                       &quot;    val: float32,\n&quot;
+<span class="lineNum">     186 </span>            :                       &quot;    id: int64\n&quot;
+<span class="lineNum">     187 </span><span class="lineNoCov">          0 :                       &quot;}\n&quot;));</span>
+<span class="lineNum">     188 </span><span class="lineCov">          1 :   EXPECT_EQ(ndt::struct_type::make({&quot;val&quot;, &quot;id&quot;}, {ndt::make_type&lt;float&gt;(), ndt::make_type&lt;int64_t&gt;()}),</span>
+<span class="lineNum">     189 </span>            :             ndt::type(&quot;{\n&quot;
+<span class="lineNum">     190 </span>            :                       &quot;    val: float32,\n&quot;
+<span class="lineNum">     191 </span>            :                       &quot;    id: int64,\n&quot;
+<span class="lineNum">     192 </span><span class="lineNoCov">          0 :                       &quot;}\n&quot;));</span>
+<a name="193"><span class="lineNum">     193 </span><span class="lineCov">          1 : }</span></a>
+<span class="lineNum">     194 </span>            : 
+<span class="lineNum">     195 </span><span class="lineCov">          5 : TEST(DataShapeParser, Callable)</span>
+<span class="lineNum">     196 </span>            : {
+<span class="lineNum">     197 </span><span class="lineCov">          2 :   ndt::type tp;</span>
+<span class="lineNum">     198 </span>            : 
+<span class="lineNum">     199 </span><span class="lineCov">          1 :   EXPECT_EQ(ndt::make_type&lt;int(int, int)&gt;(), ndt::type(&quot;(int, int) -&gt; int&quot;));</span>
+<span class="lineNum">     200 </span><span class="lineCov">          1 :   EXPECT_EQ(ndt::make_type&lt;int(int, int)&gt;(&quot;x&quot;), ndt::type(&quot;(int, x: int) -&gt; int&quot;));</span>
+<span class="lineNum">     201 </span><span class="lineCov">          1 :   EXPECT_EQ(ndt::make_type&lt;int(int, int)&gt;(&quot;x&quot;, &quot;y&quot;), ndt::type(&quot;(x: int, y: int) -&gt; int&quot;));</span>
+<span class="lineNum">     202 </span>            : 
+<span class="lineNum">     203 </span><span class="lineCov">          1 :   tp = ndt::type(&quot;(N * S, func: (M * S) -&gt; T) -&gt; N * T&quot;);</span>
+<span class="lineNum">     204 </span><span class="lineCov">          1 :   EXPECT_JSON_EQ_ARR(&quot;[\&quot;N * S\&quot;]&quot;, tp.p(&quot;pos_types&quot;));</span>
+<span class="lineNum">     205 </span><span class="lineCov">          1 :   EXPECT_JSON_EQ_ARR(&quot;[\&quot;(M * S) -&gt; T\&quot;]&quot;, tp.p(&quot;kwd_types&quot;));</span>
+<span class="lineNum">     206 </span><span class="lineCov">          1 :   EXPECT_JSON_EQ_ARR(&quot;[\&quot;func\&quot;]&quot;, tp.p(&quot;kwd_names&quot;));</span>
+<span class="lineNum">     207 </span><span class="lineCov">          1 :   EXPECT_JSON_EQ_ARR(&quot;\&quot;N * T\&quot;&quot;, tp.p(&quot;return_type&quot;));</span>
+<a name="208"><span class="lineNum">     208 </span><span class="lineCov">          1 : }</span></a>
+<span class="lineNum">     209 </span>            : 
+<span class="lineNum">     210 </span><span class="lineCov">          5 : TEST(DataShapeParser, ErrorBasic)</span>
+<span class="lineNum">     211 </span>            : {
+<span class="lineNum">     212 </span>            :   try {
+<span class="lineNum">     213 </span><span class="lineCov">          2 :     ndt::type(&quot;float65&quot;);</span>
+<span class="lineNum">     214 </span><span class="lineNoCov">          0 :     EXPECT_TRUE(false);</span>
+<span class="lineNum">     215 </span>            :   }
+<span class="lineNum">     216 </span><span class="lineCov">          2 :   catch (const runtime_error &amp;e) {</span>
+<span class="lineNum">     217 </span><span class="lineCov">          2 :     std::string msg = e.what();</span>
+<span class="lineNum">     218 </span><span class="lineCov">          1 :     EXPECT_TRUE(msg.find(&quot;line 1, column 1&quot;) != std::string::npos);</span>
+<span class="lineNum">     219 </span><span class="lineCov">          1 :     EXPECT_TRUE(msg.find(&quot;unrecognized data type&quot;) != std::string::npos);</span>
+<span class="lineNum">     220 </span>            :   }
+<span class="lineNum">     221 </span>            :   try {
+<span class="lineNum">     222 </span><span class="lineCov">          2 :     ndt::type(&quot;float64+&quot;);</span>
+<span class="lineNum">     223 </span><span class="lineNoCov">          0 :     EXPECT_TRUE(false);</span>
+<span class="lineNum">     224 </span>            :   }
+<span class="lineNum">     225 </span><span class="lineCov">          2 :   catch (const runtime_error &amp;e) {</span>
+<span class="lineNum">     226 </span><span class="lineCov">          2 :     std::string msg = e.what();</span>
+<span class="lineNum">     227 </span><span class="lineCov">          1 :     EXPECT_TRUE(msg.find(&quot;line 1, column 8&quot;) != std::string::npos);</span>
+<span class="lineNum">     228 </span><span class="lineCov">          1 :     EXPECT_TRUE(msg.find(&quot;unexpected token&quot;) != std::string::npos);</span>
+<span class="lineNum">     229 </span>            :   }
+<span class="lineNum">     230 </span>            :   try {
+<span class="lineNum">     231 </span><span class="lineCov">          2 :     ndt::type(&quot;3 * int32 * float64&quot;);</span>
+<span class="lineNum">     232 </span><span class="lineNoCov">          0 :     EXPECT_TRUE(false);</span>
+<span class="lineNum">     233 </span>            :   }
+<span class="lineNum">     234 </span><span class="lineCov">          2 :   catch (const runtime_error &amp;e) {</span>
+<span class="lineNum">     235 </span><span class="lineCov">          2 :     std::string msg = e.what();</span>
+<span class="lineNum">     236 </span><span class="lineCov">          1 :     EXPECT_TRUE(msg.find(&quot;line 1, column 5&quot;) != std::string::npos);</span>
+<span class="lineNum">     237 </span><span class="lineCov">          1 :     EXPECT_TRUE(msg.find(&quot;unrecognized dimension type&quot;) != std::string::npos);</span>
+<span class="lineNum">     238 </span>            :   }
+<a name="239"><span class="lineNum">     239 </span><span class="lineCov">          1 : }</span></a>
+<span class="lineNum">     240 </span>            : 
+<span class="lineNum">     241 </span><span class="lineCov">          5 : TEST(DataShapeParser, ErrorString)</span>
+<span class="lineNum">     242 </span>            : {
+<span class="lineNum">     243 </span>            :   try {
+<span class="lineNum">     244 </span><span class="lineCov">          2 :     ndt::type(&quot;fixed_string[&quot;);</span>
+<span class="lineNum">     245 </span><span class="lineNoCov">          0 :     EXPECT_TRUE(false);</span>
+<span class="lineNum">     246 </span>            :   }
+<span class="lineNum">     247 </span><span class="lineCov">          2 :   catch (const runtime_error &amp;e) {</span>
+<span class="lineNum">     248 </span><span class="lineCov">          2 :     std::string msg = e.what();</span>
+<span class="lineNum">     249 </span><span class="lineCov">          1 :     EXPECT_TRUE(msg.find(&quot;line 1, column 14&quot;) != std::string::npos);</span>
+<span class="lineNum">     250 </span><span class="lineCov">          1 :     EXPECT_TRUE(msg.find(&quot;expected a size integer&quot;) != std::string::npos);</span>
+<span class="lineNum">     251 </span>            :   }
+<span class="lineNum">     252 </span>            :   try {
+<span class="lineNum">     253 </span><span class="lineCov">          2 :     ndt::type(&quot;fixed_string[0]&quot;);</span>
+<span class="lineNum">     254 </span><span class="lineNoCov">          0 :     EXPECT_TRUE(false);</span>
+<span class="lineNum">     255 </span>            :   }
+<span class="lineNum">     256 </span><span class="lineCov">          2 :   catch (const runtime_error &amp;e) {</span>
+<span class="lineNum">     257 </span><span class="lineCov">          2 :     std::string msg = e.what();</span>
+<span class="lineNum">     258 </span><span class="lineCov">          1 :     EXPECT_TRUE(msg.find(&quot;line 1, column 14&quot;) != std::string::npos);</span>
+<span class="lineNum">     259 </span><span class="lineCov">          1 :     EXPECT_TRUE(msg.find(&quot;string size cannot be zero&quot;) != std::string::npos);</span>
+<span class="lineNum">     260 </span>            :   }
+<span class="lineNum">     261 </span>            :   try {
+<span class="lineNum">     262 </span><span class="lineCov">          2 :     ndt::type(&quot;fixed_string[3,'U8',10]&quot;);</span>
+<span class="lineNum">     263 </span><span class="lineNoCov">          0 :     EXPECT_TRUE(false);</span>
+<span class="lineNum">     264 </span>            :   }
+<span class="lineNum">     265 </span><span class="lineCov">          2 :   catch (const runtime_error &amp;e) {</span>
+<span class="lineNum">     266 </span><span class="lineCov">          2 :     std::string msg = e.what();</span>
+<span class="lineNum">     267 </span><span class="lineCov">          1 :     EXPECT_TRUE(msg.find(&quot;line 1, column 20&quot;) != std::string::npos);</span>
+<span class="lineNum">     268 </span><span class="lineCov">          1 :     EXPECT_TRUE(msg.find(&quot;expected closing ']'&quot;) != std::string::npos);</span>
+<span class="lineNum">     269 </span>            :   }
+<span class="lineNum">     270 </span>            :   try {
+<span class="lineNum">     271 </span><span class="lineCov">          2 :     ndt::type(&quot;fixed_string[3,3]&quot;);</span>
+<span class="lineNum">     272 </span><span class="lineNoCov">          0 :     EXPECT_TRUE(false);</span>
+<span class="lineNum">     273 </span>            :   }
+<span class="lineNum">     274 </span><span class="lineCov">          2 :   catch (const runtime_error &amp;e) {</span>
+<span class="lineNum">     275 </span><span class="lineCov">          2 :     std::string msg = e.what();</span>
+<span class="lineNum">     276 </span><span class="lineCov">          1 :     EXPECT_TRUE(msg.find(&quot;line 1, column 16&quot;) != std::string::npos);</span>
+<span class="lineNum">     277 </span><span class="lineCov">          1 :     EXPECT_TRUE(msg.find(&quot;expected a string encoding&quot;) != std::string::npos);</span>
+<span class="lineNum">     278 </span>            :   }
+<a name="279"><span class="lineNum">     279 </span><span class="lineCov">          1 : }</span></a>
+<span class="lineNum">     280 </span>            : 
+<span class="lineNum">     281 </span><span class="lineCov">          5 : TEST(DataShapeParser, ErrorRecord)</span>
+<span class="lineNum">     282 </span>            : {
+<span class="lineNum">     283 </span>            :   try {
+<span class="lineNum">     284 </span>            :     ndt::type(&quot;{\n&quot;
+<span class="lineNum">     285 </span>            :               &quot;   id: int64\n&quot;
+<span class="lineNum">     286 </span>            :               &quot;   name: string\n&quot;
+<span class="lineNum">     287 </span>            :               &quot;   amount: invalidtype\n&quot;
+<span class="lineNum">     288 </span><span class="lineCov">          2 :               &quot;}\n&quot;);</span>
+<span class="lineNum">     289 </span><span class="lineNoCov">          0 :     EXPECT_TRUE(false);</span>
+<span class="lineNum">     290 </span>            :   }
+<span class="lineNum">     291 </span><span class="lineCov">          2 :   catch (const runtime_error &amp;e) {</span>
+<span class="lineNum">     292 </span><span class="lineCov">          2 :     std::string msg = e.what();</span>
+<span class="lineNum">     293 </span><span class="lineCov">          1 :     EXPECT_TRUE(msg.find(&quot;line 2, column 13&quot;) != std::string::npos);</span>
+<span class="lineNum">     294 </span><span class="lineCov">          1 :     EXPECT_TRUE(msg.find(&quot;expected ',' or '}'&quot;) != std::string::npos);</span>
+<span class="lineNum">     295 </span>            :   }
+<span class="lineNum">     296 </span>            :   try {
+<span class="lineNum">     297 </span>            :     ndt::type(&quot;{\n&quot;
+<span class="lineNum">     298 </span>            :               &quot;   id: int64,\n&quot;
+<span class="lineNum">     299 </span>            :               &quot;   name: string,\n&quot;
+<span class="lineNum">     300 </span>            :               &quot;   amount: invalidtype;\n&quot;
+<span class="lineNum">     301 </span><span class="lineCov">          2 :               &quot;}\n&quot;);</span>
+<span class="lineNum">     302 </span><span class="lineNoCov">          0 :     EXPECT_TRUE(false);</span>
+<span class="lineNum">     303 </span>            :   }
+<span class="lineNum">     304 </span><span class="lineCov">          2 :   catch (const runtime_error &amp;e) {</span>
+<span class="lineNum">     305 </span><span class="lineCov">          2 :     std::string msg = e.what();</span>
+<span class="lineNum">     306 </span><span class="lineCov">          1 :     EXPECT_TRUE(msg.find(&quot;line 4, column 12&quot;) != std::string::npos);</span>
+<span class="lineNum">     307 </span><span class="lineCov">          1 :     EXPECT_TRUE(msg.find(&quot;unrecognized data type&quot;) != std::string::npos);</span>
+<span class="lineNum">     308 </span>            :   }
+<span class="lineNum">     309 </span>            :   try {
+<span class="lineNum">     310 </span>            :     ndt::type(&quot;{\n&quot;
+<span class="lineNum">     311 </span>            :               &quot;   id: int64,\n&quot;
+<span class="lineNum">     312 </span>            :               &quot;   name: string,\n&quot;
+<span class="lineNum">     313 </span>            :               &quot;   amount: %,\n&quot;
+<span class="lineNum">     314 </span><span class="lineCov">          2 :               &quot;}\n&quot;);</span>
+<span class="lineNum">     315 </span><span class="lineNoCov">          0 :     EXPECT_TRUE(false);</span>
+<span class="lineNum">     316 </span>            :   }
+<span class="lineNum">     317 </span><span class="lineCov">          2 :   catch (const runtime_error &amp;e) {</span>
+<span class="lineNum">     318 </span><span class="lineCov">          2 :     std::string msg = e.what();</span>
+<span class="lineNum">     319 </span><span class="lineCov">          1 :     EXPECT_TRUE(msg.find(&quot;line 4, column 11&quot;) != std::string::npos);</span>
+<span class="lineNum">     320 </span><span class="lineCov">          1 :     EXPECT_TRUE(msg.find(&quot;expected a data type&quot;) != std::string::npos);</span>
+<span class="lineNum">     321 </span>            :   }
+<span class="lineNum">     322 </span>            :   try {
+<span class="lineNum">     323 </span>            :     ndt::type(&quot;{\n&quot;
+<span class="lineNum">     324 </span>            :               &quot;   id: int64,\n&quot;
+<span class="lineNum">     325 </span>            :               &quot;   name: string,\n&quot;
+<span class="lineNum">     326 </span>            :               &quot;   amount+ float32,\n&quot;
+<span class="lineNum">     327 </span><span class="lineCov">          2 :               &quot;}\n&quot;);</span>
+<span class="lineNum">     328 </span><span class="lineNoCov">          0 :     EXPECT_TRUE(false);</span>
+<span class="lineNum">     329 </span>            :   }
+<span class="lineNum">     330 </span><span class="lineCov">          2 :   catch (const runtime_error &amp;e) {</span>
+<span class="lineNum">     331 </span><span class="lineCov">          2 :     std::string msg = e.what();</span>
+<span class="lineNum">     332 </span><span class="lineCov">          1 :     EXPECT_TRUE(msg.find(&quot;line 4, column 10&quot;) != std::string::npos);</span>
+<span class="lineNum">     333 </span><span class="lineCov">          1 :     EXPECT_TRUE(msg.find(&quot;expected ':'&quot;) != std::string::npos);</span>
+<span class="lineNum">     334 </span>            :   }
+<span class="lineNum">     335 </span>            :   try {
+<span class="lineNum">     336 </span>            :     ndt::type(&quot;{\n&quot;
+<span class="lineNum">     337 </span>            :               &quot;   id: int64,\n&quot;
+<span class="lineNum">     338 </span>            :               &quot;   name: (3 * string,\n&quot;
+<span class="lineNum">     339 </span>            :               &quot;   amount: float32,\n&quot;
+<span class="lineNum">     340 </span><span class="lineCov">          2 :               &quot;}\n&quot;);</span>
+<span class="lineNum">     341 </span><span class="lineNoCov">          0 :     EXPECT_TRUE(false);</span>
+<span class="lineNum">     342 </span>            :   }
+<span class="lineNum">     343 </span><span class="lineCov">          2 :   catch (const runtime_error &amp;e) {</span>
+<span class="lineNum">     344 </span><span class="lineCov">          2 :     std::string msg = e.what();</span>
+<span class="lineNum">     345 </span>            :     // The name field works as a funcproto until it hits the '}' token
+<span class="lineNum">     346 </span><span class="lineCov">          1 :     EXPECT_TRUE(msg.find(&quot;line 4, column 20&quot;) != std::string::npos);</span>
+<span class="lineNum">     347 </span><span class="lineCov">          1 :     EXPECT_TRUE(msg.find(&quot;expected a kwd arg in callable prototype&quot;) != std::string::npos);</span>
+<span class="lineNum">     348 </span>            :   }
+<a name="349"><span class="lineNum">     349 </span><span class="lineCov">          1 : }</span></a>
+<span class="lineNum">     350 </span>            : 
+<span class="lineNum">     351 </span><span class="lineCov">          5 : TEST(DataShapeParser, ErrorTypeAlias)</span>
+<span class="lineNum">     352 </span>            : {
+<span class="lineNum">     353 </span>            :   try {
+<span class="lineNum">     354 </span>            :     ndt::type(&quot;\n&quot;
+<span class="lineNum">     355 </span>            :               &quot;type 33 = int32\n&quot;
+<span class="lineNum">     356 </span><span class="lineCov">          2 :               &quot;2, int32\n&quot;);</span>
+<span class="lineNum">     357 </span><span class="lineNoCov">          0 :     EXPECT_TRUE(false);</span>
+<span class="lineNum">     358 </span>            :   }
+<span class="lineNum">     359 </span><span class="lineCov">          2 :   catch (const runtime_error &amp;e) {</span>
+<span class="lineNum">     360 </span><span class="lineCov">          2 :     std::string msg = e.what();</span>
+<span class="lineNum">     361 </span><span class="lineCov">          1 :     EXPECT_TRUE(msg.find(&quot;line 2, column 5&quot;) != std::string::npos);</span>
+<span class="lineNum">     362 </span><span class="lineCov">          1 :     EXPECT_TRUE(msg.find(&quot;expected an identifier&quot;) != std::string::npos);</span>
+<span class="lineNum">     363 </span>            :   }
+<span class="lineNum">     364 </span>            :   try {
+<span class="lineNum">     365 </span>            :     ndt::type(&quot;\n&quot;
+<span class="lineNum">     366 </span>            :               &quot;type MyInt - int32\n&quot;
+<span class="lineNum">     367 </span><span class="lineCov">          2 :               &quot;2, MyInt\n&quot;);</span>
+<span class="lineNum">     368 </span><span class="lineNoCov">          0 :     EXPECT_TRUE(false);</span>
+<span class="lineNum">     369 </span>            :   }
+<span class="lineNum">     370 </span><span class="lineCov">          2 :   catch (const runtime_error &amp;e) {</span>
+<span class="lineNum">     371 </span><span class="lineCov">          2 :     std::string msg = e.what();</span>
+<span class="lineNum">     372 </span><span class="lineCov">          1 :     EXPECT_TRUE(msg.find(&quot;line 2, column 11&quot;) != std::string::npos);</span>
+<span class="lineNum">     373 </span><span class="lineCov">          1 :     EXPECT_TRUE(msg.find(&quot;expected an '='&quot;) != std::string::npos);</span>
+<span class="lineNum">     374 </span>            :   }
+<span class="lineNum">     375 </span>            :   try {
+<span class="lineNum">     376 </span>            :     ndt::type(&quot;\n&quot;
+<span class="lineNum">     377 </span>            :               &quot;type MyInt = &amp;\n&quot;
+<span class="lineNum">     378 </span><span class="lineCov">          2 :               &quot;2 * MyInt\n&quot;);</span>
+<span class="lineNum">     379 </span><span class="lineNoCov">          0 :     EXPECT_TRUE(false);</span>
+<span class="lineNum">     380 </span>            :   }
+<span class="lineNum">     381 </span><span class="lineCov">          2 :   catch (const runtime_error &amp;e) {</span>
+<span class="lineNum">     382 </span><span class="lineCov">          2 :     std::string msg = e.what();</span>
+<span class="lineNum">     383 </span><span class="lineCov">          1 :     EXPECT_TRUE(msg.find(&quot;line 2, column 13&quot;) != std::string::npos);</span>
+<span class="lineNum">     384 </span><span class="lineCov">          1 :     EXPECT_TRUE(msg.find(&quot;expected a data type&quot;) != std::string::npos);</span>
+<span class="lineNum">     385 </span>            :   }
+<span class="lineNum">     386 </span>            :   try {
+<span class="lineNum">     387 </span>            :     ndt::type(&quot;\n&quot;
+<span class="lineNum">     388 </span>            :               &quot;type int32 = int64\n&quot;
+<span class="lineNum">     389 </span><span class="lineCov">          2 :               &quot;2 * int32\n&quot;);</span>
+<span class="lineNum">     390 </span><span class="lineNoCov">          0 :     EXPECT_TRUE(false);</span>
+<span class="lineNum">     391 </span>            :   }
+<span class="lineNum">     392 </span><span class="lineCov">          2 :   catch (const runtime_error &amp;e) {</span>
+<span class="lineNum">     393 </span><span class="lineCov">          2 :     std::string msg = e.what();</span>
+<span class="lineNum">     394 </span><span class="lineCov">          1 :     EXPECT_TRUE(msg.find(&quot;line 2, column 6&quot;) != std::string::npos);</span>
+<span class="lineNum">     395 </span><span class="lineCov">          1 :     EXPECT_TRUE(msg.find(&quot;cannot redefine&quot;) != std::string::npos);</span>
+<span class="lineNum">     396 </span>            :   }
+<span class="lineNum">     397 </span>            :   try {
+<span class="lineNum">     398 </span>            :     ndt::type(&quot;\n&quot;
+<span class="lineNum">     399 </span>            :               &quot;type MyInt = int64\n&quot;
+<span class="lineNum">     400 </span>            :               &quot;type MyInt = int32\n&quot;
+<span class="lineNum">     401 </span><span class="lineCov">          2 :               &quot;2 * MyInt\n&quot;);</span>
+<span class="lineNum">     402 </span><span class="lineNoCov">          0 :     EXPECT_TRUE(false);</span>
+<span class="lineNum">     403 </span>            :   }
+<span class="lineNum">     404 </span><span class="lineCov">          2 :   catch (const runtime_error &amp;e) {</span>
+<span class="lineNum">     405 </span><span class="lineCov">          2 :     std::string msg = e.what();</span>
+<span class="lineNum">     406 </span><span class="lineCov">          1 :     EXPECT_TRUE(msg.find(&quot;line 3, column 6&quot;) != std::string::npos);</span>
+<span class="lineNum">     407 </span><span class="lineCov">          1 :     EXPECT_TRUE(msg.find(&quot;type name already defined&quot;) != std::string::npos);</span>
+<span class="lineNum">     408 </span>            :   }
+<a name="409"><span class="lineNum">     409 </span><span class="lineCov">          1 : }</span></a>
+<span class="lineNum">     410 </span>            : 
+<span class="lineNum">     411 </span><span class="lineCov">          5 : TEST(DataShapeParser, KivaLoanDataShape)</span>
+<span class="lineNum">     412 </span>            : {
+<span class="lineNum">     413 </span>            :   const char *klds = &quot;type KivaLoan = {\n&quot;
+<span class="lineNum">     414 </span>            :                      &quot;    id: int64,\n&quot;
+<span class="lineNum">     415 </span>            :                      &quot;    name: string,\n&quot;
+<span class="lineNum">     416 </span>            :                      &quot;    description: {\n&quot;
+<span class="lineNum">     417 </span>            :                      &quot;        languages: var * fixed_string[2],\n&quot;
+<span class="lineNum">     418 </span>            :                      &quot;    #    texts: map(fixed_string[2], string),\n&quot;
+<span class="lineNum">     419 </span>            :                      &quot;    },\n&quot;
+<span class="lineNum">     420 </span>            :                      &quot;    status: string, # LoanStatusType,\n&quot;
+<span class="lineNum">     421 </span>            :                      &quot;    funded_amount: float64,\n&quot;
+<span class="lineNum">     422 </span>            :                      &quot;    #basket_amount: Option(float64),\n&quot;
+<span class="lineNum">     423 </span>            :                      &quot;    paid_amount: float64,\n&quot;
+<span class="lineNum">     424 </span>            :                      &quot;    image: {\n&quot;
+<span class="lineNum">     425 </span>            :                      &quot;        id: int64,\n&quot;
+<span class="lineNum">     426 </span>            :                      &quot;        template_id: int64,\n&quot;
+<span class="lineNum">     427 </span>            :                      &quot;    },\n&quot;
+<span class="lineNum">     428 </span>            :                      &quot;    #video: Option({\n&quot;
+<span class="lineNum">     429 </span>            :                      &quot;    #    id: int64,\n&quot;
+<span class="lineNum">     430 </span>            :                      &quot;    #    youtube_id: string,\n&quot;
+<span class="lineNum">     431 </span>            :                      &quot;    #}),\n&quot;
+<span class="lineNum">     432 </span>            :                      &quot;    activity: string,\n&quot;
+<span class="lineNum">     433 </span>            :                      &quot;    sector: string,\n&quot;
+<span class="lineNum">     434 </span>            :                      &quot;    use: string,\n&quot;
+<span class="lineNum">     435 </span>            :                      &quot;    # For 'delinquent', saw values \&quot;null\&quot; and \&quot;true\&quot; in brief &quot;
+<span class="lineNum">     436 </span>            :                      &quot;search, map null -&gt; false on import?\n&quot;
+<span class="lineNum">     437 </span>            :                      &quot;    delinquent: bool,\n&quot;
+<span class="lineNum">     438 </span>            :                      &quot;    location: {\n&quot;
+<span class="lineNum">     439 </span>            :                      &quot;        country_code: fixed_string[2],\n&quot;
+<span class="lineNum">     440 </span>            :                      &quot;        country: string,\n&quot;
+<span class="lineNum">     441 </span>            :                      &quot;        town: string,\n&quot;
+<span class="lineNum">     442 </span>            :                      &quot;        geo: {\n&quot;
+<span class="lineNum">     443 </span>            :                      &quot;            level: string, # GeoLevelType\n&quot;
+<span class="lineNum">     444 </span>            :                      &quot;            pairs: string, # latlong\n&quot;
+<span class="lineNum">     445 </span>            :                      &quot;            type: string, # GeoTypeType\n&quot;
+<span class="lineNum">     446 </span>            :                      &quot;        }\n&quot;
+<span class="lineNum">     447 </span>            :                      &quot;    },\n&quot;
+<span class="lineNum">     448 </span>            :                      &quot;    partner_id: int64,\n&quot;
+<span class="lineNum">     449 </span>            :                      &quot;    #posted_date: datetime&lt;seconds&gt;,\n&quot;
+<span class="lineNum">     450 </span>            :                      &quot;    #planned_expiration_date: Option(datetime&lt;seconds&gt;),\n&quot;
+<span class="lineNum">     451 </span>            :                      &quot;    loan_amount: float64,\n&quot;
+<span class="lineNum">     452 </span>            :                      &quot;    #currency_exchange_loss_amount: Option(float64),\n&quot;
+<span class="lineNum">     453 </span>            :                      &quot;    borrowers: var * {\n&quot;
+<span class="lineNum">     454 </span>            :                      &quot;        first_name: string,\n&quot;
+<span class="lineNum">     455 </span>            :                      &quot;        last_name: string,\n&quot;
+<span class="lineNum">     456 </span>            :                      &quot;        gender: fixed_string[2], # GenderType\n&quot;
+<span class="lineNum">     457 </span>            :                      &quot;        pictured: bool,\n&quot;
+<span class="lineNum">     458 </span>            :                      &quot;    },\n&quot;
+<span class="lineNum">     459 </span>            :                      &quot;    terms: {\n&quot;
+<span class="lineNum">     460 </span>            :                      &quot;    #    disbursal_date: datetime&lt;seconds&gt;,\n&quot;
+<span class="lineNum">     461 </span>            :                      &quot;    #    disbursal_currency: Option(string),\n&quot;
+<span class="lineNum">     462 </span>            :                      &quot;        disbursal_amount: float64,\n&quot;
+<span class="lineNum">     463 </span>            :                      &quot;        loan_amount: float64,\n&quot;
+<span class="lineNum">     464 </span>            :                      &quot;        local_payments: var * {\n&quot;
+<span class="lineNum">     465 </span>            :                      &quot;    #        due_date: datetime&lt;seconds&gt;,\n&quot;
+<span class="lineNum">     466 </span>            :                      &quot;            amount: float64,\n&quot;
+<span class="lineNum">     467 </span>            :                      &quot;        },\n&quot;
+<span class="lineNum">     468 </span>            :                      &quot;        scheduled_payments: var * {\n&quot;
+<span class="lineNum">     469 </span>            :                      &quot;    #        due_date: datetime&lt;seconds&gt;,\n&quot;
+<span class="lineNum">     470 </span>            :                      &quot;            amount: float64,\n&quot;
+<span class="lineNum">     471 </span>            :                      &quot;        },\n&quot;
+<span class="lineNum">     472 </span>            :                      &quot;        loss_liability: {\n&quot;
+<span class="lineNum">     473 </span>            :                      &quot;    #        nonpayment: Categorical(string, [\&quot;lender\&quot;, &quot;
+<span class="lineNum">     474 </span>            :                      &quot;\&quot;partner\&quot;]),\n&quot;
+<span class="lineNum">     475 </span>            :                      &quot;            currency_exchange: string,\n&quot;
+<span class="lineNum">     476 </span>            :                      &quot;    #        currency_exchange_coverage_rate: Option(float64),\n&quot;
+<span class="lineNum">     477 </span>            :                      &quot;        }\n&quot;
+<span class="lineNum">     478 </span>            :                      &quot;    },\n&quot;
+<span class="lineNum">     479 </span>            :                      &quot;    payments: var * {\n&quot;
+<span class="lineNum">     480 </span>            :                      &quot;        amount: float64,\n&quot;
+<span class="lineNum">     481 </span>            :                      &quot;        local_amount: float64,\n&quot;
+<span class="lineNum">     482 </span>            :                      &quot;    #    processed_date: datetime&lt;seconds&gt;,\n&quot;
+<span class="lineNum">     483 </span>            :                      &quot;    #    settlement_date: datetime&lt;seconds&gt;,\n&quot;
+<span class="lineNum">     484 </span>            :                      &quot;        rounded_local_amount: float64,\n&quot;
+<span class="lineNum">     485 </span>            :                      &quot;        currency_exchange_loss_amount: float64,\n&quot;
+<span class="lineNum">     486 </span>            :                      &quot;        payment_id: int64,\n&quot;
+<span class="lineNum">     487 </span>            :                      &quot;        comment: string,\n&quot;
+<span class="lineNum">     488 </span>            :                      &quot;    },\n&quot;
+<span class="lineNum">     489 </span>            :                      &quot;    #funded_date: datetime&lt;seconds&gt;,\n&quot;
+<span class="lineNum">     490 </span>            :                      &quot;    #paid_date: datetime&lt;seconds&gt;,\n&quot;
+<span class="lineNum">     491 </span>            :                      &quot;    journal_totals: {\n&quot;
+<span class="lineNum">     492 </span>            :                      &quot;        entries: int64,\n&quot;
+<span class="lineNum">     493 </span>            :                      &quot;        bulkEntries: int64,\n&quot;
+<span class="lineNum">     494 </span>            :                      &quot;    }\n&quot;
+<span class="lineNum">     495 </span><span class="lineCov">          1 :                      &quot;}\n&quot;;</span>
+<span class="lineNum">     496 </span><span class="lineCov">          2 :   ndt::type d = ndt::type(klds);</span>
+<span class="lineNum">     497 </span><span class="lineCov">          1 :   EXPECT_EQ(struct_id, d.get_id());</span>
+<a name="498"><span class="lineNum">     498 </span><span class="lineCov">          1 : }</span></a>
+<span class="lineNum">     499 </span>            : 
+<span class="lineNum">     500 </span><span class="lineCov">          5 : TEST(DataShapeParser, SpecialCharacterFields)</span>
+<span class="lineNum">     501 </span>            : {
+<span class="lineNum">     502 </span>            :   /*
+<span class="lineNum">     503 </span>            :     This suite is designed to test the handling of special characters in struct
+<span class="lineNum">     504 </span>            :     field names
+<span class="lineNum">     505 </span>            :       when the datashape parser is turning a string into types.
+<span class="lineNum">     506 </span>            :     Any field name that has special characters should be enclosed in quotes in
+<span class="lineNum">     507 </span>            :     order to be handled properly.
+<span class="lineNum">     508 </span>            :     Special characters may include:
+<span class="lineNum">     509 </span>            :     - space
+<span class="lineNum">     510 </span>            :     - slashes, comma, :
+<span class="lineNum">     511 </span>            :     - unicode, \n, \r, \t, etc.
+<span class="lineNum">     512 </span>            :     - forwardslash?
+<span class="lineNum">     513 </span>            :     - parens?
+<span class="lineNum">     514 </span>            :     - date and time?
+<span class="lineNum">     515 </span>            :     - numbers
+<span class="lineNum">     516 </span>            :    */
+<span class="lineNum">     517 </span>            : 
+<span class="lineNum">     518 </span>            :   // p_dt == primary_datatype, s_dt == secondary_datatype
+<span class="lineNum">     519 </span><span class="lineCov">          2 :   ndt::type p_dt, s_dt;</span>
+<span class="lineNum">     520 </span>            :   // ss == secondary_stream. This variable will be used to turn an existing
+<span class="lineNum">     521 </span>            :   // datatype into a string. That string will later be re-parsed and
+<span class="lineNum">     522 </span>            :   // compared against the primary datatype for equality.
+<span class="lineNum">     523 </span><span class="lineCov">          2 :   stringstream ss;</span>
+<span class="lineNum">     524 </span>            : 
+<span class="lineNum">     525 </span>            :   // Test basic occurrences of spaces in field names.
+<span class="lineNum">     526 </span>            :   // Potential special cases are:
+<span class="lineNum">     527 </span>            :   // beginning of name
+<span class="lineNum">     528 </span>            :   // end of name
+<span class="lineNum">     529 </span>            :   // middle of name
+<span class="lineNum">     530 </span>            :   // multiple spaces at beginning, middle, or end
+<span class="lineNum">     531 </span><span class="lineCov">          1 :   p_dt = ndt::type(&quot;{ 'sepal length' : float64 }&quot;);</span>
+<span class="lineNum">     532 </span><span class="lineCov">          1 :   ss &lt;&lt; p_dt;</span>
+<span class="lineNum">     533 </span><span class="lineCov">          1 :   s_dt = ndt::type(ss.str());</span>
+<span class="lineNum">     534 </span><span class="lineCov">          1 :   ss.str(&quot;&quot;);</span>
+<span class="lineNum">     535 </span><span class="lineCov">          1 :   EXPECT_EQ(p_dt, ndt::struct_type::make({&quot;sepal length&quot;}, {ndt::make_type&lt;double&gt;()}));</span>
+<span class="lineNum">     536 </span><span class="lineCov">          1 :   EXPECT_EQ(p_dt, s_dt);</span>
+<span class="lineNum">     537 </span>            : 
+<span class="lineNum">     538 </span><span class="lineCov">          1 :   p_dt = ndt::type(&quot;{ ' sepal length' : float64 }&quot;);</span>
+<span class="lineNum">     539 </span><span class="lineCov">          1 :   EXPECT_EQ(p_dt, ndt::struct_type::make({&quot; sepal length&quot;}, {ndt::make_type&lt;double&gt;()}));</span>
+<span class="lineNum">     540 </span><span class="lineCov">          1 :   ss &lt;&lt; p_dt;</span>
+<span class="lineNum">     541 </span><span class="lineCov">          1 :   s_dt = ndt::type(ss.str());</span>
+<span class="lineNum">     542 </span><span class="lineCov">          1 :   ss.str(&quot;&quot;);</span>
+<span class="lineNum">     543 </span><span class="lineCov">          1 :   EXPECT_EQ(p_dt, s_dt);</span>
+<span class="lineNum">     544 </span>            : 
+<span class="lineNum">     545 </span><span class="lineCov">          1 :   p_dt = ndt::type(&quot;{ 'sepal length ' : float64 }&quot;);</span>
+<span class="lineNum">     546 </span><span class="lineCov">          1 :   EXPECT_EQ(p_dt, ndt::struct_type::make({&quot;sepal length &quot;}, {ndt::make_type&lt;double&gt;()}));</span>
+<span class="lineNum">     547 </span><span class="lineCov">          1 :   ss &lt;&lt; p_dt;</span>
+<span class="lineNum">     548 </span><span class="lineCov">          1 :   s_dt = ndt::type(ss.str());</span>
+<span class="lineNum">     549 </span><span class="lineCov">          1 :   ss.str(&quot;&quot;);</span>
+<span class="lineNum">     550 </span><span class="lineCov">          1 :   EXPECT_EQ(p_dt, s_dt);</span>
+<span class="lineNum">     551 </span>            : 
+<span class="lineNum">     552 </span><span class="lineCov">          1 :   p_dt = ndt::type(&quot;{ ' sepal length ' : float64 }&quot;);</span>
+<span class="lineNum">     553 </span><span class="lineCov">          1 :   EXPECT_EQ(p_dt, ndt::struct_type::make({&quot; sepal length &quot;}, {ndt::make_type&lt;double&gt;()}));</span>
+<span class="lineNum">     554 </span><span class="lineCov">          1 :   ss &lt;&lt; p_dt;</span>
+<span class="lineNum">     555 </span><span class="lineCov">          1 :   s_dt = ndt::type(ss.str());</span>
+<span class="lineNum">     556 </span><span class="lineCov">          1 :   ss.str(&quot;&quot;);</span>
+<span class="lineNum">     557 </span><span class="lineCov">          1 :   EXPECT_EQ(p_dt, s_dt);</span>
+<span class="lineNum">     558 </span>            : 
+<span class="lineNum">     559 </span><span class="lineCov">          1 :   p_dt = ndt::type(&quot;{ '   sepal         length   ' : float64 }&quot;);</span>
+<span class="lineNum">     560 </span><span class="lineCov">          1 :   EXPECT_EQ(p_dt, ndt::struct_type::make({&quot;   sepal         length   &quot;}, {ndt::make_type&lt;double&gt;()}));</span>
+<span class="lineNum">     561 </span><span class="lineCov">          1 :   ss &lt;&lt; p_dt;</span>
+<span class="lineNum">     562 </span><span class="lineCov">          1 :   s_dt = ndt::type(ss.str());</span>
+<span class="lineNum">     563 </span><span class="lineCov">          1 :   ss.str(&quot;&quot;);</span>
+<span class="lineNum">     564 </span><span class="lineCov">          1 :   EXPECT_EQ(p_dt, s_dt);</span>
+<span class="lineNum">     565 </span>            : 
+<span class="lineNum">     566 </span>            :   // parens test
+<span class="lineNum">     567 </span>            :   // Potential special cases are:
+<span class="lineNum">     568 </span>            :   // beginning of name
+<span class="lineNum">     569 </span>            :   // end of name
+<span class="lineNum">     570 </span>            :   // middle of name
+<span class="lineNum">     571 </span>            :   // unmatched parens
+<span class="lineNum">     572 </span>            :   // multiple parens
+<span class="lineNum">     573 </span><span class="lineCov">          1 :   p_dt = ndt::type(&quot;{ 'unique key(foo)' : float64 }&quot;);</span>
+<span class="lineNum">     574 </span><span class="lineCov">          1 :   EXPECT_EQ(p_dt, ndt::struct_type::make({&quot;unique key(foo)&quot;}, {ndt::make_type&lt;double&gt;()}));</span>
+<span class="lineNum">     575 </span><span class="lineCov">          1 :   ss &lt;&lt; p_dt;</span>
+<span class="lineNum">     576 </span><span class="lineCov">          1 :   s_dt = ndt::type(ss.str());</span>
+<span class="lineNum">     577 </span><span class="lineCov">          1 :   ss.str(&quot;&quot;);</span>
+<span class="lineNum">     578 </span><span class="lineCov">          1 :   EXPECT_EQ(p_dt, s_dt);</span>
+<span class="lineNum">     579 </span>            : 
+<span class="lineNum">     580 </span><span class="lineCov">          1 :   p_dt = ndt::type(&quot;{ '(foo unique key' : float64 }&quot;);</span>
+<span class="lineNum">     581 </span><span class="lineCov">          1 :   EXPECT_EQ(p_dt, ndt::struct_type::make({&quot;(foo unique key&quot;}, {ndt::make_type&lt;double&gt;()}));</span>
+<span class="lineNum">     582 </span><span class="lineCov">          1 :   ss &lt;&lt; p_dt;</span>
+<span class="lineNum">     583 </span><span class="lineCov">          1 :   s_dt = ndt::type(ss.str());</span>
+<span class="lineNum">     584 </span><span class="lineCov">          1 :   ss.str(&quot;&quot;);</span>
+<span class="lineNum">     585 </span><span class="lineCov">          1 :   EXPECT_EQ(p_dt, s_dt);</span>
+<span class="lineNum">     586 </span>            : 
+<span class="lineNum">     587 </span><span class="lineCov">          1 :   p_dt = ndt::type(&quot;{ '(foo unique key)' : float64 }&quot;);</span>
+<span class="lineNum">     588 </span><span class="lineCov">          1 :   EXPECT_EQ(p_dt, ndt::struct_type::make({&quot;(foo unique key)&quot;}, {ndt::make_type&lt;double&gt;()}));</span>
+<span class="lineNum">     589 </span><span class="lineCov">          1 :   ss &lt;&lt; p_dt;</span>
+<span class="lineNum">     590 </span><span class="lineCov">          1 :   s_dt = ndt::type(ss.str());</span>
+<span class="lineNum">     591 </span><span class="lineCov">          1 :   ss.str(&quot;&quot;);</span>
+<span class="lineNum">     592 </span><span class="lineCov">          1 :   EXPECT_EQ(p_dt, s_dt);</span>
+<span class="lineNum">     593 </span>            : 
+<span class="lineNum">     594 </span><span class="lineCov">          1 :   p_dt = ndt::type(&quot;{ 'foo unique key)' : float64 }&quot;);</span>
+<span class="lineNum">     595 </span><span class="lineCov">          1 :   EXPECT_EQ(p_dt, ndt::struct_type::make({&quot;foo unique key)&quot;}, {ndt::make_type&lt;double&gt;()}));</span>
+<span class="lineNum">     596 </span><span class="lineCov">          1 :   ss &lt;&lt; p_dt;</span>
+<span class="lineNum">     597 </span><span class="lineCov">          1 :   s_dt = ndt::type(ss.str());</span>
+<span class="lineNum">     598 </span><span class="lineCov">          1 :   ss.str(&quot;&quot;);</span>
+<span class="lineNum">     599 </span><span class="lineCov">          1 :   EXPECT_EQ(p_dt, s_dt);</span>
+<span class="lineNum">     600 </span>            : 
+<span class="lineNum">     601 </span><span class="lineCov">          1 :   p_dt = ndt::type(&quot;{ '( foo unique key' : float64 }&quot;);</span>
+<span class="lineNum">     602 </span><span class="lineCov">          1 :   EXPECT_EQ(p_dt, ndt::struct_type::make({&quot;( foo unique key&quot;}, {ndt::make_type&lt;double&gt;()}));</span>
+<span class="lineNum">     603 </span><span class="lineCov">          1 :   ss &lt;&lt; p_dt;</span>
+<span class="lineNum">     604 </span><span class="lineCov">          1 :   s_dt = ndt::type(ss.str());</span>
+<span class="lineNum">     605 </span><span class="lineCov">          1 :   ss.str(&quot;&quot;);</span>
+<span class="lineNum">     606 </span><span class="lineCov">          1 :   EXPECT_EQ(p_dt, s_dt);</span>
+<span class="lineNum">     607 </span>            : 
+<span class="lineNum">     608 </span><span class="lineCov">          1 :   p_dt = ndt::type(&quot;{ '((((foouniquekey))())((' : float64 }&quot;);</span>
+<span class="lineNum">     609 </span><span class="lineCov">          1 :   EXPECT_EQ(p_dt, ndt::struct_type::make({&quot;((((foouniquekey))())((&quot;}, {ndt::make_type&lt;double&gt;()}));</span>
+<span class="lineNum">     610 </span><span class="lineCov">          1 :   ss &lt;&lt; p_dt;</span>
+<span class="lineNum">     611 </span><span class="lineCov">          1 :   s_dt = ndt::type(ss.str());</span>
+<span class="lineNum">     612 </span><span class="lineCov">          1 :   ss.str(&quot;&quot;);</span>
+<span class="lineNum">     613 </span><span class="lineCov">          1 :   EXPECT_EQ(p_dt, s_dt);</span>
+<span class="lineNum">     614 </span>            : 
+<span class="lineNum">     615 </span>            :   // Quote tests. These can get a little tricky since the quotes must be
+<span class="lineNum">     616 </span>            :   // escaped, and the backslashes may have to be escaped as well
+<span class="lineNum">     617 </span><span class="lineCov">          1 :   p_dt = ndt::type(&quot;{ 'sepal \&quot;\&quot;\&quot; length' : float64, 'sepal width' : float64 }&quot;);</span>
+<span class="lineNum">     618 </span><span class="lineCov">          1 :   EXPECT_EQ(p_dt, ndt::struct_type::make({&quot;sepal \&quot;\&quot;\&quot; length&quot;, &quot;sepal width&quot;},</span>
+<span class="lineNum">     619 </span><span class="lineNoCov">          0 :                                          {ndt::make_type&lt;double&gt;(), ndt::make_type&lt;double&gt;()}));</span>
+<span class="lineNum">     620 </span><span class="lineCov">          1 :   ss &lt;&lt; p_dt;</span>
+<span class="lineNum">     621 </span><span class="lineCov">          1 :   s_dt = ndt::type(ss.str());</span>
+<span class="lineNum">     622 </span><span class="lineCov">          1 :   ss.str(&quot;&quot;);</span>
+<span class="lineNum">     623 </span><span class="lineCov">          1 :   EXPECT_EQ(p_dt, s_dt);</span>
+<span class="lineNum">     624 </span>            : 
+<span class="lineNum">     625 </span><span class="lineCov">          1 :   p_dt = ndt::type(&quot;{ 'sepal \\'\\'\\' length' : float64, 'sepal width' : float64 }&quot;);</span>
+<span class="lineNum">     626 </span><span class="lineCov">          1 :   EXPECT_EQ(p_dt, ndt::struct_type::make({&quot;sepal ''' length&quot;, &quot;sepal width&quot;},</span>
+<span class="lineNum">     627 </span><span class="lineNoCov">          0 :                                          {ndt::make_type&lt;double&gt;(), ndt::make_type&lt;double&gt;()}));</span>
+<span class="lineNum">     628 </span><span class="lineCov">          1 :   ss &lt;&lt; p_dt;</span>
+<span class="lineNum">     629 </span><span class="lineCov">          1 :   s_dt = ndt::type(ss.str());</span>
+<span class="lineNum">     630 </span><span class="lineCov">          1 :   ss.str(&quot;&quot;);</span>
+<span class="lineNum">     631 </span><span class="lineCov">          1 :   EXPECT_EQ(p_dt, s_dt);</span>
+<span class="lineNum">     632 </span>            : 
+<span class="lineNum">     633 </span><span class="lineCov">          2 :   p_dt = ndt::type(&quot;{ ' sepal \\'\\'\\' length ' : float64, 'sepal &quot;</span>
+<span class="lineNum">     634 </span><span class="lineCov">          1 :                    &quot;\&quot; \\\&quot; \\\\\\' width ' : float64 }&quot;);</span>
+<span class="lineNum">     635 </span><span class="lineCov">          1 :   EXPECT_EQ(p_dt, ndt::struct_type::make({&quot; sepal ''' length &quot;, &quot;sepal \&quot; \&quot; \\' width &quot;},</span>
+<span class="lineNum">     636 </span><span class="lineNoCov">          0 :                                          {ndt::make_type&lt;double&gt;(), ndt::make_type&lt;double&gt;()}));</span>
+<span class="lineNum">     637 </span><span class="lineCov">          1 :   ss &lt;&lt; p_dt;</span>
+<span class="lineNum">     638 </span><span class="lineCov">          1 :   s_dt = ndt::type(ss.str());</span>
+<span class="lineNum">     639 </span><span class="lineCov">          1 :   ss.str(&quot;&quot;);</span>
+<span class="lineNum">     640 </span><span class="lineCov">          1 :   EXPECT_EQ(p_dt, s_dt);</span>
+<span class="lineNum">     641 </span>            : 
+<span class="lineNum">     642 </span><span class="lineCov">          1 :   p_dt = ndt::type(&quot;{ 'sepal \\'\\'\\' length' : float64, 'sepal width' : float64 }&quot;);</span>
+<span class="lineNum">     643 </span><span class="lineCov">          1 :   EXPECT_EQ(p_dt, ndt::struct_type::make({&quot;sepal ''' length&quot;, &quot;sepal width&quot;},</span>
+<span class="lineNum">     644 </span><span class="lineNoCov">          0 :                                          {ndt::make_type&lt;double&gt;(), ndt::make_type&lt;double&gt;()}));</span>
+<span class="lineNum">     645 </span><span class="lineCov">          1 :   ss &lt;&lt; p_dt;</span>
+<span class="lineNum">     646 </span><span class="lineCov">          1 :   s_dt = ndt::type(ss.str());</span>
+<span class="lineNum">     647 </span><span class="lineCov">          1 :   ss.str(&quot;&quot;);</span>
+<span class="lineNum">     648 </span><span class="lineCov">          1 :   EXPECT_EQ(p_dt, s_dt);</span>
+<span class="lineNum">     649 </span>            : 
+<span class="lineNum">     650 </span>            :   // A space is a valid field name. Perhaps it should not be.
+<span class="lineNum">     651 </span><span class="lineCov">          1 :   p_dt = ndt::type(&quot;{ ' ' : float64 }&quot;);</span>
+<span class="lineNum">     652 </span><span class="lineCov">          1 :   EXPECT_EQ(p_dt, ndt::struct_type::make({&quot; &quot;}, {ndt::make_type&lt;double&gt;()}));</span>
+<span class="lineNum">     653 </span><span class="lineCov">          1 :   ss &lt;&lt; p_dt;</span>
+<span class="lineNum">     654 </span><span class="lineCov">          1 :   s_dt = ndt::type(ss.str());</span>
+<span class="lineNum">     655 </span><span class="lineCov">          1 :   ss.str(&quot;&quot;);</span>
+<span class="lineNum">     656 </span><span class="lineCov">          1 :   EXPECT_EQ(p_dt, s_dt);</span>
+<span class="lineNum">     657 </span>            : 
+<span class="lineNum">     658 </span>            :   // NOTE: According to the grammar, bare backslashes are not allowed as field
+<span class="lineNum">     659 </span>            :   // names.
+<span class="lineNum">     660 </span>            :   //      Also not allowed are bare \n, \r, &quot;, or ' characters
+<span class="lineNum">     661 </span>            :   //      So, that means that the following tests should fail.
+<span class="lineNum">     662 </span>            :   // This one hurts my brain. When the string is parsed, each \\ gets turned
+<span class="lineNum">     663 </span>            :   // into a single \.
+<span class="lineNum">     664 </span>            :   // The final \\ is interpreted as a single \ in the name.
+<span class="lineNum">     665 </span>            :   // But, when converting the datatype back to a string, the single \ is escaped
+<span class="lineNum">     666 </span>            :   // as a \\ by print_escaped_utf8_string() via
+<span class="lineNum">     667 </span>            :   //  struct_type::print_type()
+<span class="lineNum">     668 </span>            :   /*To see that kind of code in action, try this:
+<span class="lineNum">     669 </span>            :     char char_backslash=char(92);
+<span class="lineNum">     670 </span>            :     const char *backslash=&amp;c_bs;
+<span class="lineNum">     671 </span>            :     print_escaped_utf8_string(std::cout, backslash, backslash+1, true);
+<span class="lineNum">     672 </span>            :    */
+<span class="lineNum">     673 </span><span class="lineCov">          1 :   p_dt = ndt::type(&quot;{ '\\\\' : float64 }&quot;);</span>
+<span class="lineNum">     674 </span><span class="lineCov">          1 :   EXPECT_EQ(p_dt, ndt::struct_type::make({&quot;\\&quot;}, {ndt::make_type&lt;double&gt;()}));</span>
+<span class="lineNum">     675 </span><span class="lineCov">          1 :   ss &lt;&lt; p_dt;</span>
+<span class="lineNum">     676 </span><span class="lineCov">          1 :   s_dt = ndt::type(ss.str());</span>
+<span class="lineNum">     677 </span><span class="lineCov">          1 :   ss.str(&quot;&quot;);</span>
+<span class="lineNum">     678 </span><span class="lineCov">          1 :   EXPECT_EQ(p_dt, s_dt);</span>
+<span class="lineNum">     679 </span>            : 
+<span class="lineNum">     680 </span><span class="lineCov">          1 :   p_dt = ndt::type(&quot;{ '\n' : float64 }&quot;);</span>
+<span class="lineNum">     681 </span><span class="lineCov">          1 :   EXPECT_EQ(p_dt, ndt::struct_type::make({&quot;\n&quot;}, {ndt::make_type&lt;double&gt;()}));</span>
+<span class="lineNum">     682 </span><span class="lineCov">          1 :   ss &lt;&lt; p_dt;</span>
+<span class="lineNum">     683 </span><span class="lineCov">          1 :   s_dt = ndt::type(ss.str());</span>
+<span class="lineNum">     684 </span><span class="lineCov">          1 :   ss.str(&quot;&quot;);</span>
+<span class="lineNum">     685 </span><span class="lineCov">          1 :   EXPECT_EQ(p_dt, s_dt);</span>
+<span class="lineNum">     686 </span>            : 
+<span class="lineNum">     687 </span><span class="lineCov">          1 :   p_dt = ndt::type(&quot;{ '\r' : float64 }&quot;);</span>
+<span class="lineNum">     688 </span><span class="lineCov">          1 :   EXPECT_EQ(p_dt, ndt::struct_type::make({&quot;\r&quot;}, {ndt::make_type&lt;double&gt;()}));</span>
+<span class="lineNum">     689 </span><span class="lineCov">          1 :   ss &lt;&lt; p_dt;</span>
+<span class="lineNum">     690 </span><span class="lineCov">          1 :   s_dt = ndt::type(ss.str());</span>
+<span class="lineNum">     691 </span><span class="lineCov">          1 :   ss.str(&quot;&quot;);</span>
+<span class="lineNum">     692 </span><span class="lineCov">          1 :   EXPECT_EQ(p_dt, s_dt);</span>
+<span class="lineNum">     693 </span>            : 
+<span class="lineNum">     694 </span><span class="lineCov">          1 :   p_dt = ndt::type(&quot;{ '\\\'' : float64 }&quot;);</span>
+<span class="lineNum">     695 </span><span class="lineCov">          1 :   EXPECT_EQ(p_dt, ndt::struct_type::make({&quot;\'&quot;}, {ndt::make_type&lt;double&gt;()}));</span>
+<span class="lineNum">     696 </span><span class="lineCov">          1 :   ss &lt;&lt; p_dt;</span>
+<span class="lineNum">     697 </span><span class="lineCov">          1 :   s_dt = ndt::type(ss.str());</span>
+<span class="lineNum">     698 </span><span class="lineCov">          1 :   ss.str(&quot;&quot;);</span>
+<span class="lineNum">     699 </span><span class="lineCov">          1 :   EXPECT_EQ(p_dt, s_dt);</span>
+<span class="lineNum">     700 </span>            : 
+<span class="lineNum">     701 </span><span class="lineCov">          1 :   p_dt = ndt::type(&quot;{ '\&quot;' : float64 }&quot;);</span>
+<span class="lineNum">     702 </span><span class="lineCov">          1 :   EXPECT_EQ(p_dt, ndt::struct_type::make({&quot;\&quot;&quot;}, {ndt::make_type&lt;double&gt;()}));</span>
+<span class="lineNum">     703 </span><span class="lineCov">          1 :   ss &lt;&lt; p_dt;</span>
+<span class="lineNum">     704 </span><span class="lineCov">          1 :   s_dt = ndt::type(ss.str());</span>
+<span class="lineNum">     705 </span><span class="lineCov">          1 :   ss.str(&quot;&quot;);</span>
+<span class="lineNum">     706 </span><span class="lineCov">          1 :   EXPECT_EQ(p_dt, s_dt);</span>
+<span class="lineNum">     707 </span>            : 
+<span class="lineNum">     708 </span>            :   // Testing forward slashes
+<span class="lineNum">     709 </span><span class="lineCov">          1 :   p_dt = ndt::type(&quot;{ '/usr/bin' : float64 }&quot;);</span>
+<span class="lineNum">     710 </span><span class="lineCov">          1 :   EXPECT_EQ(p_dt, ndt::struct_type::make({&quot;/usr/bin&quot;}, {ndt::make_type&lt;double&gt;()}));</span>
+<span class="lineNum">     711 </span><span class="lineCov">          1 :   ss &lt;&lt; p_dt;</span>
+<span class="lineNum">     712 </span><span class="lineCov">          1 :   s_dt = ndt::type(ss.str());</span>
+<span class="lineNum">     713 </span><span class="lineCov">          1 :   ss.str(&quot;&quot;);</span>
+<span class="lineNum">     714 </span><span class="lineCov">          1 :   EXPECT_EQ(p_dt, s_dt);</span>
+<span class="lineNum">     715 </span>            : 
+<span class="lineNum">     716 </span><span class="lineCov">          1 :   p_dt = ndt::type(&quot;{ '\\\\abcdef' : float64 }&quot;);</span>
+<span class="lineNum">     717 </span><span class="lineCov">          1 :   EXPECT_EQ(p_dt, ndt::struct_type::make({&quot;\\abcdef&quot;}, {ndt::make_type&lt;double&gt;()}));</span>
+<span class="lineNum">     718 </span><span class="lineCov">          1 :   ss &lt;&lt; p_dt;</span>
+<span class="lineNum">     719 </span><span class="lineCov">          1 :   s_dt = ndt::type(ss.str());</span>
+<span class="lineNum">     720 </span><span class="lineCov">          1 :   ss.str(&quot;&quot;);</span>
+<span class="lineNum">     721 </span><span class="lineCov">          1 :   EXPECT_EQ(p_dt, s_dt);</span>
+<span class="lineNum">     722 </span>            : 
+<span class="lineNum">     723 </span><span class="lineCov">          1 :   p_dt = ndt::type(&quot;{'a field with spaces and \&quot; \\\'': int}&quot;);</span>
+<span class="lineNum">     724 </span><span class="lineCov">          1 :   EXPECT_EQ(p_dt, ndt::struct_type::make({&quot;a field with spaces and \&quot; \'&quot;}, {ndt::make_type&lt;int&gt;()}));</span>
+<span class="lineNum">     725 </span><span class="lineCov">          1 :   ss &lt;&lt; p_dt;</span>
+<span class="lineNum">     726 </span><span class="lineCov">          1 :   s_dt = ndt::type(ss.str());</span>
+<span class="lineNum">     727 </span><span class="lineCov">          1 :   ss.str(&quot;&quot;);</span>
+<span class="lineNum">     728 </span><span class="lineCov">          1 :   EXPECT_EQ(p_dt, s_dt);</span>
+<span class="lineNum">     729 </span>            : 
+<span class="lineNum">     730 </span>            :   // Testing field names as numbers
+<span class="lineNum">     731 </span><span class="lineCov">          1 :   p_dt = ndt::type(&quot;{ '1234' : float64, '-1234':float64,'500=1234':float64 }&quot;);</span>
+<span class="lineNum">     732 </span><span class="lineCov">          1 :   EXPECT_EQ(p_dt,</span>
+<span class="lineNum">     733 </span>            :             ndt::struct_type::make({&quot;1234&quot;, &quot;-1234&quot;, &quot;500=1234&quot;},
+<span class="lineNum">     734 </span><span class="lineNoCov">          0 :                                    {ndt::make_type&lt;double&gt;(), ndt::make_type&lt;double&gt;(), ndt::make_type&lt;double&gt;()}));</span>
+<span class="lineNum">     735 </span><span class="lineCov">          1 :   ss &lt;&lt; p_dt;</span>
+<span class="lineNum">     736 </span><span class="lineCov">          1 :   s_dt = ndt::type(ss.str());</span>
+<span class="lineNum">     737 </span><span class="lineCov">          1 :   ss.str(&quot;&quot;);</span>
+<span class="lineNum">     738 </span><span class="lineCov">          1 :   EXPECT_EQ(p_dt, s_dt);</span>
+<span class="lineNum">     739 </span>            : 
+<span class="lineNum">     740 </span>            :   // Other characters or strings that the parser may have trouble with include
+<span class="lineNum">     741 </span>            :   // {,},[,],:,comma,...,&gt;,=,*,&lt;,&gt;,-
+<span class="lineNum">     742 </span><span class="lineCov">          2 :   p_dt = ndt::type(&quot;{'field name[100]': int, 'field name [x]': int, &quot;</span>
+<span class="lineNum">     743 </span><span class="lineCov">          1 :                    &quot;'field : {name-=foo} [0*&lt;&gt;...,]': int}&quot;);</span>
+<span class="lineNum">     744 </span><span class="lineCov">          1 :   EXPECT_EQ(p_dt, ndt::struct_type::make({&quot;field name[100]&quot;, &quot;field name [x]&quot;, &quot;field : {name-=foo} [0*&lt;&gt;...,]&quot;},</span>
+<span class="lineNum">     745 </span><span class="lineNoCov">          0 :                                          {ndt::make_type&lt;int&gt;(), ndt::make_type&lt;int&gt;(), ndt::make_type&lt;int&gt;()}));</span>
+<span class="lineNum">     746 </span><span class="lineCov">          1 :   ss &lt;&lt; p_dt;</span>
+<span class="lineNum">     747 </span><span class="lineCov">          1 :   s_dt = ndt::type(ss.str());</span>
+<span class="lineNum">     748 </span><span class="lineCov">          1 :   ss.str(&quot;&quot;);</span>
+<span class="lineNum">     749 </span><span class="lineCov">          1 :   EXPECT_EQ(p_dt, s_dt);</span>
+<span class="lineNum">     750 </span>            : 
+<span class="lineNum">     751 </span>            :   /*Failing tests:
+<span class="lineNum">     752 </span>            :     If special names aren't enclosed in quotes, the parser should throw an
+<span class="lineNum">     753 </span>            :     exception.
+<span class="lineNum">     754 </span>            :    */
+<span class="lineNum">     755 </span>            :   try {
+<span class="lineNum">     756 </span><span class="lineCov">          2 :     ndt::type d = ndt::type(&quot;{ bad name : int }&quot;);</span>
+<span class="lineNum">     757 </span><span class="lineNoCov">          0 :     EXPECT_TRUE(false);</span>
+<span class="lineNum">     758 </span>            :   }
+<span class="lineNum">     759 </span><span class="lineCov">          2 :   catch (std::runtime_error &amp;e) {</span>
+<span class="lineNum">     760 </span><span class="lineCov">          2 :     std::string msg = e.what();</span>
+<span class="lineNum">     761 </span><span class="lineCov">          1 :     EXPECT_TRUE(msg.find(&quot;Error parsing datashape at line 1, column 6&quot;) != std::string::npos);</span>
+<span class="lineNum">     762 </span><span class="lineCov">          1 :     EXPECT_TRUE(msg.find(&quot;Message: expected ':' after record item name&quot;) != std::string::npos);</span>
+<span class="lineNum">     763 </span>            :   }
+<span class="lineNum">     764 </span>            : 
+<span class="lineNum">     765 </span>            :   try {
+<span class="lineNum">     766 </span><span class="lineCov">          2 :     ndt::type d = ndt::type(&quot;{ name(foo) : int }&quot;);</span>
+<span class="lineNum">     767 </span><span class="lineNoCov">          0 :     EXPECT_TRUE(false);</span>
+<span class="lineNum">     768 </span>            :   }
+<span class="lineNum">     769 </span><span class="lineCov">          2 :   catch (std::runtime_error &amp;e) {</span>
+<span class="lineNum">     770 </span><span class="lineCov">          2 :     std::string msg = e.what();</span>
+<span class="lineNum">     771 </span><span class="lineCov">          1 :     EXPECT_TRUE(msg.find(&quot;Error parsing datashape at line 1, column 7&quot;) != std::string::npos);</span>
+<span class="lineNum">     772 </span><span class="lineCov">          1 :     EXPECT_TRUE(msg.find(&quot;Message: expected ':' after record item name&quot;) != std::string::npos);</span>
+<span class="lineNum">     773 </span>            :   }
+<span class="lineNum">     774 </span>            : 
+<span class="lineNum">     775 </span>            :   try {
+<span class="lineNum">     776 </span><span class="lineCov">          2 :     ndt::type d = ndt::type(&quot;{ name\' : int }&quot;);</span>
+<span class="lineNum">     777 </span><span class="lineNoCov">          0 :     EXPECT_TRUE(false);</span>
+<span class="lineNum">     778 </span>            :   }
+<span class="lineNum">     779 </span><span class="lineCov">          2 :   catch (std::runtime_error &amp;e) {</span>
+<span class="lineNum">     780 </span><span class="lineCov">          2 :     std::string msg = e.what();</span>
+<span class="lineNum">     781 </span><span class="lineCov">          1 :     EXPECT_TRUE(msg.find(&quot;Error parsing datashape at line 1, column 7&quot;) != std::string::npos);</span>
+<span class="lineNum">     782 </span><span class="lineCov">          1 :     EXPECT_TRUE(msg.find(&quot;Message: expected ':' after record item name&quot;) != std::string::npos);</span>
+<span class="lineNum">     783 </span>            :   }
+<a name="784"><span class="lineNum">     784 </span><span class="lineCov">          1 : }</span></a>
+<span class="lineNum">     785 </span>            : 
+<span class="lineNum">     786 </span><span class="lineCov">          6 : static std::string to_str(const nd::array &amp;a)</span>
+<span class="lineNum">     787 </span>            : {
+<span class="lineNum">     788 </span><span class="lineCov">         12 :   stringstream ss;</span>
+<span class="lineNum">     789 </span><span class="lineCov">          6 :   ss &lt;&lt; a;</span>
+<span class="lineNum">     790 </span><span class="lineCov">         12 :   return ss.str();</span>
+<a name="791"><span class="lineNum">     791 </span>            : }</a>
+<span class="lineNum">     792 </span>            : 
+<span class="lineNum">     793 </span><span class="lineCov">          5 : TEST(DataShapeParser, TypeConstructorArgs)</span>
+<span class="lineNum">     794 </span>            : {
+<span class="lineNum">     795 </span><span class="lineCov">          2 :   nd::array a, b;</span>
+<span class="lineNum">     796 </span><span class="lineCov">          1 :   EXPECT_JSON_EQ_ARR(&quot;[[], {}]&quot;, parse_type_constr_args(&quot;[]&quot;));</span>
+<span class="lineNum">     797 </span><span class="lineCov">          1 :   EXPECT_JSON_EQ_ARR(&quot;[[3, -10, \&quot;test\&quot;], {}]&quot;, parse_type_constr_args(&quot;[3, -10, \&quot;test\&quot;]&quot;));</span>
+<span class="lineNum">     798 </span>            :   // The following currently raises a broadcast error in equality testing
+<span class="lineNum">     799 </span><span class="lineCov">          1 :   b = parse_type_constr_args(&quot;[3, -10, \&quot;test\&quot;, first:int32, second:[1,2,3]]&quot;);</span>
+<span class="lineNum">     800 </span><span class="lineCov">          1 :   a = parse_json(b.get_type(), &quot;[[3, -10, \&quot;test\&quot;], [\&quot;int32\&quot;, [1,2,3]]]&quot;);</span>
+<span class="lineNum">     801 </span><span class="lineCov">          1 :   EXPECT_EQ(to_str(a), to_str(b));</span>
+<span class="lineNum">     802 </span><span class="lineCov">          1 :   EXPECT_JSON_EQ_ARR(&quot;[[3, -10, \&quot;test\&quot;], [\&quot;int32\&quot;, \&quot;blah\&quot;]]&quot;,</span>
+<span class="lineNum">     803 </span><span class="lineNoCov">          0 :                      parse_type_constr_args(&quot;[3, -10, \&quot;test\&quot;, first:int32, second:\&quot;blah\&quot;]&quot;));</span>
+<span class="lineNum">     804 </span>            :   // The following currently raises a broadcast error in equality testing
+<span class="lineNum">     805 </span><span class="lineCov">          1 :   b = parse_type_constr_args(&quot;[[1, 2, 3], [2 * int32, float32, 3 * int8], [\&quot;x\&quot;, \&quot;yz\&quot;]]&quot;);</span>
+<span class="lineNum">     806 </span><span class="lineCov">          1 :   a = parse_json(b.get_type(), &quot;[[[1, 2, 3], [\&quot;2 * int32\&quot;, \&quot;float32\&quot;, \&quot;3 * int8\&quot;], [\&quot;x\&quot;, \&quot;yz\&quot;]], []]&quot;);</span>
+<span class="lineNum">     807 </span><span class="lineCov">          1 :   EXPECT_EQ(to_str(a), to_str(b));</span>
+<span class="lineNum">     808 </span>            :   // The following currently raises a broadcast error in equality testing
+<span class="lineNum">     809 </span><span class="lineCov">          1 :   b = parse_type_constr_args(&quot;[[1, 2, 3], x: [2 * int32, float32, 3 * int8], y: [\&quot;x\&quot;, \&quot;yz\&quot;]]&quot;);</span>
+<a name="810"><span class="lineNum">     810 </span><span class="lineCov">          1 :   a = parse_json(b.get_type(), &quot;[[[1, 2, 3]], [[\&quot;2 * int32\&quot;, \&quot;float32\&quot;, \&quot;3 * int8\&quot;], [\&quot;x\&quot;, \&quot;yz\&quot;]]]&quot;);</span></a>
+<span class="lineNum">     811 </span><span class="lineCov">          1 :   EXPECT_EQ(to_str(a), to_str(b));</span>
+<span class="lineNum">     812 </span><span class="lineCov">          4 : }</span>
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.10</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

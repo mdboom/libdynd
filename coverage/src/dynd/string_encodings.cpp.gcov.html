@@ -1,0 +1,606 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - coverage.info.cleaned - src/dynd/string_encodings.cpp</title>
+  <link rel="stylesheet" type="text/css" href="../../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../../index.html">top level</a> - <a href="index.html">src/dynd</a> - string_encodings.cpp<span style="font-size: 80%;"> (source / <a href="string_encodings.cpp.func.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">coverage.info.cleaned</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">96</td>
+            <td class="headerCovTableEntry">267</td>
+            <td class="headerCovTableEntryLo">36.0 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2016-02-19</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">16</td>
+            <td class="headerCovTableEntry">36</td>
+            <td class="headerCovTableEntryLo">44.4 %</td>
+          </tr>
+          <tr><td><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : //</a>
+<span class="lineNum">       2 </span>            : // Copyright (C) 2011-15 DyND Developers
+<span class="lineNum">       3 </span>            : // BSD 2-Clause License, see LICENSE.txt
+<span class="lineNum">       4 </span>            : //
+<span class="lineNum">       5 </span>            : 
+<span class="lineNum">       6 </span>            : #include &lt;sstream&gt;
+<span class="lineNum">       7 </span>            : 
+<span class="lineNum">       8 </span>            : #include &lt;dynd/type.hpp&gt;
+<span class="lineNum">       9 </span>            : #include &lt;dynd/string_encodings.hpp&gt;
+<span class="lineNum">      10 </span>            : #include &lt;dynd/types/char_type.hpp&gt;
+<span class="lineNum">      11 </span>            : #include &lt;dynd/types/fixed_bytes_type.hpp&gt;
+<span class="lineNum">      12 </span>            : 
+<span class="lineNum">      13 </span>            : #include &lt;utf8.h&gt;
+<span class="lineNum">      14 </span>            : 
+<span class="lineNum">      15 </span>            : using namespace std;
+<span class="lineNum">      16 </span>            : using namespace dynd;
+<span class="lineNum">      17 </span>            : 
+<span class="lineNum">      18 </span>            : DYND_API int dynd::string_encoding_char_size_table[6] = {
+<span class="lineNum">      19 </span>            :     // string_encoding_ascii
+<span class="lineNum">      20 </span>            :     1,
+<span class="lineNum">      21 </span>            :     // string_encoding_ucs_2
+<span class="lineNum">      22 </span>            :     2,
+<span class="lineNum">      23 </span>            :     // string_encoding_utf_8
+<span class="lineNum">      24 </span>            :     1,
+<span class="lineNum">      25 </span>            :     // string_encoding_utf_16
+<span class="lineNum">      26 </span>            :     2,
+<span class="lineNum">      27 </span>            :     // string_encoding_utf_32
+<span class="lineNum">      28 </span>            :     4,
+<span class="lineNum">      29 </span>            : 
+<span class="lineNum">      30 </span>            :     // string_encoding_invalid
+<span class="lineNum">      31 </span>            :     0};
+<span class="lineNum">      32 </span>            : 
+<span class="lineNum">      33 </span>            : namespace {
+<span class="lineNum">      34 </span>            : // The substitute code point when things are invalid
+<span class="lineNum">      35 </span>            : const uint32_t ERROR_SUBSTITUTE_CODEPOINT = (uint32_t)'?';
+<span class="lineNum">      36 </span>            : 
+<a name="37"><span class="lineNum">      37 </span>            : // The next_* functions advance an iterator pair and return</a>
+<span class="lineNum">      38 </span>            : // the code point that was processed.
+<span class="lineNum">      39 </span><span class="lineNoCov">          0 : static uint32_t next_ascii(const char *&amp;it, const char *DYND_UNUSED(end))</span>
+<span class="lineNum">      40 </span>            : {
+<span class="lineNum">      41 </span><span class="lineNoCov">          0 :   uint32_t result = *reinterpret_cast&lt;const uint8_t *&gt;(it);</span>
+<span class="lineNum">      42 </span><span class="lineNoCov">          0 :   if (result &amp; 0x80) {</span>
+<span class="lineNum">      43 </span><span class="lineNoCov">          0 :     throw string_decode_error(it, it + 1, string_encoding_ascii);</span>
+<span class="lineNum">      44 </span>            :   }
+<span class="lineNum">      45 </span><span class="lineNoCov">          0 :   ++it;</span>
+<span class="lineNum">      46 </span><span class="lineNoCov">          0 :   return result;</span>
+<a name="47"><span class="lineNum">      47 </span>            : }</a>
+<span class="lineNum">      48 </span>            : 
+<span class="lineNum">      49 </span><span class="lineNoCov">          0 : static uint32_t noerror_next_ascii(const char *&amp;it, const char *DYND_UNUSED(end))</span>
+<span class="lineNum">      50 </span>            : {
+<span class="lineNum">      51 </span><span class="lineNoCov">          0 :   uint32_t result = *reinterpret_cast&lt;const uint8_t *&gt;(it);</span>
+<span class="lineNum">      52 </span><span class="lineNoCov">          0 :   ++it;</span>
+<span class="lineNum">      53 </span><span class="lineNoCov">          0 :   return ((result &amp; 0x80) == 0) ? result : ERROR_SUBSTITUTE_CODEPOINT;</span>
+<a name="54"><span class="lineNum">      54 </span>            : }</a>
+<span class="lineNum">      55 </span>            : 
+<span class="lineNum">      56 </span><span class="lineNoCov">          0 : static void append_ascii(uint32_t cp, char *&amp;it, char *DYND_UNUSED(end))</span>
+<span class="lineNum">      57 </span>            : {
+<span class="lineNum">      58 </span><span class="lineNoCov">          0 :   if ((cp &amp; ~0x7f) != 0) {</span>
+<span class="lineNum">      59 </span><span class="lineNoCov">          0 :     throw string_encode_error(cp, string_encoding_ascii);</span>
+<span class="lineNum">      60 </span>            :   }
+<span class="lineNum">      61 </span><span class="lineNoCov">          0 :   *it = static_cast&lt;char&gt;(cp);</span>
+<span class="lineNum">      62 </span><span class="lineNoCov">          0 :   ++it;</span>
+<a name="63"><span class="lineNum">      63 </span><span class="lineNoCov">          0 : }</span></a>
+<span class="lineNum">      64 </span>            : 
+<span class="lineNum">      65 </span><span class="lineNoCov">          0 : void noerror_append_ascii(uint32_t cp, char *&amp;it, char *DYND_UNUSED(end))</span>
+<span class="lineNum">      66 </span>            : {
+<span class="lineNum">      67 </span><span class="lineNoCov">          0 :   if ((cp &amp; ~0x7f) != 0) {</span>
+<span class="lineNum">      68 </span><span class="lineNoCov">          0 :     cp = ERROR_SUBSTITUTE_CODEPOINT;</span>
+<span class="lineNum">      69 </span>            :   }
+<span class="lineNum">      70 </span><span class="lineNoCov">          0 :   *it = static_cast&lt;char&gt;(cp);</span>
+<span class="lineNum">      71 </span><span class="lineNoCov">          0 :   ++it;</span>
+<a name="72"><span class="lineNum">      72 </span><span class="lineNoCov">          0 : }</span></a>
+<span class="lineNum">      73 </span>            : 
+<span class="lineNum">      74 </span><span class="lineNoCov">          0 : uint32_t next_ucs2(const char *&amp;it_raw, const char *DYND_UNUSED(end_raw))</span>
+<span class="lineNum">      75 </span>            : {
+<span class="lineNum">      76 </span><span class="lineNoCov">          0 :   uint32_t cp = *reinterpret_cast&lt;const uint16_t *&gt;(it_raw);</span>
+<span class="lineNum">      77 </span><span class="lineNoCov">          0 :   if (utf8::internal::is_surrogate(cp)) {</span>
+<span class="lineNum">      78 </span><span class="lineNoCov">          0 :     throw string_decode_error(it_raw, it_raw + 2, string_encoding_ucs_2);</span>
+<span class="lineNum">      79 </span>            :   }
+<span class="lineNum">      80 </span><span class="lineNoCov">          0 :   it_raw += 2;</span>
+<span class="lineNum">      81 </span><span class="lineNoCov">          0 :   return cp;</span>
+<a name="82"><span class="lineNum">      82 </span>            : }</a>
+<span class="lineNum">      83 </span>            : 
+<span class="lineNum">      84 </span><span class="lineNoCov">          0 : uint32_t noerror_next_ucs2(const char *&amp;it_raw, const char *DYND_UNUSED(end_raw))</span>
+<span class="lineNum">      85 </span>            : {
+<span class="lineNum">      86 </span><span class="lineNoCov">          0 :   uint32_t cp = *reinterpret_cast&lt;const uint16_t *&gt;(it_raw);</span>
+<span class="lineNum">      87 </span><span class="lineNoCov">          0 :   it_raw += 2;</span>
+<span class="lineNum">      88 </span><span class="lineNoCov">          0 :   if (utf8::internal::is_surrogate(cp)) {</span>
+<span class="lineNum">      89 </span><span class="lineNoCov">          0 :     return ERROR_SUBSTITUTE_CODEPOINT;</span>
+<span class="lineNum">      90 </span>            :   }
+<span class="lineNum">      91 </span><span class="lineNoCov">          0 :   return cp;</span>
+<a name="92"><span class="lineNum">      92 </span>            : }</a>
+<span class="lineNum">      93 </span>            : 
+<span class="lineNum">      94 </span><span class="lineNoCov">          0 : void append_ucs2(uint32_t cp, char *&amp;it_raw, char *DYND_UNUSED(end_raw))</span>
+<span class="lineNum">      95 </span>            : {
+<span class="lineNum">      96 </span><span class="lineNoCov">          0 :   uint16_t *&amp;it = reinterpret_cast&lt;uint16_t *&amp;&gt;(it_raw);</span>
+<span class="lineNum">      97 </span><span class="lineNoCov">          0 :   if ((cp &amp; ~0xffff) != 0 || utf8::internal::is_surrogate(cp)) {</span>
+<span class="lineNum">      98 </span><span class="lineNoCov">          0 :     throw string_encode_error(cp, string_encoding_ucs_2);</span>
+<span class="lineNum">      99 </span>            :   }
+<span class="lineNum">     100 </span><span class="lineNoCov">          0 :   *it = static_cast&lt;uint16_t&gt;(cp);</span>
+<span class="lineNum">     101 </span><span class="lineNoCov">          0 :   ++it;</span>
+<a name="102"><span class="lineNum">     102 </span><span class="lineNoCov">          0 : }</span></a>
+<span class="lineNum">     103 </span>            : 
+<span class="lineNum">     104 </span><span class="lineNoCov">          0 : void noerror_append_ucs2(uint32_t cp, char *&amp;it_raw, char *DYND_UNUSED(end_raw))</span>
+<span class="lineNum">     105 </span>            : {
+<span class="lineNum">     106 </span><span class="lineNoCov">          0 :   uint16_t *&amp;it = reinterpret_cast&lt;uint16_t *&amp;&gt;(it_raw);</span>
+<span class="lineNum">     107 </span><span class="lineNoCov">          0 :   if ((cp &amp; ~0xffff) != 0 || utf8::internal::is_surrogate(cp)) {</span>
+<span class="lineNum">     108 </span><span class="lineNoCov">          0 :     cp = ERROR_SUBSTITUTE_CODEPOINT;</span>
+<span class="lineNum">     109 </span>            :   }
+<span class="lineNum">     110 </span><span class="lineNoCov">          0 :   *it = static_cast&lt;uint16_t&gt;(cp);</span>
+<span class="lineNum">     111 </span><span class="lineNoCov">          0 :   ++it;</span>
+<a name="112"><span class="lineNum">     112 </span><span class="lineNoCov">          0 : }</span></a>
+<span class="lineNum">     113 </span>            : 
+<span class="lineNum">     114 </span><span class="lineCov">       1116 : uint32_t next_utf8(const char *&amp;it, const char *end)</span>
+<span class="lineNum">     115 </span>            : {
+<span class="lineNum">     116 </span>            :   // const char *saved_it = it;
+<span class="lineNum">     117 </span><span class="lineCov">       1116 :   uint32_t cp = 0;</span>
+<span class="lineNum">     118 </span><span class="lineCov">       1116 :   utf8::internal::utf_error err_code = utf8::internal::validate_next(it, end, cp);</span>
+<span class="lineNum">     119 </span><span class="lineCov">       1116 :   switch (err_code) {</span>
+<span class="lineNum">     120 </span>            :   case utf8::internal::UTF8_OK:
+<span class="lineNum">     121 </span><span class="lineCov">       1116 :     break;</span>
+<span class="lineNum">     122 </span>            :   case utf8::internal::NOT_ENOUGH_ROOM:
+<span class="lineNum">     123 </span><span class="lineNoCov">          0 :     throw std::runtime_error(&quot;Partial UTF8 character at end of buffer&quot;);</span>
+<span class="lineNum">     124 </span>            :   case utf8::internal::INVALID_LEAD:
+<span class="lineNum">     125 </span>            :   case utf8::internal::INCOMPLETE_SEQUENCE:
+<span class="lineNum">     126 </span>            :   case utf8::internal::OVERLONG_SEQUENCE:
+<span class="lineNum">     127 </span>            :     // TODO: put the invalid byte range in the exception
+<span class="lineNum">     128 </span>            :     // cout &lt;&lt; &quot;invalid sequence: &quot; &lt;&lt; string(saved_it, it) &lt;&lt; endl;
+<span class="lineNum">     129 </span><span class="lineNoCov">          0 :     throw string_encode_error(cp, string_encoding_utf_8);</span>
+<span class="lineNum">     130 </span>            :   case utf8::internal::INVALID_CODE_POINT:
+<span class="lineNum">     131 </span><span class="lineNoCov">          0 :     throw string_encode_error(cp, string_encoding_utf_8);</span>
+<span class="lineNum">     132 </span>            :   }
+<span class="lineNum">     133 </span><span class="lineCov">       1116 :   return cp;</span>
+<a name="134"><span class="lineNum">     134 </span>            : }</a>
+<span class="lineNum">     135 </span>            : 
+<span class="lineNum">     136 </span><span class="lineCov">        127 : uint32_t noerror_next_utf8(const char *&amp;it, const char *end)</span>
+<span class="lineNum">     137 </span>            : {
+<span class="lineNum">     138 </span><span class="lineCov">        127 :   uint32_t cp = 0;</span>
+<span class="lineNum">     139 </span>            :   // Determine the sequence length based on the lead octet
+<span class="lineNum">     140 </span><span class="lineCov">        127 :   std::size_t length = utf8::internal::sequence_length(it);</span>
+<span class="lineNum">     141 </span>            : 
+<span class="lineNum">     142 </span>            :   // Get trail octets and calculate the code point
+<span class="lineNum">     143 </span><span class="lineCov">        127 :   utf8::internal::utf_error err = utf8::internal::UTF8_OK;</span>
+<span class="lineNum">     144 </span><span class="lineCov">        127 :   switch (length) {</span>
+<span class="lineNum">     145 </span>            :   case 0:
+<span class="lineNum">     146 </span><span class="lineNoCov">          0 :     return ERROR_SUBSTITUTE_CODEPOINT;</span>
+<span class="lineNum">     147 </span>            :   case 1:
+<span class="lineNum">     148 </span><span class="lineCov">        127 :     err = utf8::internal::get_sequence_1(it, end, cp);</span>
+<span class="lineNum">     149 </span><span class="lineCov">        127 :     break;</span>
+<span class="lineNum">     150 </span>            :   case 2:
+<span class="lineNum">     151 </span><span class="lineNoCov">          0 :     err = utf8::internal::get_sequence_2(it, end, cp);</span>
+<span class="lineNum">     152 </span><span class="lineNoCov">          0 :     break;</span>
+<span class="lineNum">     153 </span>            :   case 3:
+<span class="lineNum">     154 </span><span class="lineNoCov">          0 :     err = utf8::internal::get_sequence_3(it, end, cp);</span>
+<span class="lineNum">     155 </span><span class="lineNoCov">          0 :     break;</span>
+<span class="lineNum">     156 </span>            :   case 4:
+<span class="lineNum">     157 </span><span class="lineNoCov">          0 :     err = utf8::internal::get_sequence_4(it, end, cp);</span>
+<span class="lineNum">     158 </span><span class="lineNoCov">          0 :     break;</span>
+<span class="lineNum">     159 </span>            :   }
+<span class="lineNum">     160 </span>            : 
+<span class="lineNum">     161 </span><span class="lineCov">        127 :   if (err == utf8::internal::UTF8_OK) {</span>
+<span class="lineNum">     162 </span>            :     // Decoding succeeded. Now, security checks...
+<span class="lineNum">     163 </span><span class="lineCov">        127 :     if (utf8::internal::is_code_point_valid(cp)) {</span>
+<span class="lineNum">     164 </span><span class="lineCov">        127 :       if (!utf8::internal::is_overlong_sequence(cp, length)) {</span>
+<span class="lineNum">     165 </span>            :         // Passed! Return here.
+<span class="lineNum">     166 </span><span class="lineCov">        127 :         ++it;</span>
+<span class="lineNum">     167 </span><span class="lineCov">        127 :         return cp;</span>
+<span class="lineNum">     168 </span>            :       }
+<span class="lineNum">     169 </span>            :       else {
+<span class="lineNum">     170 </span><span class="lineNoCov">          0 :         return ERROR_SUBSTITUTE_CODEPOINT;</span>
+<span class="lineNum">     171 </span>            :       }
+<span class="lineNum">     172 </span>            :     }
+<span class="lineNum">     173 </span>            :     else {
+<span class="lineNum">     174 </span><span class="lineNoCov">          0 :       return ERROR_SUBSTITUTE_CODEPOINT;</span>
+<span class="lineNum">     175 </span>            :     }
+<span class="lineNum">     176 </span>            :   }
+<span class="lineNum">     177 </span>            :   else {
+<span class="lineNum">     178 </span><span class="lineNoCov">          0 :     return ERROR_SUBSTITUTE_CODEPOINT;</span>
+<span class="lineNum">     179 </span>            :   }
+<span class="lineNum">     180 </span>            : 
+<span class="lineNum">     181 </span>            :   return cp;
+<a name="182"><span class="lineNum">     182 </span>            : }</a>
+<span class="lineNum">     183 </span>            : 
+<span class="lineNum">     184 </span><span class="lineCov">        614 : void append_utf8(uint32_t cp, char *&amp;it, char *end)</span>
+<span class="lineNum">     185 </span>            : {
+<span class="lineNum">     186 </span><span class="lineCov">        614 :   if (end - it &gt;= 6) {</span>
+<span class="lineNum">     187 </span><span class="lineCov">        602 :     it = utf8::append(cp, it);</span>
+<span class="lineNum">     188 </span>            :   }
+<span class="lineNum">     189 </span>            :   else {
+<span class="lineNum">     190 </span>            :     char tmp[6];
+<span class="lineNum">     191 </span><span class="lineCov">         12 :     char *tmp_ptr = tmp;</span>
+<span class="lineNum">     192 </span><span class="lineCov">         12 :     tmp_ptr = utf8::append(cp, tmp_ptr);</span>
+<span class="lineNum">     193 </span><span class="lineCov">         12 :     if (tmp_ptr - tmp &lt;= end - it) {</span>
+<span class="lineNum">     194 </span><span class="lineCov">         12 :       memcpy(it, tmp, tmp_ptr - tmp);</span>
+<span class="lineNum">     195 </span><span class="lineCov">         12 :       it += (tmp_ptr - tmp);</span>
+<span class="lineNum">     196 </span>            :     }
+<span class="lineNum">     197 </span>            :     else {
+<span class="lineNum">     198 </span><span class="lineNoCov">          0 :       throw std::runtime_error(&quot;Input too large to convert to destination string&quot;);</span>
+<span class="lineNum">     199 </span>            :     }
+<span class="lineNum">     200 </span>            :   }
+<a name="201"><span class="lineNum">     201 </span><span class="lineCov">        614 : }</span></a>
+<span class="lineNum">     202 </span>            : 
+<span class="lineNum">     203 </span><span class="lineNoCov">          0 : void noerror_append_utf8(uint32_t cp, char *&amp;it, char *end)</span>
+<span class="lineNum">     204 </span>            : {
+<span class="lineNum">     205 </span><span class="lineNoCov">          0 :   if (end - it &gt;= 6) {</span>
+<span class="lineNum">     206 </span><span class="lineNoCov">          0 :     it = utf8::append(cp, it);</span>
+<span class="lineNum">     207 </span>            :   }
+<span class="lineNum">     208 </span>            :   else {
+<span class="lineNum">     209 </span>            :     char tmp[6];
+<span class="lineNum">     210 </span><span class="lineNoCov">          0 :     char *tmp_ptr = tmp;</span>
+<span class="lineNum">     211 </span><span class="lineNoCov">          0 :     tmp_ptr = utf8::append(cp, tmp_ptr);</span>
+<span class="lineNum">     212 </span><span class="lineNoCov">          0 :     if (tmp_ptr - tmp &lt;= end - it) {</span>
+<span class="lineNum">     213 </span><span class="lineNoCov">          0 :       memcpy(it, tmp, tmp_ptr - tmp);</span>
+<span class="lineNum">     214 </span><span class="lineNoCov">          0 :       it += (tmp_ptr - tmp);</span>
+<span class="lineNum">     215 </span>            :     }
+<span class="lineNum">     216 </span>            :     else {
+<span class="lineNum">     217 </span>            :       // If it didn't fit, null-terminate
+<span class="lineNum">     218 </span><span class="lineNoCov">          0 :       memset(it, 0, end - it);</span>
+<span class="lineNum">     219 </span><span class="lineNoCov">          0 :       it = end;</span>
+<span class="lineNum">     220 </span>            :     }
+<span class="lineNum">     221 </span>            :   }
+<a name="222"><span class="lineNum">     222 </span><span class="lineNoCov">          0 : }</span></a>
+<span class="lineNum">     223 </span>            : 
+<span class="lineNum">     224 </span><span class="lineCov">          1 : inline void string_append_utf8(uint32_t cp, std::string &amp;s)</span>
+<span class="lineNum">     225 </span>            : {
+<span class="lineNum">     226 </span>            :   char tmp[6];
+<span class="lineNum">     227 </span><span class="lineCov">          1 :   char *tmp_ptr = tmp, *tmp_ptr_end;</span>
+<span class="lineNum">     228 </span><span class="lineCov">          1 :   tmp_ptr_end = utf8::append(cp, tmp_ptr);</span>
+<span class="lineNum">     229 </span><span class="lineCov">          3 :   while (tmp_ptr &lt; tmp_ptr_end)</span>
+<span class="lineNum">     230 </span><span class="lineCov">          1 :     s += *tmp_ptr++;</span>
+<a name="231"><span class="lineNum">     231 </span><span class="lineCov">          1 : }</span></a>
+<span class="lineNum">     232 </span>            : 
+<span class="lineNum">     233 </span><span class="lineCov">         20 : uint32_t next_utf16(const char *&amp;it_raw, const char *end_raw)</span>
+<span class="lineNum">     234 </span>            : {
+<span class="lineNum">     235 </span><span class="lineCov">         20 :   uint32_t cp = *reinterpret_cast&lt;const uint16_t *&gt;(it_raw);</span>
+<span class="lineNum">     236 </span>            :   // Take care of surrogate pairs first
+<span class="lineNum">     237 </span><span class="lineCov">         20 :   if (utf8::internal::is_lead_surrogate(cp)) {</span>
+<span class="lineNum">     238 </span><span class="lineNoCov">          0 :     if (it_raw + 4 &lt;= end_raw) {</span>
+<span class="lineNum">     239 </span><span class="lineNoCov">          0 :       uint32_t trail_surrogate = *reinterpret_cast&lt;const uint16_t *&gt;(it_raw + 2);</span>
+<span class="lineNum">     240 </span><span class="lineNoCov">          0 :       if (utf8::internal::is_trail_surrogate(trail_surrogate)) {</span>
+<span class="lineNum">     241 </span><span class="lineNoCov">          0 :         cp = (cp &lt;&lt; 10) + trail_surrogate + utf8::internal::SURROGATE_OFFSET;</span>
+<span class="lineNum">     242 </span>            :       }
+<span class="lineNum">     243 </span>            :       else {
+<span class="lineNum">     244 </span><span class="lineNoCov">          0 :         throw string_decode_error(it_raw, it_raw + 4, string_encoding_utf_16);</span>
+<span class="lineNum">     245 </span>            :       }
+<span class="lineNum">     246 </span><span class="lineNoCov">          0 :       it_raw += 2;</span>
+<span class="lineNum">     247 </span>            :     }
+<span class="lineNum">     248 </span>            :     else {
+<span class="lineNum">     249 </span><span class="lineNoCov">          0 :       throw string_decode_error(it_raw, end_raw, string_encoding_utf_16);</span>
+<span class="lineNum">     250 </span>            :     }
+<span class="lineNum">     251 </span>            :   }
+<span class="lineNum">     252 </span><span class="lineCov">         20 :   else if (utf8::internal::is_trail_surrogate(cp)) {</span>
+<span class="lineNum">     253 </span>            :     // Lone trail surrogate
+<span class="lineNum">     254 </span><span class="lineNoCov">          0 :     throw string_decode_error(it_raw, it_raw + 2, string_encoding_utf_16);</span>
+<span class="lineNum">     255 </span>            :   }
+<span class="lineNum">     256 </span><span class="lineCov">         20 :   it_raw += 2;</span>
+<span class="lineNum">     257 </span><span class="lineCov">         20 :   return cp;</span>
+<a name="258"><span class="lineNum">     258 </span>            : }</a>
+<span class="lineNum">     259 </span>            : 
+<span class="lineNum">     260 </span><span class="lineNoCov">          0 : uint32_t noerror_next_utf16(const char *&amp;it_raw, const char *end_raw)</span>
+<span class="lineNum">     261 </span>            : {
+<span class="lineNum">     262 </span><span class="lineNoCov">          0 :   uint32_t cp = *reinterpret_cast&lt;const uint16_t *&gt;(it_raw);</span>
+<span class="lineNum">     263 </span><span class="lineNoCov">          0 :   it_raw += 2;</span>
+<span class="lineNum">     264 </span>            :   // Take care of surrogate pairs first
+<span class="lineNum">     265 </span><span class="lineNoCov">          0 :   if (utf8::internal::is_lead_surrogate(cp)) {</span>
+<span class="lineNum">     266 </span><span class="lineNoCov">          0 :     if (it_raw &lt;= end_raw + 2) {</span>
+<span class="lineNum">     267 </span><span class="lineNoCov">          0 :       uint32_t trail_surrogate = *reinterpret_cast&lt;const uint16_t *&gt;(it_raw);</span>
+<span class="lineNum">     268 </span><span class="lineNoCov">          0 :       it_raw += 2;</span>
+<span class="lineNum">     269 </span><span class="lineNoCov">          0 :       if (utf8::internal::is_trail_surrogate(trail_surrogate)) {</span>
+<span class="lineNum">     270 </span><span class="lineNoCov">          0 :         cp = (cp &lt;&lt; 10) + trail_surrogate + utf8::internal::SURROGATE_OFFSET;</span>
+<span class="lineNum">     271 </span>            :       }
+<span class="lineNum">     272 </span>            :       else {
+<span class="lineNum">     273 </span><span class="lineNoCov">          0 :         return ERROR_SUBSTITUTE_CODEPOINT;</span>
+<span class="lineNum">     274 </span>            :       }
+<span class="lineNum">     275 </span>            :     }
+<span class="lineNum">     276 </span>            :     else {
+<span class="lineNum">     277 </span><span class="lineNoCov">          0 :       return ERROR_SUBSTITUTE_CODEPOINT;</span>
+<span class="lineNum">     278 </span>            :     }
+<span class="lineNum">     279 </span>            :   }
+<span class="lineNum">     280 </span><span class="lineNoCov">          0 :   else if (utf8::internal::is_trail_surrogate(cp)) {</span>
+<span class="lineNum">     281 </span>            :     // Lone trail surrogate
+<span class="lineNum">     282 </span><span class="lineNoCov">          0 :     return ERROR_SUBSTITUTE_CODEPOINT;</span>
+<span class="lineNum">     283 </span>            :   }
+<span class="lineNum">     284 </span><span class="lineNoCov">          0 :   return cp;</span>
+<a name="285"><span class="lineNum">     285 </span>            : }</a>
+<span class="lineNum">     286 </span>            : 
+<span class="lineNum">     287 </span><span class="lineCov">         19 : void append_utf16(uint32_t cp, char *&amp;it_raw, char *end_raw)</span>
+<span class="lineNum">     288 </span>            : {
+<span class="lineNum">     289 </span><span class="lineCov">         19 :   uint16_t *&amp;it = reinterpret_cast&lt;uint16_t *&amp;&gt;(it_raw);</span>
+<span class="lineNum">     290 </span><span class="lineCov">         19 :   uint16_t *end = reinterpret_cast&lt;uint16_t *&gt;(end_raw);</span>
+<span class="lineNum">     291 </span><span class="lineCov">         19 :   if (cp &gt; 0xffff) { // make a surrogate pair</span>
+<span class="lineNum">     292 </span><span class="lineNoCov">          0 :     *it = static_cast&lt;uint16_t&gt;((cp &gt;&gt; 10) + utf8::internal::LEAD_OFFSET);</span>
+<span class="lineNum">     293 </span><span class="lineNoCov">          0 :     if (++it &gt;= end) {</span>
+<span class="lineNum">     294 </span><span class="lineNoCov">          0 :       throw std::runtime_error(&quot;Input too large to convert to destination string&quot;);</span>
+<span class="lineNum">     295 </span>            :     }
+<span class="lineNum">     296 </span><span class="lineNoCov">          0 :     *it = static_cast&lt;uint16_t&gt;((cp &amp; 0x3ff) + utf8::internal::TRAIL_SURROGATE_MIN);</span>
+<span class="lineNum">     297 </span><span class="lineNoCov">          0 :     ++it;</span>
+<span class="lineNum">     298 </span>            :   }
+<span class="lineNum">     299 </span>            :   else {
+<span class="lineNum">     300 </span><span class="lineCov">         19 :     *it = static_cast&lt;uint16_t&gt;(cp);</span>
+<span class="lineNum">     301 </span><span class="lineCov">         19 :     ++it;</span>
+<span class="lineNum">     302 </span>            :   }
+<a name="303"><span class="lineNum">     303 </span><span class="lineCov">         19 : }</span></a>
+<span class="lineNum">     304 </span>            : 
+<span class="lineNum">     305 </span><span class="lineNoCov">          0 : void noerror_append_utf16(uint32_t cp, char *&amp;it_raw, char *end_raw)</span>
+<span class="lineNum">     306 </span>            : {
+<span class="lineNum">     307 </span><span class="lineNoCov">          0 :   uint16_t *&amp;it = reinterpret_cast&lt;uint16_t *&amp;&gt;(it_raw);</span>
+<span class="lineNum">     308 </span><span class="lineNoCov">          0 :   uint16_t *end = reinterpret_cast&lt;uint16_t *&gt;(end_raw);</span>
+<span class="lineNum">     309 </span><span class="lineNoCov">          0 :   if (cp &gt; 0xffff) { // make a surrogate pair</span>
+<span class="lineNum">     310 </span><span class="lineNoCov">          0 :     if (it + 1 &lt; end) {</span>
+<span class="lineNum">     311 </span><span class="lineNoCov">          0 :       *it = static_cast&lt;uint16_t&gt;((cp &gt;&gt; 10) + utf8::internal::LEAD_OFFSET);</span>
+<span class="lineNum">     312 </span><span class="lineNoCov">          0 :       ++it;</span>
+<span class="lineNum">     313 </span><span class="lineNoCov">          0 :       *it = static_cast&lt;uint16_t&gt;((cp &amp; 0x3ff) + utf8::internal::TRAIL_SURROGATE_MIN);</span>
+<span class="lineNum">     314 </span><span class="lineNoCov">          0 :       ++it;</span>
+<span class="lineNum">     315 </span>            :     }
+<span class="lineNum">     316 </span>            :     else {
+<span class="lineNum">     317 </span>            :       // Null-terminate
+<span class="lineNum">     318 </span><span class="lineNoCov">          0 :       memset(it_raw, 0, end_raw - it_raw);</span>
+<span class="lineNum">     319 </span><span class="lineNoCov">          0 :       it_raw = end_raw;</span>
+<span class="lineNum">     320 </span>            :     }
+<span class="lineNum">     321 </span>            :   }
+<span class="lineNum">     322 </span>            :   else {
+<span class="lineNum">     323 </span><span class="lineNoCov">          0 :     *it = static_cast&lt;uint16_t&gt;(cp);</span>
+<span class="lineNum">     324 </span><span class="lineNoCov">          0 :     ++it;</span>
+<span class="lineNum">     325 </span>            :   }
+<a name="326"><span class="lineNum">     326 </span><span class="lineNoCov">          0 : }</span></a>
+<span class="lineNum">     327 </span>            : 
+<span class="lineNum">     328 </span><span class="lineCov">          1 : uint32_t next_utf32(const char *&amp;it_raw, const char *DYND_UNUSED(end_raw))</span>
+<span class="lineNum">     329 </span>            : {
+<span class="lineNum">     330 </span><span class="lineCov">          1 :   uint32_t result = *reinterpret_cast&lt;const uint32_t *&gt;(it_raw);</span>
+<span class="lineNum">     331 </span><span class="lineCov">          1 :   if (!utf8::internal::is_code_point_valid(result)) {</span>
+<span class="lineNum">     332 </span><span class="lineNoCov">          0 :     throw string_decode_error(it_raw, it_raw + 4, string_encoding_utf_32);</span>
+<span class="lineNum">     333 </span>            :   }
+<span class="lineNum">     334 </span><span class="lineCov">          1 :   it_raw += 4;</span>
+<span class="lineNum">     335 </span><span class="lineCov">          1 :   return result;</span>
+<a name="336"><span class="lineNum">     336 </span>            : }</a>
+<span class="lineNum">     337 </span>            : 
+<span class="lineNum">     338 </span><span class="lineNoCov">          0 : uint32_t noerror_next_utf32(const char *&amp;it_raw, const char *DYND_UNUSED(end_raw))</span>
+<span class="lineNum">     339 </span>            : {
+<span class="lineNum">     340 </span><span class="lineNoCov">          0 :   uint32_t result = *reinterpret_cast&lt;const uint32_t *&gt;(it_raw);</span>
+<span class="lineNum">     341 </span><span class="lineNoCov">          0 :   it_raw += 4;</span>
+<span class="lineNum">     342 </span><span class="lineNoCov">          0 :   if (!utf8::internal::is_code_point_valid(result)) {</span>
+<span class="lineNum">     343 </span><span class="lineNoCov">          0 :     return ERROR_SUBSTITUTE_CODEPOINT;</span>
+<span class="lineNum">     344 </span>            :   }
+<span class="lineNum">     345 </span><span class="lineNoCov">          0 :   return result;</span>
+<a name="346"><span class="lineNum">     346 </span>            : }</a>
+<span class="lineNum">     347 </span>            : 
+<span class="lineNum">     348 </span><span class="lineCov">          1 : void append_utf32(uint32_t cp, char *&amp;it_raw, char *DYND_UNUSED(end_raw))</span>
+<span class="lineNum">     349 </span>            : {
+<span class="lineNum">     350 </span><span class="lineCov">          1 :   uint32_t *&amp;it = reinterpret_cast&lt;uint32_t *&amp;&gt;(it_raw);</span>
+<span class="lineNum">     351 </span>            :   // uint32_t *end = reinterpret_cast&lt;uint32_t *&gt;(end);
+<span class="lineNum">     352 </span><span class="lineCov">          1 :   *it = cp;</span>
+<span class="lineNum">     353 </span><span class="lineCov">          1 :   ++it;</span>
+<a name="354"><span class="lineNum">     354 </span><span class="lineCov">          1 : }</span></a>
+<span class="lineNum">     355 </span>            : 
+<span class="lineNum">     356 </span><span class="lineNoCov">          0 : void noerror_append_utf32(uint32_t cp, char *&amp;it_raw, char *DYND_UNUSED(end_raw))</span>
+<span class="lineNum">     357 </span>            : {
+<span class="lineNum">     358 </span><span class="lineNoCov">          0 :   uint32_t *&amp;it = reinterpret_cast&lt;uint32_t *&amp;&gt;(it_raw);</span>
+<span class="lineNum">     359 </span>            :   // uint32_t *end = reinterpret_cast&lt;uint32_t *&gt;(end);
+<span class="lineNum">     360 </span><span class="lineNoCov">          0 :   *it = cp;</span>
+<span class="lineNum">     361 </span><span class="lineNoCov">          0 :   ++it;</span>
+<span class="lineNum">     362 </span><span class="lineNoCov">          0 : }</span>
+<a name="363"><span class="lineNum">     363 </span>            : } // anonymous namespace</a>
+<span class="lineNum">     364 </span>            : 
+<span class="lineNum">     365 </span><span class="lineCov">        108 : next_unicode_codepoint_t dynd::get_next_unicode_codepoint_function(string_encoding_t encoding,</span>
+<span class="lineNum">     366 </span>            :                                                                    assign_error_mode errmode)
+<span class="lineNum">     367 </span>            : {
+<span class="lineNum">     368 </span><span class="lineCov">        108 :   switch (encoding) {</span>
+<span class="lineNum">     369 </span>            :   case string_encoding_ascii:
+<span class="lineNum">     370 </span><span class="lineNoCov">          0 :     return (errmode != assign_error_nocheck) ? next_ascii : noerror_next_ascii;</span>
+<span class="lineNum">     371 </span>            :   case string_encoding_ucs_2:
+<span class="lineNum">     372 </span><span class="lineNoCov">          0 :     return (errmode != assign_error_nocheck) ? next_ucs2 : noerror_next_ucs2;</span>
+<span class="lineNum">     373 </span>            :   case string_encoding_utf_8:
+<span class="lineNum">     374 </span><span class="lineCov">        105 :     return (errmode != assign_error_nocheck) ? next_utf8 : noerror_next_utf8;</span>
+<span class="lineNum">     375 </span>            :   case string_encoding_utf_16:
+<span class="lineNum">     376 </span><span class="lineCov">          2 :     return (errmode != assign_error_nocheck) ? next_utf16 : noerror_next_utf16;</span>
+<span class="lineNum">     377 </span>            :   case string_encoding_utf_32:
+<span class="lineNum">     378 </span><span class="lineCov">          1 :     return (errmode != assign_error_nocheck) ? next_utf32 : noerror_next_utf32;</span>
+<span class="lineNum">     379 </span>            :   default:
+<span class="lineNum">     380 </span><span class="lineNoCov">          0 :     throw runtime_error(&quot;get_next_unicode_codepoint_function: Unrecognized string encoding&quot;);</span>
+<span class="lineNum">     381 </span>            :   }
+<a name="382"><span class="lineNum">     382 </span>            : }</a>
+<span class="lineNum">     383 </span>            : 
+<span class="lineNum">     384 </span><span class="lineCov">         89 : append_unicode_codepoint_t dynd::get_append_unicode_codepoint_function(string_encoding_t encoding,</span>
+<span class="lineNum">     385 </span>            :                                                                        assign_error_mode errmode)
+<span class="lineNum">     386 </span>            : {
+<span class="lineNum">     387 </span><span class="lineCov">         89 :   switch (encoding) {</span>
+<span class="lineNum">     388 </span>            :   case string_encoding_ascii:
+<span class="lineNum">     389 </span><span class="lineNoCov">          0 :     return (errmode != assign_error_nocheck) ? append_ascii : noerror_append_ascii;</span>
+<span class="lineNum">     390 </span>            :   case string_encoding_ucs_2:
+<span class="lineNum">     391 </span><span class="lineNoCov">          0 :     return (errmode != assign_error_nocheck) ? append_ucs2 : noerror_append_ucs2;</span>
+<span class="lineNum">     392 </span>            :   case string_encoding_utf_8:
+<span class="lineNum">     393 </span><span class="lineCov">         86 :     return (errmode != assign_error_nocheck) ? append_utf8 : noerror_append_utf8;</span>
+<span class="lineNum">     394 </span>            :   case string_encoding_utf_16:
+<span class="lineNum">     395 </span><span class="lineCov">          2 :     return (errmode != assign_error_nocheck) ? append_utf16 : noerror_append_utf16;</span>
+<span class="lineNum">     396 </span>            :   case string_encoding_utf_32:
+<span class="lineNum">     397 </span><span class="lineCov">          1 :     return (errmode != assign_error_nocheck) ? append_utf32 : noerror_append_utf32;</span>
+<span class="lineNum">     398 </span>            :   default:
+<span class="lineNum">     399 </span><span class="lineNoCov">          0 :     throw runtime_error(&quot;get_append_unicode_codepoint_function: Unrecognized string encoding&quot;);</span>
+<span class="lineNum">     400 </span>            :   }
+<span class="lineNum">     401 </span>            : }
+<a name="402"><span class="lineNum">     402 </span>            : </a>
+<span class="lineNum">     403 </span>            : template &lt;next_unicode_codepoint_t next_fn&gt;
+<span class="lineNum">     404 </span><span class="lineNoCov">          0 : std::string string_range_as_utf8_string_templ(const char *begin, const char *end)</span>
+<span class="lineNum">     405 </span>            : {
+<span class="lineNum">     406 </span><span class="lineNoCov">          0 :   std::string result;</span>
+<span class="lineNum">     407 </span><span class="lineNoCov">          0 :   uint32_t cp = 0;</span>
+<span class="lineNum">     408 </span><span class="lineNoCov">          0 :   while (begin &lt; end) {</span>
+<span class="lineNum">     409 </span><span class="lineNoCov">          0 :     cp = next_fn(begin, end);</span>
+<span class="lineNum">     410 </span><span class="lineNoCov">          0 :     string_append_utf8(cp, result);</span>
+<span class="lineNum">     411 </span>            :   }
+<span class="lineNum">     412 </span><span class="lineNoCov">          0 :   return result;</span>
+<a name="413"><span class="lineNum">     413 </span>            : }</a>
+<span class="lineNum">     414 </span>            : 
+<span class="lineNum">     415 </span><span class="lineCov">         52 : std::string dynd::string_range_as_utf8_string(string_encoding_t encoding, const char *begin, const char *end,</span>
+<span class="lineNum">     416 </span>            :                                               assign_error_mode errmode)
+<span class="lineNum">     417 </span>            : {
+<span class="lineNum">     418 </span><span class="lineCov">         52 :   switch (encoding) {</span>
+<span class="lineNum">     419 </span>            :   case string_encoding_ascii:
+<span class="lineNum">     420 </span>            :   case string_encoding_utf_8:
+<span class="lineNum">     421 </span>            :     // TODO: Validate the input string according to errmode
+<span class="lineNum">     422 </span><span class="lineCov">         52 :     return std::string(begin, end);</span>
+<span class="lineNum">     423 </span>            :   case string_encoding_ucs_2:
+<span class="lineNum">     424 </span><span class="lineNoCov">          0 :     if (errmode == assign_error_nocheck) {</span>
+<span class="lineNum">     425 </span><span class="lineNoCov">          0 :       return string_range_as_utf8_string_templ&lt;&amp;noerror_next_ucs2&gt;(begin, end);</span>
+<span class="lineNum">     426 </span>            :     }
+<span class="lineNum">     427 </span>            :     else {
+<span class="lineNum">     428 </span><span class="lineNoCov">          0 :       return string_range_as_utf8_string_templ&lt;&amp;next_ucs2&gt;(begin, end);</span>
+<span class="lineNum">     429 </span>            :     }
+<span class="lineNum">     430 </span>            :   case string_encoding_utf_16: {
+<span class="lineNum">     431 </span><span class="lineNoCov">          0 :     if (errmode == assign_error_nocheck) {</span>
+<span class="lineNum">     432 </span><span class="lineNoCov">          0 :       return string_range_as_utf8_string_templ&lt;&amp;noerror_next_utf16&gt;(begin, end);</span>
+<span class="lineNum">     433 </span>            :     }
+<span class="lineNum">     434 </span>            :     else {
+<span class="lineNum">     435 </span><span class="lineNoCov">          0 :       return string_range_as_utf8_string_templ&lt;&amp;next_utf16&gt;(begin, end);</span>
+<span class="lineNum">     436 </span>            :     }
+<span class="lineNum">     437 </span>            :   }
+<span class="lineNum">     438 </span>            :   case string_encoding_utf_32: {
+<span class="lineNum">     439 </span><span class="lineNoCov">          0 :     if (errmode == assign_error_nocheck) {</span>
+<span class="lineNum">     440 </span><span class="lineNoCov">          0 :       return string_range_as_utf8_string_templ&lt;&amp;noerror_next_utf32&gt;(begin, end);</span>
+<span class="lineNum">     441 </span>            :     }
+<span class="lineNum">     442 </span>            :     else {
+<span class="lineNum">     443 </span><span class="lineNoCov">          0 :       return string_range_as_utf8_string_templ&lt;&amp;next_utf32&gt;(begin, end);</span>
+<span class="lineNum">     444 </span>            :     }
+<span class="lineNum">     445 </span>            :   }
+<span class="lineNum">     446 </span>            :   default: {
+<span class="lineNum">     447 </span><span class="lineNoCov">          0 :     stringstream ss;</span>
+<span class="lineNum">     448 </span><span class="lineNoCov">          0 :     ss &lt;&lt; &quot;string_range_as_utf8_string: Unrecognized string encoding&quot;;</span>
+<span class="lineNum">     449 </span><span class="lineNoCov">          0 :     ss &lt;&lt; encoding;</span>
+<span class="lineNum">     450 </span><span class="lineNoCov">          0 :     throw runtime_error(ss.str());</span>
+<span class="lineNum">     451 </span>            :   }
+<span class="lineNum">     452 </span>            :   }
+<a name="453"><span class="lineNum">     453 </span>            : }</a>
+<span class="lineNum">     454 </span>            : 
+<span class="lineNum">     455 </span><span class="lineCov">        585 : void dynd::print_escaped_unicode_codepoint(std::ostream &amp;o, uint32_t cp, bool single_quote)</span>
+<span class="lineNum">     456 </span>            : {
+<span class="lineNum">     457 </span><span class="lineCov">        585 :   if (cp &lt; 0x80) {</span>
+<span class="lineNum">     458 </span><span class="lineCov">        585 :     switch (cp) {</span>
+<span class="lineNum">     459 </span>            :     case '\b':
+<span class="lineNum">     460 </span><span class="lineNoCov">          0 :       o &lt;&lt; &quot;\\b&quot;;</span>
+<span class="lineNum">     461 </span><span class="lineNoCov">          0 :       break;</span>
+<span class="lineNum">     462 </span>            :     case '\f':
+<span class="lineNum">     463 </span><span class="lineNoCov">          0 :       o &lt;&lt; &quot;\\f&quot;;</span>
+<span class="lineNum">     464 </span><span class="lineNoCov">          0 :       break;</span>
+<span class="lineNum">     465 </span>            :     case '\n':
+<span class="lineNum">     466 </span><span class="lineCov">          1 :       o &lt;&lt; &quot;\\n&quot;;</span>
+<span class="lineNum">     467 </span><span class="lineCov">          1 :       break;</span>
+<span class="lineNum">     468 </span>            :     case '\r':
+<span class="lineNum">     469 </span><span class="lineCov">          1 :       o &lt;&lt; &quot;\\r&quot;;</span>
+<span class="lineNum">     470 </span><span class="lineCov">          1 :       break;</span>
+<span class="lineNum">     471 </span>            :     case '\t':
+<span class="lineNum">     472 </span><span class="lineNoCov">          0 :       o &lt;&lt; &quot;\\t&quot;;</span>
+<span class="lineNum">     473 </span><span class="lineNoCov">          0 :       break;</span>
+<span class="lineNum">     474 </span>            :     case '\\':
+<span class="lineNum">     475 </span><span class="lineCov">          3 :       o &lt;&lt; &quot;\\\\&quot;;</span>
+<span class="lineNum">     476 </span><span class="lineCov">          3 :       break;</span>
+<span class="lineNum">     477 </span>            :     case '\'':
+<span class="lineNum">     478 </span><span class="lineCov">         12 :       o &lt;&lt; (single_quote ? &quot;\\'&quot; : &quot;'&quot;);</span>
+<span class="lineNum">     479 </span><span class="lineCov">         12 :       break;</span>
+<span class="lineNum">     480 </span>            :     case '\&quot;':
+<span class="lineNum">     481 </span><span class="lineCov">          7 :       o &lt;&lt; (single_quote ? &quot;\&quot;&quot; : &quot;\\\&quot;&quot;);</span>
+<span class="lineNum">     482 </span><span class="lineCov">          7 :       break;</span>
+<span class="lineNum">     483 </span>            :     default:
+<span class="lineNum">     484 </span><span class="lineCov">        561 :       if (cp &lt; 0x20 || cp == 0x7f) {</span>
+<span class="lineNum">     485 </span><span class="lineNoCov">          0 :         o &lt;&lt; &quot;\\u&quot;;</span>
+<span class="lineNum">     486 </span><span class="lineNoCov">          0 :         hexadecimal_print(o, static_cast&lt;uint16_t&gt;(cp));</span>
+<span class="lineNum">     487 </span>            :       }
+<span class="lineNum">     488 </span>            :       else {
+<span class="lineNum">     489 </span><span class="lineCov">        561 :         o &lt;&lt; static_cast&lt;char&gt;(cp);</span>
+<span class="lineNum">     490 </span>            :       }
+<span class="lineNum">     491 </span><span class="lineCov">        561 :       break;</span>
+<span class="lineNum">     492 </span>            :     }
+<span class="lineNum">     493 </span>            :   }
+<span class="lineNum">     494 </span><span class="lineNoCov">          0 :   else if (cp &lt; 0x10000) {</span>
+<span class="lineNum">     495 </span><span class="lineNoCov">          0 :     o &lt;&lt; &quot;\\u&quot;;</span>
+<span class="lineNum">     496 </span><span class="lineNoCov">          0 :     hexadecimal_print(o, static_cast&lt;uint16_t&gt;(cp));</span>
+<span class="lineNum">     497 </span>            :   }
+<span class="lineNum">     498 </span>            :   else {
+<span class="lineNum">     499 </span><span class="lineNoCov">          0 :     o &lt;&lt; &quot;\\U&quot;;</span>
+<span class="lineNum">     500 </span><span class="lineNoCov">          0 :     hexadecimal_print(o, static_cast&lt;uint32_t&gt;(cp));</span>
+<span class="lineNum">     501 </span>            :   }
+<a name="502"><span class="lineNum">     502 </span><span class="lineCov">        585 : }</span></a>
+<span class="lineNum">     503 </span>            : 
+<span class="lineNum">     504 </span><span class="lineCov">         57 : void dynd::print_escaped_utf8_string(std::ostream &amp;o, const char *str_begin, const char *str_end, bool single_quote)</span>
+<span class="lineNum">     505 </span>            : {
+<span class="lineNum">     506 </span><span class="lineCov">         57 :   uint32_t cp = 0;</span>
+<span class="lineNum">     507 </span>            : 
+<span class="lineNum">     508 </span>            :   // Print as an escaped string
+<span class="lineNum">     509 </span><span class="lineCov">         57 :   o &lt;&lt; (single_quote ? '\'' : '\&quot;');</span>
+<span class="lineNum">     510 </span><span class="lineCov">       1061 :   while (str_begin &lt; str_end) {</span>
+<span class="lineNum">     511 </span><span class="lineCov">        502 :     cp = next_utf8(str_begin, str_end);</span>
+<span class="lineNum">     512 </span><span class="lineCov">        502 :     print_escaped_unicode_codepoint(o, cp, single_quote);</span>
+<span class="lineNum">     513 </span>            :   }
+<span class="lineNum">     514 </span><span class="lineCov">         57 :   o &lt;&lt; (single_quote ? '\'' : '\&quot;');</span>
+<a name="515"><span class="lineNum">     515 </span><span class="lineCov">         57 : }</span></a>
+<span class="lineNum">     516 </span>            : 
+<a name="517"><span class="lineNum">     517 </span><span class="lineCov">          1 : void dynd::append_utf8_codepoint(uint32_t cp, std::string &amp;out_str) { string_append_utf8(cp, out_str); }</span></a>
+<span class="lineNum">     518 </span>            : 
+<span class="lineNum">     519 </span><span class="lineNoCov">          0 : ndt::type dynd::char_type_of_encoding(string_encoding_t encoding)</span>
+<span class="lineNum">     520 </span>            : {
+<span class="lineNum">     521 </span><span class="lineNoCov">          0 :   if (encoding == string_encoding_utf_8) {</span>
+<span class="lineNum">     522 </span><span class="lineNoCov">          0 :     return ndt::make_fixed_bytes(1, 1);</span>
+<span class="lineNum">     523 </span>            :   }
+<span class="lineNum">     524 </span><span class="lineNoCov">          0 :   else if (encoding == string_encoding_utf_16) {</span>
+<span class="lineNum">     525 </span><span class="lineNoCov">          0 :     return ndt::make_fixed_bytes(2, 2);</span>
+<span class="lineNum">     526 </span>            :   }
+<span class="lineNum">     527 </span>            :   else {
+<a name="528"><span class="lineNum">     528 </span><span class="lineNoCov">          0 :     return ndt::make_type&lt;ndt::char_type&gt;(encoding);</span></a>
+<span class="lineNum">     529 </span>            :   }
+<span class="lineNum">     530 </span><span class="lineCov">          3 : }</span>
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.10</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

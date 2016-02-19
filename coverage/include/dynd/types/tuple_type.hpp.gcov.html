@@ -1,0 +1,224 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - coverage.info.cleaned - include/dynd/types/tuple_type.hpp</title>
+  <link rel="stylesheet" type="text/css" href="../../../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../../../index.html">top level</a> - <a href="index.html">include/dynd/types</a> - tuple_type.hpp<span style="font-size: 80%;"> (source / <a href="tuple_type.hpp.func.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">coverage.info.cleaned</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">23</td>
+            <td class="headerCovTableEntry">23</td>
+            <td class="headerCovTableEntryHi">100.0 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2016-02-19</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">14</td>
+            <td class="headerCovTableEntry">14</td>
+            <td class="headerCovTableEntryHi">100.0 %</td>
+          </tr>
+          <tr><td><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : //</a>
+<span class="lineNum">       2 </span>            : // Copyright (C) 2011-15 DyND Developers
+<span class="lineNum">       3 </span>            : // BSD 2-Clause License, see LICENSE.txt
+<span class="lineNum">       4 </span>            : //
+<span class="lineNum">       5 </span>            : 
+<span class="lineNum">       6 </span>            : #pragma once
+<span class="lineNum">       7 </span>            : 
+<span class="lineNum">       8 </span>            : #include &lt;string&gt;
+<span class="lineNum">       9 </span>            : #include &lt;vector&gt;
+<span class="lineNum">      10 </span>            : 
+<span class="lineNum">      11 </span>            : #include &lt;dynd/type.hpp&gt;
+<span class="lineNum">      12 </span>            : #include &lt;dynd/types/fixed_dim_type.hpp&gt;
+<span class="lineNum">      13 </span>            : 
+<span class="lineNum">      14 </span>            : namespace dynd {
+<a name="15"><span class="lineNum">      15 </span>            : namespace ndt {</a>
+<span class="lineNum">      16 </span>            : 
+<span class="lineNum">      17 </span><span class="lineCov">      19160 :   class DYND_API tuple_type : public base_type {</span>
+<span class="lineNum">      18 </span>            :   protected:
+<span class="lineNum">      19 </span>            :     /**
+<span class="lineNum">      20 </span>            :      * The number of values in m_field_types and m_arrmeta_offsets.
+<span class="lineNum">      21 </span>            :      */
+<span class="lineNum">      22 </span>            :     intptr_t m_field_count;
+<span class="lineNum">      23 </span>            : 
+<span class="lineNum">      24 </span>            :     /**
+<span class="lineNum">      25 </span>            :      * Immutable vector of field types. Always has type &quot;N * type&quot;.
+<span class="lineNum">      26 </span>            :      */
+<span class="lineNum">      27 </span>            :     const std::vector&lt;type&gt; m_field_types;
+<span class="lineNum">      28 </span>            : 
+<span class="lineNum">      29 </span>            :     /**
+<span class="lineNum">      30 </span>            :      * Immutable vector of arrmeta offsets. Always has type &quot;N * uintptr&quot;.
+<span class="lineNum">      31 </span>            :      */
+<span class="lineNum">      32 </span>            :     std::vector&lt;uintptr_t&gt; m_arrmeta_offsets;
+<span class="lineNum">      33 </span>            : 
+<span class="lineNum">      34 </span>            :     /**
+<span class="lineNum">      35 </span>            :      * If true, the tuple is variadic, which means it is symbolic, and matches
+<span class="lineNum">      36 </span>            :      * against the beginning of a concrete tuple.
+<span class="lineNum">      37 </span>            :      */
+<span class="lineNum">      38 </span>            :     bool m_variadic;
+<span class="lineNum">      39 </span>            : 
+<span class="lineNum">      40 </span>            :     tuple_type(type_id_t type_id, const std::vector&lt;type&gt; &amp;field_types, flags_type flags, bool layout_in_arrmeta,
+<a name="41"><span class="lineNum">      41 </span>            :                bool variadic);</a>
+<span class="lineNum">      42 </span>            : 
+<span class="lineNum">      43 </span><span class="lineCov">        156 :     uintptr_t *get_arrmeta_data_offsets(char *arrmeta) const { return reinterpret_cast&lt;uintptr_t *&gt;(arrmeta); }</span>
+<span class="lineNum">      44 </span>            : 
+<span class="lineNum">      45 </span>            :   public:
+<span class="lineNum">      46 </span>            :     tuple_type(const std::vector&lt;type&gt; &amp;field_types, bool variadic);
+<a name="47"><span class="lineNum">      47 </span>            : </a>
+<span class="lineNum">      48 </span>            :     /** The array of the field data offsets */
+<span class="lineNum">      49 </span><span class="lineCov">      78953 :     inline const uintptr_t *get_data_offsets(const char *arrmeta) const</span>
+<span class="lineNum">      50 </span>            :     {
+<span class="lineNum">      51 </span><span class="lineCov">      78953 :       return reinterpret_cast&lt;const uintptr_t *&gt;(arrmeta);</span>
+<span class="lineNum">      52 </span>            :     }
+<span class="lineNum">      53 </span>            : 
+<span class="lineNum">      54 </span>            :     /** The number of fields in the struct. This is the size of the other
+<a name="55"><span class="lineNum">      55 </span>            :      * arrays.</a>
+<span class="lineNum">      56 </span>            :      */
+<a name="57"><span class="lineNum">      57 </span><span class="lineCov">     211164 :     intptr_t get_field_count() const { return m_field_count; }</span></a>
+<span class="lineNum">      58 </span>            :     /** The type of the tuple */
+<span class="lineNum">      59 </span><span class="lineCov">         22 :     const ndt::type get_type() const { return ndt::type_for(m_field_types); }</span>
+<a name="60"><span class="lineNum">      60 </span>            : </a>
+<span class="lineNum">      61 </span>            :     /** The field types */
+<span class="lineNum">      62 </span><span class="lineCov">        702 :     const std::vector&lt;type&gt; &amp;get_field_types() const { return m_field_types; }</span>
+<span class="lineNum">      63 </span>            : 
+<a name="64"><span class="lineNum">      64 </span>            :     const type *get_field_types_raw() const { return m_field_types.data(); }</a>
+<span class="lineNum">      65 </span>            :     /** The field arrmeta offsets */
+<span class="lineNum">      66 </span><span class="lineCov">        115 :     const std::vector&lt;uintptr_t&gt; &amp;get_arrmeta_offsets() const { return m_arrmeta_offsets; }</span>
+<a name="67"><span class="lineNum">      67 </span>            :     const uintptr_t *get_arrmeta_offsets_raw() const { return m_arrmeta_offsets.data(); }</a>
+<a name="68"><span class="lineNum">      68 </span>            : </a>
+<span class="lineNum">      69 </span><span class="lineCov">     180112 :     const type &amp;get_field_type(intptr_t i) const { return m_field_types[i]; }</span>
+<a name="70"><span class="lineNum">      70 </span><span class="lineCov">          4 :     uintptr_t get_arrmeta_offset(intptr_t i) const { return m_arrmeta_offsets[i]; }</span></a>
+<span class="lineNum">      71 </span>            : 
+<span class="lineNum">      72 </span><span class="lineCov">      14289 :     bool is_variadic() const { return m_variadic; }</span>
+<span class="lineNum">      73 </span>            : 
+<span class="lineNum">      74 </span>            :     virtual void get_vars(std::unordered_set&lt;std::string&gt; &amp;vars) const;
+<span class="lineNum">      75 </span>            : 
+<span class="lineNum">      76 </span>            :     void print_data(std::ostream &amp;o, const char *arrmeta, const char *data) const;
+<span class="lineNum">      77 </span>            :     bool is_expression() const;
+<span class="lineNum">      78 </span>            :     bool is_unique_data_owner(const char *arrmeta) const;
+<span class="lineNum">      79 </span>            : 
+<span class="lineNum">      80 </span>            :     size_t get_default_data_size() const;
+<span class="lineNum">      81 </span>            : 
+<span class="lineNum">      82 </span>            :     void get_shape(intptr_t ndim, intptr_t i, intptr_t *out_shape, const char *arrmeta, const char *data) const;
+<span class="lineNum">      83 </span>            : 
+<span class="lineNum">      84 </span>            :     type apply_linear_index(intptr_t nindices, const irange *indices, size_t current_i, const type &amp;root_tp,
+<span class="lineNum">      85 </span>            :                             bool leading_dimension) const;
+<span class="lineNum">      86 </span>            :     intptr_t apply_linear_index(intptr_t nindices, const irange *indices, const char *arrmeta, const type &amp;result_tp,
+<span class="lineNum">      87 </span>            :                                 char *out_arrmeta, const intrusive_ptr&lt;memory_block_data&gt; &amp;embedded_reference,
+<span class="lineNum">      88 </span>            :                                 size_t current_i, const type &amp;root_tp, bool leading_dimension, char **inout_data,
+<span class="lineNum">      89 </span>            :                                 intrusive_ptr&lt;memory_block_data&gt; &amp;inout_dataref) const;
+<span class="lineNum">      90 </span>            : 
+<span class="lineNum">      91 </span>            :     void print_type(std::ostream &amp;o) const;
+<span class="lineNum">      92 </span>            : 
+<span class="lineNum">      93 </span>            :     void transform_child_types(type_transform_fn_t transform_fn, intptr_t arrmeta_offset, void *extra,
+<span class="lineNum">      94 </span>            :                                type &amp;out_transformed_tp, bool &amp;out_was_transformed) const;
+<span class="lineNum">      95 </span>            :     type get_canonical_type() const;
+<span class="lineNum">      96 </span>            : 
+<span class="lineNum">      97 </span>            :     bool is_lossless_assignment(const type &amp;dst_tp, const type &amp;src_tp) const;
+<span class="lineNum">      98 </span>            : 
+<span class="lineNum">      99 </span>            :     bool operator==(const base_type &amp;rhs) const;
+<span class="lineNum">     100 </span>            : 
+<span class="lineNum">     101 </span>            :     void arrmeta_default_construct(char *arrmeta, bool blockref_alloc) const;
+<span class="lineNum">     102 </span>            :     void arrmeta_copy_construct(char *dst_arrmeta, const char *src_arrmeta,
+<span class="lineNum">     103 </span>            :                                 const intrusive_ptr&lt;memory_block_data&gt; &amp;embedded_reference) const;
+<span class="lineNum">     104 </span>            :     void arrmeta_reset_buffers(char *arrmeta) const;
+<span class="lineNum">     105 </span>            :     void arrmeta_finalize_buffers(char *arrmeta) const;
+<span class="lineNum">     106 </span>            :     void arrmeta_destruct(char *arrmeta) const;
+<span class="lineNum">     107 </span>            : 
+<span class="lineNum">     108 </span>            :     void data_destruct(const char *arrmeta, char *data) const;
+<span class="lineNum">     109 </span>            :     void data_destruct_strided(const char *arrmeta, char *data, intptr_t stride, size_t count) const;
+<span class="lineNum">     110 </span>            : 
+<span class="lineNum">     111 </span>            :     void foreach_leading(const char *arrmeta, char *data, foreach_fn_t callback, void *callback_data) const;
+<span class="lineNum">     112 </span>            : 
+<span class="lineNum">     113 </span>            :     void arrmeta_debug_print(const char *arrmeta, std::ostream &amp;o, const std::string &amp;indent) const;
+<span class="lineNum">     114 </span>            : 
+<span class="lineNum">     115 </span>            :     virtual bool match(const char *arrmeta, const type &amp;candidate_tp, const char *candidate_arrmeta,
+<span class="lineNum">     116 </span>            :                        std::map&lt;std::string, type&gt; &amp;tp_vars) const;
+<span class="lineNum">     117 </span>            : 
+<span class="lineNum">     118 </span>            :     std::map&lt;std::string, nd::callable&gt; get_dynamic_type_properties() const;
+<span class="lineNum">     119 </span>            : 
+<span class="lineNum">     120 </span>            :     /**
+<span class="lineNum">     121 </span>            :      * Fills in the array of default data offsets based on the data sizes
+<a name="122"><span class="lineNum">     122 </span>            :      * and alignments of the types.</a>
+<span class="lineNum">     123 </span>            :      */
+<span class="lineNum">     124 </span><span class="lineCov">        125 :     static void fill_default_data_offsets(intptr_t nfields, const type *field_tps, uintptr_t *out_data_offsets)</span>
+<span class="lineNum">     125 </span>            :     {
+<span class="lineNum">     126 </span><span class="lineCov">        125 :       if (nfields &gt; 0) {</span>
+<span class="lineNum">     127 </span><span class="lineCov">        117 :         out_data_offsets[0] = 0;</span>
+<span class="lineNum">     128 </span><span class="lineCov">        117 :         size_t offs = 0;</span>
+<span class="lineNum">     129 </span><span class="lineCov">        283 :         for (intptr_t i = 1; i &lt; nfields; ++i) {</span>
+<span class="lineNum">     130 </span><span class="lineCov">        166 :           offs += field_tps[i - 1].get_default_data_size();</span>
+<span class="lineNum">     131 </span><span class="lineCov">        166 :           offs = inc_to_alignment(offs, field_tps[i].get_data_alignment());</span>
+<span class="lineNum">     132 </span><span class="lineCov">        166 :           out_data_offsets[i] = offs;</span>
+<span class="lineNum">     133 </span>            :         }
+<span class="lineNum">     134 </span>            :       }
+<span class="lineNum">     135 </span><span class="lineCov">        125 :     }</span>
+<a name="136"><span class="lineNum">     136 </span>            : </a>
+<span class="lineNum">     137 </span>            :     /** Makes a tuple type with the specified types */
+<span class="lineNum">     138 </span><span class="lineCov">       5758 :     static type make(const std::vector&lt;type&gt; &amp;field_types, bool variadic = false)</span>
+<span class="lineNum">     139 </span>            :     {
+<span class="lineNum">     140 </span><span class="lineCov">       5758 :       return type(new tuple_type(field_types, variadic), false);</span>
+<span class="lineNum">     141 </span>            :     }
+<a name="142"><span class="lineNum">     142 </span>            : </a>
+<span class="lineNum">     143 </span>            :     /** Makes an empty tuple */
+<span class="lineNum">     144 </span><span class="lineCov">       1818 :     static type make(bool variadic = false) { return make(std::vector&lt;type&gt;(), variadic); }</span>
+<span class="lineNum">     145 </span>            :   };
+<span class="lineNum">     146 </span>            : 
+<span class="lineNum">     147 </span>            : } // namespace dynd::ndt
+<span class="lineNum">     148 </span>            : } // namespace dynd
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.10</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

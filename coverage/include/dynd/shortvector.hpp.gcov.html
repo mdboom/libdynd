@@ -1,0 +1,325 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - coverage.info.cleaned - include/dynd/shortvector.hpp</title>
+  <link rel="stylesheet" type="text/css" href="../../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../../index.html">top level</a> - <a href="index.html">include/dynd</a> - shortvector.hpp<span style="font-size: 80%;"> (source / <a href="shortvector.hpp.func.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">coverage.info.cleaned</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">28</td>
+            <td class="headerCovTableEntry">29</td>
+            <td class="headerCovTableEntryHi">96.6 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2016-02-19</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">38</td>
+            <td class="headerCovTableEntry">39</td>
+            <td class="headerCovTableEntryHi">97.4 %</td>
+          </tr>
+          <tr><td><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : //</a>
+<span class="lineNum">       2 </span>            : // Copyright (C) 2011-15 DyND Developers
+<span class="lineNum">       3 </span>            : // BSD 2-Clause License, see LICENSE.txt
+<span class="lineNum">       4 </span>            : //
+<span class="lineNum">       5 </span>            : 
+<span class="lineNum">       6 </span>            : #pragma once
+<span class="lineNum">       7 </span>            : 
+<span class="lineNum">       8 </span>            : #include &lt;algorithm&gt;
+<span class="lineNum">       9 </span>            : #include &lt;dynd/config.hpp&gt;
+<span class="lineNum">      10 </span>            : 
+<span class="lineNum">      11 </span>            : namespace dynd {
+<span class="lineNum">      12 </span>            : 
+<span class="lineNum">      13 </span>            : /**
+<span class="lineNum">      14 </span>            :  * This is a helper class for storing vectors that are
+<span class="lineNum">      15 </span>            :  * usually short. It doesn't store the actual length of the
+<span class="lineNum">      16 </span>            :  * array, however. When the vector is of length N or shorter,
+<span class="lineNum">      17 </span>            :  * no memory is allocated on the heap, otherwise it is.
+<span class="lineNum">      18 </span>            :  *
+<span class="lineNum">      19 </span>            :  * The purpose of this is to allow arrays with fewer dimensions
+<span class="lineNum">      20 </span>            :  * to be manipulated without allocating memory on the heap
+<span class="lineNum">      21 </span>            :  * for the shape and strides, but without sacrificing full generality
+<span class="lineNum">      22 </span>            :  * in the number of dimensions.
+<span class="lineNum">      23 </span>            :  */
+<span class="lineNum">      24 </span>            : template&lt;class T, int staticN = 3&gt;
+<span class="lineNum">      25 </span>            : class shortvector {
+<span class="lineNum">      26 </span>            :     T *m_data;
+<span class="lineNum">      27 </span>            :     T m_shortdata[staticN];
+<span class="lineNum">      28 </span>            :     /** Non-copyable */
+<span class="lineNum">      29 </span>            :     shortvector(const shortvector&amp; rhs); // = delete;
+<span class="lineNum">      30 </span>            :     /** Non-copyable (this object wouldn't know how much to allocate anyway) */
+<span class="lineNum">      31 </span>            :     shortvector&amp; operator=(const shortvector&amp; rhs); // = delete;
+<a name="32"><span class="lineNum">      32 </span>            : public:</a>
+<span class="lineNum">      33 </span>            :     /** Construct an uninitialized shortvector */
+<span class="lineNum">      34 </span><span class="lineCov">        393 :     shortvector()</span>
+<span class="lineNum">      35 </span><span class="lineCov">        393 :         : m_data(m_shortdata) {</span>
+<span class="lineNum">      36 </span><span class="lineCov">        393 :     }</span>
+<a name="37"><span class="lineNum">      37 </span>            : </a>
+<span class="lineNum">      38 </span>            :     /** Initializes the shortvector after default construction */
+<span class="lineNum">      39 </span><span class="lineCov">        393 :     void init(size_t size) {</span>
+<span class="lineNum">      40 </span><span class="lineCov">        393 :         if (m_data != m_shortdata) {</span>
+<span class="lineNum">      41 </span><span class="lineNoCov">          0 :             delete[] m_data;</span>
+<span class="lineNum">      42 </span>            :         }
+<span class="lineNum">      43 </span><span class="lineCov">        393 :         if (size &lt;= staticN) {</span>
+<span class="lineNum">      44 </span><span class="lineCov">        381 :             m_data = m_shortdata;</span>
+<span class="lineNum">      45 </span>            :         } else {
+<span class="lineNum">      46 </span><span class="lineCov">         12 :             m_data = new T[size];</span>
+<span class="lineNum">      47 </span>            :         }
+<span class="lineNum">      48 </span><span class="lineCov">        393 :     }</span>
+<span class="lineNum">      49 </span>            : 
+<span class="lineNum">      50 </span>            :     void init(size_t size, const T *data) {
+<span class="lineNum">      51 </span>            :         init(size);
+<span class="lineNum">      52 </span>            :         memcpy(m_data, data, size * sizeof(T));
+<span class="lineNum">      53 </span>            :     }
+<a name="54"><span class="lineNum">      54 </span>            : </a>
+<span class="lineNum">      55 </span>            :     /** Construct the shortvector with a specified size */
+<span class="lineNum">      56 </span><span class="lineCov">       1127 :     explicit shortvector(size_t size)</span>
+<span class="lineNum">      57 </span><span class="lineCov">       1127 :         : m_data((size &lt;= staticN) ? m_shortdata : new T[size])</span>
+<span class="lineNum">      58 </span>            :     {
+<span class="lineNum">      59 </span><span class="lineCov">       1127 :     }</span>
+<span class="lineNum">      60 </span>            : 
+<span class="lineNum">      61 </span>            :     /** Construct the shortvector with a specified size and initial data */
+<span class="lineNum">      62 </span>            :     shortvector(size_t size, const shortvector&amp; rhs)
+<span class="lineNum">      63 </span>            :         : m_data((size &lt;= staticN) ? m_shortdata : new T[size])
+<span class="lineNum">      64 </span>            :     {
+<span class="lineNum">      65 </span>            :         DYND_MEMCPY(m_data, rhs.m_data, size * sizeof(T));
+<span class="lineNum">      66 </span>            :     }
+<a name="67"><span class="lineNum">      67 </span>            : </a>
+<span class="lineNum">      68 </span>            :     /** Construct the shortvector with a specified size and initial data */
+<span class="lineNum">      69 </span><span class="lineCov">         13 :     shortvector(size_t size, const T* data)</span>
+<span class="lineNum">      70 </span><span class="lineCov">         13 :         : m_data((size &lt;= staticN) ? m_shortdata : new T[size])</span>
+<span class="lineNum">      71 </span>            :     {
+<span class="lineNum">      72 </span><span class="lineCov">         13 :         DYND_MEMCPY(m_data, data, size * sizeof(T));</span>
+<span class="lineNum">      73 </span><span class="lineCov">         13 :     }</span>
+<span class="lineNum">      74 </span>            : 
+<span class="lineNum">      75 </span>            :     /** Move constructor */
+<span class="lineNum">      76 </span>            :     shortvector(shortvector&amp;&amp; rhs) {
+<span class="lineNum">      77 </span>            :         if (rhs.m_data == rhs.m_shortdata) {
+<span class="lineNum">      78 </span>            :             // In the short case, copy the full shortdata vector
+<span class="lineNum">      79 </span>            :             DYND_MEMCPY(m_shortdata, rhs.m_shortdata, staticN * sizeof(T));
+<span class="lineNum">      80 </span>            :             m_data = m_shortdata;
+<span class="lineNum">      81 </span>            :         } else {
+<span class="lineNum">      82 </span>            :             // In the long case, move the long allocated pointer
+<span class="lineNum">      83 </span>            :             m_data = rhs.m_data;
+<span class="lineNum">      84 </span>            :             rhs.m_data = rhs.m_shortdata;
+<span class="lineNum">      85 </span>            :         }
+<span class="lineNum">      86 </span>            :     }
+<span class="lineNum">      87 </span>            : 
+<span class="lineNum">      88 </span>            :     /** Move assignment operator */
+<span class="lineNum">      89 </span>            :     shortvector&amp; operator=(shortvector&amp;&amp; rhs) {
+<span class="lineNum">      90 </span>            :         if (this != &amp;rhs) {
+<span class="lineNum">      91 </span>            :             if (m_data != m_shortdata) {
+<span class="lineNum">      92 </span>            :                 delete[] m_data;
+<span class="lineNum">      93 </span>            :             }
+<span class="lineNum">      94 </span>            :             if (rhs.m_data == rhs.m_shortdata) {
+<span class="lineNum">      95 </span>            :                 // In the short case, copy the full shortdata vector
+<span class="lineNum">      96 </span>            :                 DYND_MEMCPY(m_shortdata, rhs.m_shortdata, staticN * sizeof(T));
+<span class="lineNum">      97 </span>            :                 m_data = m_shortdata;
+<span class="lineNum">      98 </span>            :             } else {
+<span class="lineNum">      99 </span>            :                 // In the long case, move the long allocated pointer
+<span class="lineNum">     100 </span>            :                 m_data = rhs.m_data;
+<span class="lineNum">     101 </span>            :                 rhs.m_data = rhs.m_shortdata;
+<span class="lineNum">     102 </span>            :             }
+<span class="lineNum">     103 </span>            :         }
+<span class="lineNum">     104 </span>            :         return *this;
+<span class="lineNum">     105 </span>            :     }
+<a name="106"><span class="lineNum">     106 </span>            : </a>
+<span class="lineNum">     107 </span>            :     /** Destructor */
+<span class="lineNum">     108 </span><span class="lineCov">       1533 :     ~shortvector() {</span>
+<span class="lineNum">     109 </span><span class="lineCov">       1533 :         if (m_data != m_shortdata) {</span>
+<span class="lineNum">     110 </span><span class="lineCov">         39 :             delete[] m_data;</span>
+<span class="lineNum">     111 </span>            :         }
+<span class="lineNum">     112 </span><span class="lineCov">       1533 :     }</span>
+<span class="lineNum">     113 </span>            : 
+<span class="lineNum">     114 </span>            :     void swap(shortvector&amp; rhs) {
+<span class="lineNum">     115 </span>            :         // Start by swapping the pointers
+<span class="lineNum">     116 </span>            :         std::swap(m_data, rhs.m_data);
+<span class="lineNum">     117 </span>            :         // Copy the shortdata if necessary
+<span class="lineNum">     118 </span>            :         if (m_data == rhs.m_shortdata) {
+<span class="lineNum">     119 </span>            :             // The rhs data was pointing to shortdata
+<span class="lineNum">     120 </span>            :             m_data = m_shortdata;
+<span class="lineNum">     121 </span>            :             if (rhs.m_data == m_shortdata) {
+<span class="lineNum">     122 </span>            :                 // Both data's were pointing to their shortdata
+<span class="lineNum">     123 </span>            :                 T tmp[staticN];
+<span class="lineNum">     124 </span>            :                 rhs.m_data = rhs.m_shortdata;
+<span class="lineNum">     125 </span>            :                 DYND_MEMCPY(tmp, m_shortdata, staticN * sizeof(T));
+<span class="lineNum">     126 </span>            :                 DYND_MEMCPY(m_shortdata, rhs.m_shortdata, staticN * sizeof(T));
+<span class="lineNum">     127 </span>            :                 DYND_MEMCPY(rhs.m_shortdata, tmp, staticN * sizeof(T));
+<span class="lineNum">     128 </span>            :             } else {
+<span class="lineNum">     129 </span>            :                 // Just the rhs data was pointing to shortdata
+<span class="lineNum">     130 </span>            :                 DYND_MEMCPY(m_shortdata, rhs.m_shortdata, staticN * sizeof(T));
+<span class="lineNum">     131 </span>            :             }
+<span class="lineNum">     132 </span>            :         } else if (rhs.m_data == m_shortdata) {
+<span class="lineNum">     133 </span>            :             // Just this data was pointing to shortdata
+<span class="lineNum">     134 </span>            :             rhs.m_data = rhs.m_shortdata;
+<span class="lineNum">     135 </span>            :             DYND_MEMCPY(rhs.m_shortdata, m_shortdata, staticN * sizeof(T));
+<span class="lineNum">     136 </span>            :         }
+<span class="lineNum">     137 </span>            :     }
+<a name="138"><span class="lineNum">     138 </span>            : </a>
+<span class="lineNum">     139 </span>            :     /** Gets the const data pointer */
+<span class="lineNum">     140 </span><span class="lineCov">         22 :     const T* get() const {</span>
+<span class="lineNum">     141 </span><span class="lineCov">         22 :         return m_data;</span>
+<a name="142"><span class="lineNum">     142 </span>            :     }</a>
+<span class="lineNum">     143 </span>            :     /** Gets the non-const data pointer */
+<span class="lineNum">     144 </span><span class="lineCov">       1983 :     T* get() {</span>
+<span class="lineNum">     145 </span><span class="lineCov">       1983 :         return m_data;</span>
+<span class="lineNum">     146 </span>            :     }
+<a name="147"><span class="lineNum">     147 </span>            : </a>
+<span class="lineNum">     148 </span>            :     /** Const indexing operator */
+<span class="lineNum">     149 </span><span class="lineCov">         41 :     const T&amp; operator[](size_t i) const {</span>
+<span class="lineNum">     150 </span><span class="lineCov">         41 :         return m_data[i];</span>
+<a name="151"><span class="lineNum">     151 </span>            :     }</a>
+<span class="lineNum">     152 </span>            :     /** Non-const indexing operator */
+<span class="lineNum">     153 </span><span class="lineCov">       3878 :     T&amp; operator[](size_t i) {</span>
+<span class="lineNum">     154 </span><span class="lineCov">       3878 :         return m_data[i];</span>
+<span class="lineNum">     155 </span>            :     }
+<span class="lineNum">     156 </span>            : };
+<span class="lineNum">     157 </span>            : 
+<span class="lineNum">     158 </span>            : /**
+<span class="lineNum">     159 </span>            :  * This class holds an array of vectors, using
+<span class="lineNum">     160 </span>            :  * static storage if the number of elements is less
+<span class="lineNum">     161 </span>            :  * or equal to staticN. Using this class allows code
+<span class="lineNum">     162 </span>            :  * to combine what would be many small new[] calls into
+<span class="lineNum">     163 </span>            :  * one bigger call, when the number of shortvectors needed
+<span class="lineNum">     164 </span>            :  * is known ahead of time.
+<span class="lineNum">     165 </span>            :  *
+<span class="lineNum">     166 </span>            :  * To use this class, call the init() function with
+<span class="lineNum">     167 </span>            :  * the number of elements desired, then access the arrays
+<span class="lineNum">     168 </span>            :  * with get&lt;subvector&gt;(index).
+<span class="lineNum">     169 </span>            :  *
+<span class="lineNum">     170 </span>            :  * Before calling the init() function, the class is not
+<span class="lineNum">     171 </span>            :  * in a useable state.
+<span class="lineNum">     172 </span>            :  */
+<span class="lineNum">     173 </span>            : template&lt;class T, int M, int staticN = 3&gt;
+<span class="lineNum">     174 </span>            : class multi_shortvector {
+<span class="lineNum">     175 </span>            :     T *m_shortvectors[M];
+<span class="lineNum">     176 </span>            :     T m_static_data[staticN * M];
+<span class="lineNum">     177 </span>            :     T *m_alloc_data;
+<span class="lineNum">     178 </span>            : 
+<span class="lineNum">     179 </span>            :     void internal_init(int n) {
+<span class="lineNum">     180 </span>            :         if (n &lt;= staticN) {
+<span class="lineNum">     181 </span>            :             // Do at minimum n == 1
+<span class="lineNum">     182 </span>            :             if (n == 0) {
+<span class="lineNum">     183 </span>            :                 n = 1;
+<span class="lineNum">     184 </span>            :             }
+<span class="lineNum">     185 </span>            :             for (int i = 0; i &lt; M; ++i) {
+<span class="lineNum">     186 </span>            :                 m_shortvectors[i] = &amp;m_static_data[i*n];
+<span class="lineNum">     187 </span>            :             }
+<span class="lineNum">     188 </span>            :         } else {
+<span class="lineNum">     189 </span>            :             m_alloc_data = new T[n * M];
+<span class="lineNum">     190 </span>            :             for (int i = 0; i &lt; M; ++i) {
+<span class="lineNum">     191 </span>            :                 m_shortvectors[i] = m_alloc_data + i*n;
+<span class="lineNum">     192 </span>            :             }
+<span class="lineNum">     193 </span>            :         }
+<span class="lineNum">     194 </span>            :     }
+<span class="lineNum">     195 </span>            : 
+<span class="lineNum">     196 </span>            :     // Non-copyable
+<span class="lineNum">     197 </span>            :     multi_shortvector(const multi_shortvector&amp;);
+<span class="lineNum">     198 </span>            :     multi_shortvector&amp; operator=(const multi_shortvector&amp;);
+<span class="lineNum">     199 </span>            : public:
+<span class="lineNum">     200 </span>            :     multi_shortvector()
+<span class="lineNum">     201 </span>            :         : m_alloc_data(NULL) {
+<span class="lineNum">     202 </span>            :     }
+<span class="lineNum">     203 </span>            : 
+<span class="lineNum">     204 </span>            :     multi_shortvector(int n)
+<span class="lineNum">     205 </span>            :         : m_alloc_data(NULL) {
+<span class="lineNum">     206 </span>            :         internal_init(n);
+<span class="lineNum">     207 </span>            :     }
+<span class="lineNum">     208 </span>            : 
+<span class="lineNum">     209 </span>            :     ~multi_shortvector() {
+<span class="lineNum">     210 </span>            :         // This is OK if m_alloc_data is NULL
+<span class="lineNum">     211 </span>            :         delete[] m_alloc_data;
+<span class="lineNum">     212 </span>            :     }
+<span class="lineNum">     213 </span>            : 
+<span class="lineNum">     214 </span>            :     void init(int n) {
+<span class="lineNum">     215 </span>            :         if (m_alloc_data != NULL) {
+<span class="lineNum">     216 </span>            :             delete[] m_alloc_data;
+<span class="lineNum">     217 </span>            :         }
+<span class="lineNum">     218 </span>            :         internal_init(n);
+<span class="lineNum">     219 </span>            :     }
+<span class="lineNum">     220 </span>            : 
+<span class="lineNum">     221 </span>            :     T **get_all() {
+<span class="lineNum">     222 </span>            :         return m_shortvectors;
+<span class="lineNum">     223 </span>            :     }
+<span class="lineNum">     224 </span>            : 
+<span class="lineNum">     225 </span>            :     const T * const*get_all() const {
+<span class="lineNum">     226 </span>            :         return m_shortvectors;
+<span class="lineNum">     227 </span>            :     }
+<span class="lineNum">     228 </span>            : 
+<span class="lineNum">     229 </span>            :     T *get(int i) {
+<span class="lineNum">     230 </span>            :         return m_shortvectors[i];
+<span class="lineNum">     231 </span>            :     }
+<span class="lineNum">     232 </span>            : 
+<span class="lineNum">     233 </span>            :     const T *get(int i) const {
+<span class="lineNum">     234 </span>            :         return m_shortvectors[i];
+<span class="lineNum">     235 </span>            :     }
+<span class="lineNum">     236 </span>            : 
+<span class="lineNum">     237 </span>            :     T&amp; get(int i, int j) {
+<span class="lineNum">     238 </span>            :         return m_shortvectors[i][j];
+<span class="lineNum">     239 </span>            :     }
+<span class="lineNum">     240 </span>            : 
+<span class="lineNum">     241 </span>            :     const T&amp; get(int i, int j) const {
+<span class="lineNum">     242 </span>            :         return m_shortvectors[i][j];
+<span class="lineNum">     243 </span>            :     }
+<span class="lineNum">     244 </span>            : };
+<span class="lineNum">     245 </span>            : 
+<span class="lineNum">     246 </span>            : /** Typedef for vector of dimensions or strides */
+<span class="lineNum">     247 </span>            : typedef shortvector&lt;intptr_t&gt; dimvector;
+<span class="lineNum">     248 </span>            : 
+<span class="lineNum">     249 </span>            : } // namespace dynd
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.10</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

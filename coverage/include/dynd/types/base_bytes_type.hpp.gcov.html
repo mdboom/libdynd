@@ -1,0 +1,114 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - coverage.info.cleaned - include/dynd/types/base_bytes_type.hpp</title>
+  <link rel="stylesheet" type="text/css" href="../../../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../../../index.html">top level</a> - <a href="index.html">include/dynd/types</a> - base_bytes_type.hpp<span style="font-size: 80%;"> (source / <a href="base_bytes_type.hpp.func.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">coverage.info.cleaned</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">3</td>
+            <td class="headerCovTableEntry">3</td>
+            <td class="headerCovTableEntryHi">100.0 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2016-02-19</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">1</td>
+            <td class="headerCovTableEntry">1</td>
+            <td class="headerCovTableEntryHi">100.0 %</td>
+          </tr>
+          <tr><td><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : //</a>
+<span class="lineNum">       2 </span>            : // Copyright (C) 2011-15 DyND Developers
+<span class="lineNum">       3 </span>            : // BSD 2-Clause License, see LICENSE.txt
+<span class="lineNum">       4 </span>            : //
+<span class="lineNum">       5 </span>            : 
+<span class="lineNum">       6 </span>            : #pragma once
+<span class="lineNum">       7 </span>            : 
+<span class="lineNum">       8 </span>            : #include &lt;dynd/types/base_type.hpp&gt;
+<span class="lineNum">       9 </span>            : 
+<span class="lineNum">      10 </span>            : namespace dynd {
+<span class="lineNum">      11 </span>            : namespace ndt {
+<span class="lineNum">      12 </span>            : 
+<span class="lineNum">      13 </span>            :   /**
+<span class="lineNum">      14 </span>            :    * Base class for all bytes types. If a type
+<span class="lineNum">      15 </span>            :    * has kind bytes_kind, it must be a subclass of
+<span class="lineNum">      16 </span>            :    * base_bytes_type.
+<span class="lineNum">      17 </span>            :    */
+<a name="18"><span class="lineNum">      18 </span>            :   class DYND_API base_bytes_type : public base_type {</a>
+<span class="lineNum">      19 </span>            :   public:
+<span class="lineNum">      20 </span><span class="lineCov">         50 :     base_bytes_type(type_id_t type_id, type_kind_t kind, size_t data_size, size_t alignment, flags_type flags,</span>
+<span class="lineNum">      21 </span>            :                     size_t arrmeta_size)
+<span class="lineNum">      22 </span><span class="lineCov">         50 :         : base_type(type_id, kind, data_size, alignment, flags, arrmeta_size, 0, 0)</span>
+<span class="lineNum">      23 </span>            :     {
+<span class="lineNum">      24 </span><span class="lineCov">         50 :     }</span>
+<span class="lineNum">      25 </span>            : 
+<span class="lineNum">      26 </span>            :     virtual ~base_bytes_type();
+<span class="lineNum">      27 </span>            : 
+<span class="lineNum">      28 </span>            :     /** Retrieves the data range in which a bytes object is stored */
+<span class="lineNum">      29 </span>            :     virtual void get_bytes_range(const char **out_begin, const char **out_end, const char *arrmeta,
+<span class="lineNum">      30 </span>            :                                  const char *data) const = 0;
+<span class="lineNum">      31 </span>            : 
+<span class="lineNum">      32 </span>            :     // Bytes types stop the iterdata chain
+<span class="lineNum">      33 </span>            :     // TODO: Maybe it should be more flexible?
+<span class="lineNum">      34 </span>            :     size_t get_iterdata_size(intptr_t ndim) const;
+<span class="lineNum">      35 </span>            :   };
+<span class="lineNum">      36 </span>            : 
+<span class="lineNum">      37 </span>            : } // namespace dynd::ndt
+<span class="lineNum">      38 </span>            : } // namespace dynd
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.10</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

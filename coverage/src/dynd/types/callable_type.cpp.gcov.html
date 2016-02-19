@@ -1,0 +1,350 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - coverage.info.cleaned - src/dynd/types/callable_type.cpp</title>
+  <link rel="stylesheet" type="text/css" href="../../../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../../../index.html">top level</a> - <a href="index.html">src/dynd/types</a> - callable_type.cpp<span style="font-size: 80%;"> (source / <a href="callable_type.cpp.func.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">coverage.info.cleaned</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">63</td>
+            <td class="headerCovTableEntry">133</td>
+            <td class="headerCovTableEntryLo">47.4 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2016-02-19</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">9</td>
+            <td class="headerCovTableEntry">25</td>
+            <td class="headerCovTableEntryLo">36.0 %</td>
+          </tr>
+          <tr><td><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : //</a>
+<span class="lineNum">       2 </span>            : // Copyright (C) 2011-15 DyND Developers
+<span class="lineNum">       3 </span>            : // BSD 2-Clause License, see LICENSE.txt
+<span class="lineNum">       4 </span>            : //
+<span class="lineNum">       5 </span>            : 
+<span class="lineNum">       6 </span>            : #include &lt;dynd/callable.hpp&gt;
+<span class="lineNum">       7 </span>            : #include &lt;dynd/types/callable_type.hpp&gt;
+<span class="lineNum">       8 </span>            : #include &lt;dynd/types/fixed_dim_type.hpp&gt;
+<span class="lineNum">       9 </span>            : #include &lt;dynd/types/str_util.hpp&gt;
+<span class="lineNum">      10 </span>            : #include &lt;dynd/ensure_immutable_contig.hpp&gt;
+<span class="lineNum">      11 </span>            : #include &lt;dynd/types/typevar_type.hpp&gt;
+<span class="lineNum">      12 </span>            : #include &lt;dynd/kernels/get_then_copy_kernel.hpp&gt;
+<span class="lineNum">      13 </span>            : 
+<span class="lineNum">      14 </span>            : using namespace std;
+<a name="15"><span class="lineNum">      15 </span>            : using namespace dynd;</a>
+<span class="lineNum">      16 </span>            : 
+<span class="lineNum">      17 </span><span class="lineCov">       5667 : ndt::callable_type::callable_type(const type &amp;ret_type, const type &amp;pos_types, const type &amp;kwd_types)</span>
+<span class="lineNum">      18 </span>            :     : base_type(callable_id, function_kind, sizeof(data_type), alignof(data_type),
+<span class="lineNum">      19 </span>            :                 type_flag_zeroinit | type_flag_destructor, 0, 0, 0),
+<span class="lineNum">      20 </span><span class="lineCov">       5667 :       m_return_type(ret_type), m_pos_tuple(pos_types), m_kwd_struct(kwd_types)</span>
+<span class="lineNum">      21 </span>            : {
+<span class="lineNum">      22 </span><span class="lineCov">       5667 :   if (m_pos_tuple.get_id() != tuple_id) {</span>
+<span class="lineNum">      23 </span><span class="lineNoCov">          0 :     stringstream ss;</span>
+<span class="lineNum">      24 </span>            :     ss &lt;&lt; &quot;dynd callable positional arg types require a tuple type, got a &quot;
+<span class="lineNum">      25 </span><span class="lineNoCov">          0 :           &quot;type \&quot;&quot; &lt;&lt; m_pos_tuple &lt;&lt; &quot;\&quot;&quot;;</span>
+<span class="lineNum">      26 </span><span class="lineNoCov">          0 :     throw invalid_argument(ss.str());</span>
+<span class="lineNum">      27 </span>            :   }
+<span class="lineNum">      28 </span><span class="lineCov">       5667 :   if (m_kwd_struct.get_id() != struct_id) {</span>
+<span class="lineNum">      29 </span><span class="lineNoCov">          0 :     stringstream ss;</span>
+<span class="lineNum">      30 </span>            :     ss &lt;&lt; &quot;dynd callable keyword arg types require a struct type, got a &quot;
+<span class="lineNum">      31 </span><span class="lineNoCov">          0 :           &quot;type \&quot;&quot; &lt;&lt; m_kwd_struct &lt;&lt; &quot;\&quot;&quot;;</span>
+<span class="lineNum">      32 </span><span class="lineNoCov">          0 :     throw invalid_argument(ss.str());</span>
+<span class="lineNum">      33 </span>            :   }
+<span class="lineNum">      34 </span>            : 
+<span class="lineNum">      35 </span><span class="lineCov">       8706 :   for (intptr_t i = 0, i_end = get_nkwd(); i &lt; i_end; ++i) {</span>
+<span class="lineNum">      36 </span><span class="lineCov">       3039 :     if (m_kwd_struct.extended&lt;tuple_type&gt;()-&gt;get_field_type(i).get_id() == option_id) {</span>
+<span class="lineNum">      37 </span><span class="lineCov">        354 :       m_opt_kwd_indices.push_back(i);</span>
+<span class="lineNum">      38 </span>            :     }
+<span class="lineNum">      39 </span>            :   }
+<span class="lineNum">      40 </span>            : 
+<span class="lineNum">      41 </span>            :   // TODO: Should check that all the kwd names are simple identifier names
+<span class="lineNum">      42 </span>            :   //       because struct_type does not check that.
+<span class="lineNum">      43 </span>            : 
+<span class="lineNum">      44 </span>            :   // Note that we don't base the flags of this type on that of its arguments
+<span class="lineNum">      45 </span>            :   // and return types, because it is something the can be instantiated, even
+<span class="lineNum">      46 </span>            :   // for arguments that are symbolic.
+<a name="47"><span class="lineNum">      47 </span><span class="lineCov">       5667 : }</span></a>
+<span class="lineNum">      48 </span>            : 
+<span class="lineNum">      49 </span><span class="lineNoCov">          0 : static void print_callable(std::ostream &amp;o, const ndt::callable_type *DYND_UNUSED(af_tp),</span>
+<span class="lineNum">      50 </span>            :                            const ndt::callable_type::data_type *af)
+<span class="lineNum">      51 </span>            : {
+<span class="lineNum">      52 </span><span class="lineNoCov">          0 :   o &lt;&lt; &quot;&lt;callable at &quot; &lt;&lt; (void *)af &lt;&lt; &quot;&gt;&quot;;</span>
+<a name="53"><span class="lineNum">      53 </span><span class="lineNoCov">          0 : }</span></a>
+<span class="lineNum">      54 </span>            : 
+<span class="lineNum">      55 </span><span class="lineNoCov">          0 : void ndt::callable_type::print_data(std::ostream &amp;o, const char *DYND_UNUSED(arrmeta), const char *data) const</span>
+<span class="lineNum">      56 </span>            : {
+<span class="lineNum">      57 </span><span class="lineNoCov">          0 :   const data_type *af = reinterpret_cast&lt;const data_type *&gt;(data);</span>
+<span class="lineNum">      58 </span><span class="lineNoCov">          0 :   print_callable(o, this, af);</span>
+<a name="59"><span class="lineNum">      59 </span><span class="lineNoCov">          0 : }</span></a>
+<span class="lineNum">      60 </span>            : 
+<span class="lineNum">      61 </span><span class="lineCov">         19 : void ndt::callable_type::print_type(std::ostream &amp;o) const</span>
+<span class="lineNum">      62 </span>            : {
+<span class="lineNum">      63 </span><span class="lineCov">         19 :   intptr_t npos = get_npos();</span>
+<span class="lineNum">      64 </span><span class="lineCov">         19 :   intptr_t nkwd = get_nkwd();</span>
+<span class="lineNum">      65 </span>            : 
+<span class="lineNum">      66 </span><span class="lineCov">         19 :   o &lt;&lt; &quot;(&quot;;</span>
+<span class="lineNum">      67 </span>            : 
+<span class="lineNum">      68 </span><span class="lineCov">         49 :   for (intptr_t i = 0; i &lt; npos; ++i) {</span>
+<span class="lineNum">      69 </span><span class="lineCov">         30 :     if (i &gt; 0) {</span>
+<span class="lineNum">      70 </span><span class="lineCov">         13 :       o &lt;&lt; &quot;, &quot;;</span>
+<span class="lineNum">      71 </span>            :     }
+<span class="lineNum">      72 </span>            : 
+<span class="lineNum">      73 </span><span class="lineCov">         30 :     o &lt;&lt; get_pos_type(i);</span>
+<span class="lineNum">      74 </span>            :   }
+<span class="lineNum">      75 </span><span class="lineCov">         19 :   if (m_pos_tuple.extended&lt;tuple_type&gt;()-&gt;is_variadic()) {</span>
+<span class="lineNum">      76 </span><span class="lineCov">          2 :     if (npos &gt; 0) {</span>
+<span class="lineNum">      77 </span><span class="lineCov">          2 :       o &lt;&lt; &quot;, ...&quot;;</span>
+<span class="lineNum">      78 </span>            :     }
+<span class="lineNum">      79 </span>            :     else {
+<span class="lineNum">      80 </span><span class="lineNoCov">          0 :       o &lt;&lt; &quot;...&quot;;</span>
+<span class="lineNum">      81 </span>            :     }
+<span class="lineNum">      82 </span>            :   }
+<span class="lineNum">      83 </span><span class="lineCov">         26 :   for (intptr_t i = 0; i &lt; nkwd; ++i) {</span>
+<span class="lineNum">      84 </span><span class="lineCov">          7 :     if (i &gt; 0 || npos &gt; 0) {</span>
+<span class="lineNum">      85 </span><span class="lineCov">          7 :       o &lt;&lt; &quot;, &quot;;</span>
+<span class="lineNum">      86 </span>            :     }
+<span class="lineNum">      87 </span>            : 
+<span class="lineNum">      88 </span>            :     // TODO: names should be validated on input, not just
+<span class="lineNum">      89 </span>            :     //       printed specially like in struct_type.
+<span class="lineNum">      90 </span><span class="lineCov">         14 :     const std::string &amp;name = get_kwd_name(i);</span>
+<span class="lineNum">      91 </span><span class="lineCov">          7 :     if (is_simple_identifier_name(name)) {</span>
+<span class="lineNum">      92 </span><span class="lineCov">          7 :       o &lt;&lt; name;</span>
+<span class="lineNum">      93 </span>            :     }
+<span class="lineNum">      94 </span>            :     else {
+<span class="lineNum">      95 </span><span class="lineNoCov">          0 :       print_escaped_utf8_string(o, name, true);</span>
+<span class="lineNum">      96 </span>            :     }
+<span class="lineNum">      97 </span><span class="lineCov">          7 :     o &lt;&lt; &quot;: &quot; &lt;&lt; get_kwd_type(i);</span>
+<span class="lineNum">      98 </span>            :   }
+<span class="lineNum">      99 </span><span class="lineCov">         19 :   if (nkwd &gt; 0 &amp;&amp; m_kwd_struct.extended&lt;struct_type&gt;()-&gt;is_variadic()) {</span>
+<span class="lineNum">     100 </span><span class="lineNoCov">          0 :     o &lt;&lt; &quot;...&quot;;</span>
+<span class="lineNum">     101 </span>            :   }
+<span class="lineNum">     102 </span>            : 
+<span class="lineNum">     103 </span><span class="lineCov">         19 :   o &lt;&lt; &quot;) -&gt; &quot; &lt;&lt; m_return_type;</span>
+<a name="104"><span class="lineNum">     104 </span><span class="lineCov">         19 : }</span></a>
+<span class="lineNum">     105 </span>            : 
+<span class="lineNum">     106 </span><span class="lineNoCov">          0 : void ndt::callable_type::transform_child_types(type_transform_fn_t transform_fn, intptr_t arrmeta_offset, void *extra,</span>
+<span class="lineNum">     107 </span>            :                                                type &amp;out_transformed_tp, bool &amp;out_was_transformed) const
+<span class="lineNum">     108 </span>            : {
+<span class="lineNum">     109 </span><span class="lineNoCov">          0 :   type tmp_return_type, tmp_pos_types, tmp_kwd_types;</span>
+<span class="lineNum">     110 </span>            : 
+<span class="lineNum">     111 </span><span class="lineNoCov">          0 :   bool was_transformed = false;</span>
+<span class="lineNum">     112 </span><span class="lineNoCov">          0 :   transform_fn(m_return_type, arrmeta_offset, extra, tmp_return_type, was_transformed);</span>
+<span class="lineNum">     113 </span><span class="lineNoCov">          0 :   transform_fn(m_pos_tuple, arrmeta_offset, extra, tmp_pos_types, was_transformed);</span>
+<span class="lineNum">     114 </span><span class="lineNoCov">          0 :   transform_fn(m_kwd_struct, arrmeta_offset, extra, tmp_kwd_types, was_transformed);</span>
+<span class="lineNum">     115 </span><span class="lineNoCov">          0 :   if (was_transformed) {</span>
+<span class="lineNum">     116 </span><span class="lineNoCov">          0 :     out_transformed_tp = make(tmp_return_type, tmp_pos_types, tmp_kwd_types);</span>
+<span class="lineNum">     117 </span><span class="lineNoCov">          0 :     out_was_transformed = true;</span>
+<span class="lineNum">     118 </span>            :   }
+<span class="lineNum">     119 </span>            :   else {
+<span class="lineNum">     120 </span><span class="lineNoCov">          0 :     out_transformed_tp = type(this, true);</span>
+<span class="lineNum">     121 </span>            :   }
+<a name="122"><span class="lineNum">     122 </span><span class="lineNoCov">          0 : }</span></a>
+<span class="lineNum">     123 </span>            : 
+<span class="lineNum">     124 </span><span class="lineNoCov">          0 : ndt::type ndt::callable_type::get_canonical_type() const</span>
+<span class="lineNum">     125 </span>            : {
+<span class="lineNum">     126 </span><span class="lineNoCov">          0 :   type tmp_return_type, tmp_pos_types, tmp_kwd_types;</span>
+<span class="lineNum">     127 </span>            : 
+<span class="lineNum">     128 </span><span class="lineNoCov">          0 :   tmp_return_type = m_return_type.get_canonical_type();</span>
+<span class="lineNum">     129 </span><span class="lineNoCov">          0 :   tmp_pos_types = m_pos_tuple.get_canonical_type();</span>
+<span class="lineNum">     130 </span><span class="lineNoCov">          0 :   tmp_kwd_types = m_kwd_struct.get_canonical_type();</span>
+<span class="lineNum">     131 </span><span class="lineNoCov">          0 :   return make(tmp_return_type, tmp_pos_types, tmp_kwd_types);</span>
+<a name="132"><span class="lineNum">     132 </span>            : }</a>
+<span class="lineNum">     133 </span>            : 
+<span class="lineNum">     134 </span><span class="lineNoCov">          0 : void ndt::callable_type::get_vars(std::unordered_set&lt;std::string&gt; &amp;vars) const</span>
+<span class="lineNum">     135 </span>            : {
+<span class="lineNum">     136 </span><span class="lineNoCov">          0 :   m_return_type.get_vars(vars);</span>
+<span class="lineNum">     137 </span><span class="lineNoCov">          0 :   m_pos_tuple.get_vars(vars);</span>
+<span class="lineNum">     138 </span><span class="lineNoCov">          0 :   m_kwd_struct.get_vars(vars);</span>
+<a name="139"><span class="lineNum">     139 </span><span class="lineNoCov">          0 : }</span></a>
+<span class="lineNum">     140 </span>            : 
+<span class="lineNum">     141 </span><span class="lineNoCov">          0 : ndt::type ndt::callable_type::apply_linear_index(intptr_t DYND_UNUSED(nindices), const irange *DYND_UNUSED(indices),</span>
+<span class="lineNum">     142 </span>            :                                                  size_t DYND_UNUSED(current_i), const type &amp;DYND_UNUSED(root_tp),
+<span class="lineNum">     143 </span>            :                                                  bool DYND_UNUSED(leading_dimension)) const
+<span class="lineNum">     144 </span>            : {
+<span class="lineNum">     145 </span><span class="lineNoCov">          0 :   throw type_error(&quot;Cannot store data of funcproto type&quot;);</span>
+<a name="146"><span class="lineNum">     146 </span>            : }</a>
+<span class="lineNum">     147 </span>            : 
+<span class="lineNum">     148 </span><span class="lineNoCov">          0 : intptr_t ndt::callable_type::apply_linear_index(intptr_t DYND_UNUSED(nindices), const irange *DYND_UNUSED(indices),</span>
+<span class="lineNum">     149 </span>            :                                                 const char *DYND_UNUSED(arrmeta), const type &amp;DYND_UNUSED(result_tp),
+<span class="lineNum">     150 </span>            :                                                 char *DYND_UNUSED(out_arrmeta),
+<span class="lineNum">     151 </span>            :                                                 const intrusive_ptr&lt;memory_block_data&gt; &amp;DYND_UNUSED(embedded_reference),
+<span class="lineNum">     152 </span>            :                                                 size_t DYND_UNUSED(current_i), const type &amp;DYND_UNUSED(root_tp),
+<span class="lineNum">     153 </span>            :                                                 bool DYND_UNUSED(leading_dimension), char **DYND_UNUSED(inout_data),
+<span class="lineNum">     154 </span>            :                                                 intrusive_ptr&lt;memory_block_data&gt; &amp;DYND_UNUSED(inout_dataref)) const
+<span class="lineNum">     155 </span>            : {
+<span class="lineNum">     156 </span><span class="lineNoCov">          0 :   throw type_error(&quot;Cannot store data of funcproto type&quot;);</span>
+<a name="157"><span class="lineNum">     157 </span>            : }</a>
+<span class="lineNum">     158 </span>            : 
+<span class="lineNum">     159 </span><span class="lineNoCov">          0 : bool ndt::callable_type::is_lossless_assignment(const type &amp;dst_tp, const type &amp;src_tp) const</span>
+<span class="lineNum">     160 </span>            : {
+<span class="lineNum">     161 </span><span class="lineNoCov">          0 :   if (dst_tp.extended() == this) {</span>
+<span class="lineNum">     162 </span><span class="lineNoCov">          0 :     if (src_tp.extended() == this) {</span>
+<span class="lineNum">     163 </span><span class="lineNoCov">          0 :       return true;</span>
+<span class="lineNum">     164 </span>            :     }
+<span class="lineNum">     165 </span><span class="lineNoCov">          0 :     else if (src_tp.get_id() == callable_id) {</span>
+<span class="lineNum">     166 </span><span class="lineNoCov">          0 :       return *dst_tp.extended() == *src_tp.extended();</span>
+<span class="lineNum">     167 </span>            :     }
+<span class="lineNum">     168 </span>            :   }
+<span class="lineNum">     169 </span>            : 
+<span class="lineNum">     170 </span><span class="lineNoCov">          0 :   return false;</span>
+<a name="171"><span class="lineNum">     171 </span>            : }</a>
+<span class="lineNum">     172 </span>            : 
+<span class="lineNum">     173 </span><span class="lineCov">         10 : bool ndt::callable_type::operator==(const base_type &amp;rhs) const</span>
+<span class="lineNum">     174 </span>            : {
+<span class="lineNum">     175 </span><span class="lineCov">         10 :   if (this == &amp;rhs) {</span>
+<span class="lineNum">     176 </span><span class="lineNoCov">          0 :     return true;</span>
+<span class="lineNum">     177 </span>            :   }
+<span class="lineNum">     178 </span><span class="lineCov">         10 :   else if (rhs.get_id() != callable_id) {</span>
+<span class="lineNum">     179 </span><span class="lineNoCov">          0 :     return false;</span>
+<span class="lineNum">     180 </span>            :   }
+<span class="lineNum">     181 </span>            :   else {
+<span class="lineNum">     182 </span><span class="lineCov">         10 :     const callable_type *fpt = static_cast&lt;const callable_type *&gt;(&amp;rhs);</span>
+<span class="lineNum">     183 </span><span class="lineCov">         10 :     return m_return_type == fpt-&gt;m_return_type &amp;&amp; m_pos_tuple == fpt-&gt;m_pos_tuple &amp;&amp; m_kwd_struct == fpt-&gt;m_kwd_struct;</span>
+<span class="lineNum">     184 </span>            :   }
+<a name="185"><span class="lineNum">     185 </span>            : }</a>
+<span class="lineNum">     186 </span>            : 
+<span class="lineNum">     187 </span><span class="lineNoCov">          0 : void ndt::callable_type::arrmeta_default_construct(char *DYND_UNUSED(arrmeta), bool DYND_UNUSED(blockref_alloc)) const</span>
+<span class="lineNum">     188 </span>            : {
+<a name="189"><span class="lineNum">     189 </span><span class="lineNoCov">          0 : }</span></a>
+<span class="lineNum">     190 </span>            : 
+<span class="lineNum">     191 </span><span class="lineNoCov">          0 : void ndt::callable_type::arrmeta_copy_construct(</span>
+<span class="lineNum">     192 </span>            :     char *DYND_UNUSED(dst_arrmeta), const char *DYND_UNUSED(src_arrmeta),
+<span class="lineNum">     193 </span>            :     const intrusive_ptr&lt;memory_block_data&gt; &amp;DYND_UNUSED(embedded_reference)) const
+<span class="lineNum">     194 </span>            : {
+<a name="195"><span class="lineNum">     195 </span><span class="lineNoCov">          0 : }</span></a>
+<span class="lineNum">     196 </span>            : 
+<a name="197"><span class="lineNum">     197 </span><span class="lineNoCov">          0 : void ndt::callable_type::arrmeta_reset_buffers(char *DYND_UNUSED(arrmeta)) const {}</span></a>
+<span class="lineNum">     198 </span>            : 
+<a name="199"><span class="lineNum">     199 </span><span class="lineNoCov">          0 : void ndt::callable_type::arrmeta_finalize_buffers(char *DYND_UNUSED(arrmeta)) const {}</span></a>
+<span class="lineNum">     200 </span>            : 
+<a name="201"><span class="lineNum">     201 </span><span class="lineNoCov">          0 : void ndt::callable_type::arrmeta_destruct(char *DYND_UNUSED(arrmeta)) const {}</span></a>
+<span class="lineNum">     202 </span>            : 
+<span class="lineNum">     203 </span><span class="lineNoCov">          0 : void ndt::callable_type::data_destruct(const char *DYND_UNUSED(arrmeta), char *data) const</span>
+<span class="lineNum">     204 </span>            : {
+<span class="lineNum">     205 </span><span class="lineNoCov">          0 :   const data_type *d = reinterpret_cast&lt;data_type *&gt;(data);</span>
+<span class="lineNum">     206 </span><span class="lineNoCov">          0 :   d-&gt;~data_type();</span>
+<a name="207"><span class="lineNum">     207 </span><span class="lineNoCov">          0 : }</span></a>
+<span class="lineNum">     208 </span>            : 
+<span class="lineNum">     209 </span><span class="lineNoCov">          0 : void ndt::callable_type::data_destruct_strided(const char *DYND_UNUSED(arrmeta), char *data, intptr_t stride,</span>
+<span class="lineNum">     210 </span>            :                                                size_t count) const
+<span class="lineNum">     211 </span>            : {
+<span class="lineNum">     212 </span><span class="lineNoCov">          0 :   for (size_t i = 0; i != count; ++i, data += stride) {</span>
+<span class="lineNum">     213 </span><span class="lineNoCov">          0 :     const data_type *d = reinterpret_cast&lt;data_type *&gt;(data);</span>
+<span class="lineNum">     214 </span><span class="lineNoCov">          0 :     d-&gt;~data_type();</span>
+<span class="lineNum">     215 </span>            :   }
+<a name="216"><span class="lineNum">     216 </span><span class="lineNoCov">          0 : }</span></a>
+<span class="lineNum">     217 </span>            : 
+<span class="lineNum">     218 </span><span class="lineCov">         58 : bool ndt::callable_type::match(const char *arrmeta, const type &amp;candidate_tp, const char *candidate_arrmeta,</span>
+<span class="lineNum">     219 </span>            :                                std::map&lt;std::string, type&gt; &amp;tp_vars) const
+<span class="lineNum">     220 </span>            : {
+<span class="lineNum">     221 </span><span class="lineCov">         58 :   if (candidate_tp.get_id() != callable_id) {</span>
+<span class="lineNum">     222 </span><span class="lineNoCov">          0 :     return false;</span>
+<span class="lineNum">     223 </span>            :   }
+<span class="lineNum">     224 </span>            : 
+<span class="lineNum">     225 </span>            :   // First match the return type
+<span class="lineNum">     226 </span><span class="lineCov">         58 :   if (!m_return_type.match(arrmeta, candidate_tp.extended&lt;callable_type&gt;()-&gt;m_return_type, candidate_arrmeta,</span>
+<span class="lineNum">     227 </span>            :                            tp_vars)) {
+<span class="lineNum">     228 </span><span class="lineCov">          6 :     return false;</span>
+<span class="lineNum">     229 </span>            :   }
+<span class="lineNum">     230 </span>            : 
+<span class="lineNum">     231 </span>            :   // Next match all the positional parameters
+<span class="lineNum">     232 </span><span class="lineCov">         52 :   if (!m_pos_tuple.match(arrmeta, candidate_tp.extended&lt;callable_type&gt;()-&gt;m_pos_tuple, candidate_arrmeta, tp_vars)) {</span>
+<span class="lineNum">     233 </span><span class="lineCov">          5 :     return false;</span>
+<span class="lineNum">     234 </span>            :   }
+<span class="lineNum">     235 </span>            : 
+<span class="lineNum">     236 </span>            :   // Finally match all the keyword parameters
+<span class="lineNum">     237 </span><span class="lineCov">         47 :   if (!m_kwd_struct.match(arrmeta, candidate_tp.extended&lt;callable_type&gt;()-&gt;get_kwd_struct(), candidate_arrmeta,</span>
+<span class="lineNum">     238 </span>            :                           tp_vars)) {
+<span class="lineNum">     239 </span><span class="lineCov">          2 :     return false;</span>
+<span class="lineNum">     240 </span>            :   }
+<span class="lineNum">     241 </span>            : 
+<span class="lineNum">     242 </span><span class="lineCov">         45 :   return true;</span>
+<a name="243"><span class="lineNum">     243 </span>            : }</a>
+<span class="lineNum">     244 </span>            : 
+<span class="lineNum">     245 </span><span class="lineCov">          9 : std::map&lt;std::string, nd::callable&gt; ndt::callable_type::get_dynamic_type_properties() const</span>
+<span class="lineNum">     246 </span>            : {
+<span class="lineNum">     247 </span><span class="lineCov">          9 :   std::map&lt;std::string, nd::callable&gt; properties;</span>
+<span class="lineNum">     248 </span><span class="lineCov">         18 :   properties[&quot;pos_types&quot;] = nd::callable::make&lt;</span>
+<span class="lineNum">     249 </span><span class="lineCov">         18 :       nd::get_then_copy_kernel&lt;const std::vector&lt;type&gt; &amp;, callable_type, &amp;callable_type::get_pos_types&gt;&gt;(</span>
+<span class="lineNum">     250 </span><span class="lineCov">         18 :       ndt::callable_type::make(m_pos_tuple.extended&lt;ndt::tuple_type&gt;()-&gt;get_type(), ndt::tuple_type::make(),</span>
+<span class="lineNum">     251 </span><span class="lineCov">         27 :                                ndt::struct_type::make({&quot;self&quot;}, {ndt::make_type&lt;ndt::type_type&gt;()})));</span>
+<span class="lineNum">     252 </span><span class="lineCov">         18 :   properties[&quot;kwd_types&quot;] = nd::callable::make&lt;</span>
+<span class="lineNum">     253 </span><span class="lineCov">         18 :       nd::get_then_copy_kernel&lt;const std::vector&lt;type&gt; &amp;, callable_type, &amp;callable_type::get_kwd_types&gt;&gt;(</span>
+<span class="lineNum">     254 </span><span class="lineCov">         18 :       ndt::callable_type::make(m_kwd_struct.extended&lt;ndt::struct_type&gt;()-&gt;get_type(), ndt::tuple_type::make(),</span>
+<span class="lineNum">     255 </span><span class="lineCov">         27 :                                ndt::struct_type::make({&quot;self&quot;}, {ndt::make_type&lt;ndt::type_type&gt;()})));</span>
+<span class="lineNum">     256 </span><span class="lineCov">         18 :   properties[&quot;kwd_names&quot;] = nd::callable::make&lt;</span>
+<span class="lineNum">     257 </span><span class="lineCov">         18 :       nd::get_then_copy_kernel&lt;const std::vector&lt;std::string&gt; &amp;, callable_type, &amp;callable_type::get_kwd_names&gt;&gt;(</span>
+<span class="lineNum">     258 </span><span class="lineCov">         18 :       ndt::callable_type::make(ndt::type_for(m_kwd_struct.extended&lt;ndt::struct_type&gt;()-&gt;get_field_names()),</span>
+<a name="259"><span class="lineNum">     259 </span><span class="lineCov">         18 :                                ndt::tuple_type::make(),</span></a>
+<span class="lineNum">     260 </span><span class="lineCov">         27 :                                ndt::struct_type::make({&quot;self&quot;}, {ndt::make_type&lt;ndt::type_type&gt;()})));</span>
+<span class="lineNum">     261 </span><span class="lineCov">         11 :   properties[&quot;return_type&quot;] = nd::callable([](type self) { return self.extended&lt;callable_type&gt;()-&gt;get_return_type(); });</span>
+<span class="lineNum">     262 </span>            : 
+<span class="lineNum">     263 </span><span class="lineCov">          9 :   return properties;</span>
+<a name="264"><span class="lineNum">     264 </span>            : }</a>
+<span class="lineNum">     265 </span>            : 
+<span class="lineNum">     266 </span><span class="lineCov">         25 : ndt::type ndt::make_generic_funcproto(intptr_t nargs)</span>
+<span class="lineNum">     267 </span>            : {
+<span class="lineNum">     268 </span><span class="lineCov">         25 :   return callable_type::make(typevar_type::make(&quot;R&quot;), make_typevar_range(&quot;T&quot;, nargs));</span>
+<a name="269"><span class="lineNum">     269 </span>            : }</a>
+<span class="lineNum">     270 </span>            : 
+<span class="lineNum">     271 </span><span class="lineNoCov">          0 : std::map&lt;std::string, nd::callable&gt; ndt::callable_type::get_dynamic_array_functions() const</span>
+<a name="272"><span class="lineNum">     272 </span>            : {</a>
+<span class="lineNum">     273 </span><span class="lineNoCov">          0 :   return std::map&lt;std::string, nd::callable&gt;();</span>
+<span class="lineNum">     274 </span><span class="lineCov">          3 : }</span>
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.10</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

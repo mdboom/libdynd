@@ -1,0 +1,245 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - coverage.info.cleaned - include/dynd/func/arithmetic.hpp</title>
+  <link rel="stylesheet" type="text/css" href="../../../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../../../index.html">top level</a> - <a href="index.html">include/dynd/func</a> - arithmetic.hpp<span style="font-size: 80%;"> (source / <a href="arithmetic.hpp.func.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">coverage.info.cleaned</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">32</td>
+            <td class="headerCovTableEntry">60</td>
+            <td class="headerCovTableEntryLo">53.3 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2016-02-19</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">20</td>
+            <td class="headerCovTableEntry">58</td>
+            <td class="headerCovTableEntryLo">34.5 %</td>
+          </tr>
+          <tr><td><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : //</a>
+<span class="lineNum">       2 </span>            : // Copyright (C) 2011-15 DyND Developers
+<span class="lineNum">       3 </span>            : // BSD 2-Clause License, see LICENSE.txt
+<span class="lineNum">       4 </span>            : //
+<span class="lineNum">       5 </span>            : 
+<span class="lineNum">       6 </span>            : #include &lt;dynd/functional.hpp&gt;
+<span class="lineNum">       7 </span>            : #include &lt;dynd/kernels/arithmetic.hpp&gt;
+<span class="lineNum">       8 </span>            : #include &lt;dynd/kernels/compound_add_kernel.hpp&gt;
+<span class="lineNum">       9 </span>            : #include &lt;dynd/kernels/compound_div_kernel.hpp&gt;
+<span class="lineNum">      10 </span>            : 
+<span class="lineNum">      11 </span>            : namespace dynd {
+<span class="lineNum">      12 </span>            : namespace nd {
+<span class="lineNum">      13 </span>            : 
+<a name="14"><span class="lineNum">      14 </span>            :   template &lt;typename FuncType, template &lt;type_id_t&gt; class KernelType, typename TypeIDSequence&gt;</a>
+<span class="lineNum">      15 </span>            :   struct unary_arithmetic_operator : declfunc&lt;FuncType&gt; {
+<span class="lineNum">      16 </span><span class="lineCov">          1 :     static callable make()</span>
+<span class="lineNum">      17 </span>            :     {
+<span class="lineNum">      18 </span><span class="lineCov">          2 :       auto children = callable::make_all&lt;KernelType, TypeIDSequence&gt;();</span>
+<span class="lineNum">      19 </span>            : 
+<span class="lineNum">      20 </span><span class="lineCov">          2 :       const callable self = functional::call&lt;FuncType&gt;(ndt::type(&quot;(Any) -&gt; Any&quot;));</span>
+<span class="lineNum">      21 </span>            : 
+<span class="lineNum">      22 </span><span class="lineCov">          3 :       for (type_id_t i0 : i2a&lt;dim_ids&gt;()) {</span>
+<span class="lineNum">      23 </span><span class="lineCov">          4 :         const ndt::type child_tp = ndt::callable_type::make(self.get_type()-&gt;get_return_type(), ndt::type(i0));</span>
+<span class="lineNum">      24 </span><span class="lineCov">          2 :         children[i0] = functional::elwise(child_tp, self);</span>
+<span class="lineNum">      25 </span>            :       }
+<a name="26"><span class="lineNum">      26 </span>            : </a>
+<a name="27"><span class="lineNum">      27 </span><span class="lineCov">          1 :       return functional::dispatch(self.get_array_type(),</span></a>
+<span class="lineNum">      28 </span><span class="lineCov">          3 :                                   [children](const ndt::type &amp;DYND_UNUSED(dst_tp), intptr_t DYND_UNUSED(nsrc),</span>
+<span class="lineNum">      29 </span><span class="lineCov">          5 :                                              const ndt::type *src_tp) mutable -&gt; callable &amp; {</span>
+<span class="lineNum">      30 </span><span class="lineCov">          5 :                                     callable &amp;child = children[src_tp[0].get_id()];</span>
+<span class="lineNum">      31 </span><span class="lineCov">          5 :                                     if (child.is_null()) {</span>
+<span class="lineNum">      32 </span><span class="lineNoCov">          0 :                                       throw std::runtime_error(FuncType::what(src_tp[0]));</span>
+<span class="lineNum">      33 </span>            :                                     }
+<span class="lineNum">      34 </span>            : 
+<span class="lineNum">      35 </span><span class="lineCov">          5 :                                     return child;</span>
+<span class="lineNum">      36 </span><span class="lineCov">          3 :                                   });</span>
+<span class="lineNum">      37 </span>            :     }
+<span class="lineNum">      38 </span>            :   };
+<span class="lineNum">      39 </span>            : 
+<span class="lineNum">      40 </span>            : #define DYND_DEF_UNARY_OP_CALLABLE(NAME, TYPES)                                                                        \
+<span class="lineNum">      41 </span>            :   extern DYND_API struct DYND_API NAME : unary_arithmetic_operator&lt;NAME, NAME##_kernel, TYPES&gt; {                       \
+<span class="lineNum">      42 </span>            :     static std::string what(const ndt::type &amp;src0_type)                                                                \
+<span class="lineNum">      43 </span>            :     {                                                                                                                  \
+<span class="lineNum">      44 </span>            :       std::stringstream ss;                                                                                            \
+<span class="lineNum">      45 </span>            :       ss &lt;&lt; &quot;no viable overload for dynd::nd::&quot; #NAME &quot; with argument type \&quot;&quot; &lt;&lt; src0_type &lt;&lt; &quot;\&quot;&quot;;                   \
+<span class="lineNum">      46 </span>            :       return ss.str();                                                                                                 \
+<span class="lineNum">      47 </span>            :     }                                                                                                                  \
+<a name="48"><span class="lineNum">      48 </span>            :   } NAME;</a>
+<a name="49"><span class="lineNum">      49 </span>            : </a>
+<a name="50"><span class="lineNum">      50 </span><span class="lineNoCov">          0 :   DYND_DEF_UNARY_OP_CALLABLE(plus, arithmetic_ids)</span></a>
+<a name="51"><span class="lineNum">      51 </span><span class="lineNoCov">          0 :   DYND_DEF_UNARY_OP_CALLABLE(minus, arithmetic_ids)</span></a>
+<span class="lineNum">      52 </span><span class="lineNoCov">          0 :   DYND_DEF_UNARY_OP_CALLABLE(logical_not, arithmetic_ids)</span>
+<span class="lineNum">      53 </span><span class="lineNoCov">          0 :   DYND_DEF_UNARY_OP_CALLABLE(bitwise_not, integral_ids)</span>
+<span class="lineNum">      54 </span>            : 
+<span class="lineNum">      55 </span>            : #undef DYND_DEF_UNARY_OP_CALLABLE
+<span class="lineNum">      56 </span>            : 
+<a name="57"><span class="lineNum">      57 </span>            :   template &lt;typename FuncType, template &lt;type_id_t, type_id_t&gt; class KernelType, typename TypeIDSequence&gt;</a>
+<span class="lineNum">      58 </span>            :   struct binary_arithmetic_operator : declfunc&lt;FuncType&gt; {
+<span class="lineNum">      59 </span><span class="lineCov">          4 :     static callable make()</span>
+<span class="lineNum">      60 </span>            :     {
+<span class="lineNum">      61 </span><span class="lineCov">          8 :       auto children = callable::make_all&lt;KernelType, TypeIDSequence, TypeIDSequence&gt;();</span>
+<span class="lineNum">      62 </span>            : 
+<span class="lineNum">      63 </span><span class="lineCov">         52 :       for (type_id_t i : i2a&lt;TypeIDSequence&gt;()) {</span>
+<span class="lineNum">      64 </span><span class="lineCov">         48 :         children[{{option_id, i}}] = callable::make&lt;option_arithmetic_kernel&lt;FuncType, true, false&gt;&gt;();</span>
+<span class="lineNum">      65 </span><span class="lineCov">         48 :         children[{{i, option_id}}] = callable::make&lt;option_arithmetic_kernel&lt;FuncType, false, true&gt;&gt;();</span>
+<span class="lineNum">      66 </span>            :       }
+<span class="lineNum">      67 </span><span class="lineCov">          4 :       children[{{option_id, option_id}}] = callable::make&lt;option_arithmetic_kernel&lt;FuncType, true, true&gt;&gt;();</span>
+<span class="lineNum">      68 </span>            : 
+<span class="lineNum">      69 </span><span class="lineCov">          8 :       callable self = functional::call&lt;FuncType&gt;(ndt::type(&quot;(Any, Any) -&gt; Any&quot;));</span>
+<span class="lineNum">      70 </span><span class="lineCov">         52 :       for (type_id_t i0 : i2a&lt;TypeIDSequence&gt;()) {</span>
+<span class="lineNum">      71 </span><span class="lineCov">        144 :         for (type_id_t i1 : i2a&lt;dim_ids&gt;()) {</span>
+<span class="lineNum">      72 </span><span class="lineCov">         96 :           children[{{i0, i1}}] = functional::elwise(self);</span>
+<span class="lineNum">      73 </span>            :         }
+<span class="lineNum">      74 </span>            :       }
+<span class="lineNum">      75 </span>            : 
+<span class="lineNum">      76 </span><span class="lineCov">         12 :       for (type_id_t i0 : i2a&lt;dim_ids&gt;()) {</span>
+<span class="lineNum">      77 </span>            :         typedef typename join&lt;TypeIDSequence, dim_ids&gt;::type broadcast_ids;
+<span class="lineNum">      78 </span><span class="lineCov">        120 :         for (type_id_t i1 : i2a&lt;broadcast_ids&gt;()) {</span>
+<span class="lineNum">      79 </span><span class="lineCov">        112 :           children[{{i0, i1}}] = functional::elwise(self);</span>
+<span class="lineNum">      80 </span>            :         }
+<span class="lineNum">      81 </span>            :       }
+<a name="82"><span class="lineNum">      82 </span>            : </a>
+<a name="83"><span class="lineNum">      83 </span>            :       return functional::dispatch(ndt::type(&quot;(Any, Any) -&gt; Any&quot;),</a>
+<span class="lineNum">      84 </span><span class="lineCov">         12 :                                   [children](const ndt::type &amp;DYND_UNUSED(dst_tp), intptr_t DYND_UNUSED(nsrc),</span>
+<span class="lineNum">      85 </span><span class="lineCov">        946 :                                              const ndt::type *src_tp) mutable -&gt; callable &amp; {</span>
+<span class="lineNum">      86 </span><span class="lineCov">        946 :                                     callable &amp;child = children[{{src_tp[0].get_id(), src_tp[1].get_id()}}];</span>
+<span class="lineNum">      87 </span><span class="lineCov">        946 :                                     if (child.is_null()) {</span>
+<span class="lineNum">      88 </span><span class="lineNoCov">          0 :                                       throw std::runtime_error(FuncType::what(src_tp[0], src_tp[1]));</span>
+<span class="lineNum">      89 </span>            :                                     }
+<span class="lineNum">      90 </span>            : 
+<span class="lineNum">      91 </span><span class="lineCov">        946 :                                     return child;</span>
+<span class="lineNum">      92 </span><span class="lineCov">          8 :                                   });</span>
+<span class="lineNum">      93 </span>            :     }
+<span class="lineNum">      94 </span>            :   };
+<span class="lineNum">      95 </span>            : 
+<span class="lineNum">      96 </span>            : #define DYND_DEF_BINARY_OP_CALLABLE(NAME, TYPES)                                                                       \
+<span class="lineNum">      97 </span>            :   extern DYND_API struct DYND_API NAME : binary_arithmetic_operator&lt;NAME, NAME##_kernel, TYPES&gt; {                      \
+<span class="lineNum">      98 </span>            :     static std::string what(const ndt::type &amp;src0_tp, const ndt::type &amp;src1_tp)                                        \
+<span class="lineNum">      99 </span>            :     {                                                                                                                  \
+<span class="lineNum">     100 </span>            :       std::stringstream ss;                                                                                            \
+<span class="lineNum">     101 </span>            :       ss &lt;&lt; &quot;no viable overload for dynd::nd::&quot; #NAME &quot; with argument types \&quot;&quot; &lt;&lt; src0_tp &lt;&lt; &quot;\&quot; and \&quot;&quot; &lt;&lt; src1_tp   \
+<span class="lineNum">     102 </span>            :          &lt;&lt; &quot;\&quot;&quot;;                                                                                                      \
+<span class="lineNum">     103 </span>            :       return ss.str();                                                                                                 \
+<span class="lineNum">     104 </span>            :     }                                                                                                                  \
+<span class="lineNum">     105 </span>            :   } NAME;
+<span class="lineNum">     106 </span>            : 
+<span class="lineNum">     107 </span>            :   namespace detail {
+<span class="lineNum">     108 </span>            : 
+<span class="lineNum">     109 </span>            :     typedef type_id_sequence&lt;uint8_id, uint16_id, uint32_id, uint64_id, int8_id, int16_id,
+<span class="lineNum">     110 </span>            :                              int32_id, int64_id, float32_id, float64_id, complex_float32_id,
+<span class="lineNum">     111 </span>            :                              complex_float64_id&gt; binop_ids;
+<span class="lineNum">     112 </span>            : 
+<span class="lineNum">     113 </span>            :     typedef type_id_sequence&lt;uint8_id, uint16_id, uint32_id, uint64_id, int8_id, int16_id,
+<span class="lineNum">     114 </span>            :                              int32_id, int64_id, float32_id, float64_id&gt; binop_real_ids;
+<a name="115"><span class="lineNum">     115 </span>            :   }</a>
+<a name="116"><span class="lineNum">     116 </span>            : </a>
+<a name="117"><span class="lineNum">     117 </span><span class="lineNoCov">          0 :   DYND_DEF_BINARY_OP_CALLABLE(add, detail::binop_ids)</span></a>
+<a name="118"><span class="lineNum">     118 </span><span class="lineNoCov">          0 :   DYND_DEF_BINARY_OP_CALLABLE(subtract, detail::binop_ids)</span></a>
+<a name="119"><span class="lineNum">     119 </span><span class="lineNoCov">          0 :   DYND_DEF_BINARY_OP_CALLABLE(multiply, detail::binop_ids)</span></a>
+<a name="120"><span class="lineNum">     120 </span><span class="lineNoCov">          0 :   DYND_DEF_BINARY_OP_CALLABLE(divide, detail::binop_ids)</span></a>
+<span class="lineNum">     121 </span><span class="lineNoCov">          0 :   DYND_DEF_BINARY_OP_CALLABLE(logical_and, detail::binop_real_ids)</span>
+<span class="lineNum">     122 </span><span class="lineNoCov">          0 :   DYND_DEF_BINARY_OP_CALLABLE(logical_or, detail::binop_real_ids)</span>
+<span class="lineNum">     123 </span>            : 
+<span class="lineNum">     124 </span>            : #undef DYND_DEF_BINARY_OP_CALLABLE
+<span class="lineNum">     125 </span>            : 
+<a name="126"><span class="lineNum">     126 </span>            :   template &lt;typename FuncType, template &lt;type_id_t, type_id_t&gt; class KernelType, typename TypeIDSequence&gt;</a>
+<span class="lineNum">     127 </span>            :   struct compound_arithmetic_operator : declfunc&lt;FuncType&gt; {
+<span class="lineNum">     128 </span><span class="lineNoCov">          0 :     static callable make()</span>
+<span class="lineNum">     129 </span>            :     {
+<span class="lineNum">     130 </span><span class="lineNoCov">          0 :       auto children = callable::make_all&lt;KernelType, TypeIDSequence, TypeIDSequence&gt;();</span>
+<span class="lineNum">     131 </span>            : 
+<span class="lineNum">     132 </span><span class="lineNoCov">          0 :       callable self = functional::call&lt;FuncType&gt;(ndt::type(&quot;(Any, Any) -&gt; Any&quot;));</span>
+<span class="lineNum">     133 </span><span class="lineNoCov">          0 :       for (type_id_t i0 : i2a&lt;TypeIDSequence&gt;()) {</span>
+<span class="lineNum">     134 </span><span class="lineNoCov">          0 :         for (type_id_t i1 : i2a&lt;dim_ids&gt;()) {</span>
+<span class="lineNum">     135 </span><span class="lineNoCov">          0 :           children[{{i0, i1}}] = functional::elwise(self);</span>
+<span class="lineNum">     136 </span>            :         }
+<span class="lineNum">     137 </span>            :       }
+<span class="lineNum">     138 </span>            : 
+<span class="lineNum">     139 </span><span class="lineNoCov">          0 :       for (type_id_t i0 : i2a&lt;dim_ids&gt;()) {</span>
+<span class="lineNum">     140 </span>            :         typedef typename join&lt;TypeIDSequence, dim_ids&gt;::type broadcast_ids;
+<span class="lineNum">     141 </span><span class="lineNoCov">          0 :         for (type_id_t i1 : i2a&lt;broadcast_ids&gt;()) {</span>
+<span class="lineNum">     142 </span><span class="lineNoCov">          0 :           children[{{i0, i1}}] = functional::elwise(self);</span>
+<span class="lineNum">     143 </span>            :         }
+<span class="lineNum">     144 </span>            :       }
+<a name="145"><span class="lineNum">     145 </span>            : </a>
+<a name="146"><span class="lineNum">     146 </span>            :       return functional::dispatch(ndt::type(&quot;(Any) -&gt; Any&quot;),</a>
+<span class="lineNum">     147 </span><span class="lineNoCov">          0 :                                        [children](const ndt::type &amp;dst_tp, intptr_t DYND_UNUSED(nsrc),</span>
+<span class="lineNum">     148 </span><span class="lineNoCov">          0 :                                                   const ndt::type *src_tp) mutable -&gt; callable &amp; {</span>
+<span class="lineNum">     149 </span><span class="lineNoCov">          0 :                                          callable &amp;child = children[{{dst_tp.get_id(), src_tp[0].get_id()}}];</span>
+<span class="lineNum">     150 </span><span class="lineNoCov">          0 :                                          if (child.is_null()) {</span>
+<span class="lineNum">     151 </span><span class="lineNoCov">          0 :                                            throw std::runtime_error(&quot;no child found&quot;);</span>
+<span class="lineNum">     152 </span>            :                                          }
+<span class="lineNum">     153 </span>            : 
+<span class="lineNum">     154 </span><span class="lineNoCov">          0 :                                          return child;</span>
+<span class="lineNum">     155 </span><span class="lineNoCov">          0 :                                        });</span>
+<span class="lineNum">     156 </span>            :     }
+<span class="lineNum">     157 </span>            :   };
+<span class="lineNum">     158 </span>            : 
+<span class="lineNum">     159 </span>            : #define DYND_DEF_COMPOUND_OP_CALLABLE(NAME, TYPES)                                                                     \
+<span class="lineNum">     160 </span>            :   extern DYND_API struct DYND_API NAME : compound_arithmetic_operator&lt;NAME, NAME##_kernel_t, TYPES&gt; {                  \
+<span class="lineNum">     161 </span>            :   } NAME;
+<span class="lineNum">     162 </span>            : 
+<span class="lineNum">     163 </span>            :   DYND_DEF_COMPOUND_OP_CALLABLE(compound_add, detail::binop_ids)
+<span class="lineNum">     164 </span>            :   DYND_DEF_COMPOUND_OP_CALLABLE(compound_div, detail::binop_ids)
+<span class="lineNum">     165 </span>            : 
+<span class="lineNum">     166 </span>            : #undef DYND_DEF_COMPOUND_OP_CALLABLE
+<span class="lineNum">     167 </span>            : 
+<span class="lineNum">     168 </span>            : } // namespace dynd::nd
+<span class="lineNum">     169 </span>            : } // namespace dynd
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.10</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

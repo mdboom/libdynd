@@ -1,0 +1,293 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - coverage.info.cleaned - tests/func/test_neighborhood.cpp</title>
+  <link rel="stylesheet" type="text/css" href="../../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../../index.html">top level</a> - <a href="index.html">tests/func</a> - test_neighborhood.cpp<span style="font-size: 80%;"> (source / <a href="test_neighborhood.cpp.func.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">coverage.info.cleaned</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">7</td>
+            <td class="headerCovTableEntry">28</td>
+            <td class="headerCovTableEntryLo">25.0 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2016-02-19</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">14</td>
+            <td class="headerCovTableEntry">20</td>
+            <td class="headerCovTableEntryLo">70.0 %</td>
+          </tr>
+          <tr><td><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : //</a>
+<span class="lineNum">       2 </span>            : // Copyright (C) 2011-15 DyND Developers
+<span class="lineNum">       3 </span>            : // BSD 2-Clause License, see LICENSE.txt
+<span class="lineNum">       4 </span>            : //
+<span class="lineNum">       5 </span>            : 
+<span class="lineNum">       6 </span>            : #include &lt;iostream&gt;
+<span class="lineNum">       7 </span>            : #include &lt;stdexcept&gt;
+<span class="lineNum">       8 </span>            : #include &lt;algorithm&gt;
+<span class="lineNum">       9 </span>            : #include &lt;cmath&gt;
+<span class="lineNum">      10 </span>            : 
+<span class="lineNum">      11 </span>            : #include &quot;inc_gtest.hpp&quot;
+<span class="lineNum">      12 </span>            : #include &quot;../dynd_assertions.hpp&quot;
+<span class="lineNum">      13 </span>            : 
+<span class="lineNum">      14 </span>            : #include &lt;dynd/json_parser.hpp&gt;
+<span class="lineNum">      15 </span>            : #include &lt;dynd/func/neighborhood.hpp&gt;
+<span class="lineNum">      16 </span>            : #include &lt;dynd/types/struct_type.hpp&gt;
+<span class="lineNum">      17 </span>            : 
+<span class="lineNum">      18 </span>            : using namespace std;
+<span class="lineNum">      19 </span>            : using namespace dynd;
+<span class="lineNum">      20 </span>            : 
+<a name="21"><span class="lineNum">      21 </span>            : #define NA std::numeric_limits&lt;int&gt;::max()</a>
+<span class="lineNum">      22 </span>            : 
+<span class="lineNum">      23 </span><span class="lineCov">          5 : TEST(Neighborhood, Sum1D)</span>
+<span class="lineNum">      24 </span>            : {
+<a name="25"><span class="lineNum">      25 </span><span class="lineCov">          1 :   return;</span></a>
+<span class="lineNum">      26 </span>            : 
+<span class="lineNum">      27 </span><span class="lineNoCov">          0 :   nd::callable f = nd::functional::neighborhood(nd::functional::apply([](fixed_dim&lt;int&gt; vals) {</span>
+<span class="lineNum">      28 </span><span class="lineNoCov">          0 :                                                   int res = 0;</span>
+<span class="lineNum">      29 </span><span class="lineNoCov">          0 :                                                   for (auto val : vals) {</span>
+<span class="lineNum">      30 </span><span class="lineNoCov">          0 :                                                     res += val;</span>
+<span class="lineNum">      31 </span>            :                                                   }
+<a name="32"><span class="lineNum">      32 </span><span class="lineNoCov">          0 :                                                   return res;</span></a>
+<span class="lineNum">      33 </span>            :                                                 }),
+<span class="lineNum">      34 </span><span class="lineNoCov">          0 :                                                 nd::functional::apply([]() { return NA; }));</span>
+<span class="lineNum">      35 </span>            : 
+<span class="lineNum">      36 </span>            :   EXPECT_ARRAY_EQ((nd::array{3, 6, NA, NA}), f({nd::array{0, 1, 2, 3}}, {{&quot;shape&quot;, nd::array{3}}}));
+<span class="lineNum">      37 </span>            : 
+<span class="lineNum">      38 </span>            :   EXPECT_ARRAY_EQ((nd::array{NA, 3, 6, NA}),
+<span class="lineNum">      39 </span>            :                   f({nd::array{0, 1, 2, 3}}, {{&quot;shape&quot;, nd::array{3}}, {&quot;offset&quot;, nd::array{-1}}}));
+<span class="lineNum">      40 </span>            : 
+<span class="lineNum">      41 </span>            :   EXPECT_ARRAY_EQ((nd::array{15, 21, 27, 33, 39, NA, NA, NA, NA, NA}),
+<span class="lineNum">      42 </span>            :                   f({nd::array{0, 1, 2, 3, 4, 5, 6, 7, 8, 9}}, {{&quot;shape&quot;, nd::array{6}}}));
+<span class="lineNum">      43 </span>            : 
+<span class="lineNum">      44 </span>            :   EXPECT_ARRAY_EQ((nd::array{NA, 15, 21, 27, 33, 39, NA, NA, NA, NA}),
+<span class="lineNum">      45 </span>            :                   f({nd::array{0, 1, 2, 3, 4, 5, 6, 7, 8, 9}}, {{&quot;shape&quot;, nd::array{6}}, {&quot;offset&quot;, nd::array{-1}}}));
+<span class="lineNum">      46 </span>            : 
+<span class="lineNum">      47 </span>            :   EXPECT_ARRAY_EQ((nd::array{NA, NA, 3, 6, 9, 12, 15, 18, 21, 24}),
+<span class="lineNum">      48 </span>            :                   f({nd::array{0, 1, 2, 3, 4, 5, 6, 7, 8, 9}}, {{&quot;shape&quot;, nd::array{3}}, {&quot;offset&quot;, nd::array{-2}}}));
+<a name="49"><span class="lineNum">      49 </span>            : }</a>
+<span class="lineNum">      50 </span>            : 
+<span class="lineNum">      51 </span><span class="lineCov">          5 : TEST(Neighborhood, Sum2D)</span>
+<span class="lineNum">      52 </span>            : {
+<a name="53"><span class="lineNum">      53 </span><span class="lineCov">          1 :   return;</span></a>
+<span class="lineNum">      54 </span>            : 
+<span class="lineNum">      55 </span><span class="lineNoCov">          0 :   nd::callable f = nd::functional::neighborhood(nd::functional::apply([](fixed_dim&lt;fixed_dim&lt;int&gt;&gt; vals) {</span>
+<span class="lineNum">      56 </span><span class="lineNoCov">          0 :                                                   int res = 0;</span>
+<span class="lineNum">      57 </span><span class="lineNoCov">          0 :                                                   for (auto vals0 : vals) {</span>
+<span class="lineNum">      58 </span><span class="lineNoCov">          0 :                                                     for (auto val : vals0) {</span>
+<span class="lineNum">      59 </span><span class="lineNoCov">          0 :                                                       res += val;</span>
+<span class="lineNum">      60 </span>            :                                                     }
+<span class="lineNum">      61 </span>            :                                                   }
+<a name="62"><span class="lineNum">      62 </span><span class="lineNoCov">          0 :                                                   return res;</span></a>
+<span class="lineNum">      63 </span>            :                                                 }),
+<span class="lineNum">      64 </span><span class="lineNoCov">          0 :                                                 nd::functional::apply([]() { return NA; }));</span>
+<span class="lineNum">      65 </span>            : 
+<span class="lineNum">      66 </span>            :   EXPECT_ARRAY_EQ((nd::array{{10, 14, 18, NA}, {NA, NA, NA, NA}}),
+<span class="lineNum">      67 </span>            :                   f({nd::array{{0, 1, 2, 3}, {4, 5, 6, 7}}}, {{&quot;shape&quot;, nd::array{2, 2}}}));
+<span class="lineNum">      68 </span>            : 
+<span class="lineNum">      69 </span>            :   EXPECT_ARRAY_EQ(
+<span class="lineNum">      70 </span>            :       (nd::array{{45, 54, NA, NA}, {81, 90, NA, NA}, {NA, NA, NA, NA}, {NA, NA, NA, NA}}),
+<span class="lineNum">      71 </span>            :       f({nd::array{{0, 1, 2, 3}, {4, 5, 6, 7}, {8, 9, 10, 11}, {12, 13, 14, 15}}}, {{&quot;shape&quot;, nd::array{3, 3}}}));
+<span class="lineNum">      72 </span>            : 
+<span class="lineNum">      73 </span>            :   /*
+<span class="lineNum">      74 </span>            :       nd::callable af = nd::functional::neighborhood(nd::functional::apply(&amp;sum&lt;2&gt;), 2);
+<span class="lineNum">      75 </span>            :       nd::array a;
+<span class="lineNum">      76 </span>            : 
+<span class="lineNum">      77 </span>            :       a = parse_json(&quot;4 * 4 * int&quot;,
+<span class="lineNum">      78 </span>            :           &quot;[[0, 1, 2, 3], [4, 5, 6, 7], [8, 9, 10, 11], [12, 13, 14, 15]]&quot;);
+<span class="lineNum">      79 </span>            : 
+<span class="lineNum">      80 </span>            :       EXPECT_JSON_EQ_ARR(&quot;[[45, 54, 39, 21], [81, 90, 63, 33], [66, 72, 50, 26], [39, 42, 29, 15]]&quot;,
+<span class="lineNum">      81 </span>            :           af(a, kwds(&quot;shape&quot;, parse_json(&quot;2 * int&quot;, &quot;[3, 3]&quot;))));
+<span class="lineNum">      82 </span>            : 
+<span class="lineNum">      83 </span>            :       EXPECT_JSON_EQ_ARR(&quot;[[25, 30, 27, 7], [45, 50, 43, 11], [48, 52, 40, 15], [13, 14, 15, 0]]&quot;,
+<span class="lineNum">      84 </span>            :           af(a, kwds(&quot;mask&quot;, parse_json(&quot;3 * 3 * bool&quot;, &quot;[[false, true, false], [true, true, true], [false, true,
+<span class="lineNum">      85 </span>            :   false]]&quot;))));
+<span class="lineNum">      86 </span>            : 
+<span class="lineNum">      87 </span>            :       EXPECT_JSON_EQ_ARR(&quot;[[10, 18, 24, 18], [27, 45, 54, 39], [51, 81, 90, 63], [42, 66, 72, 50]]&quot;,
+<span class="lineNum">      88 </span>            :           af(a, kwds(&quot;shape&quot;, parse_json(&quot;2 * int&quot;, &quot;[3, 3]&quot;), &quot;offset&quot;, parse_json(&quot;2 * int&quot;, &quot;[-1, -1]&quot;))));
+<span class="lineNum">      89 </span>            : 
+<span class="lineNum">      90 </span>            :       EXPECT_JSON_EQ_ARR(&quot;[[5, 8, 12, 12], [17, 25, 30, 27], [33, 45, 50, 43], [33, 48, 52, 40]]&quot;,
+<span class="lineNum">      91 </span>            :           af(a, kwds(&quot;mask&quot;, parse_json(&quot;3 * 3 * bool&quot;, &quot;[[false, true, false], [true, true, true], [false, true,
+<span class="lineNum">      92 </span>            :   false]]&quot;),
+<span class="lineNum">      93 </span>            :           &quot;offset&quot;, parse_json(&quot;2 * int&quot;, &quot;[-1, -1]&quot;))));
+<span class="lineNum">      94 </span>            : 
+<span class="lineNum">      95 </span>            :       a = parse_json(&quot;6 * 5 * int&quot;,
+<span class="lineNum">      96 </span>            :           &quot;[[0, 1, 2, 3, 4], [5, 6, 7, 8, 9], [10, 11, 12, 13, 14],&quot;
+<span class="lineNum">      97 </span>            :           &quot;[15, 16, 17, 18, 19], [20, 21, 22, 23, 24], [25, 26, 27, 28, 29]]&quot;);
+<span class="lineNum">      98 </span>            : 
+<span class="lineNum">      99 </span>            :       EXPECT_JSON_EQ_ARR(&quot;[[300, 250, 195, 135, 70], [425, 350, 270, 185, 95], [390, 320, 246, 168, 86],&quot;
+<span class="lineNum">     100 </span>            :           &quot;[330, 270, 207, 141, 72], [245, 200, 153, 104, 53], [135, 110, 84, 57, 29]]&quot;,
+<span class="lineNum">     101 </span>            :           af(a, kwds(&quot;shape&quot;, parse_json(&quot;2 * int&quot;, &quot;[5, 5]&quot;))));
+<span class="lineNum">     102 </span>            : 
+<span class="lineNum">     103 </span>            :       EXPECT_JSON_EQ_ARR(&quot;[[30, 35, 40, 25, 18], [55, 60, 65, 40, 28], [80, 85, 90, 55, 38],&quot;
+<span class="lineNum">     104 </span>            :           &quot;[105, 110, 115, 70, 48], [68, 71, 74, 52, 24], [52, 54, 56, 28, 29]]&quot;,
+<span class="lineNum">     105 </span>            :           af(a, kwds(&quot;mask&quot;, parse_json(&quot;3 * 3 * bool&quot;, &quot;[[true, false, true], [false, true, false], [true, false,
+<span class="lineNum">     106 </span>            :   true]]&quot;))));
+<span class="lineNum">     107 </span>            : 
+<span class="lineNum">     108 </span>            :       EXPECT_JSON_EQ_ARR(&quot;[[69, 75, 81, 37, 19], [99, 105, 111, 47, 24], [129, 135, 141, 57, 29],&quot;
+<span class="lineNum">     109 </span>            :           &quot;[66, 69, 72, 0, 0], [49, 51, 53, 0, 0], [27, 28, 29, 0, 0]]&quot;,
+<span class="lineNum">     110 </span>            :           af(a, kwds(&quot;mask&quot;, parse_json(&quot;4 * 3 * bool&quot;, &quot;[[false, false, true], [false, false, true], [false, false,
+<span class="lineNum">     111 </span>            :   true], [true, true, true]]&quot;))));
+<span class="lineNum">     112 </span>            : 
+<span class="lineNum">     113 </span>            :       EXPECT_JSON_EQ_ARR(&quot;[[54, 78, 105, 90, 72], [102, 144, 190, 160, 126], [165, 230, 300, 250, 195],&quot;
+<span class="lineNum">     114 </span>            :           &quot;[240, 330, 425, 350, 270], [222, 304, 390, 320, 246], [189, 258, 330, 270, 207]]&quot;,
+<span class="lineNum">     115 </span>            :           af(a, kwds(&quot;shape&quot;, parse_json(&quot;2 * int&quot;, &quot;[5, 5]&quot;), &quot;offset&quot;, parse_json(&quot;2 * int&quot;, &quot;[-2, -2]&quot;))));
+<span class="lineNum">     116 </span>            : 
+<span class="lineNum">     117 </span>            :       EXPECT_JSON_EQ_ARR(&quot;[[0, 1, 3, 6, 9], [5, 12, 20, 25, 30], [15, 28, 47, 54, 61],&quot;
+<span class="lineNum">     118 </span>            :           &quot;[30, 48, 82, 89, 96], [45, 68, 117, 124, 131], [60, 88, 152, 159, 166]]&quot;,
+<span class="lineNum">     119 </span>            :           af(a, kwds(&quot;mask&quot;, parse_json(&quot;3 * 3 * bool&quot;, &quot;[[true, false, true], [true, false, true], [true, true,
+<span class="lineNum">     120 </span>            :   true]]&quot;),
+<span class="lineNum">     121 </span>            :           &quot;offset&quot;, parse_json(&quot;2 * int&quot;, &quot;[-2, -2]&quot;))));
+<span class="lineNum">     122 </span>            : 
+<span class="lineNum">     123 </span>            :       EXPECT_JSON_EQ_ARR(&quot;[[32, 40, 33, 24, 13], [72, 80, 63, 44, 23], [112, 120, 93, 64, 33],&quot;
+<span class="lineNum">     124 </span>            :           &quot;[152, 160, 123, 84, 43], [192, 200, 153, 104, 53], [106, 110, 84, 57, 29]]&quot;,
+<span class="lineNum">     125 </span>            :           af(a, kwds(&quot;shape&quot;, parse_json(&quot;2 * int&quot;, &quot;[2, 4]&quot;))));
+<span class="lineNum">     126 </span>            : 
+<span class="lineNum">     127 </span>            :       EXPECT_JSON_EQ_ARR(&quot;[[0, 0, 0, 0, 0], [0, 0, 0, 0, 0], [9, 7, 4, 0, 0],&quot;
+<span class="lineNum">     128 </span>            :           &quot;[33, 24, 13, 0, 0], [63, 44, 23, 0, 0], [93, 64, 33, 0, 0]]&quot;,
+<span class="lineNum">     129 </span>            :           af(a, kwds(&quot;shape&quot;, parse_json(&quot;2 * int&quot;, &quot;[2, 4]&quot;), &quot;offset&quot;, parse_json(&quot;2 * int&quot;, &quot;[-3, 2]&quot;))));
+<span class="lineNum">     130 </span>            : 
+<span class="lineNum">     131 </span>            :       EXPECT_JSON_EQ_ARR(&quot;[[0, 0, 0, 0, 0], [0, 0, 0, 0, 0], [3, 4, 0, 0, 0],&quot;
+<span class="lineNum">     132 </span>            :           &quot;[14, 12, 4, 0, 0], [29, 22, 9, 0, 0], [44, 32, 14, 0, 0]]&quot;,
+<span class="lineNum">     133 </span>            :           af(a, kwds(&quot;mask&quot;, parse_json(&quot;2 * 3 * bool&quot;, &quot;[[true, false, true], [false, true, false]]&quot;),
+<span class="lineNum">     134 </span>            :           &quot;offset&quot;, parse_json(&quot;2 * int&quot;, &quot;[-3, 2]&quot;))));
+<span class="lineNum">     135 </span>            :   */
+<a name="136"><span class="lineNum">     136 </span>            : }</a>
+<span class="lineNum">     137 </span>            : 
+<span class="lineNum">     138 </span><span class="lineCov">          5 : TEST(Neighborhood, Sum3D)</span>
+<span class="lineNum">     139 </span>            : {
+<a name="140"><span class="lineNum">     140 </span><span class="lineCov">          1 :   return;</span></a>
+<span class="lineNum">     141 </span>            : 
+<span class="lineNum">     142 </span><span class="lineNoCov">          0 :   nd::callable f = nd::functional::neighborhood(nd::functional::apply([](fixed_dim&lt;fixed_dim&lt;fixed_dim&lt;int&gt;&gt;&gt; vals) {</span>
+<span class="lineNum">     143 </span><span class="lineNoCov">          0 :                                                   int res = 0;</span>
+<span class="lineNum">     144 </span><span class="lineNoCov">          0 :                                                   for (auto vals0 : vals) {</span>
+<span class="lineNum">     145 </span><span class="lineNoCov">          0 :                                                     for (auto vals1 : vals0) {</span>
+<span class="lineNum">     146 </span><span class="lineNoCov">          0 :                                                       for (auto val : vals1) {</span>
+<span class="lineNum">     147 </span><span class="lineNoCov">          0 :                                                         res += val;</span>
+<span class="lineNum">     148 </span>            :                                                       }
+<span class="lineNum">     149 </span>            :                                                     }
+<span class="lineNum">     150 </span>            :                                                   }
+<a name="151"><span class="lineNum">     151 </span><span class="lineNoCov">          0 :                                                   return res;</span></a>
+<span class="lineNum">     152 </span>            :                                                 }),
+<span class="lineNum">     153 </span><span class="lineNoCov">          0 :                                                 nd::functional::apply([]() { return NA; }));</span>
+<span class="lineNum">     154 </span>            : 
+<span class="lineNum">     155 </span>            :   EXPECT_ARRAY_EQ((nd::array{{{567, 594, NA, NA}, {675, 702, NA, NA}, {NA, NA, NA, NA}, {NA, NA, NA, NA}},
+<span class="lineNum">     156 </span>            :                              {{999, 1026, NA, NA}, {1107, 1134, NA, NA}, {NA, NA, NA, NA}, {NA, NA, NA, NA}},
+<span class="lineNum">     157 </span>            :                              {{NA, NA, NA, NA}, {NA, NA, NA, NA}, {NA, NA, NA, NA}, {NA, NA, NA, NA}},
+<span class="lineNum">     158 </span>            :                              {{NA, NA, NA, NA}, {NA, NA, NA, NA}, {NA, NA, NA, NA}, {NA, NA, NA, NA}}}),
+<span class="lineNum">     159 </span>            :                   f({nd::array{{{0, 1, 2, 3}, {4, 5, 6, 7}, {8, 9, 10, 11}, {12, 13, 14, 15}},
+<span class="lineNum">     160 </span>            :                                {{16, 17, 18, 19}, {20, 21, 22, 23}, {24, 25, 26, 27}, {28, 29, 30, 31}},
+<span class="lineNum">     161 </span>            :                                {{32, 33, 34, 35}, {36, 37, 38, 39}, {40, 41, 42, 43}, {44, 45, 46, 47}},
+<span class="lineNum">     162 </span>            :                                {{48, 49, 50, 51}, {52, 53, 54, 55}, {56, 57, 58, 59}, {60, 61, 62, 63}}}},
+<span class="lineNum">     163 </span>            :                     {{&quot;shape&quot;, nd::array{3, 3, 3}}}));
+<span class="lineNum">     164 </span>            : 
+<span class="lineNum">     165 </span>            :   /*
+<span class="lineNum">     166 </span>            :     nd::callable af = nd::functional::neighborhood(nd::functional::apply(&amp;sum&lt;3&gt;), 3);
+<span class="lineNum">     167 </span>            :     nd::array a;
+<span class="lineNum">     168 </span>            : 
+<span class="lineNum">     169 </span>            :     a = parse_json(&quot;4 * 4 * 4 * int&quot;, &quot;[[[0, 1, 2, 3], [4, 5, 6, 7], [8, 9, 10, 11], [12, 13, 14, 15]],&quot;
+<span class="lineNum">     170 </span>            :                                       &quot;[[16, 17, 18, 19], [20, 21, 22, 23], [24, 25, 26, 27], [28, 29, 30, 31]],&quot;
+<span class="lineNum">     171 </span>            :                                       &quot;[[32, 33, 34, 35], [36, 37, 38, 39], [40, 41, 42, 43], [44, 45, 46, 47]],&quot;
+<span class="lineNum">     172 </span>            :                                       &quot;[[48, 49, 50, 51], [52, 53, 54, 55], [56, 57, 58, 59], [60, 61, 62, 63]]]&quot;);
+<span class="lineNum">     173 </span>            : 
+<span class="lineNum">     174 </span>            :     EXPECT_JSON_EQ_ARR(&quot;[[[567, 594, 405, 207], [675, 702, 477, 243], [486, 504, 342, 174], [261, 270, 183, 93]],&quot;
+<span class="lineNum">     175 </span>            :                        &quot;[[999, 1026, 693, 351], [1107, 1134, 765, 387], [774, 792, 534, 270], [405, 414, 279, 141]],&quot;
+<span class="lineNum">     176 </span>            :                        &quot;[[810, 828, 558, 282], [882, 900, 606, 306], [612, 624, 420, 212], [318, 324, 218, 110]],&quot;
+<span class="lineNum">     177 </span>            :                        &quot;[[477, 486, 327, 165], [513, 522, 351, 177], [354, 360, 242, 122], [183, 186, 125, 63]]]&quot;,
+<span class="lineNum">     178 </span>            :                        af(a, kwds(&quot;shape&quot;, parse_json(&quot;3 * int&quot;, &quot;[3, 3, 3]&quot;))));
+<span class="lineNum">     179 </span>            : 
+<span class="lineNum">     180 </span>            :       EXPECT_JSON_EQ_ARR(&quot;[[[294, 308, 202, 115], [350, 364, 238, 135], [241, 250, 171, 85], [145, 150, 91, 62]],&quot;
+<span class="lineNum">     181 </span>            :           &quot;[[518, 532, 346, 195], [574, 588, 382, 215], [385, 394, 267, 133], [225, 230, 139, 94]],&quot;
+<span class="lineNum">     182 </span>            :           &quot;[[397, 406, 279, 133], [433, 442, 303, 145], [306, 312, 210, 106], [151, 154, 109, 47]],&quot;
+<span class="lineNum">     183 </span>            :           &quot;[[265, 270, 163, 110], [285, 290, 175, 118], [175, 178, 121, 59], [122, 124, 62, 63]]]&quot;,
+<span class="lineNum">     184 </span>            :           af(a, kwds(&quot;mask&quot;, parse_json(&quot;3 * 3 * 3 * bool&quot;, &quot;[[[true, false, true], [false, true, false], [true, false,
+<span class="lineNum">     185 </span>            :   true]],&quot;
+<span class="lineNum">     186 </span>            :           &quot;[[false, true, false], [true, false, true], [false, true, false]],&quot;
+<span class="lineNum">     187 </span>            :           &quot;[[true, false, true], [false, true, false], [true, false, true]]]&quot;))));
+<span class="lineNum">     188 </span>            : 
+<span class="lineNum">     189 </span>            :       EXPECT_JSON_EQ_ARR(
+<span class="lineNum">     190 </span>            :           &quot;[[[84, 132, 144, 100], [150, 234, 252, 174], [198, 306, 324, 222], [148, 228, 240, 164]],&quot;
+<span class="lineNum">     191 </span>            :           &quot;[[222, 342, 360, 246], [369, 567, 594, 405], [441, 675, 702, 477], [318, 486, 504, 342]],&quot;
+<span class="lineNum">     192 </span>            :           &quot;[[414, 630, 648, 438], [657, 999, 1026, 693], [729, 1107, 1134, 765], [510, 774, 792, 534]],&quot;
+<span class="lineNum">     193 </span>            :           &quot;[[340, 516, 528, 356], [534, 810, 828, 558], [582, 882, 900, 606], [404, 612, 624, 420]]]&quot;,
+<span class="lineNum">     194 </span>            :           af(a, kwds(&quot;shape&quot;, parse_json(&quot;3 * int&quot;, &quot;[3, 3, 3]&quot;), &quot;offset&quot;, parse_json(&quot;3 * int&quot;, &quot;[-1, -1, -1]&quot;))));
+<span class="lineNum">     195 </span>            : 
+<span class="lineNum">     196 </span>            :       EXPECT_JSON_EQ_ARR(&quot;[[[42, 66, 72, 50], [75, 125, 134, 87], [99, 161, 170, 111], [74, 114, 120, 82]],&quot;
+<span class="lineNum">     197 </span>            :           &quot;[[111, 173, 182, 123], [185, 294, 308, 202], [221, 350, 364, 238], [159, 241, 250, 171]],&quot;
+<span class="lineNum">     198 </span>            :           &quot;[[207, 317, 326, 219], [329, 518, 532, 346], [365, 574, 588, 382], [255, 385, 394, 267]],&quot;
+<span class="lineNum">     199 </span>            :           &quot;[[170, 258, 264, 178], [267, 397, 406, 279], [291, 433, 442, 303], [202, 306, 312, 210]]]&quot;,
+<span class="lineNum">     200 </span>            :           af(a, kwds(&quot;mask&quot;, parse_json(&quot;3 * 3 * 3 * bool&quot;, &quot;[[[true, false, true], [false, true, false], [true, false,
+<span class="lineNum">     201 </span>            :   true]],&quot;
+<span class="lineNum">     202 </span>            :           &quot;[[false, true, false], [true, false, true], [false, true, false]],&quot;
+<span class="lineNum">     203 </span>            :           &quot;[[true, false, true], [false, true, false], [true, false, true]]]&quot;), &quot;offset&quot;, parse_json(&quot;3 * int&quot;, &quot;[-1,
+<span class="lineNum">     204 </span>            :   -1,
+<a name="205"><span class="lineNum">     205 </span>            :   -1]&quot;))));</a>
+<span class="lineNum">     206 </span>            :   */
+<span class="lineNum">     207 </span><span class="lineCov">          3 : }</span>
+<span class="lineNum">     208 </span>            : 
+<span class="lineNum">     209 </span>            : /*
+<span class="lineNum">     210 </span>            :     Todo: Make this 3D test pass.
+<span class="lineNum">     211 </span>            : 
+<span class="lineNum">     212 </span>            :     EXPECT_JSON_EQ_ARR(&quot;[[[1128, 864, 588, 300], [918, 702, 477, 243], [660, 504, 342, 174], [354, 270, 183, 93]],&quot;
+<span class="lineNum">     213 </span>            :         &quot;[[1896, 1440, 972, 492], [1494, 1134, 765, 387], [1044, 792, 534, 270], [546, 414, 279, 141]],&quot;
+<span class="lineNum">     214 </span>            :         &quot;[[1520, 1152, 776, 392], [1188, 900, 606, 306], [824, 624, 420, 212], [428, 324, 218, 110]],&quot;
+<span class="lineNum">     215 </span>            :         &quot;[[888, 672, 452, 228], [690, 522, 351, 177], [476, 360, 242, 122], [246, 186, 125, 63]]]&quot;,
+<span class="lineNum">     216 </span>            :         af(a, kwds(&quot;shape&quot;, parse_json(&quot;3 * int&quot;, &quot;[3, 5, 7]&quot;))));
+<span class="lineNum">     217 </span>            : */
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.10</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

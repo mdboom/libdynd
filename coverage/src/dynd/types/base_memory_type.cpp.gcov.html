@@ -1,0 +1,230 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - coverage.info.cleaned - src/dynd/types/base_memory_type.cpp</title>
+  <link rel="stylesheet" type="text/css" href="../../../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../../../index.html">top level</a> - <a href="index.html">src/dynd/types</a> - base_memory_type.cpp<span style="font-size: 80%;"> (source / <a href="base_memory_type.cpp.func.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">coverage.info.cleaned</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">1</td>
+            <td class="headerCovTableEntry">69</td>
+            <td class="headerCovTableEntryLo">1.4 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2016-02-19</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">2</td>
+            <td class="headerCovTableEntry">22</td>
+            <td class="headerCovTableEntryLo">9.1 %</td>
+          </tr>
+          <tr><td><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : //</a>
+<span class="lineNum">       2 </span>            : // Copyright (C) 2011-15 DyND Developers
+<span class="lineNum">       3 </span>            : // BSD 2-Clause License, see LICENSE.txt
+<span class="lineNum">       4 </span>            : //
+<span class="lineNum">       5 </span>            : 
+<span class="lineNum">       6 </span>            : #include &lt;dynd/callable.hpp&gt;
+<span class="lineNum">       7 </span>            : #include &lt;dynd/types/base_memory_type.hpp&gt;
+<span class="lineNum">       8 </span>            : 
+<span class="lineNum">       9 </span>            : using namespace std;
+<a name="10"><span class="lineNum">      10 </span>            : using namespace dynd;</a>
+<span class="lineNum">      11 </span>            : 
+<a name="12"><span class="lineNum">      12 </span><span class="lineNoCov">          0 : ndt::base_memory_type::~base_memory_type() {}</span></a>
+<span class="lineNum">      13 </span>            : 
+<span class="lineNum">      14 </span><span class="lineNoCov">          0 : size_t ndt::base_memory_type::get_default_data_size() const</span>
+<span class="lineNum">      15 </span>            : {
+<span class="lineNum">      16 </span><span class="lineNoCov">          0 :   if (m_element_tp.is_builtin()) {</span>
+<span class="lineNum">      17 </span><span class="lineNoCov">          0 :     return m_element_tp.get_data_size();</span>
+<span class="lineNum">      18 </span>            :   }
+<span class="lineNum">      19 </span>            :   else {
+<span class="lineNum">      20 </span><span class="lineNoCov">          0 :     return m_element_tp.extended()-&gt;get_default_data_size();</span>
+<span class="lineNum">      21 </span>            :   }
+<a name="22"><span class="lineNum">      22 </span>            : }</a>
+<span class="lineNum">      23 </span>            : 
+<span class="lineNum">      24 </span><span class="lineNoCov">          0 : void ndt::base_memory_type::print_data(std::ostream &amp;o, const char *arrmeta, const char *data) const</span>
+<span class="lineNum">      25 </span>            : {
+<span class="lineNum">      26 </span><span class="lineNoCov">          0 :   m_element_tp.print_data(o, arrmeta + m_storage_arrmeta_offset, data);</span>
+<a name="27"><span class="lineNum">      27 </span><span class="lineNoCov">          0 : }</span></a>
+<span class="lineNum">      28 </span>            : 
+<span class="lineNum">      29 </span><span class="lineNoCov">          0 : void ndt::base_memory_type::get_shape(intptr_t ndim, intptr_t i, intptr_t *out_shape, const char *arrmeta,</span>
+<span class="lineNum">      30 </span>            :                                       const char *data) const
+<span class="lineNum">      31 </span>            : {
+<span class="lineNum">      32 </span><span class="lineNoCov">          0 :   m_element_tp.extended()-&gt;get_shape(ndim, i, out_shape, arrmeta, data);</span>
+<a name="33"><span class="lineNum">      33 </span><span class="lineNoCov">          0 : }</span></a>
+<span class="lineNum">      34 </span>            : 
+<span class="lineNum">      35 </span><span class="lineNoCov">          0 : void ndt::base_memory_type::get_strides(size_t i, intptr_t *out_strides, const char *arrmeta) const</span>
+<span class="lineNum">      36 </span>            : {
+<span class="lineNum">      37 </span><span class="lineNoCov">          0 :   m_element_tp.extended()-&gt;get_strides(i, out_strides, arrmeta);</span>
+<a name="38"><span class="lineNum">      38 </span><span class="lineNoCov">          0 : }</span></a>
+<span class="lineNum">      39 </span>            : 
+<a name="40"><span class="lineNum">      40 </span><span class="lineNoCov">          0 : void ndt::base_memory_type::get_vars(std::unordered_set&lt;std::string&gt; &amp;vars) const { m_element_tp.get_vars(vars); }</span></a>
+<span class="lineNum">      41 </span>            : 
+<span class="lineNum">      42 </span><span class="lineNoCov">          0 : ndt::type ndt::base_memory_type::apply_linear_index(intptr_t nindices, const irange *indices, size_t current_i,</span>
+<span class="lineNum">      43 </span>            :                                                     const type &amp;root_tp, bool leading_dimension) const
+<span class="lineNum">      44 </span>            : {
+<span class="lineNum">      45 </span>            :   return with_replaced_storage_type(
+<span class="lineNum">      46 </span><span class="lineNoCov">          0 :       m_element_tp.extended()-&gt;apply_linear_index(nindices, indices, current_i, root_tp, leading_dimension));</span>
+<a name="47"><span class="lineNum">      47 </span>            : }</a>
+<span class="lineNum">      48 </span>            : 
+<span class="lineNum">      49 </span><span class="lineNoCov">          0 : intptr_t ndt::base_memory_type::apply_linear_index(intptr_t nindices, const irange *indices, const char *arrmeta,</span>
+<span class="lineNum">      50 </span>            :                                                    const type &amp;result_type, char *out_arrmeta,
+<span class="lineNum">      51 </span>            :                                                    const intrusive_ptr&lt;memory_block_data&gt; &amp;embedded_reference,
+<span class="lineNum">      52 </span>            :                                                    size_t current_i, const type &amp;root_tp, bool leading_dimension,
+<span class="lineNum">      53 </span>            :                                                    char **inout_data,
+<span class="lineNum">      54 </span>            :                                                    intrusive_ptr&lt;memory_block_data&gt; &amp;inout_dataref) const
+<span class="lineNum">      55 </span>            : {
+<span class="lineNum">      56 </span><span class="lineNoCov">          0 :   if (m_element_tp.is_builtin()) {</span>
+<span class="lineNum">      57 </span><span class="lineNoCov">          0 :     return 0;</span>
+<span class="lineNum">      58 </span>            :   }
+<span class="lineNum">      59 </span>            : 
+<span class="lineNum">      60 </span><span class="lineNoCov">          0 :   return m_element_tp.extended()-&gt;apply_linear_index(</span>
+<span class="lineNum">      61 </span><span class="lineNoCov">          0 :       nindices, indices, arrmeta, result_type.extended&lt;base_memory_type&gt;()-&gt;get_element_type(), out_arrmeta,</span>
+<span class="lineNum">      62 </span><span class="lineNoCov">          0 :       embedded_reference, current_i, root_tp, leading_dimension, inout_data, inout_dataref);</span>
+<a name="63"><span class="lineNum">      63 </span>            : }</a>
+<span class="lineNum">      64 </span>            : 
+<span class="lineNum">      65 </span><span class="lineNoCov">          0 : ndt::type ndt::base_memory_type::at_single(intptr_t i0, const char **inout_arrmeta, const char **inout_data) const</span>
+<span class="lineNum">      66 </span>            : {
+<span class="lineNum">      67 </span><span class="lineNoCov">          0 :   return with_replaced_storage_type(m_element_tp.extended()-&gt;at_single(i0, inout_arrmeta, inout_data));</span>
+<a name="68"><span class="lineNum">      68 </span>            : }</a>
+<span class="lineNum">      69 </span>            : 
+<span class="lineNum">      70 </span><span class="lineNoCov">          0 : ndt::type ndt::base_memory_type::get_type_at_dimension(char **inout_arrmeta, intptr_t i, intptr_t total_ndim) const</span>
+<span class="lineNum">      71 </span>            : {
+<span class="lineNum">      72 </span><span class="lineNoCov">          0 :   if (i == 0) {</span>
+<span class="lineNum">      73 </span><span class="lineNoCov">          0 :     return type(this, true);</span>
+<span class="lineNum">      74 </span>            :   }
+<span class="lineNum">      75 </span>            : 
+<span class="lineNum">      76 </span><span class="lineNoCov">          0 :   return with_replaced_storage_type(m_element_tp.extended()-&gt;get_type_at_dimension(inout_arrmeta, i, total_ndim));</span>
+<a name="77"><span class="lineNum">      77 </span>            : }</a>
+<span class="lineNum">      78 </span>            : 
+<span class="lineNum">      79 </span><span class="lineNoCov">          0 : bool ndt::base_memory_type::is_lossless_assignment(const type &amp;dst_tp, const type &amp;src_tp) const</span>
+<span class="lineNum">      80 </span>            : {
+<span class="lineNum">      81 </span>            :   // Default to calling with the storage types
+<span class="lineNum">      82 </span><span class="lineNoCov">          0 :   if (dst_tp.extended() == this) {</span>
+<span class="lineNum">      83 </span><span class="lineNoCov">          0 :     return ::is_lossless_assignment(m_element_tp, src_tp);</span>
+<span class="lineNum">      84 </span>            :   }
+<span class="lineNum">      85 </span>            :   else {
+<span class="lineNum">      86 </span><span class="lineNoCov">          0 :     return ::is_lossless_assignment(dst_tp, m_element_tp);</span>
+<span class="lineNum">      87 </span>            :   }
+<a name="88"><span class="lineNum">      88 </span>            : }</a>
+<span class="lineNum">      89 </span>            : 
+<span class="lineNum">      90 </span><span class="lineNoCov">          0 : void ndt::base_memory_type::transform_child_types(type_transform_fn_t transform_fn, intptr_t arrmeta_offset,</span>
+<span class="lineNum">      91 </span>            :                                                   void *extra, type &amp;out_transformed_tp,
+<span class="lineNum">      92 </span>            :                                                   bool &amp;out_was_transformed) const
+<span class="lineNum">      93 </span>            : {
+<span class="lineNum">      94 </span><span class="lineNoCov">          0 :   type tmp_tp;</span>
+<span class="lineNum">      95 </span><span class="lineNoCov">          0 :   bool was_transformed = false;</span>
+<span class="lineNum">      96 </span><span class="lineNoCov">          0 :   transform_fn(m_element_tp, arrmeta_offset + m_storage_arrmeta_offset, extra, tmp_tp, was_transformed);</span>
+<span class="lineNum">      97 </span><span class="lineNoCov">          0 :   if (was_transformed) {</span>
+<span class="lineNum">      98 </span><span class="lineNoCov">          0 :     out_transformed_tp = with_replaced_storage_type(tmp_tp);</span>
+<span class="lineNum">      99 </span><span class="lineNoCov">          0 :     out_was_transformed = true;</span>
+<span class="lineNum">     100 </span>            :   }
+<span class="lineNum">     101 </span>            :   else {
+<span class="lineNum">     102 </span><span class="lineNoCov">          0 :     out_transformed_tp = type(this, true);</span>
+<span class="lineNum">     103 </span>            :   }
+<a name="104"><span class="lineNum">     104 </span><span class="lineNoCov">          0 : }</span></a>
+<span class="lineNum">     105 </span>            : 
+<a name="106"><span class="lineNum">     106 </span><span class="lineNoCov">          0 : ndt::type ndt::base_memory_type::get_canonical_type() const { return m_element_tp.get_canonical_type(); }</span></a>
+<span class="lineNum">     107 </span>            : 
+<span class="lineNum">     108 </span><span class="lineNoCov">          0 : void ndt::base_memory_type::arrmeta_default_construct(char *arrmeta, bool blockref_alloc) const</span>
+<span class="lineNum">     109 </span>            : {
+<span class="lineNum">     110 </span><span class="lineNoCov">          0 :   if (!m_element_tp.is_builtin()) {</span>
+<span class="lineNum">     111 </span><span class="lineNoCov">          0 :     m_element_tp.extended()-&gt;arrmeta_default_construct(arrmeta + m_storage_arrmeta_offset, blockref_alloc);</span>
+<span class="lineNum">     112 </span>            :   }
+<a name="113"><span class="lineNum">     113 </span><span class="lineNoCov">          0 : }</span></a>
+<span class="lineNum">     114 </span>            : 
+<span class="lineNum">     115 </span><span class="lineNoCov">          0 : void ndt::base_memory_type::arrmeta_copy_construct(char *dst_arrmeta, const char *src_arrmeta,</span>
+<span class="lineNum">     116 </span>            :                                                    const intrusive_ptr&lt;memory_block_data&gt; &amp;embedded_reference) const
+<span class="lineNum">     117 </span>            : {
+<span class="lineNum">     118 </span><span class="lineNoCov">          0 :   if (!m_element_tp.is_builtin()) {</span>
+<span class="lineNum">     119 </span><span class="lineNoCov">          0 :     m_element_tp.extended()-&gt;arrmeta_copy_construct(dst_arrmeta + m_storage_arrmeta_offset,</span>
+<span class="lineNum">     120 </span><span class="lineNoCov">          0 :                                                     src_arrmeta + m_storage_arrmeta_offset, embedded_reference);</span>
+<span class="lineNum">     121 </span>            :   }
+<a name="122"><span class="lineNum">     122 </span><span class="lineNoCov">          0 : }</span></a>
+<span class="lineNum">     123 </span>            : 
+<span class="lineNum">     124 </span><span class="lineNoCov">          0 : void ndt::base_memory_type::arrmeta_destruct(char *arrmeta) const</span>
+<span class="lineNum">     125 </span>            : {
+<span class="lineNum">     126 </span><span class="lineNoCov">          0 :   if (!m_element_tp.is_builtin()) {</span>
+<span class="lineNum">     127 </span><span class="lineNoCov">          0 :     m_element_tp.extended()-&gt;arrmeta_destruct(arrmeta + m_storage_arrmeta_offset);</span>
+<span class="lineNum">     128 </span>            :   }
+<a name="129"><span class="lineNum">     129 </span><span class="lineNoCov">          0 : }</span></a>
+<span class="lineNum">     130 </span>            : 
+<span class="lineNum">     131 </span><span class="lineNoCov">          0 : bool ndt::base_memory_type::match(const char *arrmeta, const type &amp;candidate_tp, const char *candidate_arrmeta,</span>
+<span class="lineNum">     132 </span>            :                                   std::map&lt;std::string, type&gt; &amp;tp_vars) const
+<span class="lineNum">     133 </span>            : {
+<span class="lineNum">     134 </span><span class="lineNoCov">          0 :   if (candidate_tp.get_kind() != memory_kind) {</span>
+<span class="lineNum">     135 </span><span class="lineNoCov">          0 :     return false;</span>
+<span class="lineNum">     136 </span>            :   }
+<span class="lineNum">     137 </span>            : 
+<span class="lineNum">     138 </span><span class="lineNoCov">          0 :   return m_element_tp.match(arrmeta, candidate_tp.extended&lt;base_memory_type&gt;()-&gt;m_element_tp, candidate_arrmeta,</span>
+<span class="lineNum">     139 </span><span class="lineNoCov">          0 :                             tp_vars);</span>
+<a name="140"><span class="lineNum">     140 </span>            : }</a>
+<span class="lineNum">     141 </span>            : 
+<span class="lineNum">     142 </span><span class="lineNoCov">          0 : static ndt::type property_get_storage_type(ndt::type tp)</span>
+<span class="lineNum">     143 </span>            : {
+<span class="lineNum">     144 </span><span class="lineNoCov">          0 :   const ndt::base_memory_type *md = tp.extended&lt;ndt::base_memory_type&gt;();</span>
+<span class="lineNum">     145 </span><span class="lineNoCov">          0 :   return md-&gt;get_element_type();</span>
+<a name="146"><span class="lineNum">     146 </span>            : }</a>
+<span class="lineNum">     147 </span>            : 
+<span class="lineNum">     148 </span><span class="lineNoCov">          0 : std::map&lt;std::string, nd::callable&gt; ndt::base_memory_type::get_dynamic_type_properties() const</span>
+<span class="lineNum">     149 </span>            : {
+<span class="lineNum">     150 </span><span class="lineNoCov">          0 :   std::map&lt;std::string, nd::callable&gt; properties;</span>
+<span class="lineNum">     151 </span><span class="lineNoCov">          0 :   properties[&quot;storage_type&quot;] = nd::functional::apply(&amp;property_get_storage_type, &quot;self&quot;);</span>
+<a name="152"><span class="lineNum">     152 </span>            : </a>
+<span class="lineNum">     153 </span><span class="lineNoCov">          0 :   return properties;</span>
+<span class="lineNum">     154 </span><span class="lineCov">          3 : }</span>
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.10</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

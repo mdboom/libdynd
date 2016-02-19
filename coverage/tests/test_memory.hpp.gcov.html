@@ -1,0 +1,221 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - coverage.info.cleaned - tests/test_memory.hpp</title>
+  <link rel="stylesheet" type="text/css" href="../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../index.html">top level</a> - <a href="index.html">tests</a> - test_memory.hpp<span style="font-size: 80%;"> (source / <a href="test_memory.hpp.func.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">coverage.info.cleaned</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">10</td>
+            <td class="headerCovTableEntry">10</td>
+            <td class="headerCovTableEntryHi">100.0 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2016-02-19</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">15</td>
+            <td class="headerCovTableEntry">17</td>
+            <td class="headerCovTableEntryMed">88.2 %</td>
+          </tr>
+          <tr><td><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : //</a>
+<span class="lineNum">       2 </span>            : // Copyright (C) 2011-15 DyND Developers
+<span class="lineNum">       3 </span>            : // BSD 2-Clause License, see LICENSE.txt
+<span class="lineNum">       4 </span>            : //
+<span class="lineNum">       5 </span>            : 
+<span class="lineNum">       6 </span>            : #include &quot;inc_gtest.hpp&quot;
+<span class="lineNum">       7 </span>            : 
+<span class="lineNum">       8 </span>            : #include &lt;utility&gt;
+<span class="lineNum">       9 </span>            : 
+<span class="lineNum">      10 </span>            : #include &lt;dynd/array.hpp&gt;
+<span class="lineNum">      11 </span>            : #include &lt;dynd/type.hpp&gt;
+<span class="lineNum">      12 </span>            : #include &lt;dynd/types/cuda_host_type.hpp&gt;
+<span class="lineNum">      13 </span>            : #include &lt;dynd/types/cuda_device_type.hpp&gt;
+<span class="lineNum">      14 </span>            : #include &lt;dynd/types/type_id.hpp&gt;
+<span class="lineNum">      15 </span>            : #include &lt;dynd/types/callable_type.hpp&gt;
+<span class="lineNum">      16 </span>            : 
+<span class="lineNum">      17 </span>            : using namespace std;
+<span class="lineNum">      18 </span>            : using namespace dynd;
+<span class="lineNum">      19 </span>            : 
+<span class="lineNum">      20 </span>            : typedef void None;
+<span class="lineNum">      21 </span>            : 
+<span class="lineNum">      22 </span>            : namespace testing {
+<span class="lineNum">      23 </span>            : 
+<span class="lineNum">      24 </span>            : // This is needed to pretty print ::testing::Types
+<span class="lineNum">      25 </span>            : template &lt;typename T0, typename T1&gt;
+<span class="lineNum">      26 </span>            : struct Types2 : ::testing::Types&lt;T0, T1&gt; {
+<span class="lineNum">      27 </span>            : };
+<span class="lineNum">      28 </span>            : 
+<span class="lineNum">      29 </span>            : }
+<span class="lineNum">      30 </span>            : 
+<span class="lineNum">      31 </span>            : /**
+<span class="lineNum">      32 </span>            :  * This class describes a memory space for testing purposes.
+<span class="lineNum">      33 </span>            :  *
+<span class="lineNum">      34 </span>            :  * The idea is that we implement a template specialization for each memory type
+<span class="lineNum">      35 </span>            :  * to test. The specialization then handles details like the transfer of data back
+<span class="lineNum">      36 </span>            :  * and forth.
+<span class="lineNum">      37 </span>            :  *
+<span class="lineNum">      38 </span>            :  * Since default memory has no memory type, we use the C++ type 'None' from Google Test
+<span class="lineNum">      39 </span>            :  * to represent it.
+<span class="lineNum">      40 </span>            :  */
+<span class="lineNum">      41 </span>            : template &lt;typename T&gt;
+<span class="lineNum">      42 </span>            : class Memory;
+<span class="lineNum">      43 </span>            : 
+<span class="lineNum">      44 </span>            : /**
+<span class="lineNum">      45 </span>            :  * This class is a pair of memory spaces, which is needed by some tests.
+<span class="lineNum">      46 </span>            :  */
+<span class="lineNum">      47 </span>            : template &lt;typename T&gt;
+<span class="lineNum">      48 </span>            : class MemoryPair;
+<a name="49"><span class="lineNum">      49 </span>            : </a>
+<span class="lineNum">      50 </span>            : template &lt;typename T0, typename T1&gt;
+<span class="lineNum">      51 </span><span class="lineCov">         22 : class MemoryPair&lt; ::testing::Types2&lt;T0, T1&gt; &gt; : public ::testing::Test {</span>
+<span class="lineNum">      52 </span>            : public:
+<span class="lineNum">      53 </span>            :     typedef Memory&lt;T0&gt; First;
+<span class="lineNum">      54 </span>            :     typedef Memory&lt;T1&gt; Second;
+<span class="lineNum">      55 </span>            : };
+<a name="56"><span class="lineNum">      56 </span>            : </a>
+<span class="lineNum">      57 </span>            : template &lt;&gt;
+<span class="lineNum">      58 </span><span class="lineCov">         18 : class Memory&lt;None&gt; : public ::testing::Test {</span>
+<span class="lineNum">      59 </span>            : public:
+<a name="60"><span class="lineNum">      60 </span>            :     typedef None Type;</a>
+<span class="lineNum">      61 </span>            : 
+<span class="lineNum">      62 </span><span class="lineCov">         34 :     static inline bool IsTypeID(type_id_t DYND_UNUSED(type_id)) {</span>
+<span class="lineNum">      63 </span><span class="lineCov">         34 :         return false;</span>
+<a name="64"><span class="lineNum">      64 </span>            :     }</a>
+<span class="lineNum">      65 </span>            : 
+<span class="lineNum">      66 </span><span class="lineCov">         32 :     static inline ndt::type MakeType(const ndt::type&amp; target_tp) {</span>
+<span class="lineNum">      67 </span><span class="lineCov">         32 :         return target_tp;</span>
+<span class="lineNum">      68 </span>            :     }
+<a name="69"><span class="lineNum">      69 </span>            : </a>
+<span class="lineNum">      70 </span>            :     template &lt;typename T&gt;
+<span class="lineNum">      71 </span><span class="lineCov">        134 :     static inline T Dereference(const T* ptr) {</span>
+<span class="lineNum">      72 </span><span class="lineCov">        134 :         return *ptr;</span>
+<a name="73"><span class="lineNum">      73 </span>            :     }</a>
+<span class="lineNum">      74 </span>            : 
+<span class="lineNum">      75 </span><span class="lineCov">         95 :     static inline nd::array To(const nd::array&amp; a) {</span>
+<span class="lineNum">      76 </span>            : #ifdef DYND_CUDA
+<span class="lineNum">      77 </span>            :         return a.to_host();
+<span class="lineNum">      78 </span>            : #else
+<span class="lineNum">      79 </span><span class="lineCov">         95 :         return a;</span>
+<span class="lineNum">      80 </span>            : #endif // DYND_CUDA
+<span class="lineNum">      81 </span>            :     }
+<span class="lineNum">      82 </span>            : };
+<span class="lineNum">      83 </span>            : 
+<span class="lineNum">      84 </span>            : typedef ::testing::Types&lt;None&gt; DefaultMemory;
+<span class="lineNum">      85 </span>            : typedef ::testing::Types&lt; ::testing::Types2&lt;None, None&gt; &gt; DefaultMemoryPairs;
+<span class="lineNum">      86 </span>            : 
+<span class="lineNum">      87 </span>            : #ifdef DYND_CUDA
+<span class="lineNum">      88 </span>            : 
+<span class="lineNum">      89 </span>            : template &lt;&gt;
+<span class="lineNum">      90 </span>            : class Memory&lt;cuda_host_type&gt; : public ::testing::Test {
+<span class="lineNum">      91 </span>            :     static const type_id_t TypeID = cuda_host_id;
+<span class="lineNum">      92 </span>            : public:
+<span class="lineNum">      93 </span>            :     typedef cuda_host_type Type;
+<span class="lineNum">      94 </span>            : 
+<span class="lineNum">      95 </span>            :     static inline bool IsTypeID(type_id_t type_id) {
+<span class="lineNum">      96 </span>            :         return TypeID == type_id;
+<span class="lineNum">      97 </span>            :     }
+<span class="lineNum">      98 </span>            : 
+<span class="lineNum">      99 </span>            :     static inline ndt::type MakeType(const ndt::type&amp; target_tp, unsigned int cuda_host_flags = cudaHostAllocDefault) {
+<span class="lineNum">     100 </span>            :         return make_cuda_host(target_tp, cuda_host_flags);
+<span class="lineNum">     101 </span>            :     }
+<span class="lineNum">     102 </span>            : 
+<span class="lineNum">     103 </span>            :     template &lt;typename T&gt;
+<span class="lineNum">     104 </span>            :     static inline T Dereference(const T* ptr) {
+<span class="lineNum">     105 </span>            :         return *ptr;
+<span class="lineNum">     106 </span>            :     }
+<span class="lineNum">     107 </span>            : 
+<span class="lineNum">     108 </span>            :     static inline nd::array To(const nd::array&amp; a, unsigned int cuda_host_flags = cudaHostAllocDefault) {
+<span class="lineNum">     109 </span>            :         return a.to_cuda_host(cuda_host_flags);
+<span class="lineNum">     110 </span>            :     }
+<span class="lineNum">     111 </span>            : };
+<span class="lineNum">     112 </span>            : 
+<span class="lineNum">     113 </span>            : template &lt;&gt;
+<span class="lineNum">     114 </span>            : class Memory&lt;cuda_device_type&gt; : public ::testing::Test {
+<span class="lineNum">     115 </span>            :     static const type_id_t TypeID = cuda_device_id;
+<span class="lineNum">     116 </span>            : public:
+<span class="lineNum">     117 </span>            :     typedef cuda_device_type Type;
+<span class="lineNum">     118 </span>            : 
+<span class="lineNum">     119 </span>            :     static inline bool IsTypeID(type_id_t type_id) {
+<span class="lineNum">     120 </span>            :         return TypeID == type_id;
+<span class="lineNum">     121 </span>            :     }
+<span class="lineNum">     122 </span>            : 
+<span class="lineNum">     123 </span>            :     static inline ndt::type MakeType(const ndt::type&amp; target_tp) {
+<span class="lineNum">     124 </span>            :         return make_cuda_device(target_tp);
+<span class="lineNum">     125 </span>            :     }
+<span class="lineNum">     126 </span>            : 
+<span class="lineNum">     127 </span>            :     template &lt;typename T&gt;
+<span class="lineNum">     128 </span>            :     static inline T Dereference(const T* ptr) {
+<span class="lineNum">     129 </span>            :         T tmp;
+<span class="lineNum">     130 </span>            :         cuda_throw_if_not_success(cudaMemcpy(&amp;tmp, ptr, sizeof(T), cudaMemcpyDeviceToHost));
+<span class="lineNum">     131 </span>            :         return tmp;
+<span class="lineNum">     132 </span>            :     }
+<span class="lineNum">     133 </span>            : 
+<span class="lineNum">     134 </span>            :     static inline nd::array To(const nd::array&amp; a) {
+<span class="lineNum">     135 </span>            :         return a.to_cuda_device();
+<span class="lineNum">     136 </span>            :     }
+<span class="lineNum">     137 </span>            : };
+<span class="lineNum">     138 </span>            : 
+<span class="lineNum">     139 </span>            : typedef ::testing::Types&lt;cuda_host_type, cuda_device_type&gt; CUDAMemory;
+<span class="lineNum">     140 </span>            : typedef ::testing::Types&lt; ::testing::Types2&lt;None, cuda_host_type&gt;, ::testing::Types2&lt;None, cuda_device_type&gt;,
+<span class="lineNum">     141 </span>            :     ::testing::Types2&lt;cuda_host_type, None&gt;, ::testing::Types2&lt;cuda_device_type, None&gt;,
+<span class="lineNum">     142 </span>            :     ::testing::Types2&lt;cuda_host_type, cuda_host_type&gt;, ::testing::Types2&lt;cuda_host_type, cuda_device_type&gt;,
+<span class="lineNum">     143 </span>            :     ::testing::Types2&lt;cuda_device_type, cuda_host_type&gt;, ::testing::Types2&lt;cuda_device_type, cuda_device_type&gt; &gt; CUDAMemoryPairs;
+<span class="lineNum">     144 </span>            : 
+<span class="lineNum">     145 </span>            : #endif // DYND_CUDA
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.10</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

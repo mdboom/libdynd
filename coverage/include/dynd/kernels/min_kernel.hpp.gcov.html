@@ -1,0 +1,152 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - coverage.info.cleaned - include/dynd/kernels/min_kernel.hpp</title>
+  <link rel="stylesheet" type="text/css" href="../../../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../../../index.html">top level</a> - <a href="index.html">include/dynd/kernels</a> - min_kernel.hpp<span style="font-size: 80%;"> (source / <a href="min_kernel.hpp.func.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">coverage.info.cleaned</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">11</td>
+            <td class="headerCovTableEntry">19</td>
+            <td class="headerCovTableEntryLo">57.9 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2016-02-19</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">19</td>
+            <td class="headerCovTableEntry">49</td>
+            <td class="headerCovTableEntryLo">38.8 %</td>
+          </tr>
+          <tr><td><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : //</a>
+<span class="lineNum">       2 </span>            : // Copyright (C) 2011-15 DyND Developers
+<span class="lineNum">       3 </span>            : // BSD 2-Clause License, see LICENSE.txt
+<span class="lineNum">       4 </span>            : //
+<span class="lineNum">       5 </span>            : 
+<span class="lineNum">       6 </span>            : #pragma once
+<span class="lineNum">       7 </span>            : 
+<span class="lineNum">       8 </span>            : #include &lt;dynd/kernels/base_kernel.hpp&gt;
+<span class="lineNum">       9 </span>            : #include &lt;dynd/types/callable_type.hpp&gt;
+<span class="lineNum">      10 </span>            : 
+<span class="lineNum">      11 </span>            : namespace dynd {
+<span class="lineNum">      12 </span>            : namespace nd {
+<span class="lineNum">      13 </span>            : 
+<span class="lineNum">      14 </span>            :   template &lt;type_id_t Src0TypeID&gt;
+<span class="lineNum">      15 </span>            :   struct min_kernel : base_kernel&lt;min_kernel&lt;Src0TypeID&gt;, 1&gt; {
+<span class="lineNum">      16 </span>            :     typedef typename type_of&lt;Src0TypeID&gt;::type src0_type;
+<a name="17"><span class="lineNum">      17 </span>            :     typedef src0_type dst_type;</a>
+<span class="lineNum">      18 </span>            : 
+<span class="lineNum">      19 </span><span class="lineNoCov">          0 :     void single(char *dst, char *const *src)</span>
+<span class="lineNum">      20 </span>            :     {
+<span class="lineNum">      21 </span><span class="lineNoCov">          0 :       if (*reinterpret_cast&lt;src0_type *&gt;(src[0]) &lt; *reinterpret_cast&lt;dst_type *&gt;(dst)) {</span>
+<span class="lineNum">      22 </span><span class="lineNoCov">          0 :         *reinterpret_cast&lt;dst_type *&gt;(dst) = *reinterpret_cast&lt;src0_type *&gt;(src[0]);</span>
+<span class="lineNum">      23 </span>            :       }
+<a name="24"><span class="lineNum">      24 </span><span class="lineNoCov">          0 :     }</span></a>
+<span class="lineNum">      25 </span>            : 
+<span class="lineNum">      26 </span><span class="lineCov">         20 :     void strided(char *dst, intptr_t dst_stride, char *const *src, const intptr_t *src_stride, size_t count)</span>
+<span class="lineNum">      27 </span>            :     {
+<span class="lineNum">      28 </span>            : 
+<span class="lineNum">      29 </span><span class="lineCov">         20 :       char *src0 = src[0];</span>
+<span class="lineNum">      30 </span><span class="lineCov">         20 :       intptr_t src0_stride = src_stride[0];</span>
+<span class="lineNum">      31 </span><span class="lineCov">         72 :       for (size_t i = 0; i &lt; count; ++i) {</span>
+<span class="lineNum">      32 </span><span class="lineCov">         52 :         if (*reinterpret_cast&lt;src0_type *&gt;(src0) &lt; *reinterpret_cast&lt;dst_type *&gt;(dst)) {</span>
+<span class="lineNum">      33 </span><span class="lineCov">         20 :           *reinterpret_cast&lt;dst_type *&gt;(dst) = *reinterpret_cast&lt;src0_type *&gt;(src0);</span>
+<span class="lineNum">      34 </span>            :         }
+<span class="lineNum">      35 </span><span class="lineCov">         52 :         dst += dst_stride;</span>
+<span class="lineNum">      36 </span><span class="lineCov">         52 :         src0 += src0_stride;</span>
+<span class="lineNum">      37 </span>            :       }
+<span class="lineNum">      38 </span><span class="lineCov">         20 :     }</span>
+<span class="lineNum">      39 </span>            :   };
+<span class="lineNum">      40 </span>            : 
+<span class="lineNum">      41 </span>            :   template &lt;&gt;
+<span class="lineNum">      42 </span>            :   struct min_kernel&lt;complex_float32_id&gt; : base_kernel&lt;min_kernel&lt;complex_float32_id&gt;, 1&gt; {
+<span class="lineNum">      43 </span>            :     typedef complex&lt;float&gt; src0_type;
+<a name="44"><span class="lineNum">      44 </span>            :     typedef src0_type dst_type;</a>
+<span class="lineNum">      45 </span>            : 
+<span class="lineNum">      46 </span><span class="lineNoCov">          0 :     void single(char *DYND_UNUSED(dst), char *const *DYND_UNUSED(src))</span>
+<span class="lineNum">      47 </span>            :     {
+<span class="lineNum">      48 </span><span class="lineNoCov">          0 :       throw std::runtime_error(&quot;nd::min is not implemented for complex types&quot;);</span>
+<span class="lineNum">      49 </span>            :     }
+<span class="lineNum">      50 </span>            :   };
+<span class="lineNum">      51 </span>            : 
+<span class="lineNum">      52 </span>            :   template &lt;&gt;
+<span class="lineNum">      53 </span>            :   struct min_kernel&lt;complex_float64_id&gt; : base_kernel&lt;min_kernel&lt;complex_float64_id&gt;, 1&gt; {
+<span class="lineNum">      54 </span>            :     typedef complex&lt;double&gt; src0_type;
+<a name="55"><span class="lineNum">      55 </span>            :     typedef src0_type dst_type;</a>
+<span class="lineNum">      56 </span>            : 
+<span class="lineNum">      57 </span><span class="lineNoCov">          0 :     void single(char *DYND_UNUSED(dst), char *const *DYND_UNUSED(src))</span>
+<span class="lineNum">      58 </span>            :     {
+<span class="lineNum">      59 </span><span class="lineNoCov">          0 :       throw std::runtime_error(&quot;nd::min is not implemented for complex types&quot;);</span>
+<span class="lineNum">      60 </span>            :     }
+<span class="lineNum">      61 </span>            :   };
+<span class="lineNum">      62 </span>            : 
+<span class="lineNum">      63 </span>            : } // namespace dynd::nd
+<span class="lineNum">      64 </span>            : 
+<span class="lineNum">      65 </span>            : namespace ndt {
+<span class="lineNum">      66 </span>            : 
+<a name="67"><span class="lineNum">      67 </span>            :   template &lt;type_id_t Src0TypeID&gt;</a>
+<span class="lineNum">      68 </span>            :   struct traits&lt;nd::min_kernel&lt;Src0TypeID&gt;&gt; {
+<span class="lineNum">      69 </span><span class="lineCov">         17 :     static type equivalent()</span>
+<span class="lineNum">      70 </span>            :     {
+<span class="lineNum">      71 </span><span class="lineCov">         17 :       return callable_type::make(ndt::make_type&lt;typename nd::min_kernel&lt;Src0TypeID&gt;::dst_type&gt;(), type(Src0TypeID));</span>
+<span class="lineNum">      72 </span>            :     }
+<span class="lineNum">      73 </span>            :   };
+<span class="lineNum">      74 </span>            : 
+<span class="lineNum">      75 </span>            : } // namespace dynd::ndt
+<span class="lineNum">      76 </span>            : } // namespace dynd
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.10</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

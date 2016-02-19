@@ -1,0 +1,265 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - coverage.info.cleaned - src/dynd/types/datashape_formatter.cpp</title>
+  <link rel="stylesheet" type="text/css" href="../../../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../../../index.html">top level</a> - <a href="index.html">src/dynd/types</a> - datashape_formatter.cpp<span style="font-size: 80%;"> (source / <a href="datashape_formatter.cpp.func.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">coverage.info.cleaned</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">80</td>
+            <td class="headerCovTableEntry">103</td>
+            <td class="headerCovTableEntryMed">77.7 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2016-02-19</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">9</td>
+            <td class="headerCovTableEntry">10</td>
+            <td class="headerCovTableEntryHi">90.0 %</td>
+          </tr>
+          <tr><td><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : //</a>
+<span class="lineNum">       2 </span>            : // Copyright (C) 2011-15 DyND Developers
+<span class="lineNum">       3 </span>            : // BSD 2-Clause License, see LICENSE.txt
+<span class="lineNum">       4 </span>            : //
+<span class="lineNum">       5 </span>            : 
+<span class="lineNum">       6 </span>            : #include &lt;dynd/types/datashape_formatter.hpp&gt;
+<span class="lineNum">       7 </span>            : #include &lt;dynd/types/struct_type.hpp&gt;
+<span class="lineNum">       8 </span>            : #include &lt;dynd/types/fixed_dim_kind_type.hpp&gt;
+<span class="lineNum">       9 </span>            : #include &lt;dynd/types/fixed_dim_type.hpp&gt;
+<span class="lineNum">      10 </span>            : #include &lt;dynd/types/var_dim_type.hpp&gt;
+<span class="lineNum">      11 </span>            : #include &lt;dynd/types/string_type.hpp&gt;
+<span class="lineNum">      12 </span>            : #include &lt;dynd/types/fixed_string_type.hpp&gt;
+<span class="lineNum">      13 </span>            : #include &lt;dynd/callable.hpp&gt;
+<span class="lineNum">      14 </span>            : 
+<span class="lineNum">      15 </span>            : using namespace std;
+<span class="lineNum">      16 </span>            : using namespace dynd;
+<span class="lineNum">      17 </span>            : 
+<span class="lineNum">      18 </span>            : static void format_datashape(std::ostream &amp;o, const ndt::type &amp;tp, const char *arrmeta, const char *data,
+<a name="19"><span class="lineNum">      19 </span>            :                              const std::string &amp;indent, bool multiline);</a>
+<span class="lineNum">      20 </span>            : 
+<span class="lineNum">      21 </span><span class="lineCov">          8 : static void format_struct_datashape(std::ostream &amp;o, const ndt::type &amp;tp, const char *arrmeta, const char *data,</span>
+<span class="lineNum">      22 </span>            :                                     const std::string &amp;indent, bool multiline)
+<span class="lineNum">      23 </span>            : {
+<span class="lineNum">      24 </span>            :   // The data requires arrmeta
+<span class="lineNum">      25 </span><span class="lineCov">          8 :   if (arrmeta == NULL) {</span>
+<span class="lineNum">      26 </span><span class="lineCov">          5 :     data = NULL;</span>
+<span class="lineNum">      27 </span>            :   }
+<span class="lineNum">      28 </span><span class="lineCov">          8 :   const ndt::struct_type *bsd = tp.extended&lt;ndt::struct_type&gt;();</span>
+<span class="lineNum">      29 </span><span class="lineCov">          8 :   size_t field_count = bsd-&gt;get_field_count();</span>
+<span class="lineNum">      30 </span><span class="lineCov">          8 :   const std::vector&lt;uintptr_t&gt; &amp;arrmeta_offsets = bsd-&gt;get_arrmeta_offsets();</span>
+<span class="lineNum">      31 </span><span class="lineCov">          8 :   const uintptr_t *data_offsets = NULL;</span>
+<span class="lineNum">      32 </span><span class="lineCov">          8 :   if (data != NULL) {</span>
+<span class="lineNum">      33 </span><span class="lineCov">          2 :     data_offsets = bsd-&gt;get_data_offsets(arrmeta);</span>
+<span class="lineNum">      34 </span>            :   }
+<span class="lineNum">      35 </span><span class="lineCov">          8 :   o &lt;&lt; (multiline ? &quot;{\n&quot; : &quot;{&quot;);</span>
+<span class="lineNum">      36 </span><span class="lineCov">         24 :   for (size_t i = 0; i &lt; field_count; ++i) {</span>
+<span class="lineNum">      37 </span><span class="lineCov">         16 :     if (multiline) {</span>
+<span class="lineNum">      38 </span><span class="lineNoCov">          0 :       o &lt;&lt; indent &lt;&lt; &quot;  &quot;;</span>
+<span class="lineNum">      39 </span>            :     }
+<span class="lineNum">      40 </span><span class="lineCov">         16 :     o &lt;&lt; bsd-&gt;get_field_name(i) &lt;&lt; &quot;: &quot;;</span>
+<span class="lineNum">      41 </span><span class="lineCov">         36 :     format_datashape(o, bsd-&gt;get_field_type(i), arrmeta ? (arrmeta + arrmeta_offsets[i]) : NULL,</span>
+<span class="lineNum">      42 </span><span class="lineCov">         20 :                      data ? (data + data_offsets[i]) : NULL, multiline ? (indent + &quot;  &quot;) : indent, multiline);</span>
+<span class="lineNum">      43 </span><span class="lineCov">         16 :     if (multiline) {</span>
+<span class="lineNum">      44 </span><span class="lineNoCov">          0 :       o &lt;&lt; &quot;,\n&quot;;</span>
+<span class="lineNum">      45 </span>            :     }
+<span class="lineNum">      46 </span><span class="lineCov">         16 :     else if (i != field_count - 1) {</span>
+<span class="lineNum">      47 </span><span class="lineCov">          8 :       o &lt;&lt; &quot;, &quot;;</span>
+<span class="lineNum">      48 </span>            :     }
+<span class="lineNum">      49 </span>            :   }
+<span class="lineNum">      50 </span><span class="lineCov">          8 :   o &lt;&lt; indent &lt;&lt; &quot;}&quot;;</span>
+<a name="51"><span class="lineNum">      51 </span><span class="lineCov">          8 : }</span></a>
+<span class="lineNum">      52 </span>            : 
+<span class="lineNum">      53 </span><span class="lineCov">         17 : static void format_dim_datashape(std::ostream &amp;o, const ndt::type &amp;tp, const char *arrmeta, const char *data,</span>
+<span class="lineNum">      54 </span>            :                                  const std::string &amp;indent, bool multiline)
+<span class="lineNum">      55 </span>            : {
+<span class="lineNum">      56 </span><span class="lineCov">         17 :   switch (tp.get_id()) {</span>
+<span class="lineNum">      57 </span>            :   case fixed_dim_id: {
+<span class="lineNum">      58 </span><span class="lineCov">          7 :     if (tp.get_kind() == kind_kind) {</span>
+<span class="lineNum">      59 </span>            :       // A symbolic type, so arrmeta/data can't exist
+<span class="lineNum">      60 </span><span class="lineNoCov">          0 :       o &lt;&lt; &quot;Fixed * &quot;;</span>
+<span class="lineNum">      61 </span><span class="lineNoCov">          0 :       format_datashape(o, tp.extended&lt;ndt::base_dim_type&gt;()-&gt;get_element_type(), NULL, NULL, indent, multiline);</span>
+<span class="lineNum">      62 </span><span class="lineNoCov">          0 :       break;</span>
+<span class="lineNum">      63 </span>            :     }
+<span class="lineNum">      64 </span><span class="lineCov">          7 :     const ndt::fixed_dim_type *fad = tp.extended&lt;ndt::fixed_dim_type&gt;();</span>
+<span class="lineNum">      65 </span><span class="lineCov">          7 :     intptr_t dim_size = fad-&gt;get_fixed_dim_size();</span>
+<span class="lineNum">      66 </span><span class="lineCov">          7 :     o &lt;&lt; dim_size &lt;&lt; &quot; * &quot;;</span>
+<span class="lineNum">      67 </span>            :     // Allow data to keep going only if the dimension size is 1
+<span class="lineNum">      68 </span><span class="lineCov">          7 :     if (dim_size != 1) {</span>
+<span class="lineNum">      69 </span><span class="lineCov">          7 :       data = NULL;</span>
+<span class="lineNum">      70 </span>            :     }
+<span class="lineNum">      71 </span><span class="lineCov">          7 :     format_datashape(o, fad-&gt;get_element_type(), arrmeta + (arrmeta ? sizeof(fixed_dim_type_arrmeta) : 0), data, indent,</span>
+<span class="lineNum">      72 </span><span class="lineCov">          7 :                      multiline);</span>
+<span class="lineNum">      73 </span><span class="lineCov">          7 :     break;</span>
+<span class="lineNum">      74 </span>            :   }
+<span class="lineNum">      75 </span>            :   case var_dim_id: {
+<span class="lineNum">      76 </span><span class="lineCov">         10 :     const ndt::var_dim_type *vad = tp.extended&lt;ndt::var_dim_type&gt;();</span>
+<span class="lineNum">      77 </span><span class="lineCov">         10 :     const char *child_data = NULL;</span>
+<span class="lineNum">      78 </span><span class="lineCov">         10 :     if (data == NULL || arrmeta == NULL) {</span>
+<span class="lineNum">      79 </span><span class="lineCov">          7 :       o &lt;&lt; &quot;var * &quot;;</span>
+<span class="lineNum">      80 </span>            :     }
+<span class="lineNum">      81 </span>            :     else {
+<span class="lineNum">      82 </span><span class="lineCov">          3 :       const ndt::var_dim_type::data_type *d = reinterpret_cast&lt;const ndt::var_dim_type::data_type *&gt;(data);</span>
+<span class="lineNum">      83 </span><span class="lineCov">          3 :       if (d-&gt;begin == NULL) {</span>
+<span class="lineNum">      84 </span><span class="lineCov">          3 :         o &lt;&lt; &quot;var * &quot;;</span>
+<span class="lineNum">      85 </span>            :       }
+<span class="lineNum">      86 </span>            :       else {
+<span class="lineNum">      87 </span><span class="lineNoCov">          0 :         o &lt;&lt; d-&gt;size &lt;&lt; &quot; * &quot;;</span>
+<span class="lineNum">      88 </span><span class="lineNoCov">          0 :         if (d-&gt;size == 1) {</span>
+<span class="lineNum">      89 </span>            :           const ndt::var_dim_type::metadata_type *md =
+<span class="lineNum">      90 </span><span class="lineNoCov">          0 :               reinterpret_cast&lt;const ndt::var_dim_type::metadata_type *&gt;(arrmeta);</span>
+<span class="lineNum">      91 </span><span class="lineNoCov">          0 :           child_data = d-&gt;begin + md-&gt;offset;</span>
+<span class="lineNum">      92 </span>            :         }
+<span class="lineNum">      93 </span>            :       }
+<span class="lineNum">      94 </span>            :     }
+<span class="lineNum">      95 </span><span class="lineCov">         10 :     format_datashape(o, vad-&gt;get_element_type(), arrmeta ? (arrmeta + sizeof(ndt::var_dim_type::metadata_type)) : NULL,</span>
+<span class="lineNum">      96 </span><span class="lineCov">         10 :                      child_data, indent, multiline);</span>
+<span class="lineNum">      97 </span><span class="lineCov">         10 :     break;</span>
+<span class="lineNum">      98 </span>            :   }
+<span class="lineNum">      99 </span>            :   default: {
+<span class="lineNum">     100 </span><span class="lineNoCov">          0 :     stringstream ss;</span>
+<span class="lineNum">     101 </span><span class="lineNoCov">          0 :     ss &lt;&lt; &quot;Datashape formatting for dynd type &quot; &lt;&lt; tp &lt;&lt; &quot; is not yet implemented&quot;;</span>
+<span class="lineNum">     102 </span><span class="lineNoCov">          0 :     throw runtime_error(ss.str());</span>
+<span class="lineNum">     103 </span>            :   }
+<span class="lineNum">     104 </span>            :   }
+<a name="105"><span class="lineNum">     105 </span><span class="lineCov">         17 : }</span></a>
+<span class="lineNum">     106 </span>            : 
+<span class="lineNum">     107 </span><span class="lineCov">         24 : static void format_string_datashape(std::ostream &amp;o, const ndt::type &amp;tp)</span>
+<span class="lineNum">     108 </span>            : {
+<span class="lineNum">     109 </span><span class="lineCov">         24 :   switch (tp.get_id()) {</span>
+<span class="lineNum">     110 </span>            :   case string_id:
+<span class="lineNum">     111 </span>            :   case fixed_string_id:
+<span class="lineNum">     112 </span>            :     // data shape only has one kind of string
+<span class="lineNum">     113 </span><span class="lineCov">         24 :     o &lt;&lt; &quot;string&quot;;</span>
+<span class="lineNum">     114 </span><span class="lineCov">         24 :     break;</span>
+<span class="lineNum">     115 </span>            :   default: {
+<span class="lineNum">     116 </span><span class="lineNoCov">          0 :     stringstream ss;</span>
+<span class="lineNum">     117 </span><span class="lineNoCov">          0 :     ss &lt;&lt; &quot;unrecognized string dynd type &quot; &lt;&lt; tp &lt;&lt; &quot; while formatting datashape&quot;;</span>
+<span class="lineNum">     118 </span><span class="lineNoCov">          0 :     throw dynd::type_error(ss.str());</span>
+<span class="lineNum">     119 </span>            :   }
+<span class="lineNum">     120 </span>            :   }
+<a name="121"><span class="lineNum">     121 </span><span class="lineCov">         24 : }</span></a>
+<span class="lineNum">     122 </span>            : 
+<span class="lineNum">     123 </span><span class="lineCov">          4 : static void format_complex_datashape(std::ostream &amp;o, const ndt::type &amp;tp)</span>
+<span class="lineNum">     124 </span>            : {
+<span class="lineNum">     125 </span><span class="lineCov">          4 :   switch (tp.get_id()) {</span>
+<span class="lineNum">     126 </span>            :   case complex_float32_id:
+<span class="lineNum">     127 </span><span class="lineCov">          2 :     o &lt;&lt; &quot;complex[float32]&quot;;</span>
+<span class="lineNum">     128 </span><span class="lineCov">          2 :     break;</span>
+<span class="lineNum">     129 </span>            :   case complex_float64_id:
+<span class="lineNum">     130 </span><span class="lineCov">          2 :     o &lt;&lt; &quot;complex[float64]&quot;;</span>
+<span class="lineNum">     131 </span><span class="lineCov">          2 :     break;</span>
+<span class="lineNum">     132 </span>            :   default: {
+<span class="lineNum">     133 </span><span class="lineNoCov">          0 :     stringstream ss;</span>
+<span class="lineNum">     134 </span><span class="lineNoCov">          0 :     ss &lt;&lt; &quot;unrecognized string complex type &quot; &lt;&lt; tp &lt;&lt; &quot; while formatting datashape&quot;;</span>
+<span class="lineNum">     135 </span><span class="lineNoCov">          0 :     throw dynd::type_error(ss.str());</span>
+<span class="lineNum">     136 </span>            :   }
+<span class="lineNum">     137 </span>            :   }
+<a name="138"><span class="lineNum">     138 </span><span class="lineCov">          4 : }</span></a>
+<span class="lineNum">     139 </span>            : 
+<span class="lineNum">     140 </span><span class="lineCov">         99 : static void format_datashape(std::ostream &amp;o, const ndt::type &amp;tp, const char *arrmeta, const char *data,</span>
+<span class="lineNum">     141 </span>            :                              const std::string &amp;indent, bool multiline)
+<span class="lineNum">     142 </span>            : {
+<span class="lineNum">     143 </span><span class="lineCov">         99 :   switch (tp.get_kind()) {</span>
+<span class="lineNum">     144 </span>            :   case struct_kind:
+<span class="lineNum">     145 </span><span class="lineCov">          8 :     format_struct_datashape(o, tp, arrmeta, data, indent, multiline);</span>
+<span class="lineNum">     146 </span><span class="lineCov">          8 :     break;</span>
+<span class="lineNum">     147 </span>            :   case dim_kind:
+<span class="lineNum">     148 </span><span class="lineCov">         17 :     format_dim_datashape(o, tp, arrmeta, data, indent, multiline);</span>
+<span class="lineNum">     149 </span><span class="lineCov">         17 :     break;</span>
+<span class="lineNum">     150 </span>            :   case string_kind:
+<span class="lineNum">     151 </span><span class="lineCov">         24 :     format_string_datashape(o, tp);</span>
+<span class="lineNum">     152 </span><span class="lineCov">         24 :     break;</span>
+<span class="lineNum">     153 </span>            :   case complex_kind:
+<span class="lineNum">     154 </span><span class="lineCov">          4 :     format_complex_datashape(o, tp);</span>
+<span class="lineNum">     155 </span><span class="lineCov">          4 :     break;</span>
+<span class="lineNum">     156 </span>            :   case expr_kind:
+<span class="lineNum">     157 </span><span class="lineNoCov">          0 :     format_datashape(o, tp.value_type(), NULL, NULL, indent, multiline);</span>
+<span class="lineNum">     158 </span><span class="lineNoCov">          0 :     break;</span>
+<span class="lineNum">     159 </span>            :   default:
+<span class="lineNum">     160 </span><span class="lineCov">         46 :     o &lt;&lt; tp;</span>
+<span class="lineNum">     161 </span><span class="lineCov">         46 :     break;</span>
+<span class="lineNum">     162 </span>            :   }
+<a name="163"><span class="lineNum">     163 </span><span class="lineCov">         99 : }</span></a>
+<span class="lineNum">     164 </span>            : 
+<span class="lineNum">     165 </span><span class="lineNoCov">          0 : void dynd::format_datashape(std::ostream &amp;o, const ndt::type &amp;tp, const char *arrmeta, const char *data, bool multiline)</span>
+<span class="lineNum">     166 </span>            : {
+<span class="lineNum">     167 </span><span class="lineNoCov">          0 :   ::format_datashape(o, tp, arrmeta, data, &quot;&quot;, multiline);</span>
+<a name="168"><span class="lineNum">     168 </span><span class="lineNoCov">          0 : }</span></a>
+<span class="lineNum">     169 </span>            : 
+<span class="lineNum">     170 </span><span class="lineCov">         34 : std::string dynd::format_datashape(const nd::array &amp;a, const std::string &amp;prefix, bool multiline)</span>
+<span class="lineNum">     171 </span>            : {
+<span class="lineNum">     172 </span><span class="lineCov">         68 :   stringstream ss;</span>
+<span class="lineNum">     173 </span><span class="lineCov">         34 :   ss &lt;&lt; prefix;</span>
+<span class="lineNum">     174 </span><span class="lineCov">         34 :   if (!a.is_null()) {</span>
+<span class="lineNum">     175 </span><span class="lineCov">         33 :     ::format_datashape(ss, a.get_type(), a.get()-&gt;metadata(), a.cdata(), &quot;&quot;, multiline);</span>
+<span class="lineNum">     176 </span>            :   }
+<span class="lineNum">     177 </span>            :   else {
+<span class="lineNum">     178 </span><span class="lineCov">          1 :     ::format_datashape(ss, ndt::type(), NULL, NULL, &quot;&quot;, multiline);</span>
+<span class="lineNum">     179 </span>            :   }
+<span class="lineNum">     180 </span><span class="lineCov">         68 :   return ss.str();</span>
+<a name="181"><span class="lineNum">     181 </span>            : }</a>
+<span class="lineNum">     182 </span>            : 
+<span class="lineNum">     183 </span><span class="lineCov">         32 : std::string dynd::format_datashape(const ndt::type &amp;tp, const std::string &amp;prefix, bool multiline)</span>
+<span class="lineNum">     184 </span>            : {
+<span class="lineNum">     185 </span><span class="lineCov">         64 :   stringstream ss;</span>
+<span class="lineNum">     186 </span><span class="lineCov">         32 :   ss &lt;&lt; prefix;</span>
+<a name="187"><span class="lineNum">     187 </span><span class="lineCov">         32 :   ::format_datashape(ss, tp, NULL, NULL, &quot;&quot;, multiline);</span></a>
+<span class="lineNum">     188 </span><span class="lineCov">         64 :   return ss.str();</span>
+<span class="lineNum">     189 </span><span class="lineCov">          3 : }</span>
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.10</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

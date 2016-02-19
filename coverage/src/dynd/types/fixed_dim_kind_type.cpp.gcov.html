@@ -1,0 +1,375 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - coverage.info.cleaned - src/dynd/types/fixed_dim_kind_type.cpp</title>
+  <link rel="stylesheet" type="text/css" href="../../../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../../../index.html">top level</a> - <a href="index.html">src/dynd/types</a> - fixed_dim_kind_type.cpp<span style="font-size: 80%;"> (source / <a href="fixed_dim_kind_type.cpp.func.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">coverage.info.cleaned</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">52</td>
+            <td class="headerCovTableEntry">128</td>
+            <td class="headerCovTableEntryLo">40.6 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2016-02-19</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">12</td>
+            <td class="headerCovTableEntry">36</td>
+            <td class="headerCovTableEntryLo">33.3 %</td>
+          </tr>
+          <tr><td><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : //</a>
+<span class="lineNum">       2 </span>            : // Copyright (C) 2011-15 DyND Developers
+<span class="lineNum">       3 </span>            : // BSD 2-Clause License, see LICENSE.txt
+<span class="lineNum">       4 </span>            : //
+<span class="lineNum">       5 </span>            : 
+<span class="lineNum">       6 </span>            : #include &lt;dynd/callable.hpp&gt;
+<span class="lineNum">       7 </span>            : #include &lt;dynd/types/fixed_dim_kind_type.hpp&gt;
+<span class="lineNum">       8 </span>            : #include &lt;dynd/types/pow_dimsym_type.hpp&gt;
+<span class="lineNum">       9 </span>            : #include &lt;dynd/types/typevar_type.hpp&gt;
+<span class="lineNum">      10 </span>            : #include &lt;dynd/types/typevar_dim_type.hpp&gt;
+<span class="lineNum">      11 </span>            : #include &lt;dynd/shape_tools.hpp&gt;
+<span class="lineNum">      12 </span>            : #include &lt;dynd/exceptions.hpp&gt;
+<span class="lineNum">      13 </span>            : 
+<span class="lineNum">      14 </span>            : using namespace std;
+<a name="15"><span class="lineNum">      15 </span>            : using namespace dynd;</a>
+<span class="lineNum">      16 </span>            : 
+<span class="lineNum">      17 </span><span class="lineCov">        101 : ndt::fixed_dim_kind_type::fixed_dim_kind_type(const type &amp;element_tp)</span>
+<span class="lineNum">      18 </span>            :     : base_dim_type(fixed_dim_id, kind_kind, element_tp, 0, element_tp.get_data_alignment(), sizeof(size_stride_t),
+<span class="lineNum">      19 </span><span class="lineCov">        101 :                     type_flag_symbolic, true)</span>
+<span class="lineNum">      20 </span>            : {
+<span class="lineNum">      21 </span>            :   // Propagate the inherited flags from the element
+<span class="lineNum">      22 </span><span class="lineCov">        101 :   this-&gt;flags |= (element_tp.get_flags() &amp; (type_flags_operand_inherited | type_flags_value_inherited));</span>
+<a name="23"><span class="lineNum">      23 </span><span class="lineCov">        101 : }</span></a>
+<span class="lineNum">      24 </span>            : 
+<a name="25"><span class="lineNum">      25 </span><span class="lineCov">        184 : ndt::fixed_dim_kind_type::~fixed_dim_kind_type() {}</span></a>
+<span class="lineNum">      26 </span>            : 
+<span class="lineNum">      27 </span><span class="lineNoCov">          0 : size_t ndt::fixed_dim_kind_type::get_default_data_size() const</span>
+<span class="lineNum">      28 </span>            : {
+<span class="lineNum">      29 </span><span class="lineNoCov">          0 :   stringstream ss;</span>
+<span class="lineNum">      30 </span><span class="lineNoCov">          0 :   ss &lt;&lt; &quot;Cannot get default data size of type &quot; &lt;&lt; type(this, true);</span>
+<span class="lineNum">      31 </span><span class="lineNoCov">          0 :   throw runtime_error(ss.str());</span>
+<a name="32"><span class="lineNum">      32 </span>            : }</a>
+<span class="lineNum">      33 </span>            : 
+<span class="lineNum">      34 </span><span class="lineNoCov">          0 : void ndt::fixed_dim_kind_type::print_data(std::ostream &amp;DYND_UNUSED(o), const char *DYND_UNUSED(arrmeta),</span>
+<span class="lineNum">      35 </span>            :                                           const char *DYND_UNUSED(data)) const
+<span class="lineNum">      36 </span>            : {
+<span class="lineNum">      37 </span><span class="lineNoCov">          0 :   throw type_error(&quot;Cannot store data of symbolic fixed_dim type&quot;);</span>
+<a name="38"><span class="lineNum">      38 </span>            : }</a>
+<span class="lineNum">      39 </span>            : 
+<a name="40"><span class="lineNum">      40 </span><span class="lineCov">          7 : void ndt::fixed_dim_kind_type::print_type(std::ostream &amp;o) const { o &lt;&lt; &quot;Fixed * &quot; &lt;&lt; m_element_tp; }</span></a>
+<span class="lineNum">      41 </span>            : 
+<a name="42"><span class="lineNum">      42 </span><span class="lineNoCov">          0 : bool ndt::fixed_dim_kind_type::is_expression() const { return m_element_tp.is_expression(); }</span></a>
+<span class="lineNum">      43 </span>            : 
+<a name="44"><span class="lineNum">      44 </span><span class="lineNoCov">          0 : bool ndt::fixed_dim_kind_type::is_unique_data_owner(const char *DYND_UNUSED(arrmeta)) const { return false; }</span></a>
+<span class="lineNum">      45 </span>            : 
+<span class="lineNum">      46 </span><span class="lineNoCov">          0 : void ndt::fixed_dim_kind_type::transform_child_types(type_transform_fn_t transform_fn, intptr_t arrmeta_offset,</span>
+<span class="lineNum">      47 </span>            :                                                      void *extra, type &amp;out_transformed_tp,
+<span class="lineNum">      48 </span>            :                                                      bool &amp;out_was_transformed) const
+<span class="lineNum">      49 </span>            : {
+<span class="lineNum">      50 </span><span class="lineNoCov">          0 :   type tmp_tp;</span>
+<span class="lineNum">      51 </span><span class="lineNoCov">          0 :   bool was_transformed = false;</span>
+<span class="lineNum">      52 </span><span class="lineNoCov">          0 :   transform_fn(m_element_tp, arrmeta_offset, extra, tmp_tp, was_transformed);</span>
+<span class="lineNum">      53 </span><span class="lineNoCov">          0 :   if (was_transformed) {</span>
+<span class="lineNum">      54 </span><span class="lineNoCov">          0 :     out_transformed_tp = type(new fixed_dim_kind_type(tmp_tp), false);</span>
+<span class="lineNum">      55 </span><span class="lineNoCov">          0 :     out_was_transformed = true;</span>
+<span class="lineNum">      56 </span>            :   }
+<span class="lineNum">      57 </span>            :   else {
+<span class="lineNum">      58 </span><span class="lineNoCov">          0 :     out_transformed_tp = type(this, true);</span>
+<span class="lineNum">      59 </span>            :   }
+<a name="60"><span class="lineNum">      60 </span><span class="lineNoCov">          0 : }</span></a>
+<span class="lineNum">      61 </span>            : 
+<span class="lineNum">      62 </span><span class="lineNoCov">          0 : ndt::type ndt::fixed_dim_kind_type::get_canonical_type() const</span>
+<span class="lineNum">      63 </span>            : {
+<span class="lineNum">      64 </span><span class="lineNoCov">          0 :   return type(new fixed_dim_kind_type(m_element_tp.get_canonical_type()), false);</span>
+<a name="65"><span class="lineNum">      65 </span>            : }</a>
+<span class="lineNum">      66 </span>            : 
+<span class="lineNum">      67 </span><span class="lineNoCov">          0 : ndt::type ndt::fixed_dim_kind_type::at_single(intptr_t DYND_UNUSED(i0), const char **DYND_UNUSED(inout_arrmeta),</span>
+<span class="lineNum">      68 </span>            :                                               const char **DYND_UNUSED(inout_data)) const
+<span class="lineNum">      69 </span>            : {
+<span class="lineNum">      70 </span><span class="lineNoCov">          0 :   return m_element_tp;</span>
+<a name="71"><span class="lineNum">      71 </span>            : }</a>
+<span class="lineNum">      72 </span>            : 
+<span class="lineNum">      73 </span><span class="lineCov">          2 : ndt::type ndt::fixed_dim_kind_type::get_type_at_dimension(char **DYND_UNUSED(inout_arrmeta), intptr_t i,</span>
+<span class="lineNum">      74 </span>            :                                                           intptr_t total_ndim) const
+<span class="lineNum">      75 </span>            : {
+<span class="lineNum">      76 </span><span class="lineCov">          2 :   if (i == 0) {</span>
+<span class="lineNum">      77 </span><span class="lineCov">          1 :     return type(this, true);</span>
+<span class="lineNum">      78 </span>            :   }
+<span class="lineNum">      79 </span>            :   else {
+<span class="lineNum">      80 </span><span class="lineCov">          1 :     return m_element_tp.get_type_at_dimension(NULL, i - 1, total_ndim + 1);</span>
+<span class="lineNum">      81 </span>            :   }
+<a name="82"><span class="lineNum">      82 </span>            : }</a>
+<span class="lineNum">      83 </span>            : 
+<span class="lineNum">      84 </span><span class="lineNoCov">          0 : intptr_t ndt::fixed_dim_kind_type::get_dim_size(const char *DYND_UNUSED(arrmeta), const char *DYND_UNUSED(data)) const</span>
+<span class="lineNum">      85 </span>            : {
+<span class="lineNum">      86 </span><span class="lineNoCov">          0 :   return -1;</span>
+<a name="87"><span class="lineNum">      87 </span>            : }</a>
+<span class="lineNum">      88 </span>            : 
+<span class="lineNum">      89 </span><span class="lineNoCov">          0 : void ndt::fixed_dim_kind_type::get_shape(intptr_t ndim, intptr_t i, intptr_t *out_shape,</span>
+<span class="lineNum">      90 </span>            :                                          const char *DYND_UNUSED(arrmeta), const char *DYND_UNUSED(data)) const
+<span class="lineNum">      91 </span>            : {
+<span class="lineNum">      92 </span><span class="lineNoCov">          0 :   out_shape[i] = -1;</span>
+<span class="lineNum">      93 </span>            : 
+<span class="lineNum">      94 </span>            :   // Process the later shape values
+<span class="lineNum">      95 </span><span class="lineNoCov">          0 :   if (i + 1 &lt; ndim) {</span>
+<span class="lineNum">      96 </span><span class="lineNoCov">          0 :     if (!m_element_tp.is_builtin()) {</span>
+<span class="lineNum">      97 </span><span class="lineNoCov">          0 :       m_element_tp.extended()-&gt;get_shape(ndim, i + 1, out_shape, NULL, NULL);</span>
+<span class="lineNum">      98 </span>            :     }
+<span class="lineNum">      99 </span>            :     else {
+<span class="lineNum">     100 </span><span class="lineNoCov">          0 :       stringstream ss;</span>
+<span class="lineNum">     101 </span><span class="lineNoCov">          0 :       ss &lt;&lt; &quot;requested too many dimensions from type &quot; &lt;&lt; type(this, true);</span>
+<span class="lineNum">     102 </span><span class="lineNoCov">          0 :       throw runtime_error(ss.str());</span>
+<span class="lineNum">     103 </span>            :     }
+<span class="lineNum">     104 </span>            :   }
+<a name="105"><span class="lineNum">     105 </span><span class="lineNoCov">          0 : }</span></a>
+<span class="lineNum">     106 </span>            : 
+<span class="lineNum">     107 </span><span class="lineNoCov">          0 : bool ndt::fixed_dim_kind_type::is_lossless_assignment(const type &amp;DYND_UNUSED(dst_tp),</span>
+<span class="lineNum">     108 </span>            :                                                       const type &amp;DYND_UNUSED(src_tp)) const
+<span class="lineNum">     109 </span>            : {
+<span class="lineNum">     110 </span><span class="lineNoCov">          0 :   return false;</span>
+<a name="111"><span class="lineNum">     111 </span>            : }</a>
+<span class="lineNum">     112 </span>            : 
+<span class="lineNum">     113 </span><span class="lineCov">         23 : bool ndt::fixed_dim_kind_type::operator==(const base_type &amp;rhs) const</span>
+<span class="lineNum">     114 </span>            : {
+<span class="lineNum">     115 </span><span class="lineCov">         23 :   if (this == &amp;rhs) {</span>
+<span class="lineNum">     116 </span><span class="lineNoCov">          0 :     return true;</span>
+<span class="lineNum">     117 </span>            :   }
+<span class="lineNum">     118 </span><span class="lineCov">         23 :   else if (rhs.get_id() != fixed_dim_id) {</span>
+<span class="lineNum">     119 </span><span class="lineCov">          1 :     return false;</span>
+<span class="lineNum">     120 </span>            :   }
+<span class="lineNum">     121 </span><span class="lineCov">         22 :   else if (rhs.get_kind() != kind_kind) {</span>
+<span class="lineNum">     122 </span><span class="lineCov">          1 :     return false;</span>
+<span class="lineNum">     123 </span>            :   }
+<span class="lineNum">     124 </span>            :   else {
+<span class="lineNum">     125 </span><span class="lineCov">         21 :     const fixed_dim_kind_type *dt = static_cast&lt;const fixed_dim_kind_type *&gt;(&amp;rhs);</span>
+<span class="lineNum">     126 </span><span class="lineCov">         21 :     return m_element_tp == dt-&gt;m_element_tp;</span>
+<span class="lineNum">     127 </span>            :   }
+<a name="128"><span class="lineNum">     128 </span>            : }</a>
+<span class="lineNum">     129 </span>            : 
+<span class="lineNum">     130 </span><span class="lineNoCov">          0 : void ndt::fixed_dim_kind_type::arrmeta_default_construct(char *DYND_UNUSED(arrmeta),</span>
+<span class="lineNum">     131 </span>            :                                                          bool DYND_UNUSED(blockref_alloc)) const
+<span class="lineNum">     132 </span>            : {
+<span class="lineNum">     133 </span><span class="lineNoCov">          0 :   stringstream ss;</span>
+<span class="lineNum">     134 </span><span class="lineNoCov">          0 :   ss &lt;&lt; &quot;Cannot default construct arrmeta for symbolic type &quot; &lt;&lt; type(this, true);</span>
+<span class="lineNum">     135 </span><span class="lineNoCov">          0 :   throw runtime_error(ss.str());</span>
+<a name="136"><span class="lineNum">     136 </span>            : }</a>
+<span class="lineNum">     137 </span>            : 
+<span class="lineNum">     138 </span><span class="lineNoCov">          0 : void ndt::fixed_dim_kind_type::arrmeta_copy_construct(</span>
+<span class="lineNum">     139 </span>            :     char *DYND_UNUSED(dst_arrmeta), const char *DYND_UNUSED(src_arrmeta),
+<span class="lineNum">     140 </span>            :     const intrusive_ptr&lt;memory_block_data&gt; &amp;DYND_UNUSED(embedded_reference)) const
+<span class="lineNum">     141 </span>            : {
+<span class="lineNum">     142 </span><span class="lineNoCov">          0 :   stringstream ss;</span>
+<span class="lineNum">     143 </span><span class="lineNoCov">          0 :   ss &lt;&lt; &quot;Cannot copy construct arrmeta for symbolic type &quot; &lt;&lt; type(this, true);</span>
+<span class="lineNum">     144 </span><span class="lineNoCov">          0 :   throw runtime_error(ss.str());</span>
+<a name="145"><span class="lineNum">     145 </span>            : }</a>
+<span class="lineNum">     146 </span>            : 
+<span class="lineNum">     147 </span><span class="lineNoCov">          0 : size_t ndt::fixed_dim_kind_type::arrmeta_copy_construct_onedim(</span>
+<span class="lineNum">     148 </span>            :     char *DYND_UNUSED(dst_arrmeta), const char *DYND_UNUSED(src_arrmeta),
+<span class="lineNum">     149 </span>            :     const intrusive_ptr&lt;memory_block_data&gt; &amp;DYND_UNUSED(embedded_reference)) const
+<span class="lineNum">     150 </span>            : {
+<span class="lineNum">     151 </span><span class="lineNoCov">          0 :   stringstream ss;</span>
+<span class="lineNum">     152 </span><span class="lineNoCov">          0 :   ss &lt;&lt; &quot;Cannot copy construct arrmeta for symbolic type &quot; &lt;&lt; type(this, true);</span>
+<span class="lineNum">     153 </span><span class="lineNoCov">          0 :   throw runtime_error(ss.str());</span>
+<a name="154"><span class="lineNum">     154 </span>            : }</a>
+<span class="lineNum">     155 </span>            : 
+<a name="156"><span class="lineNum">     156 </span><span class="lineNoCov">          0 : void ndt::fixed_dim_kind_type::arrmeta_reset_buffers(char *DYND_UNUSED(arrmeta)) const {}</span></a>
+<span class="lineNum">     157 </span>            : 
+<a name="158"><span class="lineNum">     158 </span><span class="lineNoCov">          0 : void ndt::fixed_dim_kind_type::arrmeta_finalize_buffers(char *DYND_UNUSED(arrmeta)) const {}</span></a>
+<span class="lineNum">     159 </span>            : 
+<a name="160"><span class="lineNum">     160 </span><span class="lineNoCov">          0 : void ndt::fixed_dim_kind_type::arrmeta_destruct(char *DYND_UNUSED(arrmeta)) const {}</span></a>
+<span class="lineNum">     161 </span>            : 
+<span class="lineNum">     162 </span><span class="lineNoCov">          0 : void ndt::fixed_dim_kind_type::arrmeta_debug_print(const char *DYND_UNUSED(arrmeta), std::ostream &amp;DYND_UNUSED(o),</span>
+<span class="lineNum">     163 </span>            :                                                    const std::string &amp;DYND_UNUSED(indent)) const
+<span class="lineNum">     164 </span>            : {
+<span class="lineNum">     165 </span><span class="lineNoCov">          0 :   stringstream ss;</span>
+<span class="lineNum">     166 </span><span class="lineNoCov">          0 :   ss &lt;&lt; &quot;Cannot have arrmeta for symbolic type &quot; &lt;&lt; type(this, true);</span>
+<span class="lineNum">     167 </span><span class="lineNoCov">          0 :   throw runtime_error(ss.str());</span>
+<a name="168"><span class="lineNum">     168 </span>            : }</a>
+<span class="lineNum">     169 </span>            : 
+<span class="lineNum">     170 </span><span class="lineNoCov">          0 : void ndt::fixed_dim_kind_type::data_destruct(const char *DYND_UNUSED(arrmeta), char *DYND_UNUSED(data)) const</span>
+<span class="lineNum">     171 </span>            : {
+<span class="lineNum">     172 </span><span class="lineNoCov">          0 :   stringstream ss;</span>
+<span class="lineNum">     173 </span><span class="lineNoCov">          0 :   ss &lt;&lt; &quot;Cannot have data for symbolic type &quot; &lt;&lt; type(this, true);</span>
+<span class="lineNum">     174 </span><span class="lineNoCov">          0 :   throw runtime_error(ss.str());</span>
+<a name="175"><span class="lineNum">     175 </span>            : }</a>
+<span class="lineNum">     176 </span>            : 
+<span class="lineNum">     177 </span><span class="lineNoCov">          0 : void ndt::fixed_dim_kind_type::data_destruct_strided(const char *DYND_UNUSED(arrmeta), char *DYND_UNUSED(data),</span>
+<span class="lineNum">     178 </span>            :                                                      intptr_t DYND_UNUSED(stride), size_t DYND_UNUSED(count)) const
+<span class="lineNum">     179 </span>            : {
+<span class="lineNum">     180 </span><span class="lineNoCov">          0 :   stringstream ss;</span>
+<span class="lineNum">     181 </span><span class="lineNoCov">          0 :   ss &lt;&lt; &quot;Cannot have data for symbolic type &quot; &lt;&lt; type(this, true);</span>
+<span class="lineNum">     182 </span><span class="lineNoCov">          0 :   throw runtime_error(ss.str());</span>
+<a name="183"><span class="lineNum">     183 </span>            : }</a>
+<span class="lineNum">     184 </span>            : 
+<span class="lineNum">     185 </span><span class="lineCov">         24 : bool ndt::fixed_dim_kind_type::match(const char *arrmeta, const type &amp;candidate_tp, const char *candidate_arrmeta,</span>
+<span class="lineNum">     186 </span>            :                                      std::map&lt;std::string, type&gt; &amp;tp_vars) const
+<span class="lineNum">     187 </span>            : {
+<span class="lineNum">     188 </span><span class="lineCov">         24 :   switch (candidate_tp.get_id()) {</span>
+<span class="lineNum">     189 </span>            :   case fixed_dim_id:
+<span class="lineNum">     190 </span><span class="lineCov">         23 :     if (candidate_tp.get_kind() == kind_kind) {</span>
+<span class="lineNum">     191 </span><span class="lineNoCov">          0 :       return m_element_tp.match(arrmeta, candidate_tp.extended&lt;fixed_dim_kind_type&gt;()-&gt;get_element_type(),</span>
+<span class="lineNum">     192 </span><span class="lineNoCov">          0 :                                 candidate_arrmeta, tp_vars);</span>
+<span class="lineNum">     193 </span>            :     }
+<span class="lineNum">     194 </span>            :     else {
+<span class="lineNum">     195 </span><span class="lineCov">         23 :       return m_element_tp.match(arrmeta, candidate_tp.extended&lt;fixed_dim_type&gt;()-&gt;get_element_type(),</span>
+<span class="lineNum">     196 </span><span class="lineCov">         23 :                                 DYND_INC_IF_NOT_NULL(candidate_arrmeta, sizeof(fixed_dim_type_arrmeta)), tp_vars);</span>
+<span class="lineNum">     197 </span>            :     }
+<span class="lineNum">     198 </span>            :   case any_kind_id:
+<span class="lineNum">     199 </span><span class="lineNoCov">          0 :     return true;</span>
+<span class="lineNum">     200 </span>            :   default:
+<span class="lineNum">     201 </span><span class="lineCov">          1 :     return false;</span>
+<span class="lineNum">     202 </span>            :   }
+<a name="203"><span class="lineNum">     203 </span>            : }</a>
+<span class="lineNum">     204 </span>            : 
+<a name="205"><span class="lineNum">     205 </span><span class="lineNoCov">          0 : static ndt::type get_element_type(ndt::type dt) { return dt.extended&lt;ndt::fixed_dim_kind_type&gt;()-&gt;get_element_type(); }</span></a>
+<span class="lineNum">     206 </span>            : 
+<span class="lineNum">     207 </span><span class="lineNoCov">          0 : std::map&lt;std::string, nd::callable&gt; ndt::fixed_dim_kind_type::get_dynamic_type_properties() const</span>
+<span class="lineNum">     208 </span>            : {
+<span class="lineNum">     209 </span><span class="lineNoCov">          0 :   std::map&lt;std::string, nd::callable&gt; properties;</span>
+<span class="lineNum">     210 </span><span class="lineNoCov">          0 :   properties[&quot;element_type&quot;] = nd::functional::apply(&amp;::get_element_type, &quot;self&quot;);</span>
+<span class="lineNum">     211 </span>            : 
+<span class="lineNum">     212 </span><span class="lineNoCov">          0 :   return properties;</span>
+<a name="213"><span class="lineNum">     213 </span>            : }</a>
+<span class="lineNum">     214 </span>            : 
+<span class="lineNum">     215 </span><span class="lineNoCov">          0 : std::map&lt;std::string, nd::callable&gt; ndt::fixed_dim_kind_type::get_dynamic_array_properties() const</span>
+<span class="lineNum">     216 </span>            : {
+<span class="lineNum">     217 </span><span class="lineNoCov">          0 :   return m_element_tp.get_array_properties();</span>
+<a name="218"><span class="lineNum">     218 </span>            : }</a>
+<span class="lineNum">     219 </span>            : 
+<span class="lineNum">     220 </span><span class="lineNoCov">          0 : std::map&lt;std::string, nd::callable&gt; ndt::fixed_dim_kind_type::get_dynamic_array_functions() const</span>
+<span class="lineNum">     221 </span>            : {
+<span class="lineNum">     222 </span><span class="lineNoCov">          0 :   return m_element_tp.get_array_functions();</span>
+<span class="lineNum">     223 </span>            : }
+<span class="lineNum">     224 </span>            : 
+<span class="lineNum">     225 </span>            : namespace {
+<a name="226"><span class="lineNum">     226 </span>            : // TODO: use the PP meta stuff, but DYND_PP_LEN_MAX is set to 8 right now,</a>
+<span class="lineNum">     227 </span>            : // would need to be 19
+<span class="lineNum">     228 </span><span class="lineCov">          1 : struct static_strided_dims {</span>
+<span class="lineNum">     229 </span>            :   ndt::fixed_dim_kind_type bt1;
+<span class="lineNum">     230 </span>            :   ndt::fixed_dim_kind_type bt2;
+<span class="lineNum">     231 </span>            :   ndt::fixed_dim_kind_type bt3;
+<span class="lineNum">     232 </span>            :   ndt::fixed_dim_kind_type bt4;
+<span class="lineNum">     233 </span>            :   ndt::fixed_dim_kind_type bt5;
+<span class="lineNum">     234 </span>            :   ndt::fixed_dim_kind_type bt6;
+<span class="lineNum">     235 </span>            :   ndt::fixed_dim_kind_type bt7;
+<span class="lineNum">     236 </span>            :   ndt::fixed_dim_kind_type bt8;
+<span class="lineNum">     237 </span>            :   ndt::fixed_dim_kind_type bt9;
+<span class="lineNum">     238 </span>            :   ndt::fixed_dim_kind_type bt10;
+<span class="lineNum">     239 </span>            :   ndt::fixed_dim_kind_type bt11;
+<span class="lineNum">     240 </span>            :   ndt::fixed_dim_kind_type bt12;
+<span class="lineNum">     241 </span>            :   ndt::fixed_dim_kind_type bt13;
+<span class="lineNum">     242 </span>            :   ndt::fixed_dim_kind_type bt14;
+<span class="lineNum">     243 </span>            :   ndt::fixed_dim_kind_type bt15;
+<span class="lineNum">     244 </span>            :   ndt::fixed_dim_kind_type bt16;
+<span class="lineNum">     245 </span>            :   ndt::fixed_dim_kind_type bt17;
+<span class="lineNum">     246 </span>            :   ndt::fixed_dim_kind_type bt18;
+<span class="lineNum">     247 </span>            : 
+<a name="248"><span class="lineNum">     248 </span>            :   ndt::type static_builtins_instance[builtin_id_count];</a>
+<span class="lineNum">     249 </span>            : 
+<span class="lineNum">     250 </span><span class="lineCov">          1 :   static_strided_dims()</span>
+<span class="lineNum">     251 </span>            :       : bt1(ndt::type((type_id_t)1)), bt2(ndt::type((type_id_t)2)), bt3(ndt::type((type_id_t)3)),
+<span class="lineNum">     252 </span>            :         bt4(ndt::type((type_id_t)4)), bt5(ndt::type((type_id_t)5)), bt6(ndt::type((type_id_t)6)),
+<span class="lineNum">     253 </span>            :         bt7(ndt::type((type_id_t)7)), bt8(ndt::type((type_id_t)8)), bt9(ndt::type((type_id_t)9)),
+<span class="lineNum">     254 </span>            :         bt10(ndt::type((type_id_t)10)), bt11(ndt::type((type_id_t)11)), bt12(ndt::type((type_id_t)12)),
+<span class="lineNum">     255 </span>            :         bt13(ndt::type((type_id_t)13)), bt14(ndt::type((type_id_t)14)), bt15(ndt::type((type_id_t)15)),
+<span class="lineNum">     256 </span><span class="lineCov">          1 :         bt16(ndt::type((type_id_t)16)), bt17(ndt::type((type_id_t)17)), bt18(ndt::type((type_id_t)18))</span>
+<span class="lineNum">     257 </span>            :   {
+<span class="lineNum">     258 </span><span class="lineCov">          1 :     static_builtins_instance[1] = ndt::type(&amp;bt1, true);</span>
+<span class="lineNum">     259 </span><span class="lineCov">          1 :     static_builtins_instance[2] = ndt::type(&amp;bt2, true);</span>
+<span class="lineNum">     260 </span><span class="lineCov">          1 :     static_builtins_instance[3] = ndt::type(&amp;bt3, true);</span>
+<span class="lineNum">     261 </span><span class="lineCov">          1 :     static_builtins_instance[4] = ndt::type(&amp;bt4, true);</span>
+<span class="lineNum">     262 </span><span class="lineCov">          1 :     static_builtins_instance[5] = ndt::type(&amp;bt5, true);</span>
+<span class="lineNum">     263 </span><span class="lineCov">          1 :     static_builtins_instance[6] = ndt::type(&amp;bt6, true);</span>
+<span class="lineNum">     264 </span><span class="lineCov">          1 :     static_builtins_instance[7] = ndt::type(&amp;bt7, true);</span>
+<span class="lineNum">     265 </span><span class="lineCov">          1 :     static_builtins_instance[8] = ndt::type(&amp;bt8, true);</span>
+<span class="lineNum">     266 </span><span class="lineCov">          1 :     static_builtins_instance[9] = ndt::type(&amp;bt9, true);</span>
+<span class="lineNum">     267 </span><span class="lineCov">          1 :     static_builtins_instance[10] = ndt::type(&amp;bt10, true);</span>
+<span class="lineNum">     268 </span><span class="lineCov">          1 :     static_builtins_instance[11] = ndt::type(&amp;bt11, true);</span>
+<span class="lineNum">     269 </span><span class="lineCov">          1 :     static_builtins_instance[12] = ndt::type(&amp;bt12, true);</span>
+<span class="lineNum">     270 </span><span class="lineCov">          1 :     static_builtins_instance[13] = ndt::type(&amp;bt13, true);</span>
+<span class="lineNum">     271 </span><span class="lineCov">          1 :     static_builtins_instance[14] = ndt::type(&amp;bt14, true);</span>
+<span class="lineNum">     272 </span><span class="lineCov">          1 :     static_builtins_instance[15] = ndt::type(&amp;bt15, true);</span>
+<span class="lineNum">     273 </span><span class="lineCov">          1 :     static_builtins_instance[16] = ndt::type(&amp;bt16, true);</span>
+<span class="lineNum">     274 </span><span class="lineCov">          1 :     static_builtins_instance[17] = ndt::type(&amp;bt17, true);</span>
+<span class="lineNum">     275 </span><span class="lineCov">          1 :     static_builtins_instance[18] = ndt::type(&amp;bt18, true);</span>
+<span class="lineNum">     276 </span><span class="lineCov">          1 :   }</span>
+<span class="lineNum">     277 </span>            : };
+<a name="278"><span class="lineNum">     278 </span>            : } // anonymous namespace</a>
+<span class="lineNum">     279 </span>            : 
+<span class="lineNum">     280 </span><span class="lineCov">        172 : ndt::type ndt::make_fixed_dim_kind(const type &amp;element_tp)</span>
+<span class="lineNum">     281 </span>            : {
+<span class="lineNum">     282 </span>            :   // Static instances of the types, which have a reference
+<span class="lineNum">     283 </span>            :   // count &gt; 0 for the lifetime of the program. This static
+<span class="lineNum">     284 </span>            :   // construction is inside a function to ensure correct creation
+<span class="lineNum">     285 </span>            :   // order during startup.
+<span class="lineNum">     286 </span><span class="lineCov">        172 :   static static_strided_dims ssd;</span>
+<span class="lineNum">     287 </span>            : 
+<span class="lineNum">     288 </span><span class="lineCov">        172 :   if (element_tp.is_builtin()) {</span>
+<span class="lineNum">     289 </span><span class="lineCov">        120 :     return ssd.static_builtins_instance[element_tp.get_id()];</span>
+<span class="lineNum">     290 </span>            :   }
+<span class="lineNum">     291 </span>            :   else {
+<span class="lineNum">     292 </span><span class="lineCov">         52 :     return type(new fixed_dim_kind_type(element_tp), false);</span>
+<span class="lineNum">     293 </span>            :   }
+<a name="294"><span class="lineNum">     294 </span>            : }</a>
+<span class="lineNum">     295 </span>            : 
+<span class="lineNum">     296 </span><span class="lineNoCov">          0 : ndt::type ndt::fixed_dim_kind_type::with_element_type(const type &amp;element_tp) const</span>
+<a name="297"><span class="lineNum">     297 </span>            : {</a>
+<span class="lineNum">     298 </span><span class="lineNoCov">          0 :   return make_fixed_dim_kind(element_tp);</span>
+<span class="lineNum">     299 </span><span class="lineCov">          3 : }</span>
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.10</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

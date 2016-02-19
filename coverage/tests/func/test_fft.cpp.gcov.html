@@ -1,0 +1,919 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - coverage.info.cleaned - tests/func/test_fft.cpp</title>
+  <link rel="stylesheet" type="text/css" href="../../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../../index.html">top level</a> - <a href="index.html">tests/func</a> - test_fft.cpp<span style="font-size: 80%;"> (source / <a href="test_fft.cpp.func.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">coverage.info.cleaned</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">1</td>
+            <td class="headerCovTableEntry">1</td>
+            <td class="headerCovTableEntryHi">100.0 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2016-02-19</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">2</td>
+            <td class="headerCovTableEntry">2</td>
+            <td class="headerCovTableEntryHi">100.0 %</td>
+          </tr>
+          <tr><td><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : //</a>
+<span class="lineNum">       2 </span>            : // Copyright (C) 2011-15 DyND Developers
+<span class="lineNum">       3 </span>            : // BSD 2-Clause License, see LICENSE.txt
+<span class="lineNum">       4 </span>            : //
+<span class="lineNum">       5 </span>            : 
+<span class="lineNum">       6 </span>            : #include &lt;iostream&gt;
+<span class="lineNum">       7 </span>            : #include &lt;stdexcept&gt;
+<span class="lineNum">       8 </span>            : #include &lt;algorithm&gt;
+<span class="lineNum">       9 </span>            : #include &lt;cmath&gt;
+<span class="lineNum">      10 </span>            : 
+<span class="lineNum">      11 </span>            : #include &quot;inc_gtest.hpp&quot;
+<span class="lineNum">      12 </span>            : #include &quot;dynd_assertions.hpp&quot;
+<span class="lineNum">      13 </span>            : 
+<span class="lineNum">      14 </span>            : #include &lt;dynd/func/fft.hpp&gt;
+<span class="lineNum">      15 </span>            : #include &lt;dynd/func/random.hpp&gt;
+<a name="16"><span class="lineNum">      16 </span>            : </a>
+<span class="lineNum">      17 </span>            : using namespace std;
+<span class="lineNum">      18 </span><span class="lineCov">          3 : using namespace dynd;</span>
+<span class="lineNum">      19 </span>            : 
+<span class="lineNum">      20 </span>            : #ifdef DYND_FFTW
+<span class="lineNum">      21 </span>            : 
+<span class="lineNum">      22 </span>            : class FFT1D : public ::testing::TestWithParam&lt;std::tr1::tuple&lt;const char *, const char *, const char *&gt;&gt; {
+<span class="lineNum">      23 </span>            : 
+<span class="lineNum">      24 </span>            : public:
+<span class="lineNum">      25 </span>            :   ndt::type GetParam() const
+<span class="lineNum">      26 </span>            :   {
+<span class="lineNum">      27 </span>            :     ndt::type concrete_tp = ndt::type(std::tr1::get&lt;1&gt;(
+<span class="lineNum">      28 </span>            :         ::testing::TestWithParam&lt;std::tr1::tuple&lt;const char *, const char *, const char *&gt;&gt;::GetParam()));
+<span class="lineNum">      29 </span>            :     ndt::type pattern_tp = ndt::type(std::tr1::get&lt;0&gt;(
+<span class="lineNum">      30 </span>            :         ::testing::TestWithParam&lt;std::tr1::tuple&lt;const char *, const char *, const char *&gt;&gt;::GetParam()));
+<span class="lineNum">      31 </span>            :     ndt::type dtp = ndt::type(std::tr1::get&lt;2&gt;(
+<span class="lineNum">      32 </span>            :         ::testing::TestWithParam&lt;std::tr1::tuple&lt;const char *, const char *, const char *&gt;&gt;::GetParam()));
+<span class="lineNum">      33 </span>            : 
+<span class="lineNum">      34 </span>            :     if (pattern_tp == ndt::type(&quot;T&quot;)) {
+<span class="lineNum">      35 </span>            :       std::map&lt;std::string, ndt::type&gt; tp_vars;
+<span class="lineNum">      36 </span>            :       tp_vars[&quot;R&quot;] = dtp;
+<span class="lineNum">      37 </span>            : 
+<span class="lineNum">      38 </span>            :       return ndt::substitute(concrete_tp, tp_vars, true);
+<span class="lineNum">      39 </span>            :     }
+<span class="lineNum">      40 </span>            : 
+<span class="lineNum">      41 </span>            : #ifdef DYND_CUDA
+<span class="lineNum">      42 </span>            :     if (pattern_tp == ndt::type(&quot;cuda_device[T]&quot;)) {
+<span class="lineNum">      43 </span>            :       std::map&lt;std::string, ndt::type&gt; tp_vars;
+<span class="lineNum">      44 </span>            :       tp_vars[&quot;R&quot;] = dtp;
+<span class="lineNum">      45 </span>            : 
+<span class="lineNum">      46 </span>            :       return ndt::substitute(ndt::make_cuda_device(concrete_tp), tp_vars, true);
+<span class="lineNum">      47 </span>            :     }
+<span class="lineNum">      48 </span>            : #endif
+<span class="lineNum">      49 </span>            : 
+<span class="lineNum">      50 </span>            :     throw std::runtime_error(&quot;error&quot;);
+<span class="lineNum">      51 </span>            :   }
+<span class="lineNum">      52 </span>            : };
+<span class="lineNum">      53 </span>            : 
+<span class="lineNum">      54 </span>            : class FFT2D : public ::testing::TestWithParam&lt;std::tr1::tuple&lt;const char *, const char *, const char *&gt;&gt; {
+<span class="lineNum">      55 </span>            : 
+<span class="lineNum">      56 </span>            : public:
+<span class="lineNum">      57 </span>            :   ndt::type GetParam() const
+<span class="lineNum">      58 </span>            :   {
+<span class="lineNum">      59 </span>            :     ndt::type concrete_tp = ndt::type(std::tr1::get&lt;1&gt;(
+<span class="lineNum">      60 </span>            :         ::testing::TestWithParam&lt;std::tr1::tuple&lt;const char *, const char *, const char *&gt;&gt;::GetParam()));
+<span class="lineNum">      61 </span>            :     ndt::type pattern_tp = ndt::type(std::tr1::get&lt;0&gt;(
+<span class="lineNum">      62 </span>            :         ::testing::TestWithParam&lt;std::tr1::tuple&lt;const char *, const char *, const char *&gt;&gt;::GetParam()));
+<span class="lineNum">      63 </span>            :     ndt::type dtp = ndt::type(std::tr1::get&lt;2&gt;(
+<span class="lineNum">      64 </span>            :         ::testing::TestWithParam&lt;std::tr1::tuple&lt;const char *, const char *, const char *&gt;&gt;::GetParam()));
+<span class="lineNum">      65 </span>            : 
+<span class="lineNum">      66 </span>            :     if (pattern_tp == ndt::type(&quot;T&quot;)) {
+<span class="lineNum">      67 </span>            :       std::map&lt;std::string, ndt::type&gt; tp_vars;
+<span class="lineNum">      68 </span>            :       tp_vars[&quot;R&quot;] = dtp;
+<span class="lineNum">      69 </span>            : 
+<span class="lineNum">      70 </span>            :       return ndt::substitute(concrete_tp, tp_vars, true);
+<span class="lineNum">      71 </span>            :     }
+<span class="lineNum">      72 </span>            : 
+<span class="lineNum">      73 </span>            : #ifdef DYND_CUDA
+<span class="lineNum">      74 </span>            :     if (pattern_tp == ndt::type(&quot;cuda_device[T]&quot;)) {
+<span class="lineNum">      75 </span>            :       std::map&lt;std::string, ndt::type&gt; tp_vars;
+<span class="lineNum">      76 </span>            :       tp_vars[&quot;R&quot;] = dtp;
+<span class="lineNum">      77 </span>            : 
+<span class="lineNum">      78 </span>            :       return ndt::substitute(ndt::make_cuda_device(concrete_tp), tp_vars, true);
+<span class="lineNum">      79 </span>            :     }
+<span class="lineNum">      80 </span>            : #endif
+<span class="lineNum">      81 </span>            : 
+<span class="lineNum">      82 </span>            :     throw std::runtime_error(&quot;error&quot;);
+<span class="lineNum">      83 </span>            :   }
+<span class="lineNum">      84 </span>            : };
+<span class="lineNum">      85 </span>            : 
+<span class="lineNum">      86 </span>            : /*
+<span class="lineNum">      87 </span>            : template &lt;typename T&gt;
+<span class="lineNum">      88 </span>            : class FFT1D;
+<span class="lineNum">      89 </span>            : 
+<span class="lineNum">      90 </span>            : template &lt;typename T, int N&gt;
+<span class="lineNum">      91 </span>            : class FFT1D&lt;dynd::complex&lt;T&gt; [N]&gt; : public ::testing::Test {
+<span class="lineNum">      92 </span>            : public:
+<span class="lineNum">      93 </span>            :   typedef T RealType;
+<span class="lineNum">      94 </span>            :   typedef dynd::complex&lt;T&gt; ComplexType;
+<span class="lineNum">      95 </span>            : 
+<span class="lineNum">      96 </span>            :   static const intptr_t SrcShape[1];
+<span class="lineNum">      97 </span>            :   static const intptr_t SrcSize;
+<span class="lineNum">      98 </span>            :   typedef ComplexType SrcType;
+<span class="lineNum">      99 </span>            : 
+<span class="lineNum">     100 </span>            :   static const intptr_t DstShape[1];
+<span class="lineNum">     101 </span>            :   static const intptr_t DstSize;
+<span class="lineNum">     102 </span>            :   typedef ComplexType DstType;
+<span class="lineNum">     103 </span>            : };
+<span class="lineNum">     104 </span>            : 
+<span class="lineNum">     105 </span>            : template &lt;typename T, int N&gt;
+<span class="lineNum">     106 </span>            : const intptr_t FFT1D&lt;dynd::complex&lt;T&gt; [N]&gt;::SrcShape[1] = {N};
+<span class="lineNum">     107 </span>            : 
+<span class="lineNum">     108 </span>            : template &lt;typename T, int N&gt;
+<span class="lineNum">     109 </span>            : const intptr_t FFT1D&lt;dynd::complex&lt;T&gt; [N]&gt;::SrcSize = SrcShape[0];
+<span class="lineNum">     110 </span>            : 
+<span class="lineNum">     111 </span>            : template &lt;typename T, int N&gt;
+<span class="lineNum">     112 </span>            : const intptr_t FFT1D&lt;dynd::complex&lt;T&gt; [N]&gt;::DstShape[1] = {N};
+<span class="lineNum">     113 </span>            : 
+<span class="lineNum">     114 </span>            : template &lt;typename T, int N&gt;
+<span class="lineNum">     115 </span>            : const intptr_t FFT1D&lt;dynd::complex&lt;T&gt; [N]&gt;::DstSize = DstShape[0];
+<span class="lineNum">     116 </span>            : 
+<span class="lineNum">     117 </span>            : TYPED_TEST_CASE_P(FFT1D);
+<span class="lineNum">     118 </span>            : */
+<span class="lineNum">     119 </span>            : 
+<span class="lineNum">     120 </span>            : template &lt;typename T&gt;
+<span class="lineNum">     121 </span>            : class RFFT1D;
+<span class="lineNum">     122 </span>            : 
+<span class="lineNum">     123 </span>            : template &lt;typename T, int N&gt;
+<span class="lineNum">     124 </span>            : class RFFT1D&lt;T[N]&gt; : public ::testing::Test {
+<span class="lineNum">     125 </span>            : public:
+<span class="lineNum">     126 </span>            :   typedef T RealType;
+<span class="lineNum">     127 </span>            :   typedef dynd::complex&lt;T&gt; ComplexType;
+<span class="lineNum">     128 </span>            : 
+<span class="lineNum">     129 </span>            :   static const intptr_t SrcShape[1];
+<span class="lineNum">     130 </span>            :   static const intptr_t SrcSize;
+<span class="lineNum">     131 </span>            :   typedef RealType SrcType;
+<span class="lineNum">     132 </span>            : 
+<span class="lineNum">     133 </span>            :   static const intptr_t DstShape[1];
+<span class="lineNum">     134 </span>            :   static const intptr_t DstSize;
+<span class="lineNum">     135 </span>            :   typedef ComplexType DstType;
+<span class="lineNum">     136 </span>            : };
+<span class="lineNum">     137 </span>            : 
+<span class="lineNum">     138 </span>            : template &lt;typename T, int N&gt;
+<span class="lineNum">     139 </span>            : const intptr_t RFFT1D&lt;T[N]&gt;::SrcShape[1] = {N};
+<span class="lineNum">     140 </span>            : 
+<span class="lineNum">     141 </span>            : template &lt;typename T, int N&gt;
+<span class="lineNum">     142 </span>            : const intptr_t RFFT1D&lt;T[N]&gt;::SrcSize = SrcShape[0];
+<span class="lineNum">     143 </span>            : 
+<span class="lineNum">     144 </span>            : template &lt;typename T, int N&gt;
+<span class="lineNum">     145 </span>            : const intptr_t RFFT1D&lt;T[N]&gt;::DstShape[1] = {N / 2 + 1};
+<span class="lineNum">     146 </span>            : 
+<span class="lineNum">     147 </span>            : template &lt;typename T, int N&gt;
+<span class="lineNum">     148 </span>            : const intptr_t RFFT1D&lt;T[N]&gt;::DstSize = DstShape[0];
+<span class="lineNum">     149 </span>            : 
+<span class="lineNum">     150 </span>            : TYPED_TEST_CASE_P(RFFT1D);
+<span class="lineNum">     151 </span>            : 
+<span class="lineNum">     152 </span>            : template &lt;typename T&gt;
+<span class="lineNum">     153 </span>            : struct FixedDim1D {
+<span class="lineNum">     154 </span>            :   typedef testing::Types&lt;T[4], T[8], T[17], T[25], T[64], T[76], T[99], T[128], T[203], T[256], T[512]&gt; Types;
+<span class="lineNum">     155 </span>            : };
+<span class="lineNum">     156 </span>            : 
+<span class="lineNum">     157 </span>            : template &lt;typename T&gt;
+<span class="lineNum">     158 </span>            : class RFFT2D;
+<span class="lineNum">     159 </span>            : 
+<span class="lineNum">     160 </span>            : template &lt;typename T, int M, int N&gt;
+<span class="lineNum">     161 </span>            : class RFFT2D&lt;T[M][N]&gt; : public ::testing::Test {
+<span class="lineNum">     162 </span>            : public:
+<span class="lineNum">     163 </span>            :   typedef T RealType;
+<span class="lineNum">     164 </span>            :   typedef dynd::complex&lt;T&gt; ComplexType;
+<span class="lineNum">     165 </span>            : 
+<span class="lineNum">     166 </span>            :   static const intptr_t SrcShape[2];
+<span class="lineNum">     167 </span>            :   static const intptr_t SrcSize;
+<span class="lineNum">     168 </span>            :   typedef RealType SrcType;
+<span class="lineNum">     169 </span>            : 
+<span class="lineNum">     170 </span>            :   static const intptr_t DstShape[2];
+<span class="lineNum">     171 </span>            :   static const intptr_t DstSize;
+<span class="lineNum">     172 </span>            :   typedef ComplexType DstType;
+<span class="lineNum">     173 </span>            : };
+<span class="lineNum">     174 </span>            : 
+<span class="lineNum">     175 </span>            : template &lt;typename T, int M, int N&gt;
+<span class="lineNum">     176 </span>            : const intptr_t RFFT2D&lt;T[M][N]&gt;::SrcShape[2] = {M, N};
+<span class="lineNum">     177 </span>            : 
+<span class="lineNum">     178 </span>            : template &lt;typename T, int M, int N&gt;
+<span class="lineNum">     179 </span>            : const intptr_t RFFT2D&lt;T[M][N]&gt;::SrcSize = SrcShape[0] * SrcShape[1];
+<span class="lineNum">     180 </span>            : 
+<span class="lineNum">     181 </span>            : template &lt;typename T, int M, int N&gt;
+<span class="lineNum">     182 </span>            : const intptr_t RFFT2D&lt;T[M][N]&gt;::DstShape[2] = {M, N / 2 + 1};
+<span class="lineNum">     183 </span>            : 
+<span class="lineNum">     184 </span>            : template &lt;typename T, int M, int N&gt;
+<span class="lineNum">     185 </span>            : const intptr_t RFFT2D&lt;T[M][N]&gt;::DstSize = DstShape[0] * DstShape[1];
+<span class="lineNum">     186 </span>            : 
+<span class="lineNum">     187 </span>            : TYPED_TEST_CASE_P(RFFT2D);
+<span class="lineNum">     188 </span>            : 
+<span class="lineNum">     189 </span>            : template &lt;typename T&gt;
+<span class="lineNum">     190 </span>            : struct FixedDim2D {
+<span class="lineNum">     191 </span>            :   typedef testing::Types&lt;T[4][4], T[8][8], T[17][25], T[64][64], T[76][14], T[128][128], T[203][99], T[256][256],
+<span class="lineNum">     192 </span>            :                          T[512][512]&gt; Types;
+<span class="lineNum">     193 </span>            : };
+<span class="lineNum">     194 </span>            : 
+<span class="lineNum">     195 </span>            : template &lt;typename T&gt;
+<span class="lineNum">     196 </span>            : T rel_err_max();
+<span class="lineNum">     197 </span>            : 
+<span class="lineNum">     198 </span>            : template &lt;&gt;
+<span class="lineNum">     199 </span>            : inline float rel_err_max&lt;float&gt;()
+<span class="lineNum">     200 </span>            : {
+<span class="lineNum">     201 </span>            :   return 1E-4f;
+<span class="lineNum">     202 </span>            : }
+<span class="lineNum">     203 </span>            : 
+<span class="lineNum">     204 </span>            : template &lt;&gt;
+<span class="lineNum">     205 </span>            : inline double rel_err_max&lt;double&gt;()
+<span class="lineNum">     206 </span>            : {
+<span class="lineNum">     207 </span>            :   return 1E-8;
+<span class="lineNum">     208 </span>            : }
+<span class="lineNum">     209 </span>            : 
+<span class="lineNum">     210 </span>            : TEST_P(FFT1D, Linear)
+<span class="lineNum">     211 </span>            : {
+<span class="lineNum">     212 </span>            :   const ndt::type &amp;tp = GetParam();
+<span class="lineNum">     213 </span>            : 
+<span class="lineNum">     214 </span>            :   nd::array x0 = nd::random::uniform({}, {{&quot;dst_tp&quot;, tp}});
+<span class="lineNum">     215 </span>            :   nd::array x1 = nd::random::uniform({}, {{&quot;dst_tp&quot;, tp}});
+<span class="lineNum">     216 </span>            :   nd::array x = x0 + x1;
+<span class="lineNum">     217 </span>            : 
+<span class="lineNum">     218 </span>            :   nd::array y0 = nd::fft(x0);
+<span class="lineNum">     219 </span>            :   nd::array y1 = nd::fft(x1);
+<span class="lineNum">     220 </span>            :   nd::array y = nd::fft(x);
+<span class="lineNum">     221 </span>            : 
+<span class="lineNum">     222 </span>            : #ifdef DYND_CUDA
+<span class="lineNum">     223 </span>            :   y0 = y0.to_host();
+<span class="lineNum">     224 </span>            :   y1 = y1.to_host();
+<span class="lineNum">     225 </span>            :   y = y.to_host();
+<span class="lineNum">     226 </span>            : #endif
+<span class="lineNum">     227 </span>            : 
+<span class="lineNum">     228 </span>            :   EXPECT_ARRAY_NEAR(y0 + y1, y, rel_err_max&lt;double&gt;());
+<span class="lineNum">     229 </span>            : }
+<span class="lineNum">     230 </span>            : 
+<span class="lineNum">     231 </span>            : TEST_P(FFT1D, Inverse)
+<span class="lineNum">     232 </span>            : {
+<span class="lineNum">     233 </span>            :   const ndt::type &amp;tp = GetParam();
+<span class="lineNum">     234 </span>            : 
+<span class="lineNum">     235 </span>            :   nd::array x = nd::random::uniform({}, {{&quot;dst_tp&quot;, tp}});
+<span class="lineNum">     236 </span>            : 
+<span class="lineNum">     237 </span>            :   nd::array y = nd::ifft(nd::fft(x));
+<span class="lineNum">     238 </span>            : 
+<span class="lineNum">     239 </span>            : #ifdef DYND_CUDA
+<span class="lineNum">     240 </span>            :   x = x.to_host();
+<span class="lineNum">     241 </span>            :   y = y.to_host();
+<span class="lineNum">     242 </span>            : #endif
+<span class="lineNum">     243 </span>            : 
+<span class="lineNum">     244 </span>            :   EXPECT_ARRAY_NEAR(x, y / y.get_dim_size(), rel_err_max&lt;double&gt;());
+<span class="lineNum">     245 </span>            : }
+<span class="lineNum">     246 </span>            : 
+<span class="lineNum">     247 </span>            : /*
+<span class="lineNum">     248 </span>            : 
+<span class="lineNum">     249 </span>            : TYPED_TEST_P(FFT1D, Zeros)
+<span class="lineNum">     250 </span>            : {
+<span class="lineNum">     251 </span>            :   nd::array x = nd::zeros(TestFixture::SrcShape[0],
+<span class="lineNum">     252 </span>            :                           ndt::make_type&lt;typename TestFixture::SrcType&gt;());
+<span class="lineNum">     253 </span>            : 
+<span class="lineNum">     254 </span>            :   nd::array y = nd::fft(x);
+<span class="lineNum">     255 </span>            : 
+<span class="lineNum">     256 </span>            :   EXPECT_ARRAY_NEAR(dynd::complex&lt;double&gt;(0.0), y, rel_err_max&lt;double&gt;());
+<span class="lineNum">     257 </span>            : }
+<span class="lineNum">     258 </span>            : */
+<span class="lineNum">     259 </span>            : 
+<span class="lineNum">     260 </span>            : /*
+<span class="lineNum">     261 </span>            : TYPED_TEST_P(FFT1D, Ones)
+<span class="lineNum">     262 </span>            : {
+<span class="lineNum">     263 </span>            :   nd::array x = nd::ones(TestFixture::SrcShape[0],
+<span class="lineNum">     264 </span>            :                          ndt::make_type&lt;typename TestFixture::SrcType&gt;());
+<span class="lineNum">     265 </span>            : 
+<span class="lineNum">     266 </span>            :   nd::array y = nd::fft(x);
+<span class="lineNum">     267 </span>            :   for (int i = 0; i &lt; TestFixture::DstShape[0]; ++i) {
+<span class="lineNum">     268 </span>            :     if (i == 0) {
+<span class="lineNum">     269 </span>            :       EXPECT_EQ_RELERR(TestFixture::SrcSize,
+<span class="lineNum">     270 </span>            :                        y(i).as&lt;typename TestFixture::DstType&gt;(),
+<span class="lineNum">     271 </span>            :                        rel_err_max&lt;typename TestFixture::RealType&gt;());
+<span class="lineNum">     272 </span>            :     } else {
+<span class="lineNum">     273 </span>            :       EXPECT_EQ_RELERR(0, y(i).as&lt;typename TestFixture::DstType&gt;(),
+<span class="lineNum">     274 </span>            :                        rel_err_max&lt;typename TestFixture::RealType&gt;());
+<span class="lineNum">     275 </span>            :     }
+<span class="lineNum">     276 </span>            :   }
+<span class="lineNum">     277 </span>            : }
+<span class="lineNum">     278 </span>            : 
+<span class="lineNum">     279 </span>            : TYPED_TEST_P(FFT1D, KroneckerDelta)
+<span class="lineNum">     280 </span>            : {
+<span class="lineNum">     281 </span>            :   // Only continue if each dimension is divisible by 2
+<span class="lineNum">     282 </span>            :   if ((TestFixture::SrcShape[0] % 2) != 0) {
+<span class="lineNum">     283 </span>            :     return;
+<span class="lineNum">     284 </span>            :   }
+<span class="lineNum">     285 </span>            : 
+<span class="lineNum">     286 </span>            :   nd::array x = nd::zeros(TestFixture::SrcShape[0],
+<span class="lineNum">     287 </span>            :                           ndt::make_type&lt;typename TestFixture::SrcType&gt;());
+<span class="lineNum">     288 </span>            :   x(TestFixture::SrcShape[0] / 2).vals() = 1;
+<span class="lineNum">     289 </span>            : 
+<span class="lineNum">     290 </span>            :   nd::array y = nd::fft(x);
+<span class="lineNum">     291 </span>            : 
+<span class="lineNum">     292 </span>            :   for (int i = 0; i &lt; TestFixture::DstShape[0]; ++i) {
+<span class="lineNum">     293 </span>            :     EXPECT_EQ_RELERR(pow(static_cast&lt;typename TestFixture::RealType&gt;(-1), i),
+<span class="lineNum">     294 </span>            :                      y(i).as&lt;typename TestFixture::DstType&gt;(),
+<span class="lineNum">     295 </span>            :                      rel_err_max&lt;typename TestFixture::RealType&gt;());
+<span class="lineNum">     296 </span>            :   }
+<span class="lineNum">     297 </span>            : 
+<span class="lineNum">     298 </span>            :   // Only continue if each dimension is divisible by 4
+<span class="lineNum">     299 </span>            :   if ((TestFixture::SrcShape[0] % 4) != 0) {
+<span class="lineNum">     300 </span>            :     return;
+<span class="lineNum">     301 </span>            :   }
+<span class="lineNum">     302 </span>            : 
+<span class="lineNum">     303 </span>            :   y = nd::fft(x(irange().by(2)));
+<span class="lineNum">     304 </span>            :   for (int i = 0; i &lt; TestFixture::DstShape[0] / 2; ++i) {
+<span class="lineNum">     305 </span>            :     EXPECT_EQ_RELERR(pow(static_cast&lt;typename TestFixture::RealType&gt;(-1), i),
+<span class="lineNum">     306 </span>            :                      y(i).as&lt;typename TestFixture::DstType&gt;(),
+<span class="lineNum">     307 </span>            :                      rel_err_max&lt;typename TestFixture::RealType&gt;());
+<span class="lineNum">     308 </span>            :   }
+<span class="lineNum">     309 </span>            : }
+<span class="lineNum">     310 </span>            : */
+<span class="lineNum">     311 </span>            : 
+<span class="lineNum">     312 </span>            : TEST(FFT1D, Shift)
+<span class="lineNum">     313 </span>            : {
+<span class="lineNum">     314 </span>            :   double vals0[9] = {0.0, 1.0, 2.0, 3.0, 4.0, -4.0, -3.0, -2.0, -1.0};
+<span class="lineNum">     315 </span>            : 
+<span class="lineNum">     316 </span>            :   nd::array x0 = nd::empty(ndt::make_type&lt;double[9]&gt;());
+<span class="lineNum">     317 </span>            :   x0.vals() = vals0;
+<span class="lineNum">     318 </span>            : 
+<span class="lineNum">     319 </span>            :   nd::array y0 = nd::fftshift(x0);
+<span class="lineNum">     320 </span>            :   EXPECT_JSON_EQ_ARR(&quot;[-4, -3, -2, -1, 0, 1, 2, 3, 4]&quot;, y0);
+<span class="lineNum">     321 </span>            : 
+<span class="lineNum">     322 </span>            :   y0 = nd::ifftshift(y0);
+<span class="lineNum">     323 </span>            :   EXPECT_ARRAY_EQ(x0, y0);
+<span class="lineNum">     324 </span>            : 
+<span class="lineNum">     325 </span>            :   double vals1[10] = {0.0, 1.0, 2.0, 3.0, 4.0, -5.0, -4.0, -3.0, -2.0, -1.0};
+<span class="lineNum">     326 </span>            : 
+<span class="lineNum">     327 </span>            :   nd::array x1 = nd::empty(ndt::make_type&lt;double[10]&gt;());
+<span class="lineNum">     328 </span>            :   x1.vals() = vals1;
+<span class="lineNum">     329 </span>            : 
+<span class="lineNum">     330 </span>            :   nd::array y1 = nd::fftshift(x1);
+<span class="lineNum">     331 </span>            :   EXPECT_JSON_EQ_ARR(&quot;[-5, -4, -3, -2, -1, 0, 1, 2, 3, 4]&quot;, y1);
+<span class="lineNum">     332 </span>            : 
+<span class="lineNum">     333 </span>            :   y1 = nd::ifftshift(y1);
+<span class="lineNum">     334 </span>            :   EXPECT_ARRAY_EQ(x1, y1);
+<span class="lineNum">     335 </span>            : }
+<span class="lineNum">     336 </span>            : 
+<span class="lineNum">     337 </span>            : /*
+<span class="lineNum">     338 </span>            : TYPED_TEST_P(RFFT1D, Linear)
+<span class="lineNum">     339 </span>            : {
+<span class="lineNum">     340 </span>            :   nd::array x0 = nd::rand(TestFixture::SrcShape[0],
+<span class="lineNum">     341 </span>            :                           ndt::make_type&lt;typename TestFixture::SrcType&gt;());
+<span class="lineNum">     342 </span>            :   nd::array x1 = nd::rand(TestFixture::SrcShape[0],
+<span class="lineNum">     343 </span>            :                           ndt::make_type&lt;typename TestFixture::SrcType&gt;());
+<span class="lineNum">     344 </span>            :   nd::array x = nd::empty(TestFixture::SrcShape[0],
+<span class="lineNum">     345 </span>            :                           ndt::make_type&lt;typename TestFixture::SrcType&gt;());
+<span class="lineNum">     346 </span>            :   x.vals() = x0 + x1;
+<span class="lineNum">     347 </span>            : 
+<span class="lineNum">     348 </span>            :   nd::array y0 = nd::rfft(x0);
+<span class="lineNum">     349 </span>            :   nd::array y1 = nd::rfft(x1);
+<span class="lineNum">     350 </span>            :   nd::array y = nd::rfft(x);
+<span class="lineNum">     351 </span>            : 
+<span class="lineNum">     352 </span>            :   for (int i = 0; i &lt; TestFixture::DstShape[0]; ++i) {
+<span class="lineNum">     353 </span>            :     EXPECT_EQ_RELERR(y0(i).as&lt;typename TestFixture::DstType&gt;() +
+<span class="lineNum">     354 </span>            :                          y1(i).as&lt;typename TestFixture::DstType&gt;(),
+<span class="lineNum">     355 </span>            :                      y(i).as&lt;typename TestFixture::DstType&gt;(),
+<span class="lineNum">     356 </span>            :                      rel_err_max&lt;typename TestFixture::RealType&gt;());
+<span class="lineNum">     357 </span>            :   }
+<span class="lineNum">     358 </span>            : }
+<span class="lineNum">     359 </span>            : 
+<span class="lineNum">     360 </span>            : TYPED_TEST_P(RFFT1D, Inverse)
+<span class="lineNum">     361 </span>            : {
+<span class="lineNum">     362 </span>            :   nd::array x = nd::rand(TestFixture::SrcShape[0],
+<span class="lineNum">     363 </span>            :                          ndt::make_type&lt;typename TestFixture::SrcType&gt;());
+<span class="lineNum">     364 </span>            : 
+<span class="lineNum">     365 </span>            :   nd::array y = irfft(nd::rfft(x), TestFixture::SrcShape[0]);
+<span class="lineNum">     366 </span>            :   for (int i = 0; i &lt; TestFixture::SrcShape[0]; ++i) {
+<span class="lineNum">     367 </span>            :     EXPECT_EQ_RELERR(x(i).as&lt;typename TestFixture::SrcType&gt;(),
+<span class="lineNum">     368 </span>            :                      y(i).as&lt;typename TestFixture::SrcType&gt;() /
+<span class="lineNum">     369 </span>            :                          TestFixture::SrcSize,
+<span class="lineNum">     370 </span>            :                      rel_err_max&lt;typename TestFixture::RealType&gt;());
+<span class="lineNum">     371 </span>            :   }
+<span class="lineNum">     372 </span>            : }
+<span class="lineNum">     373 </span>            : 
+<span class="lineNum">     374 </span>            : TYPED_TEST_P(RFFT1D, Zeros)
+<span class="lineNum">     375 </span>            : {
+<span class="lineNum">     376 </span>            :   nd::array x = nd::zeros(TestFixture::SrcShape[0],
+<span class="lineNum">     377 </span>            :                           ndt::make_type&lt;typename TestFixture::SrcType&gt;());
+<span class="lineNum">     378 </span>            : 
+<span class="lineNum">     379 </span>            :   nd::array y = nd::rfft(x);
+<span class="lineNum">     380 </span>            :   for (int i = 0; i &lt; TestFixture::DstShape[0]; ++i) {
+<span class="lineNum">     381 </span>            :     EXPECT_EQ(0, y(i).as&lt;typename TestFixture::DstType&gt;());
+<span class="lineNum">     382 </span>            :   }
+<span class="lineNum">     383 </span>            : }
+<span class="lineNum">     384 </span>            : 
+<span class="lineNum">     385 </span>            : TYPED_TEST_P(RFFT1D, Ones)
+<span class="lineNum">     386 </span>            : {
+<span class="lineNum">     387 </span>            :   nd::array x = nd::ones(TestFixture::SrcShape[0],
+<span class="lineNum">     388 </span>            :                          ndt::make_type&lt;typename TestFixture::SrcType&gt;());
+<span class="lineNum">     389 </span>            : 
+<span class="lineNum">     390 </span>            :   nd::array y = nd::rfft(x);
+<span class="lineNum">     391 </span>            :   for (int i = 0; i &lt; TestFixture::DstShape[0]; ++i) {
+<span class="lineNum">     392 </span>            :     if (i == 0) {
+<span class="lineNum">     393 </span>            :       EXPECT_EQ_RELERR(TestFixture::SrcSize,
+<span class="lineNum">     394 </span>            :                        y(i).as&lt;typename TestFixture::DstType&gt;(),
+<span class="lineNum">     395 </span>            :                        rel_err_max&lt;typename TestFixture::RealType&gt;());
+<span class="lineNum">     396 </span>            :     } else {
+<span class="lineNum">     397 </span>            :       EXPECT_EQ_RELERR(0, y(i).as&lt;typename TestFixture::DstType&gt;(),
+<span class="lineNum">     398 </span>            :                        rel_err_max&lt;typename TestFixture::RealType&gt;());
+<span class="lineNum">     399 </span>            :     }
+<span class="lineNum">     400 </span>            :   }
+<span class="lineNum">     401 </span>            : }
+<span class="lineNum">     402 </span>            : 
+<span class="lineNum">     403 </span>            : TYPED_TEST_P(RFFT1D, KroneckerDelta)
+<span class="lineNum">     404 </span>            : {
+<span class="lineNum">     405 </span>            :   // Only continue if each dimension is divisible by 2
+<span class="lineNum">     406 </span>            :   if ((TestFixture::SrcShape[0] % 2) != 0) {
+<span class="lineNum">     407 </span>            :     return;
+<span class="lineNum">     408 </span>            :   }
+<span class="lineNum">     409 </span>            : 
+<span class="lineNum">     410 </span>            :   nd::array x = nd::zeros(TestFixture::SrcShape[0],
+<span class="lineNum">     411 </span>            :                           ndt::make_type&lt;typename TestFixture::SrcType&gt;());
+<span class="lineNum">     412 </span>            :   x(TestFixture::SrcShape[0] / 2).vals() = 1;
+<span class="lineNum">     413 </span>            : 
+<span class="lineNum">     414 </span>            :   nd::array y = nd::rfft(x);
+<span class="lineNum">     415 </span>            :   for (int i = 0; i &lt; TestFixture::DstShape[0]; ++i) {
+<span class="lineNum">     416 </span>            :     EXPECT_EQ_RELERR(pow(static_cast&lt;typename TestFixture::RealType&gt;(-1), i),
+<span class="lineNum">     417 </span>            :                      y(i).as&lt;typename TestFixture::DstType&gt;(),
+<span class="lineNum">     418 </span>            :                      rel_err_max&lt;typename TestFixture::RealType&gt;());
+<span class="lineNum">     419 </span>            :   }
+<span class="lineNum">     420 </span>            : 
+<span class="lineNum">     421 </span>            :   // Only continue if each dimension is divisible by 4
+<span class="lineNum">     422 </span>            :   if ((TestFixture::SrcShape[0] % 4) != 0) {
+<span class="lineNum">     423 </span>            :     return;
+<span class="lineNum">     424 </span>            :   }
+<span class="lineNum">     425 </span>            : 
+<span class="lineNum">     426 </span>            :   y = nd::rfft(x(irange().by(2)));
+<span class="lineNum">     427 </span>            :   for (int i = 0; i &lt; TestFixture::DstShape[0] / 2; ++i) {
+<span class="lineNum">     428 </span>            :     EXPECT_EQ_RELERR(pow(static_cast&lt;typename TestFixture::RealType&gt;(-1), i),
+<span class="lineNum">     429 </span>            :                      y(i).as&lt;typename TestFixture::DstType&gt;(),
+<span class="lineNum">     430 </span>            :                      rel_err_max&lt;typename TestFixture::RealType&gt;());
+<span class="lineNum">     431 </span>            :   }
+<span class="lineNum">     432 </span>            : }
+<span class="lineNum">     433 </span>            : */
+<span class="lineNum">     434 </span>            : 
+<span class="lineNum">     435 </span>            : TEST_P(FFT2D, Linear)
+<span class="lineNum">     436 </span>            : {
+<span class="lineNum">     437 </span>            :   const ndt::type &amp;tp = GetParam();
+<span class="lineNum">     438 </span>            : 
+<span class="lineNum">     439 </span>            :   nd::array x0 = nd::random::uniform({}, {{&quot;dst_tp&quot;, tp}});
+<span class="lineNum">     440 </span>            :   nd::array x1 = nd::random::uniform({}, {{&quot;dst_tp&quot;, tp}});
+<span class="lineNum">     441 </span>            :   nd::array x = x0 + x1;
+<span class="lineNum">     442 </span>            : 
+<span class="lineNum">     443 </span>            :   nd::array y0 = nd::fft(x0);
+<span class="lineNum">     444 </span>            :   nd::array y1 = nd::fft(x1);
+<span class="lineNum">     445 </span>            :   nd::array y = nd::fft(x);
+<span class="lineNum">     446 </span>            : 
+<span class="lineNum">     447 </span>            :   EXPECT_ARRAY_NEAR(y0 + y1, y, rel_err_max&lt;double&gt;());
+<span class="lineNum">     448 </span>            : 
+<span class="lineNum">     449 </span>            :   vector&lt;intptr_t&gt; axes;
+<span class="lineNum">     450 </span>            :   axes.push_back(0);
+<span class="lineNum">     451 </span>            : 
+<span class="lineNum">     452 </span>            :   y0 = nd::fft({x0}, {{&quot;shape&quot;, x0.get_shape()}, {&quot;axes&quot;, axes}});
+<span class="lineNum">     453 </span>            :   y1 = nd::fft({x1}, {{&quot;shape&quot;, x1.get_shape()}, {&quot;axes&quot;, axes}});
+<span class="lineNum">     454 </span>            :   y = nd::fft({x}, {{&quot;shape&quot;, x.get_shape()}, {&quot;axes&quot;, axes}});
+<span class="lineNum">     455 </span>            : 
+<span class="lineNum">     456 </span>            :   EXPECT_ARRAY_NEAR(y0 + y1, y, rel_err_max&lt;double&gt;());
+<span class="lineNum">     457 </span>            : 
+<span class="lineNum">     458 </span>            :   if (tp.get_id() != cuda_device_id) {
+<span class="lineNum">     459 </span>            :     axes.clear();
+<span class="lineNum">     460 </span>            :     axes.push_back(1);
+<span class="lineNum">     461 </span>            : 
+<span class="lineNum">     462 </span>            :     y0 = nd::fft({x0}, {{&quot;shape&quot;, x0.get_shape()}, {&quot;axes&quot;, axes}});
+<span class="lineNum">     463 </span>            :     y1 = nd::fft({x1}, {{&quot;shape&quot;, x1.get_shape()}, {&quot;axes&quot;, axes}});
+<span class="lineNum">     464 </span>            :     y = nd::fft({x}, {{&quot;shape&quot;, x.get_shape()}, {&quot;axes&quot;, axes}});
+<span class="lineNum">     465 </span>            : 
+<span class="lineNum">     466 </span>            :     EXPECT_ARRAY_NEAR(y0 + y1, y, rel_err_max&lt;double&gt;());
+<span class="lineNum">     467 </span>            :   }
+<span class="lineNum">     468 </span>            : }
+<span class="lineNum">     469 </span>            : 
+<span class="lineNum">     470 </span>            : TEST_P(FFT2D, Inverse)
+<span class="lineNum">     471 </span>            : {
+<span class="lineNum">     472 </span>            :   const ndt::type &amp;tp = GetParam();
+<span class="lineNum">     473 </span>            : 
+<span class="lineNum">     474 </span>            :   nd::array x = nd::random::uniform({}, {{&quot;dst_tp&quot;, tp}});
+<span class="lineNum">     475 </span>            : 
+<span class="lineNum">     476 </span>            :   nd::array y = nd::ifft(nd::fft(x));
+<span class="lineNum">     477 </span>            : 
+<span class="lineNum">     478 </span>            : #ifdef DYND_CUDA
+<span class="lineNum">     479 </span>            :   x = x.to_host();
+<span class="lineNum">     480 </span>            :   y = y.to_host();
+<span class="lineNum">     481 </span>            : #endif
+<span class="lineNum">     482 </span>            : 
+<span class="lineNum">     483 </span>            :   EXPECT_ARRAY_NEAR(x, y / (y.get_dim_size(0) * y.get_dim_size(1)), rel_err_max&lt;double&gt;());
+<span class="lineNum">     484 </span>            : 
+<span class="lineNum">     485 </span>            :   /*
+<span class="lineNum">     486 </span>            :   #ifdef DYND_CUDA
+<span class="lineNum">     487 </span>            :     x = x.to_cuda_device();
+<span class="lineNum">     488 </span>            :     y = y.to_cuda_device();
+<span class="lineNum">     489 </span>            :   #endif
+<span class="lineNum">     490 </span>            :   */
+<span class="lineNum">     491 </span>            : 
+<span class="lineNum">     492 </span>            :   if (tp.get_id() != cuda_device_id) {
+<span class="lineNum">     493 </span>            : 
+<span class="lineNum">     494 </span>            :     vector&lt;intptr_t&gt; axes;
+<span class="lineNum">     495 </span>            :     axes.push_back(0);
+<span class="lineNum">     496 </span>            : 
+<span class="lineNum">     497 </span>            :     y = nd::ifft({nd::fft({x}, {{&quot;shape&quot;, x.get_shape()}, {&quot;axes&quot;, axes}})},
+<span class="lineNum">     498 </span>            :                  {{&quot;shape&quot;, y.get_shape()}, {&quot;axes&quot;, axes}});
+<span class="lineNum">     499 </span>            : 
+<span class="lineNum">     500 </span>            :     EXPECT_ARRAY_NEAR(x, y / y.get_dim_size(0), rel_err_max&lt;double&gt;());
+<span class="lineNum">     501 </span>            : 
+<span class="lineNum">     502 </span>            :     axes.clear();
+<span class="lineNum">     503 </span>            :     axes.push_back(1);
+<span class="lineNum">     504 </span>            : 
+<span class="lineNum">     505 </span>            :     y = nd::ifft({nd::fft({x}, {{&quot;shape&quot;, x.get_shape()}, {&quot;axes&quot;, axes}})},
+<span class="lineNum">     506 </span>            :                  {{&quot;shape&quot;, y.get_shape()}, {&quot;axes&quot;, axes}});
+<span class="lineNum">     507 </span>            : 
+<span class="lineNum">     508 </span>            :     EXPECT_ARRAY_NEAR(x, y / y.get_dim_size(1), rel_err_max&lt;double&gt;());
+<span class="lineNum">     509 </span>            :   }
+<span class="lineNum">     510 </span>            : }
+<span class="lineNum">     511 </span>            : 
+<span class="lineNum">     512 </span>            : /*
+<span class="lineNum">     513 </span>            : TYPED_TEST_P(FFT2D, Zeros)
+<span class="lineNum">     514 </span>            : {
+<span class="lineNum">     515 </span>            :   nd::array x = nd::zeros(TestFixture::SrcShape[0], TestFixture::SrcShape[1],
+<span class="lineNum">     516 </span>            :                           ndt::make_type&lt;typename TestFixture::SrcType&gt;());
+<span class="lineNum">     517 </span>            : 
+<span class="lineNum">     518 </span>            :   nd::array y = nd::fft(x);
+<span class="lineNum">     519 </span>            :   for (int i = 0; i &lt; TestFixture::DstShape[0]; ++i) {
+<span class="lineNum">     520 </span>            :     for (int j = 0; j &lt; TestFixture::DstShape[1]; ++j) {
+<span class="lineNum">     521 </span>            :       EXPECT_EQ(0, y(i, j).as&lt;typename TestFixture::DstType&gt;());
+<span class="lineNum">     522 </span>            :     }
+<span class="lineNum">     523 </span>            :   }
+<span class="lineNum">     524 </span>            : 
+<span class="lineNum">     525 </span>            :   vector&lt;intptr_t&gt; axes;
+<span class="lineNum">     526 </span>            :   axes.push_back(0);
+<span class="lineNum">     527 </span>            : 
+<span class="lineNum">     528 </span>            :   y = nd::fft({x}, {{&quot;shape&quot;, x.get_shape()}, {&quot;axes&quot;, axes}});
+<span class="lineNum">     529 </span>            :   for (int i = 0; i &lt; TestFixture::DstShape[0]; ++i) {
+<span class="lineNum">     530 </span>            :     for (int j = 0; j &lt; TestFixture::DstShape[1]; ++j) {
+<span class="lineNum">     531 </span>            :       EXPECT_EQ(0, y(i, j).as&lt;typename TestFixture::DstType&gt;());
+<span class="lineNum">     532 </span>            :     }
+<span class="lineNum">     533 </span>            :   }
+<span class="lineNum">     534 </span>            : 
+<span class="lineNum">     535 </span>            :   axes.clear();
+<span class="lineNum">     536 </span>            :   axes.push_back(1);
+<span class="lineNum">     537 </span>            : 
+<span class="lineNum">     538 </span>            :   y = nd::fft({x}, {{&quot;shape&quot;, x.get_shape()}, {&quot;axes&quot;, axes}});
+<span class="lineNum">     539 </span>            :   for (int i = 0; i &lt; TestFixture::DstShape[0]; ++i) {
+<span class="lineNum">     540 </span>            :     for (int j = 0; j &lt; TestFixture::DstShape[1]; ++j) {
+<span class="lineNum">     541 </span>            :       EXPECT_EQ(0, y(i, j).as&lt;typename TestFixture::DstType&gt;());
+<span class="lineNum">     542 </span>            :     }
+<span class="lineNum">     543 </span>            :   }
+<span class="lineNum">     544 </span>            : }
+<span class="lineNum">     545 </span>            : */
+<span class="lineNum">     546 </span>            : 
+<span class="lineNum">     547 </span>            : /*
+<span class="lineNum">     548 </span>            : TYPED_TEST_P(FFT2D, Ones)
+<span class="lineNum">     549 </span>            : {
+<span class="lineNum">     550 </span>            :   nd::array x = nd::ones(TestFixture::SrcShape[0], TestFixture::SrcShape[1],
+<span class="lineNum">     551 </span>            :                          ndt::make_type&lt;typename TestFixture::SrcType&gt;());
+<span class="lineNum">     552 </span>            : 
+<span class="lineNum">     553 </span>            :   nd::array y = nd::fft(x);
+<span class="lineNum">     554 </span>            :   for (int i = 0; i &lt; TestFixture::DstShape[0]; ++i) {
+<span class="lineNum">     555 </span>            :     for (int j = 0; j &lt; TestFixture::DstShape[1]; ++j) {
+<span class="lineNum">     556 </span>            :       if (i == 0 &amp;&amp; j == 0) {
+<span class="lineNum">     557 </span>            :         EXPECT_EQ_RELERR(TestFixture::SrcSize,
+<span class="lineNum">     558 </span>            :                          y(i, j).as&lt;typename TestFixture::DstType&gt;(),
+<span class="lineNum">     559 </span>            :                          rel_err_max&lt;typename TestFixture::RealType&gt;());
+<span class="lineNum">     560 </span>            :       } else {
+<span class="lineNum">     561 </span>            :         EXPECT_EQ_RELERR(0, y(i, j).as&lt;typename TestFixture::DstType&gt;(),
+<span class="lineNum">     562 </span>            :                          rel_err_max&lt;typename TestFixture::RealType&gt;());
+<span class="lineNum">     563 </span>            :       }
+<span class="lineNum">     564 </span>            :     }
+<span class="lineNum">     565 </span>            :   }
+<span class="lineNum">     566 </span>            : }
+<span class="lineNum">     567 </span>            : */
+<span class="lineNum">     568 </span>            : 
+<span class="lineNum">     569 </span>            : /*
+<span class="lineNum">     570 </span>            : TYPED_TEST_P(FFT2D, KroneckerDelta)
+<span class="lineNum">     571 </span>            : {
+<span class="lineNum">     572 </span>            :   // Only continue if each dimension is divisible by 2
+<span class="lineNum">     573 </span>            :   if ((TestFixture::SrcShape[0] % 2) != 0 ||
+<span class="lineNum">     574 </span>            :       (TestFixture::SrcShape[1] % 2) != 0) {
+<span class="lineNum">     575 </span>            :     return;
+<span class="lineNum">     576 </span>            :   }
+<span class="lineNum">     577 </span>            : 
+<span class="lineNum">     578 </span>            :   nd::array x = nd::zeros(TestFixture::SrcShape[0], TestFixture::SrcShape[1],
+<span class="lineNum">     579 </span>            :                           ndt::make_type&lt;typename TestFixture::SrcType&gt;());
+<span class="lineNum">     580 </span>            :   x(TestFixture::SrcShape[0] / 2, TestFixture::SrcShape[1] / 2).vals() = 1;
+<span class="lineNum">     581 </span>            : 
+<span class="lineNum">     582 </span>            :   nd::array y = nd::fft(x);
+<span class="lineNum">     583 </span>            :   for (int i = 0; i &lt; TestFixture::DstShape[0]; ++i) {
+<span class="lineNum">     584 </span>            :     for (int j = 0; j &lt; TestFixture::DstShape[1]; ++j) {
+<span class="lineNum">     585 </span>            :       EXPECT_EQ_RELERR(
+<span class="lineNum">     586 </span>            :           pow(static_cast&lt;typename TestFixture::RealType&gt;(-1), i + j),
+<span class="lineNum">     587 </span>            :           y(i, j).as&lt;typename TestFixture::DstType&gt;(),
+<span class="lineNum">     588 </span>            :           rel_err_max&lt;typename TestFixture::RealType&gt;());
+<span class="lineNum">     589 </span>            :     }
+<span class="lineNum">     590 </span>            :   }
+<span class="lineNum">     591 </span>            : 
+<span class="lineNum">     592 </span>            :   // Only continue if each dimension is divisible by 4
+<span class="lineNum">     593 </span>            :   if ((TestFixture::SrcShape[0] % 4) != 0 ||
+<span class="lineNum">     594 </span>            :       (TestFixture::SrcShape[1] % 4) != 0) {
+<span class="lineNum">     595 </span>            :     return;
+<span class="lineNum">     596 </span>            :   }
+<span class="lineNum">     597 </span>            : 
+<span class="lineNum">     598 </span>            :   y = nd::fft(x(irange().by(2), irange().by(2)));
+<span class="lineNum">     599 </span>            :   for (int i = 0; i &lt; TestFixture::DstShape[0] / 2; ++i) {
+<span class="lineNum">     600 </span>            :     for (int j = 0; j &lt; TestFixture::DstShape[1] / 2; ++j) {
+<span class="lineNum">     601 </span>            :       EXPECT_EQ_RELERR(
+<span class="lineNum">     602 </span>            :           pow(static_cast&lt;typename TestFixture::RealType&gt;(-1), i + j),
+<span class="lineNum">     603 </span>            :           y(i, j).as&lt;typename TestFixture::DstType&gt;(),
+<span class="lineNum">     604 </span>            :           rel_err_max&lt;typename TestFixture::RealType&gt;());
+<span class="lineNum">     605 </span>            :     }
+<span class="lineNum">     606 </span>            :   }
+<span class="lineNum">     607 </span>            : }
+<span class="lineNum">     608 </span>            : */
+<span class="lineNum">     609 </span>            : 
+<span class="lineNum">     610 </span>            : TEST(FFT2D, Shift)
+<span class="lineNum">     611 </span>            : {
+<span class="lineNum">     612 </span>            :   double vals0[3][3] = {{0.0, 1.0, 2.0}, {3.0, 4.0, -4.0}, {-3.0, -2.0, -1.0}};
+<span class="lineNum">     613 </span>            : 
+<span class="lineNum">     614 </span>            :   nd::array x0 = nd::empty(ndt::make_type&lt;double[3][3]&gt;());
+<span class="lineNum">     615 </span>            :   x0.vals() = vals0;
+<span class="lineNum">     616 </span>            : 
+<span class="lineNum">     617 </span>            :   nd::array y0 = nd::fftshift(x0);
+<span class="lineNum">     618 </span>            :   EXPECT_EQ(y0(0, 0).as&lt;double&gt;(), -1.0);
+<span class="lineNum">     619 </span>            :   EXPECT_EQ(y0(0, 1).as&lt;double&gt;(), -3.0);
+<span class="lineNum">     620 </span>            :   EXPECT_EQ(y0(0, 2).as&lt;double&gt;(), -2.0);
+<span class="lineNum">     621 </span>            :   EXPECT_EQ(y0(1, 0).as&lt;double&gt;(), 2.0);
+<span class="lineNum">     622 </span>            :   EXPECT_EQ(y0(1, 1).as&lt;double&gt;(), 0.0);
+<span class="lineNum">     623 </span>            :   EXPECT_EQ(y0(1, 2).as&lt;double&gt;(), 1.0);
+<span class="lineNum">     624 </span>            :   EXPECT_EQ(y0(2, 0).as&lt;double&gt;(), -4.0);
+<span class="lineNum">     625 </span>            :   EXPECT_EQ(y0(2, 1).as&lt;double&gt;(), 3.0);
+<span class="lineNum">     626 </span>            :   EXPECT_EQ(y0(2, 2).as&lt;double&gt;(), 4.0);
+<span class="lineNum">     627 </span>            : 
+<span class="lineNum">     628 </span>            :   y0 = nd::ifftshift(y0);
+<span class="lineNum">     629 </span>            :   for (int i = 0; i &lt; 3; ++i) {
+<span class="lineNum">     630 </span>            :     for (int j = 0; j &lt; 3; ++j) {
+<span class="lineNum">     631 </span>            :       EXPECT_EQ(y0(i, j).as&lt;double&gt;(), x0(i, j).as&lt;double&gt;());
+<span class="lineNum">     632 </span>            :     }
+<span class="lineNum">     633 </span>            :   }
+<span class="lineNum">     634 </span>            : 
+<span class="lineNum">     635 </span>            :   double vals1[4][2] = {{0.0, 5.0}, {1.0, 8.0}, {-6.0, 7.0}, {3.0, -1.0}};
+<span class="lineNum">     636 </span>            : 
+<span class="lineNum">     637 </span>            :   nd::array x1 = nd::empty(ndt::make_type&lt;double[4][2]&gt;());
+<span class="lineNum">     638 </span>            :   x1.vals() = vals1;
+<span class="lineNum">     639 </span>            : 
+<span class="lineNum">     640 </span>            :   nd::array y1 = nd::fftshift(x1);
+<span class="lineNum">     641 </span>            :   EXPECT_EQ(y1(0, 0).as&lt;double&gt;(), 7.0);
+<span class="lineNum">     642 </span>            :   EXPECT_EQ(y1(0, 1).as&lt;double&gt;(), -6.0);
+<span class="lineNum">     643 </span>            :   EXPECT_EQ(y1(1, 0).as&lt;double&gt;(), -1.0);
+<span class="lineNum">     644 </span>            :   EXPECT_EQ(y1(1, 1).as&lt;double&gt;(), 3.0);
+<span class="lineNum">     645 </span>            :   EXPECT_EQ(y1(2, 0).as&lt;double&gt;(), 5.0);
+<span class="lineNum">     646 </span>            :   EXPECT_EQ(y1(2, 1).as&lt;double&gt;(), 0.0);
+<span class="lineNum">     647 </span>            :   EXPECT_EQ(y1(3, 0).as&lt;double&gt;(), 8.0);
+<span class="lineNum">     648 </span>            :   EXPECT_EQ(y1(3, 1).as&lt;double&gt;(), 1.0);
+<span class="lineNum">     649 </span>            : 
+<span class="lineNum">     650 </span>            :   y1 = nd::ifftshift(y1);
+<span class="lineNum">     651 </span>            :   for (int i = 0; i &lt; 4; ++i) {
+<span class="lineNum">     652 </span>            :     for (int j = 0; j &lt; 2; ++j) {
+<span class="lineNum">     653 </span>            :       EXPECT_EQ(y1(i, j).as&lt;double&gt;(), x1(i, j).as&lt;double&gt;());
+<span class="lineNum">     654 </span>            :     }
+<span class="lineNum">     655 </span>            :   }
+<span class="lineNum">     656 </span>            : 
+<span class="lineNum">     657 </span>            :   double vals2[2][3] = {{0.0, 5.0, 1.0}, {8.0, -6.0, 7.0}};
+<span class="lineNum">     658 </span>            : 
+<span class="lineNum">     659 </span>            :   nd::array x2 = nd::empty(ndt::make_type&lt;double[2][3]&gt;());
+<span class="lineNum">     660 </span>            :   x2.vals() = vals2;
+<span class="lineNum">     661 </span>            : 
+<span class="lineNum">     662 </span>            :   nd::array y2 = nd::fftshift(x2);
+<span class="lineNum">     663 </span>            :   EXPECT_EQ(y2(0, 0).as&lt;double&gt;(), 7.0);
+<span class="lineNum">     664 </span>            :   EXPECT_EQ(y2(0, 1).as&lt;double&gt;(), 8.0);
+<span class="lineNum">     665 </span>            :   EXPECT_EQ(y2(0, 2).as&lt;double&gt;(), -6.0);
+<span class="lineNum">     666 </span>            :   EXPECT_EQ(y2(1, 0).as&lt;double&gt;(), 1.0);
+<span class="lineNum">     667 </span>            :   EXPECT_EQ(y2(1, 1).as&lt;double&gt;(), 0.0);
+<span class="lineNum">     668 </span>            :   EXPECT_EQ(y2(1, 2).as&lt;double&gt;(), 5.0);
+<span class="lineNum">     669 </span>            : 
+<span class="lineNum">     670 </span>            :   y2 = nd::ifftshift(y2);
+<span class="lineNum">     671 </span>            :   for (int i = 0; i &lt; 2; ++i) {
+<span class="lineNum">     672 </span>            :     for (int j = 0; j &lt; 3; ++j) {
+<span class="lineNum">     673 </span>            :       EXPECT_EQ(y2(i, j).as&lt;double&gt;(), x2(i, j).as&lt;double&gt;());
+<span class="lineNum">     674 </span>            :     }
+<span class="lineNum">     675 </span>            :   }
+<span class="lineNum">     676 </span>            : }
+<span class="lineNum">     677 </span>            : 
+<span class="lineNum">     678 </span>            : /*
+<span class="lineNum">     679 </span>            : TYPED_TEST_P(RFFT2D, Linear)
+<span class="lineNum">     680 </span>            : {
+<span class="lineNum">     681 </span>            :   nd::array x0 = nd::rand(TestFixture::SrcShape[0], TestFixture::SrcShape[1],
+<span class="lineNum">     682 </span>            :                           ndt::make_type&lt;typename TestFixture::SrcType&gt;());
+<span class="lineNum">     683 </span>            :   nd::array x1 = nd::rand(TestFixture::SrcShape[0], TestFixture::SrcShape[1],
+<span class="lineNum">     684 </span>            :                           ndt::make_type&lt;typename TestFixture::SrcType&gt;());
+<span class="lineNum">     685 </span>            :   nd::array x = nd::empty(TestFixture::SrcShape[0], TestFixture::SrcShape[1],
+<span class="lineNum">     686 </span>            :                           ndt::make_type&lt;typename TestFixture::SrcType&gt;());
+<span class="lineNum">     687 </span>            :   x.vals() = x0 + x1;
+<span class="lineNum">     688 </span>            : 
+<span class="lineNum">     689 </span>            :   nd::array y0 = nd::rfft(x0);
+<span class="lineNum">     690 </span>            :   nd::array y1 = nd::rfft(x1);
+<span class="lineNum">     691 </span>            :   nd::array y = nd::rfft(x);
+<span class="lineNum">     692 </span>            : 
+<span class="lineNum">     693 </span>            :   for (int i = 0; i &lt; TestFixture::DstShape[0]; ++i) {
+<span class="lineNum">     694 </span>            :     for (int j = 0; j &lt; TestFixture::DstShape[1]; ++j) {
+<span class="lineNum">     695 </span>            :       EXPECT_EQ_RELERR(y0(i, j).as&lt;typename TestFixture::DstType&gt;() +
+<span class="lineNum">     696 </span>            :                            y1(i, j).as&lt;typename TestFixture::DstType&gt;(),
+<span class="lineNum">     697 </span>            :                        y(i, j).as&lt;typename TestFixture::DstType&gt;(),
+<span class="lineNum">     698 </span>            :                        rel_err_max&lt;typename TestFixture::RealType&gt;());
+<span class="lineNum">     699 </span>            :     }
+<span class="lineNum">     700 </span>            :   }
+<span class="lineNum">     701 </span>            : }
+<span class="lineNum">     702 </span>            : 
+<span class="lineNum">     703 </span>            : TYPED_TEST_P(RFFT2D, Inverse)
+<span class="lineNum">     704 </span>            : {
+<span class="lineNum">     705 </span>            :   nd::array x = nd::rand(TestFixture::SrcShape[0], TestFixture::SrcShape[1],
+<span class="lineNum">     706 </span>            :                          ndt::make_type&lt;typename TestFixture::SrcType&gt;());
+<span class="lineNum">     707 </span>            : 
+<span class="lineNum">     708 </span>            :   nd::array y =
+<span class="lineNum">     709 </span>            :       irfft(nd::rfft(x), TestFixture::SrcShape[0], TestFixture::SrcShape[1]);
+<span class="lineNum">     710 </span>            :   for (int i = 0; i &lt; TestFixture::SrcShape[0]; ++i) {
+<span class="lineNum">     711 </span>            :     for (int j = 0; j &lt; TestFixture::SrcShape[1]; ++j) {
+<span class="lineNum">     712 </span>            :       EXPECT_EQ_RELERR(x(i, j).as&lt;typename TestFixture::SrcType&gt;(),
+<span class="lineNum">     713 </span>            :                        y(i, j).as&lt;typename TestFixture::SrcType&gt;() /
+<span class="lineNum">     714 </span>            :                            TestFixture::SrcSize,
+<span class="lineNum">     715 </span>            :                        rel_err_max&lt;typename TestFixture::RealType&gt;());
+<span class="lineNum">     716 </span>            :     }
+<span class="lineNum">     717 </span>            :   }
+<span class="lineNum">     718 </span>            : }
+<span class="lineNum">     719 </span>            : 
+<span class="lineNum">     720 </span>            : TYPED_TEST_P(RFFT2D, Zeros)
+<span class="lineNum">     721 </span>            : {
+<span class="lineNum">     722 </span>            :   nd::array x = nd::zeros(TestFixture::SrcShape[0], TestFixture::SrcShape[1],
+<span class="lineNum">     723 </span>            :                           ndt::make_type&lt;typename TestFixture::SrcType&gt;());
+<span class="lineNum">     724 </span>            : 
+<span class="lineNum">     725 </span>            :   nd::array y = nd::rfft(x);
+<span class="lineNum">     726 </span>            :   for (int i = 0; i &lt; TestFixture::DstShape[0]; ++i) {
+<span class="lineNum">     727 </span>            :     for (int j = 0; j &lt; TestFixture::DstShape[1]; ++j) {
+<span class="lineNum">     728 </span>            :       EXPECT_EQ(0, y(i, j).as&lt;typename TestFixture::DstType&gt;());
+<span class="lineNum">     729 </span>            :     }
+<span class="lineNum">     730 </span>            :   }
+<span class="lineNum">     731 </span>            : }
+<span class="lineNum">     732 </span>            : 
+<span class="lineNum">     733 </span>            : TYPED_TEST_P(RFFT2D, Ones)
+<span class="lineNum">     734 </span>            : {
+<span class="lineNum">     735 </span>            :   nd::array x = nd::ones(TestFixture::SrcShape[0], TestFixture::SrcShape[1],
+<span class="lineNum">     736 </span>            :                          ndt::make_type&lt;typename TestFixture::SrcType&gt;());
+<span class="lineNum">     737 </span>            : 
+<span class="lineNum">     738 </span>            :   nd::array y = nd::rfft(x);
+<span class="lineNum">     739 </span>            :   for (int i = 0; i &lt; TestFixture::DstShape[0]; ++i) {
+<span class="lineNum">     740 </span>            :     for (int j = 0; j &lt; TestFixture::DstShape[1]; ++j) {
+<span class="lineNum">     741 </span>            :       if (i == 0 &amp;&amp; j == 0) {
+<span class="lineNum">     742 </span>            :         EXPECT_EQ_RELERR(TestFixture::SrcSize,
+<span class="lineNum">     743 </span>            :                          y(i, j).as&lt;typename TestFixture::DstType&gt;(),
+<span class="lineNum">     744 </span>            :                          rel_err_max&lt;typename TestFixture::RealType&gt;());
+<span class="lineNum">     745 </span>            :       } else {
+<span class="lineNum">     746 </span>            :         EXPECT_EQ_RELERR(0, y(i, j).as&lt;typename TestFixture::DstType&gt;(),
+<span class="lineNum">     747 </span>            :                          rel_err_max&lt;typename TestFixture::RealType&gt;());
+<span class="lineNum">     748 </span>            :       }
+<span class="lineNum">     749 </span>            :     }
+<span class="lineNum">     750 </span>            :   }
+<span class="lineNum">     751 </span>            : }
+<span class="lineNum">     752 </span>            : 
+<span class="lineNum">     753 </span>            : TYPED_TEST_P(RFFT2D, KroneckerDelta)
+<span class="lineNum">     754 </span>            : {
+<span class="lineNum">     755 </span>            :   // Only continue if each dimension is divisible by 2
+<span class="lineNum">     756 </span>            :   if ((TestFixture::SrcShape[0] % 2) != 0 ||
+<span class="lineNum">     757 </span>            :       (TestFixture::SrcShape[1] % 2) != 0) {
+<span class="lineNum">     758 </span>            :     return;
+<span class="lineNum">     759 </span>            :   }
+<span class="lineNum">     760 </span>            : 
+<span class="lineNum">     761 </span>            :   nd::array x = nd::zeros(TestFixture::SrcShape[0], TestFixture::SrcShape[1],
+<span class="lineNum">     762 </span>            :                           ndt::make_type&lt;typename TestFixture::SrcType&gt;());
+<span class="lineNum">     763 </span>            :   x(TestFixture::SrcShape[0] / 2, TestFixture::SrcShape[1] / 2).vals() = 1;
+<span class="lineNum">     764 </span>            : 
+<span class="lineNum">     765 </span>            :   nd::array y = nd::rfft(x);
+<span class="lineNum">     766 </span>            :   for (int i = 0; i &lt; TestFixture::DstShape[0]; ++i) {
+<span class="lineNum">     767 </span>            :     for (int j = 0; j &lt; TestFixture::DstShape[1]; ++j) {
+<span class="lineNum">     768 </span>            :       EXPECT_EQ_RELERR(
+<span class="lineNum">     769 </span>            :           pow(static_cast&lt;typename TestFixture::RealType&gt;(-1), i + j),
+<span class="lineNum">     770 </span>            :           y(i, j).as&lt;typename TestFixture::DstType&gt;(),
+<span class="lineNum">     771 </span>            :           rel_err_max&lt;typename TestFixture::RealType&gt;());
+<span class="lineNum">     772 </span>            :     }
+<span class="lineNum">     773 </span>            :   }
+<span class="lineNum">     774 </span>            : 
+<span class="lineNum">     775 </span>            :   // Only continue if each dimension is divisible by 4
+<span class="lineNum">     776 </span>            :   if ((TestFixture::SrcShape[0] % 4) != 0 ||
+<span class="lineNum">     777 </span>            :       (TestFixture::SrcShape[1] % 4) != 0) {
+<span class="lineNum">     778 </span>            :     return;
+<span class="lineNum">     779 </span>            :   }
+<span class="lineNum">     780 </span>            : 
+<span class="lineNum">     781 </span>            :   y = nd::rfft(x(irange().by(2), irange().by(2)));
+<span class="lineNum">     782 </span>            :   for (int i = 0; i &lt; TestFixture::DstShape[0] / 2; ++i) {
+<span class="lineNum">     783 </span>            :     for (int j = 0; j &lt; TestFixture::DstShape[1] / 2; ++j) {
+<span class="lineNum">     784 </span>            :       EXPECT_EQ_RELERR(
+<span class="lineNum">     785 </span>            :           pow(static_cast&lt;typename TestFixture::RealType&gt;(-1), i + j),
+<span class="lineNum">     786 </span>            :           y(i, j).as&lt;typename TestFixture::DstType&gt;(),
+<span class="lineNum">     787 </span>            :           rel_err_max&lt;typename TestFixture::RealType&gt;());
+<span class="lineNum">     788 </span>            :     }
+<span class="lineNum">     789 </span>            :   }
+<span class="lineNum">     790 </span>            : }
+<span class="lineNum">     791 </span>            : */
+<span class="lineNum">     792 </span>            : 
+<span class="lineNum">     793 </span>            : // For now, only test FFTs if we built DYND with FFTW
+<span class="lineNum">     794 </span>            : 
+<span class="lineNum">     795 </span>            : /** TODO: A few of the single-precision tests fail, even at what should be
+<span class="lineNum">     796 </span>            :  * reasonable relative error.
+<span class="lineNum">     797 </span>            :  *        As all of the double-precision tests are fine, I think this is
+<span class="lineNum">     798 </span>            :  * inherent to FFTW. For now,
+<span class="lineNum">     799 </span>            :  *        I'm commenting out the single-precision tests.
+<span class="lineNum">     800 </span>            :  */
+<span class="lineNum">     801 </span>            : 
+<span class="lineNum">     802 </span>            : // REGISTER_TYPED_TEST_CASE_P(FFT1D, Linear);
+<span class="lineNum">     803 </span>            : // INSTANTIATE_TYPED_TEST_CASE_P(ComplexFloat, FFT1D,
+<span class="lineNum">     804 </span>            : // FixedDim1D&lt;dynd_complex&lt;float&gt; &gt;::Types);
+<span class="lineNum">     805 </span>            : 
+<span class="lineNum">     806 </span>            : #define Shapes                                                                                                         \
+<span class="lineNum">     807 </span>            :   ::testing::Values(&quot;4 * R&quot;, &quot;8 * R&quot;, &quot;17 * R&quot;, &quot;25 * R&quot;, &quot;64 * R&quot;, &quot;76 * R&quot;, &quot;99 * R&quot;, &quot;128 * R&quot;, &quot;203 * R&quot;, &quot;256 * &quot; \
+<span class="lineNum">     808 </span>            :                                                                                                               &quot;R&quot;)
+<span class="lineNum">     809 </span>            : #define DTypes ::testing::Values(&quot;complex[float64]&quot;)
+<span class="lineNum">     810 </span>            : 
+<span class="lineNum">     811 </span>            : INSTANTIATE_TEST_CASE_P(Host, FFT1D, ::testing::Combine(::testing::Values(&quot;T&quot;), Shapes, DTypes));
+<span class="lineNum">     812 </span>            : #ifdef DYND_CUDA
+<span class="lineNum">     813 </span>            : INSTANTIATE_TEST_CASE_P(CUDADevice, FFT1D, ::testing::Combine(::testing::Values(&quot;cuda_device[T]&quot;), Shapes, DTypes));
+<span class="lineNum">     814 </span>            : #endif
+<span class="lineNum">     815 </span>            : 
+<span class="lineNum">     816 </span>            : #undef Shapes
+<span class="lineNum">     817 </span>            : #undef DTypes
+<span class="lineNum">     818 </span>            : 
+<span class="lineNum">     819 </span>            : #define Shapes ::testing::Values(&quot;4 * 4 * R&quot;, &quot;8 * 8 * R&quot;, &quot;17 * 25 * R&quot;, &quot;64 * 64 * R&quot;, &quot;76 * 14 * R&quot;)
+<span class="lineNum">     820 </span>            : // &quot;128 * 128 * R&quot;, &quot;203 * 99 * R&quot;, &quot;256 * 256 * R&quot;
+<span class="lineNum">     821 </span>            : 
+<span class="lineNum">     822 </span>            : #define DTypes ::testing::Values(&quot;complex[float64]&quot;)
+<span class="lineNum">     823 </span>            : 
+<span class="lineNum">     824 </span>            : INSTANTIATE_TEST_CASE_P(Host, FFT2D, ::testing::Combine(::testing::Values(&quot;T&quot;), Shapes, DTypes));
+<span class="lineNum">     825 </span>            : #ifdef DYND_CUDA
+<span class="lineNum">     826 </span>            : INSTANTIATE_TEST_CASE_P(CUDADevice, FFT2D, ::testing::Combine(::testing::Values(&quot;cuda_device[T]&quot;), Shapes, DTypes));
+<span class="lineNum">     827 </span>            : #endif
+<span class="lineNum">     828 </span>            : 
+<span class="lineNum">     829 </span>            : #undef Shapes
+<span class="lineNum">     830 </span>            : #undef DTypes
+<span class="lineNum">     831 </span>            : 
+<span class="lineNum">     832 </span>            : // REGISTER_TYPED_TEST_CASE_P(RFFT1D, Linear, Inverse, Zeros, Ones,
+<span class="lineNum">     833 </span>            : // KroneckerDelta);
+<span class="lineNum">     834 </span>            : // INSTANTIATE_TYPED_TEST_CASE_P(Float, RFFT1D, FixedDim1D&lt;float&gt;::Types);
+<span class="lineNum">     835 </span>            : // INSTANTIATE_TYPED_TEST_CASE_P(ComplexDouble, RFFT1D,
+<span class="lineNum">     836 </span>            : // FixedDim1D&lt;double&gt;::Types);
+<span class="lineNum">     837 </span>            : 
+<span class="lineNum">     838 </span>            : // REGISTER_TYPED_TEST_CASE_P(RFFT2D, Linear, Inverse, Zeros, Ones,
+<span class="lineNum">     839 </span>            : // KroneckerDelta);
+<span class="lineNum">     840 </span>            : // INSTANTIATE_TYPED_TEST_CASE_P(Float, RFFT2D, FixedDim2D&lt;float&gt;::Types);
+<span class="lineNum">     841 </span>            : // INSTANTIATE_TYPED_TEST_CASE_P(Double, RFFT2D, FixedDim2D&lt;double&gt;::Types);
+<span class="lineNum">     842 </span>            : 
+<span class="lineNum">     843 </span>            : #endif // DYND_FFTW
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.10</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

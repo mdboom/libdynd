@@ -1,0 +1,115 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - coverage.info.cleaned - include/dynd/types/substitute_typevars.hpp</title>
+  <link rel="stylesheet" type="text/css" href="../../../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../../../index.html">top level</a> - <a href="index.html">include/dynd/types</a> - substitute_typevars.hpp<span style="font-size: 80%;"> (source / <a href="substitute_typevars.hpp.func.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">coverage.info.cleaned</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">4</td>
+            <td class="headerCovTableEntry">4</td>
+            <td class="headerCovTableEntryHi">100.0 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2016-02-19</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">1</td>
+            <td class="headerCovTableEntry">1</td>
+            <td class="headerCovTableEntryHi">100.0 %</td>
+          </tr>
+          <tr><td><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : //</a>
+<span class="lineNum">       2 </span>            : // Copyright (C) 2011-15 DyND Developers
+<span class="lineNum">       3 </span>            : // BSD 2-Clause License, see LICENSE.txt
+<span class="lineNum">       4 </span>            : //
+<span class="lineNum">       5 </span>            : 
+<span class="lineNum">       6 </span>            : #pragma once
+<span class="lineNum">       7 </span>            : 
+<span class="lineNum">       8 </span>            : #include &lt;map&gt;
+<span class="lineNum">       9 </span>            : 
+<span class="lineNum">      10 </span>            : #include &lt;dynd/type.hpp&gt;
+<span class="lineNum">      11 </span>            : 
+<span class="lineNum">      12 </span>            : namespace dynd {
+<span class="lineNum">      13 </span>            : namespace ndt {
+<span class="lineNum">      14 </span>            : 
+<span class="lineNum">      15 </span>            :   namespace detail {
+<span class="lineNum">      16 </span>            :     DYND_API ndt::type internal_substitute(const ndt::type &amp;pattern, const std::map&lt;std::string, ndt::type&gt; &amp;typevars,
+<span class="lineNum">      17 </span>            :                                            bool concrete);
+<span class="lineNum">      18 </span>            :   }
+<span class="lineNum">      19 </span>            : 
+<span class="lineNum">      20 </span>            :   /**
+<span class="lineNum">      21 </span>            :    * Substitutes type variables in a pattern type.
+<span class="lineNum">      22 </span>            :    *
+<span class="lineNum">      23 </span>            :    * \param pattern  A symbolic type within which to substitute typevars.
+<span class="lineNum">      24 </span>            :    * \param typevars  A map of names to type var values.
+<a name="25"><span class="lineNum">      25 </span>            :    * \param concrete  If true, requires that the result be concrete.</a>
+<span class="lineNum">      26 </span>            :    */
+<span class="lineNum">      27 </span><span class="lineCov">        579 :   inline ndt::type substitute(const ndt::type &amp;pattern, const std::map&lt;std::string, ndt::type&gt; &amp;typevars, bool concrete)</span>
+<span class="lineNum">      28 </span>            :   {
+<span class="lineNum">      29 </span>            :     // This check for whether ``pattern`` is symbolic is put here in
+<span class="lineNum">      30 </span>            :     // the inline function to avoid the call overhead in this case
+<span class="lineNum">      31 </span><span class="lineCov">        579 :     if (!pattern.is_symbolic() &amp;&amp; pattern.get_id() != callable_id) {</span>
+<span class="lineNum">      32 </span><span class="lineCov">        185 :       return pattern;</span>
+<span class="lineNum">      33 </span>            :     }
+<span class="lineNum">      34 </span>            :     else {
+<span class="lineNum">      35 </span><span class="lineCov">        394 :       return detail::internal_substitute(pattern, typevars, concrete);</span>
+<span class="lineNum">      36 </span>            :     }
+<span class="lineNum">      37 </span>            :   }
+<span class="lineNum">      38 </span>            : }
+<span class="lineNum">      39 </span>            : } // namespace dynd::ndt
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.10</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

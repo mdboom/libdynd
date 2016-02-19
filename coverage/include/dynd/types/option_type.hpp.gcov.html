@@ -1,0 +1,175 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - coverage.info.cleaned - include/dynd/types/option_type.hpp</title>
+  <link rel="stylesheet" type="text/css" href="../../../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../../../index.html">top level</a> - <a href="index.html">include/dynd/types</a> - option_type.hpp<span style="font-size: 80%;"> (source / <a href="option_type.hpp.func.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">coverage.info.cleaned</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">7</td>
+            <td class="headerCovTableEntry">7</td>
+            <td class="headerCovTableEntryHi">100.0 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2016-02-19</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">7</td>
+            <td class="headerCovTableEntry">7</td>
+            <td class="headerCovTableEntryHi">100.0 %</td>
+          </tr>
+          <tr><td><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : //</a>
+<span class="lineNum">       2 </span>            : // Copyright (C) 2011-15 DyND Developers
+<span class="lineNum">       3 </span>            : // BSD 2-Clause License, see LICENSE.txt
+<span class="lineNum">       4 </span>            : //
+<span class="lineNum">       5 </span>            : 
+<span class="lineNum">       6 </span>            : #pragma once
+<span class="lineNum">       7 </span>            : 
+<span class="lineNum">       8 </span>            : #include &lt;dynd/callable.hpp&gt;
+<span class="lineNum">       9 </span>            : 
+<span class="lineNum">      10 </span>            : namespace dynd {
+<span class="lineNum">      11 </span>            : 
+<span class="lineNum">      12 </span>            : template &lt;typename ValueType&gt;
+<span class="lineNum">      13 </span>            : struct option {
+<a name="14"><span class="lineNum">      14 </span>            :   ValueType value;</a>
+<span class="lineNum">      15 </span>            : 
+<span class="lineNum">      16 </span><span class="lineCov">          7 :   option() : value(ndt::traits&lt;ValueType&gt;::na()) {}</span>
+<span class="lineNum">      17 </span>            : 
+<span class="lineNum">      18 </span>            :   option(ValueType value) : value(value) {}
+<span class="lineNum">      19 </span>            : };
+<a name="20"><span class="lineNum">      20 </span>            : </a>
+<span class="lineNum">      21 </span>            : template &lt;typename ValueType&gt;
+<span class="lineNum">      22 </span><span class="lineCov">          7 : option&lt;ValueType&gt; opt()</span>
+<span class="lineNum">      23 </span>            : {
+<span class="lineNum">      24 </span><span class="lineCov">          7 :   return option&lt;ValueType&gt;();</span>
+<span class="lineNum">      25 </span>            : }
+<span class="lineNum">      26 </span>            : 
+<span class="lineNum">      27 </span>            : template &lt;typename ValueType&gt;
+<span class="lineNum">      28 </span>            : option&lt;ValueType&gt; opt(ValueType value)
+<span class="lineNum">      29 </span>            : {
+<span class="lineNum">      30 </span>            :   return option&lt;ValueType&gt;(value);
+<span class="lineNum">      31 </span>            : }
+<span class="lineNum">      32 </span>            : 
+<span class="lineNum">      33 </span>            : namespace ndt {
+<span class="lineNum">      34 </span>            : 
+<span class="lineNum">      35 </span>            :   /**
+<a name="36"><span class="lineNum">      36 </span>            :    * The option type represents data which may or may not be there.</a>
+<span class="lineNum">      37 </span>            :    */
+<span class="lineNum">      38 </span><span class="lineCov">       2580 :   class DYND_API option_type : public base_type {</span>
+<span class="lineNum">      39 </span>            :     type m_value_tp;
+<span class="lineNum">      40 </span>            : 
+<span class="lineNum">      41 </span>            :   public:
+<a name="42"><span class="lineNum">      42 </span>            :     option_type(const type &amp;value_tp);</a>
+<span class="lineNum">      43 </span>            : 
+<span class="lineNum">      44 </span><span class="lineCov">        645 :     size_t get_default_data_size() const { return m_value_tp.get_default_data_size(); }</span>
+<span class="lineNum">      45 </span>            : 
+<a name="46"><span class="lineNum">      46 </span>            :     void get_vars(std::unordered_set&lt;std::string&gt; &amp;vars) const;</a>
+<span class="lineNum">      47 </span>            : 
+<span class="lineNum">      48 </span><span class="lineCov">       2963 :     const type &amp;get_value_type() const { return m_value_tp.value_type(); }</span>
+<span class="lineNum">      49 </span>            : 
+<span class="lineNum">      50 </span>            :     /** Assigns NA to one value */
+<span class="lineNum">      51 </span>            :     void assign_na(const char *arrmeta, char *data, const eval::eval_context *ectx) const;
+<span class="lineNum">      52 </span>            : 
+<span class="lineNum">      53 </span>            :     /** Returns true if the value is available */
+<span class="lineNum">      54 </span>            :     bool is_avail(const char *arrmeta, const char *data, const eval::eval_context *ectx) const;
+<span class="lineNum">      55 </span>            : 
+<span class="lineNum">      56 </span>            :     void print_type(std::ostream &amp;o) const;
+<span class="lineNum">      57 </span>            :     void print_data(std::ostream &amp;o, const char *arrmeta, const char *data) const;
+<span class="lineNum">      58 </span>            : 
+<span class="lineNum">      59 </span>            :     bool is_expression() const;
+<span class="lineNum">      60 </span>            :     bool is_unique_data_owner(const char *arrmeta) const;
+<span class="lineNum">      61 </span>            :     void transform_child_types(type_transform_fn_t transform_fn, intptr_t arrmeta_offset, void *extra,
+<span class="lineNum">      62 </span>            :                                type &amp;out_transformed_tp, bool &amp;out_was_transformed) const;
+<span class="lineNum">      63 </span>            :     type get_canonical_type() const;
+<span class="lineNum">      64 </span>            : 
+<span class="lineNum">      65 </span>            :     void set_from_utf8_string(const char *arrmeta, char *data, const char *utf8_begin, const char *utf8_end,
+<span class="lineNum">      66 </span>            :                               const eval::eval_context *ectx) const;
+<span class="lineNum">      67 </span>            : 
+<span class="lineNum">      68 </span>            :     type get_type_at_dimension(char **inout_arrmeta, intptr_t i, intptr_t total_ndim = 0) const;
+<span class="lineNum">      69 </span>            : 
+<span class="lineNum">      70 </span>            :     bool is_lossless_assignment(const type &amp;dst_tp, const type &amp;src_tp) const;
+<span class="lineNum">      71 </span>            : 
+<span class="lineNum">      72 </span>            :     bool operator==(const base_type &amp;rhs) const;
+<span class="lineNum">      73 </span>            : 
+<span class="lineNum">      74 </span>            :     void arrmeta_default_construct(char *arrmeta, bool blockref_alloc) const;
+<span class="lineNum">      75 </span>            :     void arrmeta_copy_construct(char *dst_arrmeta, const char *src_arrmeta,
+<span class="lineNum">      76 </span>            :                                 const intrusive_ptr&lt;memory_block_data&gt; &amp;embedded_reference) const;
+<span class="lineNum">      77 </span>            :     void arrmeta_reset_buffers(char *arrmeta) const;
+<span class="lineNum">      78 </span>            :     void arrmeta_finalize_buffers(char *arrmeta) const;
+<span class="lineNum">      79 </span>            :     void arrmeta_destruct(char *arrmeta) const;
+<span class="lineNum">      80 </span>            :     void arrmeta_debug_print(const char *arrmeta, std::ostream &amp;o, const std::string &amp;indent) const;
+<span class="lineNum">      81 </span>            : 
+<span class="lineNum">      82 </span>            :     void data_destruct(const char *arrmeta, char *data) const;
+<span class="lineNum">      83 </span>            :     void data_destruct_strided(const char *arrmeta, char *data, intptr_t stride, size_t count) const;
+<span class="lineNum">      84 </span>            : 
+<span class="lineNum">      85 </span>            :     bool match(const char *arrmeta, const type &amp;candidate_tp, const char *candidate_arrmeta,
+<span class="lineNum">      86 </span>            :                std::map&lt;std::string, type&gt; &amp;tp_vars) const;
+<span class="lineNum">      87 </span>            : 
+<span class="lineNum">      88 </span>            :     std::map&lt;std::string, nd::callable&gt; get_dynamic_type_properties() const;
+<span class="lineNum">      89 </span>            :   };
+<span class="lineNum">      90 </span>            : 
+<span class="lineNum">      91 </span>            :   template &lt;typename ValueType&gt;
+<span class="lineNum">      92 </span>            :   struct traits&lt;option&lt;ValueType&gt;&gt; {
+<a name="93"><span class="lineNum">      93 </span>            :     static const bool is_same_layout = true;</a>
+<span class="lineNum">      94 </span>            : 
+<span class="lineNum">      95 </span><span class="lineCov">          7 :     static type equivalent() { return make_type&lt;option_type&gt;(make_type&lt;ValueType&gt;()); }</span>
+<span class="lineNum">      96 </span>            :   };
+<span class="lineNum">      97 </span>            : 
+<span class="lineNum">      98 </span>            : } // namespace dynd::ndt
+<span class="lineNum">      99 </span>            : } // namespace dynd
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.10</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

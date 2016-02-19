@@ -1,0 +1,706 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - coverage.info.cleaned - include/dynd/types/base_type.hpp</title>
+  <link rel="stylesheet" type="text/css" href="../../../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../../../index.html">top level</a> - <a href="index.html">include/dynd/types</a> - base_type.hpp<span style="font-size: 80%;"> (source / <a href="base_type.hpp.func.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">coverage.info.cleaned</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">38</td>
+            <td class="headerCovTableEntry">39</td>
+            <td class="headerCovTableEntryHi">97.4 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2016-02-19</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">18</td>
+            <td class="headerCovTableEntry">19</td>
+            <td class="headerCovTableEntryHi">94.7 %</td>
+          </tr>
+          <tr><td><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : //</a>
+<span class="lineNum">       2 </span>            : // Copyright (C) 2011-15 DyND Developers
+<span class="lineNum">       3 </span>            : // BSD 2-Clause License, see LICENSE.txt
+<span class="lineNum">       4 </span>            : //
+<span class="lineNum">       5 </span>            : 
+<span class="lineNum">       6 </span>            : #pragma once
+<span class="lineNum">       7 </span>            : 
+<span class="lineNum">       8 </span>            : #include &lt;atomic&gt;
+<span class="lineNum">       9 </span>            : #include &lt;unordered_set&gt;
+<span class="lineNum">      10 </span>            : #include &lt;vector&gt;
+<span class="lineNum">      11 </span>            : 
+<span class="lineNum">      12 </span>            : #include &lt;dynd/config.hpp&gt;
+<span class="lineNum">      13 </span>            : #include &lt;dynd/types/type_id.hpp&gt;
+<span class="lineNum">      14 </span>            : #include &lt;dynd/irange.hpp&gt;
+<span class="lineNum">      15 </span>            : #include &lt;dynd/memblock/memory_block.hpp&gt;
+<span class="lineNum">      16 </span>            : #include &lt;dynd/kernels/kernel_prefix.hpp&gt;
+<span class="lineNum">      17 </span>            : 
+<span class="lineNum">      18 </span>            : namespace dynd {
+<span class="lineNum">      19 </span>            : 
+<span class="lineNum">      20 </span>            : // Forward definition from dynd/type.hpp
+<span class="lineNum">      21 </span>            : namespace ndt {
+<span class="lineNum">      22 </span>            :   class base_type;
+<span class="lineNum">      23 </span>            :   class callable_type;
+<span class="lineNum">      24 </span>            :   class type;
+<span class="lineNum">      25 </span>            : } // namespace dynd::ndt
+<span class="lineNum">      26 </span>            : 
+<span class="lineNum">      27 </span>            : // Forward definition from dynd/array.hpp
+<span class="lineNum">      28 </span>            : namespace nd {
+<span class="lineNum">      29 </span>            :   class array;
+<span class="lineNum">      30 </span>            :   class callable;
+<span class="lineNum">      31 </span>            : } // namsepace dynd::nd
+<span class="lineNum">      32 </span>            : 
+<span class="lineNum">      33 </span>            : struct iterdata_common;
+<span class="lineNum">      34 </span>            : 
+<span class="lineNum">      35 </span>            : /** This is the callback function type used by the base_type::foreach function
+<span class="lineNum">      36 </span>            :  */
+<span class="lineNum">      37 </span>            : typedef void (*foreach_fn_t)(const ndt::type &amp;dt, const char *arrmeta, char *data, void *callback_data);
+<span class="lineNum">      38 </span>            : 
+<span class="lineNum">      39 </span>            : /**
+<span class="lineNum">      40 </span>            :  * This is the iteration increment function used by iterdata. It increments the
+<span class="lineNum">      41 </span>            :  * iterator at the specified level, resetting all the more inner levels to 0.
+<span class="lineNum">      42 </span>            :  */
+<span class="lineNum">      43 </span>            : typedef char *(*iterdata_increment_fn_t)(iterdata_common *iterdata, intptr_t level);
+<span class="lineNum">      44 </span>            : /**
+<span class="lineNum">      45 </span>            :  * This is the iteration advance function used by iterdata. It advances the
+<span class="lineNum">      46 </span>            :  * iterator at the specified level by the specified amount, resetting all the
+<span class="lineNum">      47 </span>            :  * more inner levels to 0.
+<span class="lineNum">      48 </span>            :  */
+<span class="lineNum">      49 </span>            : typedef char *(*iterdata_advance_fn_t)(iterdata_common *iterdata, intptr_t level, intptr_t i);
+<span class="lineNum">      50 </span>            : /**
+<span class="lineNum">      51 </span>            :  * This is the reset function which is called when an outer dimension
+<span class="lineNum">      52 </span>            :  * increment resets all the lower dimensions to index 0. It returns
+<span class="lineNum">      53 </span>            :  * the data pointer for the next inner level of iteration.
+<span class="lineNum">      54 </span>            :  */
+<span class="lineNum">      55 </span>            : typedef char *(*iterdata_reset_fn_t)(iterdata_common *iterdata, char *data, intptr_t ndim);
+<span class="lineNum">      56 </span>            : 
+<span class="lineNum">      57 </span>            : /**
+<span class="lineNum">      58 </span>            :  * This is a generic function which applies a transformation to a type.
+<span class="lineNum">      59 </span>            :  * Usage of the function pointer is typically paired with the
+<span class="lineNum">      60 </span>            :  * base_type::transform_child_types virtual function on the type
+<span class="lineNum">      61 </span>            :  *
+<span class="lineNum">      62 </span>            :  * An implementation of this function should either copy 'dt' into
+<span class="lineNum">      63 </span>            :  * 'out_transformed_tp', and leave 'out_was_transformed' alone, or it
+<span class="lineNum">      64 </span>            :  * should place a different type in 'out_transformed_type', then set
+<span class="lineNum">      65 </span>            :  * 'out_was_transformed' to true.
+<span class="lineNum">      66 </span>            :  */
+<span class="lineNum">      67 </span>            : typedef void (*type_transform_fn_t)(const ndt::type &amp;dt, intptr_t arrmeta_offset, void *extra,
+<span class="lineNum">      68 </span>            :                                     ndt::type &amp;out_transformed_type, bool &amp;out_was_transformed);
+<span class="lineNum">      69 </span>            : 
+<span class="lineNum">      70 </span>            : // Common preamble of all iterdata instances
+<span class="lineNum">      71 </span>            : struct DYND_API iterdata_common {
+<span class="lineNum">      72 </span>            :   // This increments the iterator at the requested level
+<span class="lineNum">      73 </span>            :   iterdata_increment_fn_t incr;
+<span class="lineNum">      74 </span>            :   // This advances the iterator at the requested level by the requested amount
+<span class="lineNum">      75 </span>            :   iterdata_advance_fn_t adv;
+<span class="lineNum">      76 </span>            :   // This resets the data pointers of the iterator
+<span class="lineNum">      77 </span>            :   iterdata_reset_fn_t reset;
+<span class="lineNum">      78 </span>            : };
+<span class="lineNum">      79 </span>            : 
+<span class="lineNum">      80 </span>            : namespace ndt {
+<span class="lineNum">      81 </span>            : 
+<span class="lineNum">      82 </span>            :   /**
+<span class="lineNum">      83 </span>            :    * This is the virtual base class for defining new types which are not so
+<span class="lineNum">      84 </span>            :    * basic that we want them in the small list of builtin types. This is a reference
+<span class="lineNum">      85 </span>            :    * counted class, and is immutable, so once a base_type instance is constructed,
+<span class="lineNum">      86 </span>            :    * it should never be modified.
+<span class="lineNum">      87 </span>            :    *
+<span class="lineNum">      88 </span>            :    * Typically, the base_type is used by manipulating a type instance, which acts
+<span class="lineNum">      89 </span>            :    * as a smart pointer to base_type, which special handling for the builtin types.
+<span class="lineNum">      90 </span>            :    */
+<span class="lineNum">      91 </span>            :   class DYND_API base_type {
+<span class="lineNum">      92 </span>            :     /** Embedded reference counting */
+<span class="lineNum">      93 </span>            :     mutable std::atomic_long m_use_count;
+<span class="lineNum">      94 </span>            : 
+<span class="lineNum">      95 </span>            :   protected:
+<span class="lineNum">      96 </span>            :     type_id_t type_id;      // The type id
+<span class="lineNum">      97 </span>            :     type_kind_t kind;       // The kind
+<span class="lineNum">      98 </span>            :     size_t data_size;       // The size of one instance of the type, or 0 if there is not one fixed size.
+<span class="lineNum">      99 </span>            :     uint8_t data_alignment; // The data alignment
+<span class="lineNum">     100 </span>            :     uint32_t flags;         // The flags.
+<span class="lineNum">     101 </span>            :     size_t arrmeta_size;    // The size of a arrmeta instance for the type.
+<span class="lineNum">     102 </span>            :     int8_t ndim;            // The number of array dimensions this type has
+<span class="lineNum">     103 </span>            :     int8_t strided_ndim; // The number of strided dimensions (strided/fixed/cfixed) in a row with no pointers, var dims,
+<span class="lineNum">     104 </span>            :                          // etc in between.
+<span class="lineNum">     105 </span>            : 
+<span class="lineNum">     106 </span>            :   public:
+<span class="lineNum">     107 </span>            :     typedef uint32_t flags_type;
+<a name="108"><span class="lineNum">     108 </span>            : </a>
+<span class="lineNum">     109 </span>            :     /** Starts off the extended type instance with a use count of 1. */
+<span class="lineNum">     110 </span><span class="lineCov">      35042 :     base_type(type_id_t type_id, type_kind_t kind, size_t data_size, size_t alignment, flags_type flags,</span>
+<span class="lineNum">     111 </span>            :               size_t arrmeta_size, size_t ndim, size_t strided_ndim)
+<span class="lineNum">     112 </span>            :         : m_use_count(1), type_id(type_id), kind(kind), data_size(data_size),
+<span class="lineNum">     113 </span>            :           data_alignment(static_cast&lt;uint8_t&gt;(alignment)), flags(flags), arrmeta_size(arrmeta_size),
+<span class="lineNum">     114 </span><span class="lineCov">      35042 :           ndim(static_cast&lt;uint8_t&gt;(ndim)), strided_ndim(static_cast&lt;uint8_t&gt;(strided_ndim))</span>
+<span class="lineNum">     115 </span>            :     {
+<span class="lineNum">     116 </span><span class="lineCov">      35042 :     }</span>
+<span class="lineNum">     117 </span>            : 
+<span class="lineNum">     118 </span>            :     /** Starts off the extended type instance with a use count of 1. */
+<span class="lineNum">     119 </span>            :     base_type(type_id_t type_id, size_t data_size, size_t alignment, flags_type flags, size_t arrmeta_size, size_t ndim,
+<span class="lineNum">     120 </span>            :               size_t strided_ndim)
+<span class="lineNum">     121 </span>            :         : m_use_count(1), type_id(type_id), data_size(data_size), data_alignment(static_cast&lt;uint8_t&gt;(alignment)),
+<span class="lineNum">     122 </span>            :           flags(flags), arrmeta_size(arrmeta_size), ndim(static_cast&lt;uint8_t&gt;(ndim)),
+<span class="lineNum">     123 </span>            :           strided_ndim(static_cast&lt;uint8_t&gt;(strided_ndim))
+<span class="lineNum">     124 </span>            :     {
+<span class="lineNum">     125 </span>            :     }
+<span class="lineNum">     126 </span>            : 
+<span class="lineNum">     127 </span>            :     virtual ~base_type();
+<a name="128"><span class="lineNum">     128 </span>            : </a>
+<span class="lineNum">     129 </span>            :     /** For debugging purposes, the type's use count */
+<span class="lineNum">     130 </span><span class="lineCov">         76 :     inline int32_t get_use_count() const { return m_use_count; }</span>
+<a name="131"><span class="lineNum">     131 </span>            : </a>
+<span class="lineNum">     132 </span>            :     /** The type's type id */
+<a name="133"><span class="lineNum">     133 </span><span class="lineCov">      30740 :     inline type_id_t get_id() const { return static_cast&lt;type_id_t&gt;(type_id); }</span></a>
+<span class="lineNum">     134 </span>            :     /** The type's kind */
+<span class="lineNum">     135 </span><span class="lineCov">      15362 :     inline type_kind_t get_kind() const { return static_cast&lt;type_kind_t&gt;(kind); }</span>
+<a name="136"><span class="lineNum">     136 </span>            :     /** The size of one instance of the type, or 0 if there is not one fixed</a>
+<span class="lineNum">     137 </span>            :      * size. */
+<span class="lineNum">     138 </span><span class="lineCov">       2918 :     inline size_t get_data_size() const { return data_size; }</span>
+<a name="139"><span class="lineNum">     139 </span>            :     /** The type's data alignment. Every data pointer for this type _must_ be</a>
+<span class="lineNum">     140 </span>            :      * aligned. */
+<a name="141"><span class="lineNum">     141 </span><span class="lineCov">      12146 :     inline size_t get_data_alignment() const { return data_alignment; }</span></a>
+<span class="lineNum">     142 </span>            :     /** The number of array dimensions this type has */
+<a name="143"><span class="lineNum">     143 </span><span class="lineCov">      17997 :     inline intptr_t get_ndim() const { return ndim; }</span></a>
+<a name="144"><span class="lineNum">     144 </span>            :     /** The number of outer strided dimensions this type has in a row */</a>
+<span class="lineNum">     145 </span><span class="lineCov">       2152 :     inline intptr_t get_strided_ndim() const { return strided_ndim; }</span>
+<span class="lineNum">     146 </span><span class="lineCov">      31620 :     inline flags_type get_flags() const { return flags; }</span>
+<span class="lineNum">     147 </span>            :     virtual size_t get_default_data_size() const;
+<span class="lineNum">     148 </span>            : 
+<span class="lineNum">     149 </span>            :     /**
+<span class="lineNum">     150 </span>            :      * Print a representation of the type itself
+<span class="lineNum">     151 </span>            :      *
+<span class="lineNum">     152 </span>            :      * \param o  The std::ostream to print to.
+<span class="lineNum">     153 </span>            :      */
+<span class="lineNum">     154 </span>            :     virtual void print_type(std::ostream &amp;o) const = 0;
+<span class="lineNum">     155 </span>            : 
+<span class="lineNum">     156 </span>            :     /**
+<span class="lineNum">     157 </span>            :      * Print the raw data interpreted as a single instance of this type.
+<span class="lineNum">     158 </span>            :      *
+<span class="lineNum">     159 </span>            :      * \param o  The std::ostream to print to.
+<span class="lineNum">     160 </span>            :      * \param arrmeta  Pointer to the type arrmeta of the data element to print.
+<span class="lineNum">     161 </span>            :      * \param data  Pointer to the data element to print.
+<span class="lineNum">     162 </span>            :      */
+<a name="163"><span class="lineNum">     163 </span>            :     virtual void print_data(std::ostream &amp;o, const char *arrmeta, const char *data) const;</a>
+<span class="lineNum">     164 </span>            : 
+<span class="lineNum">     165 </span><span class="lineCov">     196169 :     inline bool is_indexable() const { return (flags &amp; type_flag_indexable) != 0; }</span>
+<span class="lineNum">     166 </span>            : 
+<span class="lineNum">     167 </span>            :     /**
+<span class="lineNum">     168 </span>            :      * Returns true if the type is a scalar.
+<span class="lineNum">     169 </span>            :      *
+<span class="lineNum">     170 </span>            :      * This precludes a dynamic type from switching between scalar and array
+<span class="lineNum">     171 </span>            :      *behavior,
+<a name="172"><span class="lineNum">     172 </span>            :      * but the simplicity seems to probably be worth it.</a>
+<span class="lineNum">     173 </span>            :      */
+<span class="lineNum">     174 </span><span class="lineCov">        220 :     bool is_scalar() const { return ndim == 0 &amp;&amp; (flags &amp; type_flag_variadic) == 0; }</span>
+<span class="lineNum">     175 </span>            : 
+<span class="lineNum">     176 </span>            :     /**
+<span class="lineNum">     177 </span>            :      * Returns true if the given type is a subarray of this type.
+<span class="lineNum">     178 </span>            :      * For example, &quot;int&quot; is a subarray of &quot;strided, int&quot;. This
+<span class="lineNum">     179 </span>            :      * relationship may exist for unequal types with the same number
+<span class="lineNum">     180 </span>            :      * of dimensions, for example &quot;int&quot; is a subarray of &quot;pointer(int)&quot;.
+<span class="lineNum">     181 </span>            :      *
+<span class="lineNum">     182 </span>            :      * \param subarray_tp  Testing if it is a subarray of 'this'.
+<span class="lineNum">     183 </span>            :      */
+<span class="lineNum">     184 </span>            :     virtual bool is_type_subarray(const ndt::type &amp;subarray_tp) const;
+<span class="lineNum">     185 </span>            : 
+<span class="lineNum">     186 </span>            :     /**
+<span class="lineNum">     187 </span>            :      * Returns true if the type contains an expression type anywhere within it.
+<span class="lineNum">     188 </span>            :      */
+<span class="lineNum">     189 </span>            :     virtual bool is_expression() const;
+<span class="lineNum">     190 </span>            : 
+<span class="lineNum">     191 </span>            :     /**
+<span class="lineNum">     192 </span>            :      * Should return true if there is no additional blockref which might point
+<span class="lineNum">     193 </span>            :      * to data not owned by the arrmeta. For example, a blockref which points
+<span class="lineNum">     194 </span>            :      * to an 'external' memory block does not own its data uniquely.
+<span class="lineNum">     195 </span>            :      */
+<span class="lineNum">     196 </span>            :     virtual bool is_unique_data_owner(const char *arrmeta) const;
+<span class="lineNum">     197 </span>            : 
+<span class="lineNum">     198 </span>            :     /**
+<span class="lineNum">     199 </span>            :      * Applies the transform function to all the child types, creating
+<span class="lineNum">     200 </span>            :      * a new type of the same type but with the transformed children.
+<span class="lineNum">     201 </span>            :      *
+<span class="lineNum">     202 </span>            :      * \param transform_fn  The function for transforming types.
+<span class="lineNum">     203 </span>            :      * \param arrmeta_offset  An offset for arrmeta corresponding to the
+<span class="lineNum">     204 </span>            :      *                        type. This is adjusted and passed to the
+<span class="lineNum">     205 </span>            :      *                        transform_fn for each child type's arrmeta_offset.
+<span class="lineNum">     206 </span>            :      * \param extra  Extra data to pass to the transform function
+<span class="lineNum">     207 </span>            :      * \param out_transformed_type  The transformed type is placed here.
+<span class="lineNum">     208 </span>            :      * \param out_was_transformed  Is set to true if a transformation was done,
+<span class="lineNum">     209 </span>            :      *                             is left alone otherwise.
+<span class="lineNum">     210 </span>            :      */
+<span class="lineNum">     211 </span>            :     virtual void transform_child_types(type_transform_fn_t transform_fn, intptr_t arrmeta_offset, void *extra,
+<span class="lineNum">     212 </span>            :                                        ndt::type &amp;out_transformed_type, bool &amp;out_was_transformed) const;
+<span class="lineNum">     213 </span>            : 
+<span class="lineNum">     214 </span>            :     /**
+<span class="lineNum">     215 </span>            :      * Returns a modified type with all expression types replaced with
+<span class="lineNum">     216 </span>            :      * their value types, and types replaced with &quot;standard versions&quot;
+<span class="lineNum">     217 </span>            :      * whereever appropriate. For example, an offset-based uniform array
+<span class="lineNum">     218 </span>            :      * would be replaced by a strided uniform array.
+<span class="lineNum">     219 </span>            :      */
+<span class="lineNum">     220 </span>            :     virtual ndt::type get_canonical_type() const;
+<span class="lineNum">     221 </span>            : 
+<span class="lineNum">     222 </span>            :     /** Sets the value from a UTF8 string */
+<span class="lineNum">     223 </span>            :     virtual void set_from_utf8_string(const char *arrmeta, char *data, const char *utf8_begin, const char *utf8_end,
+<a name="224"><span class="lineNum">     224 </span>            :                                       const eval::eval_context *ectx) const;</a>
+<span class="lineNum">     225 </span>            :     /** Copies a C++ std::string with a UTF8 encoding to a string element */
+<span class="lineNum">     226 </span><span class="lineCov">          1 :     inline void set_from_utf8_string(const char *arrmeta, char *data, const std::string &amp;utf8_str,</span>
+<span class="lineNum">     227 </span>            :                                      const eval::eval_context *ectx) const
+<span class="lineNum">     228 </span>            :     {
+<span class="lineNum">     229 </span><span class="lineCov">          1 :       this-&gt;set_from_utf8_string(arrmeta, data, utf8_str.data(), utf8_str.data() + utf8_str.size(), ectx);</span>
+<span class="lineNum">     230 </span><span class="lineCov">          1 :     }</span>
+<span class="lineNum">     231 </span>            : 
+<span class="lineNum">     232 </span>            :     /**
+<span class="lineNum">     233 </span>            :      * Indexes into the type. This function returns the type which results
+<span class="lineNum">     234 </span>            :      * from applying the same index to an ndarray of this type.
+<span class="lineNum">     235 </span>            :      *
+<span class="lineNum">     236 </span>            :      * \param nindices     The number of elements in the 'indices' array. This
+<span class="lineNum">     237 </span>            :      *                     is shrunk by one for each recursive call.
+<span class="lineNum">     238 </span>            :      * \param indices      The indices to apply. This is incremented by one for
+<span class="lineNum">     239 </span>            :      *                     each recursive call.
+<span class="lineNum">     240 </span>            :      * \param current_i    The current index position. Used for error messages.
+<span class="lineNum">     241 </span>            :      * \param root_tp      The data type in the first call, before any
+<span class="lineNum">     242 </span>            :      *                     recursion. Used for error messages.
+<span class="lineNum">     243 </span>            :      * \param leading_dimension  If this is true, the current dimension is one
+<span class="lineNum">     244 </span>            :      *                           for which there is only a single
+<span class="lineNum">     245 </span>            :      *                           data instance, and the type can do operations
+<span class="lineNum">     246 </span>            :      *                           relying on the data. An example
+<span class="lineNum">     247 </span>            :      *                           of this is a pointer data throwing away the
+<span class="lineNum">     248 </span>            :      *                           pointer part, so the result
+<span class="lineNum">     249 </span>            :      *                           doesn't contain that indirection.
+<span class="lineNum">     250 </span>            :      */
+<span class="lineNum">     251 </span>            :     virtual ndt::type apply_linear_index(intptr_t nindices, const irange *indices, size_t current_i,
+<span class="lineNum">     252 </span>            :                                          const ndt::type &amp;root_tp, bool leading_dimension) const;
+<span class="lineNum">     253 </span>            : 
+<span class="lineNum">     254 </span>            :     /**
+<span class="lineNum">     255 </span>            :      * Indexes into an nd::array using the provided linear index, and a type and
+<span class="lineNum">     256 </span>            :      *freshly allocated output
+<span class="lineNum">     257 </span>            :      * set to point to the same base data reference.
+<span class="lineNum">     258 </span>            :      *
+<span class="lineNum">     259 </span>            :      * \param nindices     The number of elements in the 'indices' array. This
+<span class="lineNum">     260 </span>            :      *is shrunk by one for each recursive call.
+<span class="lineNum">     261 </span>            :      * \param indices      The indices to apply. This is incremented by one for
+<span class="lineNum">     262 </span>            :      *each recursive call.
+<span class="lineNum">     263 </span>            :      * \param arrmeta     The arrmeta of the input array.
+<span class="lineNum">     264 </span>            :      * \param result_type The result of an apply_linear_index call.
+<span class="lineNum">     265 </span>            :      * \param out_arrmeta The arrmeta of the output array. The output data
+<span class="lineNum">     266 </span>            :      *should all be references to the data
+<span class="lineNum">     267 </span>            :      *                     of the input array, so there is no out_data
+<span class="lineNum">     268 </span>            :      *parameter.
+<span class="lineNum">     269 </span>            :      * \param embedded_reference  For references which are NULL, add this
+<span class="lineNum">     270 </span>            :      *reference in the output.
+<span class="lineNum">     271 </span>            :      *                            A NULL means the data was embedded in the
+<span class="lineNum">     272 </span>            :      *original nd::array, so
+<span class="lineNum">     273 </span>            :      *                            when putting it in a new nd::array, need to
+<span class="lineNum">     274 </span>            :      *hold a reference to
+<span class="lineNum">     275 </span>            :      *                            that memory.
+<span class="lineNum">     276 </span>            :      * \param current_i    The current index position. Used for error messages.
+<span class="lineNum">     277 </span>            :      * \param root_tp      The data type in the first call, before any
+<span class="lineNum">     278 </span>            :      *recursion.
+<span class="lineNum">     279 </span>            :      *                     Used for error messages.
+<span class="lineNum">     280 </span>            :      * \param leading_dimension  If this is true, the current dimension is one
+<span class="lineNum">     281 </span>            :      *for
+<span class="lineNum">     282 </span>            :      *                           which there is only a single data instance, and
+<span class="lineNum">     283 </span>            :      *                           the type can do operations relying on the data.
+<span class="lineNum">     284 </span>            :      *                           An example of this is a pointer data throwing
+<span class="lineNum">     285 </span>            :      *away
+<span class="lineNum">     286 </span>            :      *                           the pointer part, so the result doesn't contain
+<span class="lineNum">     287 </span>            :      *                           that indirection.
+<span class="lineNum">     288 </span>            :      * \param inout_data  This may *only* be used/modified if leading_dimension
+<span class="lineNum">     289 </span>            :      *                    is true. In the case of eliminating a pointer, this is
+<span class="lineNum">     290 </span>            :      *                    a pointer to the pointer data. The pointer type would
+<span class="lineNum">     291 </span>            :      *                    dereference the pointer data, and modify both the data
+<span class="lineNum">     292 </span>            :      *                    pointer and the data reference to reflect that change.
+<span class="lineNum">     293 </span>            :      * \param inout_dataref  This may only be used/modified if leading_dimension
+<span class="lineNum">     294 </span>            :      *                       is true. If the target of inout_data is modified,
+<span class="lineNum">     295 </span>            :      *then
+<span class="lineNum">     296 </span>            :      *                       in many cases the data will be pointing into a
+<span class="lineNum">     297 </span>            :      *different
+<span class="lineNum">     298 </span>            :      *                       memory block than before. This must be modified to
+<span class="lineNum">     299 </span>            :      *                       be a reference to the updated memory block.
+<span class="lineNum">     300 </span>            :      *
+<span class="lineNum">     301 </span>            :      * @return  An offset to apply to the data pointer(s).
+<span class="lineNum">     302 </span>            :      */
+<span class="lineNum">     303 </span>            :     virtual intptr_t apply_linear_index(intptr_t nindices, const irange *indices, const char *arrmeta,
+<span class="lineNum">     304 </span>            :                                         const ndt::type &amp;result_type, char *out_arrmeta,
+<span class="lineNum">     305 </span>            :                                         const intrusive_ptr&lt;memory_block_data&gt; &amp;embedded_reference, size_t current_i,
+<span class="lineNum">     306 </span>            :                                         const ndt::type &amp;root_tp, bool leading_dimension, char **inout_data,
+<span class="lineNum">     307 </span>            :                                         intrusive_ptr&lt;memory_block_data&gt; &amp;inout_dataref) const;
+<span class="lineNum">     308 </span>            : 
+<span class="lineNum">     309 </span>            :     /**
+<span class="lineNum">     310 </span>            :      * The 'at' function is used for indexing. Indexing one dimension with
+<span class="lineNum">     311 </span>            :      * an integer index is special-cased, both for higher performance and
+<span class="lineNum">     312 </span>            :      * to provide a way to get a arrmeta pointer for the result type.
+<span class="lineNum">     313 </span>            :      *
+<span class="lineNum">     314 </span>            :      * \param i0  The index to apply.
+<span class="lineNum">     315 </span>            :      * \param inout_arrmeta  If non-NULL, points to a arrmeta pointer for
+<span class="lineNum">     316 </span>            :      *                        this type that is modified to point to the
+<span class="lineNum">     317 </span>            :      *                        result's arrmeta.
+<span class="lineNum">     318 </span>            :      * \param inout_data  If non-NULL, points to a data pointer that is modified
+<span class="lineNum">     319 </span>            :      *                    to point to the result's data. If `inout_data` is
+<span class="lineNum">     320 </span>            :      *non-NULL,
+<span class="lineNum">     321 </span>            :      *                    `inout_arrmeta` must also be non-NULL.
+<span class="lineNum">     322 </span>            :      *
+<span class="lineNum">     323 </span>            :      * \returns  The type that results from the indexing operation.
+<span class="lineNum">     324 </span>            :      */
+<span class="lineNum">     325 </span>            :     virtual ndt::type at_single(intptr_t i0, const char **inout_arrmeta, const char **inout_data) const;
+<span class="lineNum">     326 </span>            : 
+<span class="lineNum">     327 </span>            :     /**
+<span class="lineNum">     328 </span>            :      * Retrieves the type starting at the requested dimension. This is
+<span class="lineNum">     329 </span>            :      * generally equivalent to apply_linear_index with a count of 'dim'
+<span class="lineNum">     330 </span>            :      * scalar indices.
+<span class="lineNum">     331 </span>            :      *
+<span class="lineNum">     332 </span>            :      * \param inout_arrmeta  NULL to ignore, or point it at some arrmeta for the
+<span class="lineNum">     333 </span>            :      *type,
+<span class="lineNum">     334 </span>            :      *                        and it will be updated to point to the arrmeta for
+<span class="lineNum">     335 </span>            :      *the returned
+<span class="lineNum">     336 </span>            :      *                        type.
+<span class="lineNum">     337 </span>            :      * \param i         The dimension number to retrieve.
+<span class="lineNum">     338 </span>            :      * \param total_ndim  A count of how many dimensions have been traversed
+<span class="lineNum">     339 </span>            :      *from the
+<span class="lineNum">     340 </span>            :      *                    type start, for producing error messages.
+<span class="lineNum">     341 </span>            :      */
+<span class="lineNum">     342 </span>            :     virtual ndt::type get_type_at_dimension(char **inout_arrmeta, intptr_t i, intptr_t total_ndim = 0) const;
+<span class="lineNum">     343 </span>            : 
+<span class="lineNum">     344 </span>            :     /**
+<span class="lineNum">     345 </span>            :      * Retrieves the shape of the type nd::array instance,
+<span class="lineNum">     346 </span>            :      * populating up to 'ndim' elements of out_shape. For dimensions with
+<span class="lineNum">     347 </span>            :      * variable or unknown shape, -1 is returned.
+<span class="lineNum">     348 </span>            :      *
+<span class="lineNum">     349 </span>            :      * The 'arrmeta' may be NULL, in which case -1 should be used when
+<span class="lineNum">     350 </span>            :      * the shape cannot be determined.
+<span class="lineNum">     351 </span>            :      * The 'data' may be NULL, and only gets fed deeper when an element
+<span class="lineNum">     352 </span>            :      * is unique (i.e. the dimension size is 1, it's a pointer type, etc).
+<span class="lineNum">     353 </span>            :      *
+<span class="lineNum">     354 </span>            :      * The output must be pre-initialized to have 'ndim' elements.
+<span class="lineNum">     355 </span>            :      */
+<span class="lineNum">     356 </span>            :     virtual void get_shape(intptr_t ndim, intptr_t i, intptr_t *out_shape, const char *arrmeta, const char *data) const;
+<span class="lineNum">     357 </span>            : 
+<span class="lineNum">     358 </span>            :     /**
+<span class="lineNum">     359 </span>            :      * Retrieves the strides of the type nd::array instance,
+<span class="lineNum">     360 </span>            :      * expanding the vector as needed. For dimensions where
+<span class="lineNum">     361 </span>            :      * there is not a simple stride (e.g. a tuple/struct type),
+<span class="lineNum">     362 </span>            :      * 0 is returned and the caller should handle this.
+<span class="lineNum">     363 </span>            :      *
+<span class="lineNum">     364 </span>            :      * The output must be pre-initialized to have get_ndim() elements.
+<span class="lineNum">     365 </span>            :      */
+<span class="lineNum">     366 </span>            :     virtual void get_strides(size_t i, intptr_t *out_strides, const char *arrmeta) const;
+<span class="lineNum">     367 </span>            : 
+<span class="lineNum">     368 </span>            :     virtual bool is_c_contiguous(const char *arrmeta) const;
+<span class="lineNum">     369 </span>            : 
+<span class="lineNum">     370 </span>            :     /**
+<span class="lineNum">     371 </span>            :      * Classifies the order the axes occur in the memory
+<span class="lineNum">     372 </span>            :      * layout of the array.
+<span class="lineNum">     373 </span>            :      */
+<span class="lineNum">     374 </span>            :     virtual axis_order_classification_t classify_axis_order(const char *arrmeta) const;
+<span class="lineNum">     375 </span>            : 
+<span class="lineNum">     376 </span>            :     /**
+<span class="lineNum">     377 </span>            :      * Called by ::dynd::is_lossless_assignment, with (this ==
+<span class="lineNum">     378 </span>            :      * dst_tp-&gt;extended()).
+<span class="lineNum">     379 </span>            :      */
+<span class="lineNum">     380 </span>            :     virtual bool is_lossless_assignment(const ndt::type &amp;dst_tp, const ndt::type &amp;src_tp) const;
+<span class="lineNum">     381 </span>            : 
+<span class="lineNum">     382 </span>            :     virtual bool operator==(const base_type &amp;rhs) const = 0;
+<a name="383"><span class="lineNum">     383 </span>            : </a>
+<span class="lineNum">     384 </span>            :     /** The size of the nd::array arrmeta for this type */
+<span class="lineNum">     385 </span><span class="lineCov">      16451 :     inline size_t get_arrmeta_size() const { return arrmeta_size; }</span>
+<span class="lineNum">     386 </span>            :     /**
+<span class="lineNum">     387 </span>            :      * Constructs the nd::array arrmeta for this type using default settings.
+<span class="lineNum">     388 </span>            :      * The element size of the result must match that from
+<span class="lineNum">     389 </span>            :      * get_default_data_size().
+<span class="lineNum">     390 </span>            :      *
+<span class="lineNum">     391 </span>            :      * \param arrmeta  The arrmeta to default construct.
+<span class="lineNum">     392 </span>            :      * \param blockref_alloc  If ``true``, blockref types should allocate
+<span class="lineNum">     393 </span>            :      *                        writable memory blocks, and if ``false``, they
+<span class="lineNum">     394 </span>            :      *                        should set their blockrefs to NULL. The latter
+<span class="lineNum">     395 </span>            :      *                        indicates the blockref memory is owned by
+<span class="lineNum">     396 </span>            :      *                        the parent nd::array, and is useful for viewing
+<span class="lineNum">     397 </span>            :      *                        external memory with compatible layout.
+<span class="lineNum">     398 </span>            :      */
+<span class="lineNum">     399 </span>            :     virtual void arrmeta_default_construct(char *arrmeta, bool blockref_alloc) const;
+<span class="lineNum">     400 </span>            :     /**
+<span class="lineNum">     401 </span>            :      * Constructs the nd::array arrmeta for this type, copying everything
+<span class="lineNum">     402 </span>            :      *exactly from
+<span class="lineNum">     403 </span>            :      * input arrmeta for the same type.
+<span class="lineNum">     404 </span>            :      *
+<span class="lineNum">     405 </span>            :      * \param dst_arrmeta  The new arrmeta memory which is constructed.
+<span class="lineNum">     406 </span>            :      * \param src_arrmeta   Existing arrmeta memory from which to copy.
+<span class="lineNum">     407 </span>            :      * \param embedded_reference  For references which are NULL, add this reference in the output.
+<span class="lineNum">     408 </span>            :      *                            A NULL means the data was embedded in the original nd::array, so
+<span class="lineNum">     409 </span>            :      *                            when putting it in a new nd::array, need to hold a reference to
+<span class="lineNum">     410 </span>            :      *                            that memory.
+<span class="lineNum">     411 </span>            :      */
+<span class="lineNum">     412 </span>            :     virtual void arrmeta_copy_construct(char *dst_arrmeta, const char *src_arrmeta,
+<span class="lineNum">     413 </span>            :                                         const intrusive_ptr&lt;memory_block_data&gt; &amp;embedded_reference) const;
+<span class="lineNum">     414 </span>            : 
+<span class="lineNum">     415 </span>            :     /** Destructs any references or other state contained in the nd::arrays'
+<span class="lineNum">     416 </span>            :      * arrmeta */
+<span class="lineNum">     417 </span>            :     virtual void arrmeta_destruct(char *arrmeta) const;
+<span class="lineNum">     418 </span>            :     /**
+<span class="lineNum">     419 </span>            :      * When arrmeta is used for temporary buffers of a type,
+<span class="lineNum">     420 </span>            :      * and that usage is finished one execution cycle, this function
+<span class="lineNum">     421 </span>            :      * is called to clear usage of that memory so it can be reused in
+<span class="lineNum">     422 </span>            :      * the next cycle.
+<span class="lineNum">     423 </span>            :      */
+<span class="lineNum">     424 </span>            :     virtual void arrmeta_reset_buffers(char *arrmeta) const;
+<span class="lineNum">     425 </span>            :     /**
+<span class="lineNum">     426 </span>            :      * For blockref types, once all the elements have been written
+<span class="lineNum">     427 </span>            :      * we want to turn off further memory allocation, and possibly
+<span class="lineNum">     428 </span>            :      * trim excess memory that was allocated. This function
+<span class="lineNum">     429 </span>            :      * does this.
+<span class="lineNum">     430 </span>            :      */
+<span class="lineNum">     431 </span>            :     virtual void arrmeta_finalize_buffers(char *arrmeta) const;
+<span class="lineNum">     432 </span>            :     /** Debug print of the metdata */
+<span class="lineNum">     433 </span>            :     virtual void arrmeta_debug_print(const char *arrmeta, std::ostream &amp;o, const std::string &amp;indent) const;
+<span class="lineNum">     434 </span>            : 
+<span class="lineNum">     435 </span>            :     /**
+<span class="lineNum">     436 </span>            :      * For types that have the flag type_flag_constructor set, this function
+<span class="lineNum">     437 </span>            :      * or the strided version is called to construct data.
+<span class="lineNum">     438 </span>            :      */
+<span class="lineNum">     439 </span>            :     virtual void data_construct(const char *arrmeta, char *data) const;
+<span class="lineNum">     440 </span>            : 
+<span class="lineNum">     441 </span>            :     /**
+<span class="lineNum">     442 </span>            :      * For types that have the flag type_flag_destructor set, this function
+<span class="lineNum">     443 </span>            :      * or the strided version is called to destruct data.
+<span class="lineNum">     444 </span>            :      */
+<span class="lineNum">     445 </span>            :     virtual void data_destruct(const char *arrmeta, char *data) const;
+<span class="lineNum">     446 </span>            :     /**
+<span class="lineNum">     447 </span>            :      * For types that have the flag type_flag_destructor set, this function
+<span class="lineNum">     448 </span>            :      * or the non-strided version is called to destruct data.
+<span class="lineNum">     449 </span>            :      */
+<span class="lineNum">     450 </span>            :     virtual void data_destruct_strided(const char *arrmeta, char *data, intptr_t stride, size_t count) const;
+<span class="lineNum">     451 </span>            : 
+<span class="lineNum">     452 </span>            :     /** The size of the data required for uniform iteration */
+<span class="lineNum">     453 </span>            :     virtual size_t get_iterdata_size(intptr_t ndim) const;
+<span class="lineNum">     454 </span>            :     /**
+<span class="lineNum">     455 </span>            :      * Constructs the iterdata for processing iteration at this level of the
+<span class="lineNum">     456 </span>            :      * datashape
+<span class="lineNum">     457 </span>            :      */
+<span class="lineNum">     458 </span>            :     virtual size_t iterdata_construct(iterdata_common *iterdata, const char **inout_arrmeta, intptr_t ndim,
+<span class="lineNum">     459 </span>            :                                       const intptr_t *shape, ndt::type &amp;out_uniform_tp) const;
+<span class="lineNum">     460 </span>            :     /** Destructs any references or other state contained in the iterdata */
+<span class="lineNum">     461 </span>            :     virtual size_t iterdata_destruct(iterdata_common *iterdata, intptr_t ndim) const;
+<span class="lineNum">     462 </span>            : 
+<span class="lineNum">     463 </span>            :     virtual bool match(const char *arrmeta, const ndt::type &amp;candidate_tp, const char *candidate_arrmeta,
+<span class="lineNum">     464 </span>            :                        std::map&lt;std::string, ndt::type&gt; &amp;tp_vars) const;
+<span class="lineNum">     465 </span>            : 
+<span class="lineNum">     466 </span>            :     /**
+<span class="lineNum">     467 </span>            :      * Call the callback on each element of the array with given data/arrmeta
+<span class="lineNum">     468 </span>            :      *along the leading
+<span class="lineNum">     469 </span>            :      * dimension. For array dimensions, the type provided is the same each call,
+<span class="lineNum">     470 </span>            :      *but for
+<span class="lineNum">     471 </span>            :      * heterogeneous dimensions it changes.
+<span class="lineNum">     472 </span>            :      *
+<span class="lineNum">     473 </span>            :      * \param arrmeta  The arrmeta.
+<span class="lineNum">     474 </span>            :      * \param data  The nd::array data.
+<span class="lineNum">     475 </span>            :      * \param callback  Callback function called for each subelement.
+<span class="lineNum">     476 </span>            :      * \param callback_data  Data provided to the callback function.
+<span class="lineNum">     477 </span>            :      */
+<a name="478"><span class="lineNum">     478 </span>            :     virtual void foreach_leading(const char *arrmeta, char *data, foreach_fn_t callback, void *callback_data) const;</a>
+<span class="lineNum">     479 </span>            : 
+<span class="lineNum">     480 </span><span class="lineNoCov">          0 :     virtual void get_vars(std::unordered_set&lt;std::string&gt; &amp;DYND_UNUSED(vars)) const {}</span>
+<span class="lineNum">     481 </span>            : 
+<span class="lineNum">     482 </span>            :     /**
+<span class="lineNum">     483 </span>            :      * Additional dynamic properties exposed by the type as gfunc::callable.
+<span class="lineNum">     484 </span>            :      */
+<span class="lineNum">     485 </span>            :     virtual std::map&lt;std::string, nd::callable&gt; get_dynamic_type_properties() const;
+<span class="lineNum">     486 </span>            : 
+<span class="lineNum">     487 </span>            :     /**
+<span class="lineNum">     488 </span>            :      * Additional dynamic functions exposed by the type as gfunc::callable.
+<span class="lineNum">     489 </span>            :      */
+<span class="lineNum">     490 </span>            :     virtual std::map&lt;std::string, nd::callable&gt; get_dynamic_type_functions() const;
+<span class="lineNum">     491 </span>            : 
+<span class="lineNum">     492 </span>            :     /**
+<span class="lineNum">     493 </span>            :      * Additional dynamic properties exposed by any nd::array of this type as gfunc::callable.
+<span class="lineNum">     494 </span>            :      *
+<span class="lineNum">     495 </span>            :      * \note Array types copy these properties from the first non-array data type,
+<span class="lineNum">     496 </span>            :      *       so such properties must be able to handle the case where they are the
+<span class="lineNum">     497 </span>            :      *       first non-array data type in an array type, not just strictly of the
+<span class="lineNum">     498 </span>            :      *       non-array data type.
+<span class="lineNum">     499 </span>            :      */
+<span class="lineNum">     500 </span>            :     virtual std::map&lt;std::string, nd::callable&gt; get_dynamic_array_properties() const;
+<span class="lineNum">     501 </span>            : 
+<span class="lineNum">     502 </span>            :     /**
+<span class="lineNum">     503 </span>            :      * Additional dynamic functions exposed by any nd::array of this type as gfunc::callable.
+<span class="lineNum">     504 </span>            :      *
+<span class="lineNum">     505 </span>            :      * \note Array types copy these functions from the first non-array data
+<span class="lineNum">     506 </span>            :      *       type, so such properties must be able to handle the case where
+<span class="lineNum">     507 </span>            :      *       they are the first non-array data type in an array type, not
+<span class="lineNum">     508 </span>            :      *       just strictly of the non-array data type.
+<span class="lineNum">     509 </span>            :      */
+<span class="lineNum">     510 </span>            :     virtual std::map&lt;std::string, nd::callable&gt; get_dynamic_array_functions() const;
+<span class="lineNum">     511 </span>            : 
+<span class="lineNum">     512 </span>            :     /**
+<span class="lineNum">     513 </span>            :      * Produces forward and reverse callables for adapting the operand
+<span class="lineNum">     514 </span>            :      * type to the current type, according to the information stored in
+<span class="lineNum">     515 </span>            :      * ``op``.
+<span class="lineNum">     516 </span>            :      *
+<span class="lineNum">     517 </span>            :      * \returns  True if the adapt is ok, false otherwise.
+<span class="lineNum">     518 </span>            :      */
+<span class="lineNum">     519 </span>            :     virtual bool adapt_type(const ndt::type &amp;operand_tp, const std::string &amp;op, nd::callable &amp;out_forward,
+<span class="lineNum">     520 </span>            :                             nd::callable &amp;out_reverse) const;
+<span class="lineNum">     521 </span>            : 
+<span class="lineNum">     522 </span>            :     /**
+<span class="lineNum">     523 </span>            :      * Produces forward and reverse callables for adapting the current type
+<span class="lineNum">     524 </span>            :      * to the value type, according to the information stored in
+<span class="lineNum">     525 </span>            :      * ``op``.
+<span class="lineNum">     526 </span>            :      *
+<span class="lineNum">     527 </span>            :      * \returns  True if the adapt is ok, false otherwise.
+<span class="lineNum">     528 </span>            :      */
+<span class="lineNum">     529 </span>            :     virtual bool reverse_adapt_type(const ndt::type &amp;value_tp, const std::string &amp;op, nd::callable &amp;out_forward,
+<span class="lineNum">     530 </span>            :                                     nd::callable &amp;out_reverse) const;
+<span class="lineNum">     531 </span>            : 
+<span class="lineNum">     532 </span>            :     friend void intrusive_ptr_retain(const base_type *ptr);
+<span class="lineNum">     533 </span>            :     friend void intrusive_ptr_release(const base_type *ptr);
+<span class="lineNum">     534 </span>            :     friend long intrusive_ptr_use_count(const base_type *ptr);
+<span class="lineNum">     535 </span>            : 
+<span class="lineNum">     536 </span>            :     friend type make_dynamic_type(type_id_t tp_id);
+<span class="lineNum">     537 </span>            :   };
+<span class="lineNum">     538 </span>            : 
+<span class="lineNum">     539 </span>            :   /**
+<span class="lineNum">     540 </span>            :    * Checks if the type is builtin or not, and if not,
+<a name="541"><span class="lineNum">     541 </span>            :    * increments the reference count of the type.</a>
+<span class="lineNum">     542 </span>            :    */
+<span class="lineNum">     543 </span><span class="lineCov">     890644 :   inline void intrusive_ptr_retain(const base_type *ptr)</span>
+<span class="lineNum">     544 </span>            :   {
+<span class="lineNum">     545 </span><span class="lineCov">     890644 :     if (!is_builtin_type(ptr)) {</span>
+<span class="lineNum">     546 </span><span class="lineCov">     259545 :       ++ptr-&gt;m_use_count;</span>
+<span class="lineNum">     547 </span>            :     }
+<span class="lineNum">     548 </span><span class="lineCov">     890644 :   }</span>
+<span class="lineNum">     549 </span>            : 
+<span class="lineNum">     550 </span>            :   /**
+<span class="lineNum">     551 </span>            :    * Checks if the type is builtin or not, and if not,
+<span class="lineNum">     552 </span>            :    * decrements the reference count of the type,
+<a name="553"><span class="lineNum">     553 </span>            :    * freeing it if the count reaches zero.</a>
+<span class="lineNum">     554 </span>            :    */
+<span class="lineNum">     555 </span><span class="lineCov">     925574 :   inline void intrusive_ptr_release(const base_type *ptr)</span>
+<span class="lineNum">     556 </span>            :   {
+<span class="lineNum">     557 </span><span class="lineCov">     925574 :     if (!is_builtin_type(ptr)) {</span>
+<span class="lineNum">     558 </span><span class="lineCov">     294492 :       if (--ptr-&gt;m_use_count == 0) {</span>
+<span class="lineNum">     559 </span><span class="lineCov">      34965 :         delete ptr;</span>
+<span class="lineNum">     560 </span>            :       }
+<span class="lineNum">     561 </span>            :     }
+<span class="lineNum">     562 </span><span class="lineCov">     925574 :   }</span>
+<span class="lineNum">     563 </span>            : 
+<span class="lineNum">     564 </span>            :   inline long intrusive_ptr_use_count(const base_type *ptr) { return ptr-&gt;m_use_count; }
+<span class="lineNum">     565 </span>            : 
+<span class="lineNum">     566 </span>            :   namespace detail {
+<span class="lineNum">     567 </span>            :     extern DYND_API uint8_t builtin_data_sizes[builtin_id_count];
+<span class="lineNum">     568 </span>            :     extern DYND_API uint8_t builtin_kinds[builtin_id_count];
+<span class="lineNum">     569 </span>            :     extern DYND_API uint8_t builtin_data_alignments[builtin_id_count];
+<span class="lineNum">     570 </span>            :   } // namespace dynd::ndt::detail
+<span class="lineNum">     571 </span>            : 
+<span class="lineNum">     572 </span>            :   /**
+<span class="lineNum">     573 </span>            :    * Returns the data size for the given type.
+<span class="lineNum">     574 </span>            :    *
+<a name="575"><span class="lineNum">     575 </span>            :    * \param bt  Pointer to a base_type object, or a builtin type id.</a>
+<span class="lineNum">     576 </span>            :    */
+<span class="lineNum">     577 </span><span class="lineCov">       4261 :   inline intptr_t get_base_type_data_size(const base_type *bt)</span>
+<span class="lineNum">     578 </span>            :   {
+<span class="lineNum">     579 </span><span class="lineCov">       4261 :     if (is_builtin_type(bt)) {</span>
+<span class="lineNum">     580 </span><span class="lineCov">       3665 :       return static_cast&lt;intptr_t&gt;(detail::builtin_data_sizes[reinterpret_cast&lt;uintptr_t&gt;(bt)]);</span>
+<span class="lineNum">     581 </span>            :     }
+<span class="lineNum">     582 </span>            :     else {
+<span class="lineNum">     583 </span><span class="lineCov">        596 :       return bt-&gt;get_data_size();</span>
+<span class="lineNum">     584 </span>            :     }
+<span class="lineNum">     585 </span>            :   }
+<span class="lineNum">     586 </span>            : 
+<span class="lineNum">     587 </span>            :   /**
+<span class="lineNum">     588 </span>            :    * Returns the kind for the given type.
+<span class="lineNum">     589 </span>            :    *
+<a name="590"><span class="lineNum">     590 </span>            :    * \param bt  Pointer to a base_type object, or a builtin type id.</a>
+<span class="lineNum">     591 </span>            :    */
+<span class="lineNum">     592 </span><span class="lineCov">      17719 :   inline type_kind_t get_base_type_kind(const base_type *bt)</span>
+<span class="lineNum">     593 </span>            :   {
+<span class="lineNum">     594 </span><span class="lineCov">      17719 :     if (is_builtin_type(bt)) {</span>
+<span class="lineNum">     595 </span><span class="lineCov">       4064 :       return static_cast&lt;type_kind_t&gt;(detail::builtin_kinds[reinterpret_cast&lt;uintptr_t&gt;(bt)]);</span>
+<span class="lineNum">     596 </span>            :     }
+<span class="lineNum">     597 </span>            :     else {
+<span class="lineNum">     598 </span><span class="lineCov">      13655 :       return bt-&gt;get_kind();</span>
+<span class="lineNum">     599 </span>            :     }
+<span class="lineNum">     600 </span>            :   }
+<span class="lineNum">     601 </span>            : 
+<span class="lineNum">     602 </span>            :   /**
+<span class="lineNum">     603 </span>            :    * Returns the alignment for the given type.
+<span class="lineNum">     604 </span>            :    *
+<a name="605"><span class="lineNum">     605 </span>            :    * \param bt  Pointer to a base_type object, or a builtin type id.</a>
+<span class="lineNum">     606 </span>            :    */
+<span class="lineNum">     607 </span><span class="lineCov">      18219 :   inline size_t get_base_type_alignment(const base_type *bt)</span>
+<span class="lineNum">     608 </span>            :   {
+<span class="lineNum">     609 </span><span class="lineCov">      18219 :     if (is_builtin_type(bt)) {</span>
+<span class="lineNum">     610 </span><span class="lineCov">       6311 :       return static_cast&lt;size_t&gt;(detail::builtin_data_alignments[reinterpret_cast&lt;uintptr_t&gt;(bt)]);</span>
+<span class="lineNum">     611 </span>            :     }
+<span class="lineNum">     612 </span>            :     else {
+<span class="lineNum">     613 </span><span class="lineCov">      11908 :       return bt-&gt;get_data_alignment();</span>
+<span class="lineNum">     614 </span>            :     }
+<span class="lineNum">     615 </span>            :   }
+<span class="lineNum">     616 </span>            : 
+<span class="lineNum">     617 </span>            : } // namespace dynd::ndt
+<span class="lineNum">     618 </span>            : 
+<span class="lineNum">     619 </span>            : /**
+<span class="lineNum">     620 </span>            :  * A pair of values describing the parameters of a single
+<span class="lineNum">     621 </span>            :  * strided dimension. When a type ``tp`` describes a multi-dimensional
+<span class="lineNum">     622 </span>            :  * strided array, its arrmeta always begins with an array
+<span class="lineNum">     623 </span>            :  * of ``size_stride_t`` with length ``tp.get_strided_ndim()``.
+<span class="lineNum">     624 </span>            :  */
+<span class="lineNum">     625 </span>            : struct DYND_API size_stride_t {
+<span class="lineNum">     626 </span>            :   intptr_t dim_size;
+<span class="lineNum">     627 </span>            :   intptr_t stride;
+<span class="lineNum">     628 </span>            : };
+<span class="lineNum">     629 </span>            : 
+<span class="lineNum">     630 </span>            : } // namespace dynd
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.10</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

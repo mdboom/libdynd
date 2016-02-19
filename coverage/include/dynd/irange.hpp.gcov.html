@@ -1,0 +1,240 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - coverage.info.cleaned - include/dynd/irange.hpp</title>
+  <link rel="stylesheet" type="text/css" href="../../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../../index.html">top level</a> - <a href="index.html">include/dynd</a> - irange.hpp<span style="font-size: 80%;"> (source / <a href="irange.hpp.func.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">coverage.info.cleaned</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">32</td>
+            <td class="headerCovTableEntry">32</td>
+            <td class="headerCovTableEntryHi">100.0 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2016-02-19</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">13</td>
+            <td class="headerCovTableEntry">13</td>
+            <td class="headerCovTableEntryHi">100.0 %</td>
+          </tr>
+          <tr><td><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : //</a>
+<span class="lineNum">       2 </span>            : // Copyright (C) 2011-15 DyND Developers
+<span class="lineNum">       3 </span>            : // BSD 2-Clause License, see LICENSE.txt
+<span class="lineNum">       4 </span>            : //
+<span class="lineNum">       5 </span>            : 
+<span class="lineNum">       6 </span>            : #pragma once
+<span class="lineNum">       7 </span>            : 
+<span class="lineNum">       8 </span>            : #include &lt;limits&gt;
+<span class="lineNum">       9 </span>            : 
+<span class="lineNum">      10 </span>            : #include &lt;dynd/config.hpp&gt;
+<span class="lineNum">      11 </span>            : 
+<span class="lineNum">      12 </span>            : namespace dynd {
+<span class="lineNum">      13 </span>            : 
+<span class="lineNum">      14 </span>            : /**
+<span class="lineNum">      15 </span>            :  * This class represents a range of indices, or a single index.
+<span class="lineNum">      16 </span>            :  *
+<span class="lineNum">      17 </span>            :  * The single index is indicated by a step of 0, in which case the
+<span class="lineNum">      18 </span>            :  * value of m_start is taken as that index. This form removes the
+<span class="lineNum">      19 </span>            :  * dimension it is indexing from the array.
+<span class="lineNum">      20 </span>            :  *
+<span class="lineNum">      21 </span>            :  * The range of indices is the set {m_start, m_start + m_step, ...
+<span class="lineNum">      22 </span>            :  * m_start + k * m_step} as large as possible where each element
+<span class="lineNum">      23 </span>            :  * is less than m_finish when m_step is positive, or greater than
+<span class="lineNum">      24 </span>            :  * m_finish when m_step is negative.
+<span class="lineNum">      25 </span>            :  *
+<span class="lineNum">      26 </span>            :  * The ways to construct this class do no error checking, in order
+<span class="lineNum">      27 </span>            :  * to fit the requirements of C++ DYND_CONSTEXPR.
+<span class="lineNum">      28 </span>            :  *
+<span class="lineNum">      29 </span>            :  * Typical ways to construct ranges are as follows:
+<span class="lineNum">      30 </span>            :  *
+<span class="lineNum">      31 </span>            :  * irange()                 // The full index range [begin, end)
+<span class="lineNum">      32 </span>            :  * 3 &lt;= irange()            // The index range [3, end)
+<span class="lineNum">      33 </span>            :  * 2 &lt;= irange() &lt; 10       // The index range [2, 10)
+<span class="lineNum">      34 </span>            :  * 1 &lt; irange() &lt; 5         // The index range [2, 5)
+<span class="lineNum">      35 </span>            :  * 3 &lt;= irange().by(2) &lt; 10   // The indices {3, 5, 7, 9}
+<span class="lineNum">      36 </span>            :  *
+<span class="lineNum">      37 </span>            :  * TODO: Should negative indices be supported with the meaning as in Python?
+<span class="lineNum">      38 </span>            :  */
+<span class="lineNum">      39 </span>            : class DYND_API irange {
+<a name="40"><span class="lineNum">      40 </span>            :     intptr_t m_start, m_finish, m_step;</a>
+<span class="lineNum">      41 </span>            : public:
+<span class="lineNum">      42 </span><span class="lineCov">        176 :     inline /*DYND_CONSTEXPR*/ irange()</span>
+<span class="lineNum">      43 </span><span class="lineCov">        176 :         : m_start(std::numeric_limits&lt;intptr_t&gt;::min()),</span>
+<span class="lineNum">      44 </span><span class="lineCov">        176 :           m_finish(std::numeric_limits&lt;intptr_t&gt;::max()), m_step(1) {</span>
+<a name="45"><span class="lineNum">      45 </span><span class="lineCov">        176 :     }</span></a>
+<span class="lineNum">      46 </span>            : 
+<span class="lineNum">      47 </span><span class="lineCov">     430914 :     inline DYND_CONSTEXPR irange(intptr_t idx)</span>
+<span class="lineNum">      48 </span><span class="lineCov">     430914 :         : m_start(idx), m_finish(idx), m_step(0) {</span>
+<a name="49"><span class="lineNum">      49 </span><span class="lineCov">     430914 :     }</span></a>
+<span class="lineNum">      50 </span>            : 
+<span class="lineNum">      51 </span><span class="lineCov">         42 :     inline DYND_CONSTEXPR irange(intptr_t start, intptr_t finish, intptr_t step = 1)</span>
+<span class="lineNum">      52 </span><span class="lineCov">         42 :         : m_start(start), m_finish(finish), m_step(step) {</span>
+<a name="53"><span class="lineNum">      53 </span><span class="lineCov">         42 :     }</span></a>
+<span class="lineNum">      54 </span>            : 
+<span class="lineNum">      55 </span><span class="lineCov">     861793 :     inline DYND_CONSTEXPR const intptr_t&amp; start() const {</span>
+<span class="lineNum">      56 </span><span class="lineCov">     861793 :         return m_start;</span>
+<a name="57"><span class="lineNum">      57 </span>            :     }</a>
+<span class="lineNum">      58 </span>            : 
+<span class="lineNum">      59 </span><span class="lineCov">        242 :     inline DYND_CONSTEXPR const intptr_t&amp; finish() const {</span>
+<span class="lineNum">      60 </span><span class="lineCov">        242 :         return m_finish;</span>
+<a name="61"><span class="lineNum">      61 </span>            :     }</a>
+<span class="lineNum">      62 </span>            : 
+<span class="lineNum">      63 </span><span class="lineCov">     862042 :     inline DYND_CONSTEXPR const intptr_t&amp; step() const {</span>
+<span class="lineNum">      64 </span><span class="lineCov">     862042 :         return m_step;</span>
+<span class="lineNum">      65 </span>            :     }
+<span class="lineNum">      66 </span>            : 
+<span class="lineNum">      67 </span>            :     inline void set_start(intptr_t value) {
+<span class="lineNum">      68 </span>            :         m_start = value;
+<span class="lineNum">      69 </span>            :     }
+<span class="lineNum">      70 </span>            : 
+<span class="lineNum">      71 </span>            :     inline void set_finish(intptr_t value) {
+<span class="lineNum">      72 </span>            :         m_finish = value;
+<span class="lineNum">      73 </span>            :     }
+<span class="lineNum">      74 </span>            : 
+<span class="lineNum">      75 </span>            :     inline void set_step(intptr_t value) {
+<span class="lineNum">      76 </span>            :         m_step = value;
+<span class="lineNum">      77 </span>            :     }
+<a name="78"><span class="lineNum">      78 </span>            : </a>
+<span class="lineNum">      79 </span>            :     /** Returns true if this irange does nothing, e.g. [:] */
+<span class="lineNum">      80 </span><span class="lineCov">         60 :     inline bool is_nop() const {</span>
+<span class="lineNum">      81 </span><span class="lineCov">        120 :         return m_start == std::numeric_limits&lt;intptr_t&gt;::min() &amp;&amp;</span>
+<span class="lineNum">      82 </span><span class="lineCov">        120 :             m_finish == std::numeric_limits&lt;intptr_t&gt;::max() &amp;&amp;</span>
+<span class="lineNum">      83 </span><span class="lineCov">        120 :             m_step == 1;</span>
+<span class="lineNum">      84 </span>            :     }
+<span class="lineNum">      85 </span>            : 
+<span class="lineNum">      86 </span>            :     /**
+<span class="lineNum">      87 </span>            :      * The notation &quot;irange().by(step)&quot; is a way to specify
+<a name="88"><span class="lineNum">      88 </span>            :      * the step of the range.</a>
+<span class="lineNum">      89 </span>            :      */
+<span class="lineNum">      90 </span><span class="lineCov">         11 :     DYND_CONSTEXPR irange by(intptr_t step) const {</span>
+<span class="lineNum">      91 </span><span class="lineCov">         11 :         return irange(m_start, m_finish, step);</span>
+<span class="lineNum">      92 </span>            :     }
+<span class="lineNum">      93 </span>            : 
+<span class="lineNum">      94 </span>            :     /**
+<span class="lineNum">      95 </span>            :      * The notation &quot;irange() &lt; finish&quot; is a way to specify
+<a name="96"><span class="lineNum">      96 </span>            :      * the end of a range with a positive step.</a>
+<span class="lineNum">      97 </span>            :      */
+<span class="lineNum">      98 </span><span class="lineCov">          9 :     DYND_CONSTEXPR irange operator&lt;(intptr_t finish) const {</span>
+<span class="lineNum">      99 </span><span class="lineCov">          9 :         return irange(m_start, finish, m_step);</span>
+<span class="lineNum">     100 </span>            :     }
+<span class="lineNum">     101 </span>            : 
+<span class="lineNum">     102 </span>            :     /**
+<span class="lineNum">     103 </span>            :      * The notation &quot;irange() &lt;= last&quot; is a way to specify
+<a name="104"><span class="lineNum">     104 </span>            :      * the end of a range with a positive step.</a>
+<span class="lineNum">     105 </span>            :      */
+<span class="lineNum">     106 </span><span class="lineCov">          3 :     DYND_CONSTEXPR irange operator&lt;=(intptr_t last) const {</span>
+<span class="lineNum">     107 </span><span class="lineCov">          3 :         return irange(m_start, (last != -1) ? (last+1) : std::numeric_limits&lt;intptr_t&gt;::max(), m_step);</span>
+<span class="lineNum">     108 </span>            :     }
+<span class="lineNum">     109 </span>            : 
+<span class="lineNum">     110 </span>            :     /**
+<span class="lineNum">     111 </span>            :      * The notation &quot;irange() &gt; finish&quot; is a way to specify
+<span class="lineNum">     112 </span>            :      * the end of a range with a negative step.
+<span class="lineNum">     113 </span>            :      */
+<span class="lineNum">     114 </span>            :     DYND_CONSTEXPR irange operator&gt;(intptr_t finish) const {
+<span class="lineNum">     115 </span>            :         return irange(m_start, finish, m_step);
+<span class="lineNum">     116 </span>            :     }
+<span class="lineNum">     117 </span>            : 
+<span class="lineNum">     118 </span>            :     /**
+<span class="lineNum">     119 </span>            :      * The notation &quot;irange() &gt;= last&quot; is a way to specify
+<a name="120"><span class="lineNum">     120 </span>            :      * the end of a range with a negative step.</a>
+<span class="lineNum">     121 </span>            :      */
+<span class="lineNum">     122 </span><span class="lineCov">          1 :     DYND_CONSTEXPR irange operator&gt;=(intptr_t last) const {</span>
+<span class="lineNum">     123 </span><span class="lineCov">          1 :         return irange(m_start, (last != 0) ? (last-1) : std::numeric_limits&lt;intptr_t&gt;::max(), m_step);</span>
+<span class="lineNum">     124 </span>            :     }
+<span class="lineNum">     125 </span>            : 
+<span class="lineNum">     126 </span>            :     friend DYND_CONSTEXPR irange operator&lt;(intptr_t start_minus_one, const irange&amp; i);
+<span class="lineNum">     127 </span>            :     friend DYND_CONSTEXPR irange operator&lt;=(intptr_t start, const irange&amp; i);
+<span class="lineNum">     128 </span>            :     friend DYND_CONSTEXPR irange operator&gt;(intptr_t start_plus_one, const irange&amp; i);
+<span class="lineNum">     129 </span>            :     friend DYND_CONSTEXPR irange operator&gt;=(intptr_t start, const irange&amp; i);
+<span class="lineNum">     130 </span>            : };
+<span class="lineNum">     131 </span>            : 
+<span class="lineNum">     132 </span>            : /**
+<span class="lineNum">     133 </span>            :  * The notation &quot;lower &lt; irange()&quot; is a way to specify
+<span class="lineNum">     134 </span>            :  * the beginning of a range with a positive step.
+<span class="lineNum">     135 </span>            :  */
+<span class="lineNum">     136 </span>            : inline DYND_CONSTEXPR irange operator&lt;(intptr_t start_minus_one, const irange&amp; i) {
+<span class="lineNum">     137 </span>            :     return irange(start_minus_one + 1, i.m_finish, i.m_step);
+<span class="lineNum">     138 </span>            : }
+<span class="lineNum">     139 </span>            : 
+<span class="lineNum">     140 </span>            : /**
+<span class="lineNum">     141 </span>            :  * The notation &quot;start &lt;= irange()&quot; is a way to specify
+<a name="142"><span class="lineNum">     142 </span>            :  * the beginning of a range with a positive step.</a>
+<span class="lineNum">     143 </span>            :  */
+<span class="lineNum">     144 </span><span class="lineCov">         12 : inline DYND_CONSTEXPR irange operator&lt;=(intptr_t start, const irange&amp; i) {</span>
+<span class="lineNum">     145 </span><span class="lineCov">         12 :     return irange(start, i.m_finish, i.m_step);</span>
+<span class="lineNum">     146 </span>            : }
+<span class="lineNum">     147 </span>            : 
+<span class="lineNum">     148 </span>            : /**
+<span class="lineNum">     149 </span>            :  * The notation &quot;upper &gt; irange()&quot; is a way to specify
+<span class="lineNum">     150 </span>            :  * the beginning of a range with a negative step.
+<span class="lineNum">     151 </span>            :  */
+<span class="lineNum">     152 </span>            : inline DYND_CONSTEXPR irange operator&gt;(intptr_t start_plus_one, const irange&amp; i) {
+<span class="lineNum">     153 </span>            :     return irange(start_plus_one - 1, i.m_finish, i.m_step);
+<span class="lineNum">     154 </span>            : }
+<span class="lineNum">     155 </span>            : 
+<span class="lineNum">     156 </span>            : /**
+<span class="lineNum">     157 </span>            :  * The notation &quot;start &gt;= irange()&quot; is a way to specify
+<a name="158"><span class="lineNum">     158 </span>            :  * the beginning of a range with a negative step.</a>
+<span class="lineNum">     159 </span>            :  */
+<span class="lineNum">     160 </span><span class="lineCov">          2 : inline DYND_CONSTEXPR irange operator&gt;=(intptr_t start, const irange&amp; i) {</span>
+<span class="lineNum">     161 </span><span class="lineCov">          2 :     return irange(start, i.m_finish, i.m_step);</span>
+<span class="lineNum">     162 </span>            : }
+<span class="lineNum">     163 </span>            : 
+<span class="lineNum">     164 </span>            : } // namespace dynd
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.10</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

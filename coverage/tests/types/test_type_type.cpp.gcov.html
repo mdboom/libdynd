@@ -1,0 +1,402 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - coverage.info.cleaned - tests/types/test_type_type.cpp</title>
+  <link rel="stylesheet" type="text/css" href="../../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../../index.html">top level</a> - <a href="index.html">tests/types</a> - test_type_type.cpp<span style="font-size: 80%;"> (source / <a href="test_type_type.cpp.func.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">coverage.info.cleaned</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">219</td>
+            <td class="headerCovTableEntry">220</td>
+            <td class="headerCovTableEntryHi">99.5 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2016-02-19</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">38</td>
+            <td class="headerCovTableEntry">38</td>
+            <td class="headerCovTableEntryHi">100.0 %</td>
+          </tr>
+          <tr><td><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : //</a>
+<span class="lineNum">       2 </span>            : // Copyright (C) 2011-15 DyND Developers
+<span class="lineNum">       3 </span>            : // BSD 2-Clause License, see LICENSE.txt
+<span class="lineNum">       4 </span>            : //
+<span class="lineNum">       5 </span>            : 
+<span class="lineNum">       6 </span>            : #include &lt;iostream&gt;
+<span class="lineNum">       7 </span>            : #include &lt;sstream&gt;
+<span class="lineNum">       8 </span>            : #include &lt;stdexcept&gt;
+<span class="lineNum">       9 </span>            : #include &quot;inc_gtest.hpp&quot;
+<span class="lineNum">      10 </span>            : 
+<span class="lineNum">      11 </span>            : #include &lt;dynd/array.hpp&gt;
+<span class="lineNum">      12 </span>            : #include &lt;dynd/types/type_type.hpp&gt;
+<span class="lineNum">      13 </span>            : #include &lt;dynd/types/fixed_dim_type.hpp&gt;
+<span class="lineNum">      14 </span>            : #include &lt;dynd/types/var_dim_type.hpp&gt;
+<span class="lineNum">      15 </span>            : 
+<span class="lineNum">      16 </span>            : using namespace std;
+<a name="17"><span class="lineNum">      17 </span>            : using namespace dynd;</a>
+<span class="lineNum">      18 </span>            : 
+<span class="lineNum">      19 </span><span class="lineCov">          5 : TEST(TypeType, Create)</span>
+<span class="lineNum">      20 </span>            : {
+<span class="lineNum">      21 </span><span class="lineCov">          2 :   ndt::type d;</span>
+<span class="lineNum">      22 </span>            : 
+<span class="lineNum">      23 </span>            :   // Strings with various encodings and sizes
+<span class="lineNum">      24 </span><span class="lineCov">          1 :   d = ndt::make_type&lt;ndt::type_type&gt;();</span>
+<span class="lineNum">      25 </span><span class="lineCov">          1 :   EXPECT_EQ(type_id, d.get_id());</span>
+<span class="lineNum">      26 </span><span class="lineCov">          1 :   EXPECT_EQ(scalar_kind_id, d.get_base_id());</span>
+<span class="lineNum">      27 </span><span class="lineCov">          1 :   EXPECT_EQ(ndt::type(&quot;type&quot;), d);</span>
+<span class="lineNum">      28 </span><span class="lineCov">          1 :   EXPECT_EQ(sizeof(const ndt::base_type *), d.get_data_alignment());</span>
+<span class="lineNum">      29 </span><span class="lineCov">          1 :   EXPECT_EQ(sizeof(const ndt::base_type *), d.get_data_size());</span>
+<span class="lineNum">      30 </span><span class="lineCov">          1 :   EXPECT_FALSE(d.is_expression());</span>
+<span class="lineNum">      31 </span>            :   // Roundtripping through a string
+<span class="lineNum">      32 </span><span class="lineCov">          1 :   EXPECT_EQ(d, ndt::type(d.str()));</span>
+<a name="33"><span class="lineNum">      33 </span><span class="lineCov">          1 : }</span></a>
+<span class="lineNum">      34 </span>            : 
+<span class="lineNum">      35 </span><span class="lineCov">          5 : TEST(TypeType, BasicNDArray)</span>
+<span class="lineNum">      36 </span>            : {
+<span class="lineNum">      37 </span><span class="lineCov">          2 :   nd::array a;</span>
+<span class="lineNum">      38 </span>            : 
+<span class="lineNum">      39 </span><span class="lineCov">          1 :   a = ndt::type(&quot;int32&quot;);</span>
+<span class="lineNum">      40 </span><span class="lineCov">          1 :   EXPECT_EQ(type_id, a.get_type().get_id());</span>
+<span class="lineNum">      41 </span><span class="lineCov">          1 :   EXPECT_EQ(ndt::make_type&lt;int32_t&gt;(), a.as&lt;ndt::type&gt;());</span>
+<a name="42"><span class="lineNum">      42 </span><span class="lineCov">          1 : }</span></a>
+<span class="lineNum">      43 </span>            : 
+<span class="lineNum">      44 </span><span class="lineCov">          5 : TEST(DTypeDType, StringCasting)</span>
+<span class="lineNum">      45 </span>            : {
+<span class="lineNum">      46 </span><span class="lineCov">          2 :   nd::array a;</span>
+<span class="lineNum">      47 </span>            : 
+<span class="lineNum">      48 </span><span class="lineCov">          1 :   a = nd::array(&quot;int32&quot;);</span>
+<span class="lineNum">      49 </span><span class="lineCov">          2 :   nd::array b = nd::empty(ndt::make_type&lt;ndt::type_type&gt;());</span>
+<span class="lineNum">      50 </span><span class="lineCov">          1 :   b.assign(a);</span>
+<span class="lineNum">      51 </span><span class="lineCov">          1 :   EXPECT_EQ(type_id, b.get_type().get_id());</span>
+<span class="lineNum">      52 </span><span class="lineCov">          1 :   EXPECT_EQ(ndt::make_type&lt;int32_t&gt;(), b.as&lt;ndt::type&gt;());</span>
+<span class="lineNum">      53 </span><span class="lineCov">          1 :   EXPECT_EQ(&quot;int32&quot;, b.as&lt;std::string&gt;());</span>
+<a name="54"><span class="lineNum">      54 </span><span class="lineCov">          1 : }</span></a>
+<span class="lineNum">      55 </span>            : 
+<span class="lineNum">      56 </span><span class="lineCov">          5 : TEST(DTypeDType, ScalarRefCount)</span>
+<span class="lineNum">      57 </span>            : {
+<span class="lineNum">      58 </span><span class="lineCov">          2 :   nd::array a;</span>
+<span class="lineNum">      59 </span><span class="lineCov">          2 :   ndt::type d, d2;</span>
+<span class="lineNum">      60 </span><span class="lineCov">          1 :   d = ndt::type(&quot;Fixed * 12 * int&quot;);</span>
+<span class="lineNum">      61 </span>            : 
+<span class="lineNum">      62 </span><span class="lineCov">          1 :   a = nd::empty(ndt::make_type&lt;ndt::type_type&gt;());</span>
+<span class="lineNum">      63 </span><span class="lineCov">          1 :   EXPECT_EQ(1, d.extended()-&gt;get_use_count());</span>
+<span class="lineNum">      64 </span><span class="lineCov">          1 :   a.vals() = d;</span>
+<span class="lineNum">      65 </span><span class="lineCov">          1 :   EXPECT_EQ(2, d.extended()-&gt;get_use_count());</span>
+<span class="lineNum">      66 </span><span class="lineCov">          1 :   d2 = a.as&lt;ndt::type&gt;();</span>
+<span class="lineNum">      67 </span><span class="lineCov">          1 :   EXPECT_EQ(3, d.extended()-&gt;get_use_count());</span>
+<span class="lineNum">      68 </span><span class="lineCov">          1 :   d2 = ndt::type();</span>
+<span class="lineNum">      69 </span><span class="lineCov">          1 :   EXPECT_EQ(2, d.extended()-&gt;get_use_count());</span>
+<span class="lineNum">      70 </span>            :   // Assigning a new value in the nd::array should free the reference in 'a'
+<span class="lineNum">      71 </span><span class="lineCov">          1 :   a.vals() = ndt::type();</span>
+<span class="lineNum">      72 </span><span class="lineCov">          1 :   EXPECT_EQ(1, d.extended()-&gt;get_use_count());</span>
+<span class="lineNum">      73 </span><span class="lineCov">          1 :   a.vals() = d;</span>
+<span class="lineNum">      74 </span><span class="lineCov">          1 :   EXPECT_EQ(2, d.extended()-&gt;get_use_count());</span>
+<span class="lineNum">      75 </span>            :   // Assigning a new reference to 'a' should free the reference when
+<span class="lineNum">      76 </span>            :   // destructing the existing 'a'
+<span class="lineNum">      77 </span><span class="lineCov">          1 :   a = 1.0;</span>
+<span class="lineNum">      78 </span><span class="lineCov">          1 :   EXPECT_EQ(1, d.extended()-&gt;get_use_count());</span>
+<a name="79"><span class="lineNum">      79 </span><span class="lineCov">          1 : }</span></a>
+<span class="lineNum">      80 </span>            : 
+<span class="lineNum">      81 </span><span class="lineCov">          5 : TEST(DTypeDType, StridedArrayRefCount)</span>
+<span class="lineNum">      82 </span>            : {
+<span class="lineNum">      83 </span><span class="lineCov">          2 :   nd::array a;</span>
+<span class="lineNum">      84 </span><span class="lineCov">          2 :   ndt::type d;</span>
+<span class="lineNum">      85 </span><span class="lineCov">          1 :   d = ndt::type(&quot;Fixed * 12 * int&quot;);</span>
+<span class="lineNum">      86 </span>            : 
+<span class="lineNum">      87 </span>            :   // 1D Strided Array
+<span class="lineNum">      88 </span><span class="lineCov">          1 :   a = nd::empty(10, ndt::make_type&lt;ndt::type_type&gt;());</span>
+<span class="lineNum">      89 </span><span class="lineCov">          1 :   EXPECT_EQ(1, d.extended()-&gt;get_use_count());</span>
+<span class="lineNum">      90 </span><span class="lineCov">          1 :   a.vals() = d;</span>
+<span class="lineNum">      91 </span><span class="lineCov">          1 :   EXPECT_EQ(11, d.extended()-&gt;get_use_count());</span>
+<span class="lineNum">      92 </span>            :   // Assigning one value should free one reference count
+<span class="lineNum">      93 </span><span class="lineCov">          1 :   a.vals_at(0) = ndt::make_type&lt;float&gt;();</span>
+<span class="lineNum">      94 </span><span class="lineCov">          1 :   EXPECT_EQ(10, d.extended()-&gt;get_use_count());</span>
+<span class="lineNum">      95 </span>            :   // Assigning all values should free all the reference counts
+<span class="lineNum">      96 </span><span class="lineCov">          1 :   a.vals() = ndt::make_type&lt;int&gt;();</span>
+<span class="lineNum">      97 </span><span class="lineCov">          1 :   EXPECT_EQ(1, d.extended()-&gt;get_use_count());</span>
+<span class="lineNum">      98 </span><span class="lineCov">          1 :   a.vals() = d;</span>
+<span class="lineNum">      99 </span><span class="lineCov">          1 :   EXPECT_EQ(11, d.extended()-&gt;get_use_count());</span>
+<span class="lineNum">     100 </span>            :   // Assigning a new reference to 'a' should free the references when
+<span class="lineNum">     101 </span>            :   // destructing the existing 'a'
+<span class="lineNum">     102 </span><span class="lineCov">          1 :   a = 1.0;</span>
+<span class="lineNum">     103 </span><span class="lineCov">          1 :   EXPECT_EQ(1, d.extended()-&gt;get_use_count());</span>
+<span class="lineNum">     104 </span>            : 
+<span class="lineNum">     105 </span>            :   // 2D Strided Array
+<span class="lineNum">     106 </span><span class="lineCov">          1 :   a = nd::empty(3, 3, &quot;type&quot;);</span>
+<span class="lineNum">     107 </span><span class="lineCov">          1 :   EXPECT_EQ(fixed_dim_id, a.get_type().get_id());</span>
+<span class="lineNum">     108 </span><span class="lineCov">          1 :   EXPECT_EQ(1, d.extended()-&gt;get_use_count());</span>
+<span class="lineNum">     109 </span><span class="lineCov">          1 :   a.vals() = d;</span>
+<span class="lineNum">     110 </span><span class="lineCov">          1 :   EXPECT_EQ(10, d.extended()-&gt;get_use_count());</span>
+<span class="lineNum">     111 </span>            :   // Assigning one value should free one reference count
+<span class="lineNum">     112 </span><span class="lineCov">          1 :   a.vals_at(0, 1) = ndt::make_type&lt;float&gt;();</span>
+<span class="lineNum">     113 </span><span class="lineCov">          1 :   EXPECT_EQ(9, d.extended()-&gt;get_use_count());</span>
+<span class="lineNum">     114 </span>            :   // Assigning all values should free all the reference counts
+<span class="lineNum">     115 </span><span class="lineCov">          1 :   a.vals() = ndt::make_type&lt;int&gt;();</span>
+<span class="lineNum">     116 </span><span class="lineCov">          1 :   EXPECT_EQ(1, d.extended()-&gt;get_use_count());</span>
+<span class="lineNum">     117 </span><span class="lineCov">          1 :   a.vals() = d;</span>
+<span class="lineNum">     118 </span><span class="lineCov">          1 :   EXPECT_EQ(10, d.extended()-&gt;get_use_count());</span>
+<span class="lineNum">     119 </span>            :   // Assigning one slice should free several reference counts
+<span class="lineNum">     120 </span><span class="lineCov">          1 :   a.vals_at(1) = ndt::make_type&lt;double&gt;();</span>
+<span class="lineNum">     121 </span><span class="lineCov">          1 :   EXPECT_EQ(7, d.extended()-&gt;get_use_count());</span>
+<span class="lineNum">     122 </span>            :   // Assigning a new reference to 'a' should free the references when
+<span class="lineNum">     123 </span>            :   // destructing the existing 'a'
+<span class="lineNum">     124 </span><span class="lineCov">          1 :   a = 1.0;</span>
+<span class="lineNum">     125 </span><span class="lineCov">          1 :   EXPECT_EQ(1, d.extended()-&gt;get_use_count());</span>
+<a name="126"><span class="lineNum">     126 </span><span class="lineCov">          1 : }</span></a>
+<span class="lineNum">     127 </span>            : 
+<span class="lineNum">     128 </span><span class="lineCov">          5 : TEST(DTypeDType, FixedArrayRefCount)</span>
+<span class="lineNum">     129 </span>            : {
+<span class="lineNum">     130 </span><span class="lineCov">          2 :   nd::array a;</span>
+<span class="lineNum">     131 </span><span class="lineCov">          2 :   ndt::type d;</span>
+<span class="lineNum">     132 </span><span class="lineCov">          1 :   d = ndt::type(&quot;Fixed * 12 * int&quot;);</span>
+<span class="lineNum">     133 </span>            : 
+<span class="lineNum">     134 </span>            :   // 1D Fixed Array
+<span class="lineNum">     135 </span><span class="lineCov">          1 :   a = nd::empty(ndt::make_fixed_dim(10, ndt::make_type&lt;ndt::type_type&gt;()));</span>
+<span class="lineNum">     136 </span><span class="lineCov">          1 :   EXPECT_EQ(1, d.extended()-&gt;get_use_count());</span>
+<span class="lineNum">     137 </span><span class="lineCov">          1 :   a.vals() = d;</span>
+<span class="lineNum">     138 </span><span class="lineCov">          1 :   EXPECT_EQ(11, d.extended()-&gt;get_use_count());</span>
+<span class="lineNum">     139 </span>            :   // Assigning one value should free one reference count
+<span class="lineNum">     140 </span><span class="lineCov">          1 :   a.vals_at(0) = ndt::make_type&lt;float&gt;();</span>
+<span class="lineNum">     141 </span><span class="lineCov">          1 :   EXPECT_EQ(10, d.extended()-&gt;get_use_count());</span>
+<span class="lineNum">     142 </span>            :   // Assigning all values should free all the reference counts
+<span class="lineNum">     143 </span><span class="lineCov">          1 :   a.vals() = ndt::make_type&lt;int&gt;();</span>
+<span class="lineNum">     144 </span><span class="lineCov">          1 :   EXPECT_EQ(1, d.extended()-&gt;get_use_count());</span>
+<span class="lineNum">     145 </span><span class="lineCov">          1 :   a.vals() = d;</span>
+<span class="lineNum">     146 </span><span class="lineCov">          1 :   EXPECT_EQ(11, d.extended()-&gt;get_use_count());</span>
+<span class="lineNum">     147 </span>            :   // Assigning a new reference to 'a' should free the references when
+<span class="lineNum">     148 </span>            :   // destructing the existing 'a'
+<span class="lineNum">     149 </span><span class="lineCov">          1 :   a = 1.0;</span>
+<span class="lineNum">     150 </span><span class="lineCov">          1 :   EXPECT_EQ(1, d.extended()-&gt;get_use_count());</span>
+<span class="lineNum">     151 </span>            : 
+<span class="lineNum">     152 </span>            :   // 2D Fixed Array
+<span class="lineNum">     153 </span><span class="lineCov">          1 :   a = nd::empty(ndt::type(&quot;3 * 3 * type&quot;));</span>
+<span class="lineNum">     154 </span><span class="lineCov">          1 :   EXPECT_EQ(fixed_dim_id, a.get_type().get_id());</span>
+<span class="lineNum">     155 </span><span class="lineCov">          1 :   EXPECT_EQ(1, d.extended()-&gt;get_use_count());</span>
+<span class="lineNum">     156 </span><span class="lineCov">          1 :   a.vals() = d;</span>
+<span class="lineNum">     157 </span><span class="lineCov">          1 :   EXPECT_EQ(10, d.extended()-&gt;get_use_count());</span>
+<span class="lineNum">     158 </span>            :   // Assigning one value should free one reference count
+<span class="lineNum">     159 </span><span class="lineCov">          1 :   a.vals_at(0, 1) = ndt::make_type&lt;float&gt;();</span>
+<span class="lineNum">     160 </span><span class="lineCov">          1 :   EXPECT_EQ(9, d.extended()-&gt;get_use_count());</span>
+<span class="lineNum">     161 </span>            :   // Assigning all values should free all the reference counts
+<span class="lineNum">     162 </span><span class="lineCov">          1 :   a.vals() = ndt::make_type&lt;int&gt;();</span>
+<span class="lineNum">     163 </span><span class="lineCov">          1 :   EXPECT_EQ(1, d.extended()-&gt;get_use_count());</span>
+<span class="lineNum">     164 </span><span class="lineCov">          1 :   a.vals() = d;</span>
+<span class="lineNum">     165 </span><span class="lineCov">          1 :   EXPECT_EQ(10, d.extended()-&gt;get_use_count());</span>
+<span class="lineNum">     166 </span>            :   // Assigning one slice should free several reference counts
+<span class="lineNum">     167 </span><span class="lineCov">          1 :   a.vals_at(1) = ndt::make_type&lt;double&gt;();</span>
+<span class="lineNum">     168 </span><span class="lineCov">          1 :   EXPECT_EQ(7, d.extended()-&gt;get_use_count());</span>
+<span class="lineNum">     169 </span>            :   // Assigning a new reference to 'a' should free the references when
+<span class="lineNum">     170 </span>            :   // destructing the existing 'a'
+<span class="lineNum">     171 </span><span class="lineCov">          1 :   a = 1.0;</span>
+<span class="lineNum">     172 </span><span class="lineCov">          1 :   EXPECT_EQ(1, d.extended()-&gt;get_use_count());</span>
+<a name="173"><span class="lineNum">     173 </span><span class="lineCov">          1 : }</span></a>
+<span class="lineNum">     174 </span>            : 
+<span class="lineNum">     175 </span><span class="lineCov">          5 : TEST(DTypeDType, VarArrayRefCount)</span>
+<span class="lineNum">     176 </span>            : {
+<span class="lineNum">     177 </span><span class="lineCov">          2 :   nd::array a;</span>
+<span class="lineNum">     178 </span><span class="lineCov">          2 :   ndt::type d;</span>
+<span class="lineNum">     179 </span><span class="lineCov">          1 :   d = ndt::type(&quot;Fixed * 12 * int&quot;);</span>
+<span class="lineNum">     180 </span>            : 
+<span class="lineNum">     181 </span>            :   // 1D Var Array
+<span class="lineNum">     182 </span><span class="lineCov">          1 :   a = nd::empty(ndt::var_dim_type::make(ndt::make_type&lt;ndt::type_type&gt;()));</span>
+<span class="lineNum">     183 </span>            :   // It should have an objectarray memory block type
+<span class="lineNum">     184 </span><span class="lineCov">          1 :   EXPECT_EQ((uint32_t)objectarray_memory_block_type,</span>
+<span class="lineNum">     185 </span><span class="lineNoCov">          0 :             reinterpret_cast&lt;const ndt::var_dim_type::metadata_type *&gt;(a.get()-&gt;metadata())-&gt;blockref-&gt;m_type);</span>
+<span class="lineNum">     186 </span><span class="lineCov">          1 :   a.vals() = nd::empty(&quot;10 * type&quot;);</span>
+<span class="lineNum">     187 </span><span class="lineCov">          1 :   EXPECT_EQ(1, d.extended()-&gt;get_use_count());</span>
+<span class="lineNum">     188 </span><span class="lineCov">          1 :   a.vals() = d;</span>
+<span class="lineNum">     189 </span><span class="lineCov">          1 :   EXPECT_EQ(11, d.extended()-&gt;get_use_count());</span>
+<span class="lineNum">     190 </span>            :   // Assigning one value should free one reference count
+<span class="lineNum">     191 </span><span class="lineCov">          1 :   a(0).vals() = ndt::make_type&lt;float&gt;();</span>
+<span class="lineNum">     192 </span><span class="lineCov">          1 :   EXPECT_EQ(10, d.extended()-&gt;get_use_count());</span>
+<span class="lineNum">     193 </span>            :   // Assigning all values should free all the reference counts
+<span class="lineNum">     194 </span><span class="lineCov">          1 :   a.vals() = ndt::make_type&lt;int&gt;();</span>
+<span class="lineNum">     195 </span><span class="lineCov">          1 :   EXPECT_EQ(1, d.extended()-&gt;get_use_count());</span>
+<span class="lineNum">     196 </span><span class="lineCov">          1 :   a.vals() = d;</span>
+<span class="lineNum">     197 </span><span class="lineCov">          1 :   EXPECT_EQ(11, d.extended()-&gt;get_use_count());</span>
+<span class="lineNum">     198 </span>            :   // Assigning a new reference to 'a' should free the references when
+<span class="lineNum">     199 </span>            :   // destructing the existing 'a'
+<span class="lineNum">     200 </span><span class="lineCov">          1 :   a = 1.0;</span>
+<span class="lineNum">     201 </span><span class="lineCov">          1 :   EXPECT_EQ(1, d.extended()-&gt;get_use_count());</span>
+<span class="lineNum">     202 </span>            : 
+<span class="lineNum">     203 </span>            :   // 2D Strided + Var Array
+<span class="lineNum">     204 </span><span class="lineCov">          1 :   a = nd::empty(3, ndt::var_dim_type::make(ndt::make_type&lt;ndt::type_type&gt;()));</span>
+<span class="lineNum">     205 </span><span class="lineCov">          1 :   a.vals_at(0) = nd::empty(&quot;2 * type&quot;);</span>
+<span class="lineNum">     206 </span><span class="lineCov">          1 :   a.vals_at(1) = nd::empty(&quot;3 * type&quot;);</span>
+<span class="lineNum">     207 </span><span class="lineCov">          1 :   a.vals_at(2) = nd::empty(&quot;4 * type&quot;);</span>
+<span class="lineNum">     208 </span><span class="lineCov">          1 :   EXPECT_EQ(1, d.extended()-&gt;get_use_count());</span>
+<span class="lineNum">     209 </span><span class="lineCov">          1 :   a.vals() = d;</span>
+<span class="lineNum">     210 </span><span class="lineCov">          1 :   EXPECT_EQ(10, d.extended()-&gt;get_use_count());</span>
+<span class="lineNum">     211 </span>            :   // Assigning one value should free one reference count
+<span class="lineNum">     212 </span><span class="lineCov">          1 :   a(0, 1).vals() = ndt::make_type&lt;float&gt;();</span>
+<span class="lineNum">     213 </span><span class="lineCov">          1 :   EXPECT_EQ(9, d.extended()-&gt;get_use_count());</span>
+<span class="lineNum">     214 </span>            :   // Assigning all values should free all the reference counts
+<span class="lineNum">     215 </span><span class="lineCov">          1 :   a.vals() = ndt::make_type&lt;int&gt;();</span>
+<span class="lineNum">     216 </span><span class="lineCov">          1 :   EXPECT_EQ(1, d.extended()-&gt;get_use_count());</span>
+<span class="lineNum">     217 </span><span class="lineCov">          1 :   a.vals() = d;</span>
+<span class="lineNum">     218 </span><span class="lineCov">          1 :   EXPECT_EQ(10, d.extended()-&gt;get_use_count());</span>
+<span class="lineNum">     219 </span>            :   // Assigning one slice should free several reference counts
+<span class="lineNum">     220 </span><span class="lineCov">          1 :   a.vals_at(2) = ndt::make_type&lt;double&gt;();</span>
+<span class="lineNum">     221 </span><span class="lineCov">          1 :   EXPECT_EQ(6, d.extended()-&gt;get_use_count());</span>
+<span class="lineNum">     222 </span>            :   // Assigning a new reference to 'a' should free the references when
+<span class="lineNum">     223 </span>            :   // destructing the existing 'a'
+<span class="lineNum">     224 </span><span class="lineCov">          1 :   a = 1.0;</span>
+<span class="lineNum">     225 </span><span class="lineCov">          1 :   EXPECT_EQ(1, d.extended()-&gt;get_use_count());</span>
+<a name="226"><span class="lineNum">     226 </span><span class="lineCov">          1 : }</span></a>
+<span class="lineNum">     227 </span>            : 
+<span class="lineNum">     228 </span><span class="lineCov">          5 : TEST(DTypeDType, CStructRefCount)</span>
+<span class="lineNum">     229 </span>            : {
+<span class="lineNum">     230 </span><span class="lineCov">          2 :   nd::array a;</span>
+<span class="lineNum">     231 </span><span class="lineCov">          2 :   ndt::type d;</span>
+<span class="lineNum">     232 </span><span class="lineCov">          1 :   d = ndt::type(&quot;Fixed * 12 * int&quot;);</span>
+<span class="lineNum">     233 </span>            : 
+<span class="lineNum">     234 </span>            :   // Single CStruct Instance
+<span class="lineNum">     235 </span><span class="lineCov">          1 :   a = nd::empty(&quot;{dt: type, more: {a: int32, b: type}, other: string}&quot;);</span>
+<span class="lineNum">     236 </span><span class="lineCov">          1 :   EXPECT_EQ(struct_id, a.get_type().get_id());</span>
+<span class="lineNum">     237 </span><span class="lineCov">          1 :   EXPECT_EQ(1, d.extended()-&gt;get_use_count());</span>
+<span class="lineNum">     238 </span><span class="lineCov">          1 :   a.p(&quot;dt&quot;).vals() = d;</span>
+<span class="lineNum">     239 </span><span class="lineCov">          1 :   EXPECT_EQ(2, d.extended()-&gt;get_use_count());</span>
+<span class="lineNum">     240 </span><span class="lineCov">          1 :   a.p(&quot;more&quot;).p(&quot;b&quot;).vals() = d;</span>
+<span class="lineNum">     241 </span><span class="lineCov">          1 :   EXPECT_EQ(3, d.extended()-&gt;get_use_count());</span>
+<span class="lineNum">     242 </span>            :   // Assigning one value should free one reference count
+<span class="lineNum">     243 </span><span class="lineCov">          1 :   a.vals_at(0) = ndt::type();</span>
+<span class="lineNum">     244 </span><span class="lineCov">          1 :   EXPECT_EQ(2, d.extended()-&gt;get_use_count());</span>
+<span class="lineNum">     245 </span><span class="lineCov">          1 :   a.vals_at(1, 1) = ndt::make_type&lt;int&gt;();</span>
+<span class="lineNum">     246 </span><span class="lineCov">          1 :   EXPECT_EQ(1, d.extended()-&gt;get_use_count());</span>
+<span class="lineNum">     247 </span><span class="lineCov">          1 :   a.vals_at(0) = d;</span>
+<span class="lineNum">     248 </span><span class="lineCov">          1 :   EXPECT_EQ(2, d.extended()-&gt;get_use_count());</span>
+<span class="lineNum">     249 </span><span class="lineCov">          1 :   a.vals_at(1, 1) = d;</span>
+<span class="lineNum">     250 </span><span class="lineCov">          1 :   EXPECT_EQ(3, d.extended()-&gt;get_use_count());</span>
+<span class="lineNum">     251 </span>            :   // Assigning a new reference to 'a' should free the references when
+<span class="lineNum">     252 </span>            :   // destructing the existing 'a'
+<span class="lineNum">     253 </span><span class="lineCov">          1 :   a = 1.0;</span>
+<span class="lineNum">     254 </span><span class="lineCov">          1 :   EXPECT_EQ(1, d.extended()-&gt;get_use_count());</span>
+<span class="lineNum">     255 </span>            : 
+<span class="lineNum">     256 </span>            :   // Array of CStruct Instance
+<span class="lineNum">     257 </span><span class="lineCov">          1 :   a = nd::empty(10, &quot;{dt: type, more: {a: int32, b: type}, other: string}&quot;);</span>
+<span class="lineNum">     258 </span><span class="lineCov">          1 :   EXPECT_EQ(struct_id, a(0).get_type().get_id());</span>
+<span class="lineNum">     259 </span><span class="lineCov">          1 :   EXPECT_EQ(1, d.extended()-&gt;get_use_count());</span>
+<span class="lineNum">     260 </span><span class="lineCov">          1 :   a.p(&quot;dt&quot;).vals() = d;</span>
+<span class="lineNum">     261 </span><span class="lineCov">          1 :   EXPECT_EQ(11, d.extended()-&gt;get_use_count());</span>
+<span class="lineNum">     262 </span><span class="lineCov">          1 :   a.p(&quot;more&quot;).p(&quot;b&quot;).vals() = d;</span>
+<span class="lineNum">     263 </span><span class="lineCov">          1 :   EXPECT_EQ(21, d.extended()-&gt;get_use_count());</span>
+<span class="lineNum">     264 </span>            :   // Assigning one value should free one reference count
+<span class="lineNum">     265 </span><span class="lineCov">          1 :   a.vals_at(0, 0) = ndt::type();</span>
+<span class="lineNum">     266 </span><span class="lineCov">          1 :   EXPECT_EQ(20, d.extended()-&gt;get_use_count());</span>
+<span class="lineNum">     267 </span><span class="lineCov">          1 :   a.vals_at(-1, 1, 1) = ndt::make_type&lt;int&gt;();</span>
+<span class="lineNum">     268 </span><span class="lineCov">          1 :   EXPECT_EQ(19, d.extended()-&gt;get_use_count());</span>
+<span class="lineNum">     269 </span>            :   // Assigning one slice should free several reference counts
+<span class="lineNum">     270 </span><span class="lineCov">          1 :   a(3 &lt;= irange() &lt; 6).p(&quot;dt&quot;).vals() = ndt::type();</span>
+<span class="lineNum">     271 </span><span class="lineCov">          1 :   EXPECT_EQ(16, d.extended()-&gt;get_use_count());</span>
+<span class="lineNum">     272 </span>            :   // Assigning a new reference to 'a' should free the references when
+<span class="lineNum">     273 </span>            :   // destructing the existing 'a'
+<span class="lineNum">     274 </span><span class="lineCov">          1 :   a = 1.0;</span>
+<span class="lineNum">     275 </span><span class="lineCov">          1 :   EXPECT_EQ(1, d.extended()-&gt;get_use_count());</span>
+<a name="276"><span class="lineNum">     276 </span><span class="lineCov">          1 : }</span></a>
+<span class="lineNum">     277 </span>            : 
+<span class="lineNum">     278 </span><span class="lineCov">          5 : TEST(DTypeDType, StructRefCount)</span>
+<span class="lineNum">     279 </span>            : {
+<span class="lineNum">     280 </span><span class="lineCov">          2 :   nd::array a;</span>
+<span class="lineNum">     281 </span><span class="lineCov">          2 :   ndt::type d;</span>
+<span class="lineNum">     282 </span><span class="lineCov">          1 :   d = ndt::type(&quot;Fixed * 12 * int&quot;);</span>
+<span class="lineNum">     283 </span>            : 
+<span class="lineNum">     284 </span>            :   // Single CStruct Instance
+<span class="lineNum">     285 </span><span class="lineCov">          1 :   a = nd::empty(&quot;{dt: type, more: {a: int32, b: type}, other: string}&quot;)(0 &lt;= irange() &lt; 2);</span>
+<span class="lineNum">     286 </span><span class="lineCov">          1 :   EXPECT_EQ(struct_id, a.get_type().get_id());</span>
+<span class="lineNum">     287 </span><span class="lineCov">          1 :   EXPECT_EQ(1, d.extended()-&gt;get_use_count());</span>
+<span class="lineNum">     288 </span><span class="lineCov">          1 :   a.p(&quot;dt&quot;).vals() = d;</span>
+<span class="lineNum">     289 </span><span class="lineCov">          1 :   EXPECT_EQ(2, d.extended()-&gt;get_use_count());</span>
+<span class="lineNum">     290 </span><span class="lineCov">          1 :   a.p(&quot;more&quot;).p(&quot;b&quot;).vals() = d;</span>
+<span class="lineNum">     291 </span><span class="lineCov">          1 :   EXPECT_EQ(3, d.extended()-&gt;get_use_count());</span>
+<span class="lineNum">     292 </span>            :   // Assigning one value should free one reference count
+<span class="lineNum">     293 </span><span class="lineCov">          1 :   a.vals_at(0) = ndt::type();</span>
+<span class="lineNum">     294 </span><span class="lineCov">          1 :   EXPECT_EQ(2, d.extended()-&gt;get_use_count());</span>
+<span class="lineNum">     295 </span><span class="lineCov">          1 :   a.vals_at(1, 1) = ndt::make_type&lt;int&gt;();</span>
+<span class="lineNum">     296 </span><span class="lineCov">          1 :   EXPECT_EQ(1, d.extended()-&gt;get_use_count());</span>
+<span class="lineNum">     297 </span><span class="lineCov">          1 :   a.vals_at(0) = d;</span>
+<span class="lineNum">     298 </span><span class="lineCov">          1 :   EXPECT_EQ(2, d.extended()-&gt;get_use_count());</span>
+<span class="lineNum">     299 </span><span class="lineCov">          1 :   a.vals_at(1, 1) = d;</span>
+<span class="lineNum">     300 </span><span class="lineCov">          1 :   EXPECT_EQ(3, d.extended()-&gt;get_use_count());</span>
+<span class="lineNum">     301 </span>            :   // Assigning a new reference to 'a' should free the references when
+<span class="lineNum">     302 </span>            :   // destructing the existing 'a'
+<span class="lineNum">     303 </span><span class="lineCov">          1 :   a = 1.0;</span>
+<span class="lineNum">     304 </span><span class="lineCov">          1 :   EXPECT_EQ(1, d.extended()-&gt;get_use_count());</span>
+<span class="lineNum">     305 </span>            : 
+<span class="lineNum">     306 </span>            :   // Array of Struct Instance
+<span class="lineNum">     307 </span><span class="lineCov">          1 :   a = nd::empty(10, &quot;{dt: type, more: {a: int32, b: type}, other: string}&quot;)(irange(), 0 &lt;= irange() &lt; 2);</span>
+<span class="lineNum">     308 </span><span class="lineCov">          1 :   EXPECT_EQ(struct_id, a(0).get_type().get_id());</span>
+<span class="lineNum">     309 </span><span class="lineCov">          1 :   EXPECT_EQ(1, d.extended()-&gt;get_use_count());</span>
+<span class="lineNum">     310 </span><span class="lineCov">          1 :   a.p(&quot;dt&quot;).vals() = d;</span>
+<span class="lineNum">     311 </span><span class="lineCov">          1 :   EXPECT_EQ(11, d.extended()-&gt;get_use_count());</span>
+<span class="lineNum">     312 </span><span class="lineCov">          1 :   a.p(&quot;more&quot;).p(&quot;b&quot;).vals() = d;</span>
+<span class="lineNum">     313 </span><span class="lineCov">          1 :   EXPECT_EQ(21, d.extended()-&gt;get_use_count());</span>
+<span class="lineNum">     314 </span>            :   // Assigning one value should free one reference count
+<span class="lineNum">     315 </span><span class="lineCov">          1 :   a.vals_at(0, 0) = ndt::type();</span>
+<span class="lineNum">     316 </span><span class="lineCov">          1 :   EXPECT_EQ(20, d.extended()-&gt;get_use_count());</span>
+<span class="lineNum">     317 </span><span class="lineCov">          1 :   a.vals_at(-1, 1, 1) = ndt::make_type&lt;int&gt;();</span>
+<span class="lineNum">     318 </span><span class="lineCov">          1 :   EXPECT_EQ(19, d.extended()-&gt;get_use_count());</span>
+<span class="lineNum">     319 </span>            :   // Assigning one slice should free several reference counts
+<span class="lineNum">     320 </span><span class="lineCov">          1 :   a(3 &lt;= irange() &lt; 6).p(&quot;dt&quot;).vals() = ndt::type();</span>
+<span class="lineNum">     321 </span><span class="lineCov">          1 :   EXPECT_EQ(16, d.extended()-&gt;get_use_count());</span>
+<span class="lineNum">     322 </span>            :   // Assigning a new reference to 'a' should free the references when
+<span class="lineNum">     323 </span>            :   // destructing the existing 'a'
+<a name="324"><span class="lineNum">     324 </span><span class="lineCov">          1 :   a = 1.0;</span></a>
+<span class="lineNum">     325 </span><span class="lineCov">          1 :   EXPECT_EQ(1, d.extended()-&gt;get_use_count());</span>
+<span class="lineNum">     326 </span><span class="lineCov">          4 : }</span>
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.10</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

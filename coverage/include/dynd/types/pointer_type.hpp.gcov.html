@@ -1,0 +1,188 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - coverage.info.cleaned - include/dynd/types/pointer_type.hpp</title>
+  <link rel="stylesheet" type="text/css" href="../../../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../../../index.html">top level</a> - <a href="index.html">include/dynd/types</a> - pointer_type.hpp<span style="font-size: 80%;"> (source / <a href="pointer_type.hpp.func.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">coverage.info.cleaned</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">7</td>
+            <td class="headerCovTableEntry">7</td>
+            <td class="headerCovTableEntryHi">100.0 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2016-02-19</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">5</td>
+            <td class="headerCovTableEntry">5</td>
+            <td class="headerCovTableEntryHi">100.0 %</td>
+          </tr>
+          <tr><td><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : //</a>
+<span class="lineNum">       2 </span>            : // Copyright (C) 2011-15 DyND Developers
+<span class="lineNum">       3 </span>            : // BSD 2-Clause License, see LICENSE.txt
+<span class="lineNum">       4 </span>            : //
+<span class="lineNum">       5 </span>            : 
+<span class="lineNum">       6 </span>            : /**
+<span class="lineNum">       7 </span>            :  * The pointer type contains C/C++ raw pointers
+<span class="lineNum">       8 </span>            :  * pointing at data in other memory_blocks, using
+<span class="lineNum">       9 </span>            :  * blockrefs to manage the memory.
+<span class="lineNum">      10 </span>            :  *
+<span class="lineNum">      11 </span>            :  * This type operates in a &quot;gather/scatter&quot; fashion,
+<span class="lineNum">      12 </span>            :  * exposing itself as an expression type whose expression
+<span class="lineNum">      13 </span>            :  * copies the data to/from the pointer targets.
+<span class="lineNum">      14 </span>            :  */
+<span class="lineNum">      15 </span>            : 
+<span class="lineNum">      16 </span>            : #pragma once
+<span class="lineNum">      17 </span>            : 
+<span class="lineNum">      18 </span>            : #include &lt;dynd/type.hpp&gt;
+<span class="lineNum">      19 </span>            : 
+<a name="20"><span class="lineNum">      20 </span>            : namespace dynd {</a>
+<span class="lineNum">      21 </span>            : 
+<span class="lineNum">      22 </span><span class="lineCov">          2 : struct DYND_API pointer_type_arrmeta {</span>
+<span class="lineNum">      23 </span>            :   /**
+<span class="lineNum">      24 </span>            :    * A reference to the memory block which contains the data.
+<span class="lineNum">      25 </span>            :    */
+<span class="lineNum">      26 </span>            :   intrusive_ptr&lt;memory_block_data&gt; blockref;
+<span class="lineNum">      27 </span>            :   /* Each pointed-to destination is offset by this amount */
+<span class="lineNum">      28 </span>            :   intptr_t offset;
+<span class="lineNum">      29 </span>            : };
+<span class="lineNum">      30 </span>            : 
+<span class="lineNum">      31 </span>            : namespace ndt {
+<span class="lineNum">      32 </span>            : 
+<span class="lineNum">      33 </span>            :   class DYND_API pointer_type : public base_expr_type {
+<span class="lineNum">      34 </span>            :     type m_target_tp;
+<span class="lineNum">      35 </span>            : 
+<span class="lineNum">      36 </span>            :   public:
+<span class="lineNum">      37 </span>            :     pointer_type(const type &amp;target_tp);
+<span class="lineNum">      38 </span>            : 
+<a name="39"><span class="lineNum">      39 </span>            :     virtual ~pointer_type();</a>
+<span class="lineNum">      40 </span>            : 
+<span class="lineNum">      41 </span><span class="lineCov">          1 :     const type &amp;get_value_type() const { return m_target_tp.value_type(); }</span>
+<a name="42"><span class="lineNum">      42 </span>            :     const type &amp;get_operand_type() const;</a>
+<span class="lineNum">      43 </span>            : 
+<span class="lineNum">      44 </span><span class="lineCov">          3 :     const type &amp;get_target_type() const { return m_target_tp; }</span>
+<span class="lineNum">      45 </span>            : 
+<span class="lineNum">      46 </span>            :     void print_data(std::ostream &amp;o, const char *arrmeta, const char *data) const;
+<span class="lineNum">      47 </span>            : 
+<a name="48"><span class="lineNum">      48 </span>            :     void print_type(std::ostream &amp;o) const;</a>
+<span class="lineNum">      49 </span>            : 
+<span class="lineNum">      50 </span><span class="lineCov">          3 :     inline bool is_type_subarray(const type &amp;subarray_tp) const</span>
+<span class="lineNum">      51 </span>            :     {
+<span class="lineNum">      52 </span>            :       // Uniform dimensions can share one implementation
+<span class="lineNum">      53 </span><span class="lineCov">          4 :       return (!subarray_tp.is_builtin() &amp;&amp; (*this) == (*subarray_tp.extended())) ||</span>
+<span class="lineNum">      54 </span><span class="lineCov">          4 :              m_target_tp.is_type_subarray(subarray_tp);</span>
+<span class="lineNum">      55 </span>            :     }
+<span class="lineNum">      56 </span>            : 
+<span class="lineNum">      57 </span>            :     bool is_expression() const;
+<span class="lineNum">      58 </span>            :     bool is_unique_data_owner(const char *arrmeta) const;
+<span class="lineNum">      59 </span>            :     void transform_child_types(type_transform_fn_t transform_fn, intptr_t arrmeta_offset, void *extra,
+<span class="lineNum">      60 </span>            :                                type &amp;out_transformed_tp, bool &amp;out_was_transformed) const;
+<span class="lineNum">      61 </span>            :     type get_canonical_type() const;
+<span class="lineNum">      62 </span>            : 
+<span class="lineNum">      63 </span>            :     type apply_linear_index(intptr_t nindices, const irange *indices, size_t current_i, const type &amp;root_tp,
+<span class="lineNum">      64 </span>            :                             bool leading_dimension) const;
+<span class="lineNum">      65 </span>            :     intptr_t apply_linear_index(intptr_t nindices, const irange *indices, const char *arrmeta, const type &amp;result_tp,
+<span class="lineNum">      66 </span>            :                                 char *out_arrmeta, const intrusive_ptr&lt;memory_block_data&gt; &amp;embedded_reference,
+<span class="lineNum">      67 </span>            :                                 size_t current_i, const type &amp;root_tp, bool leading_dimension, char **inout_data,
+<span class="lineNum">      68 </span>            :                                 intrusive_ptr&lt;memory_block_data&gt; &amp;inout_dataref) const;
+<span class="lineNum">      69 </span>            :     type at_single(intptr_t i0, const char **inout_arrmeta, const char **inout_data) const;
+<span class="lineNum">      70 </span>            : 
+<span class="lineNum">      71 </span>            :     type get_type_at_dimension(char **inout_arrmeta, intptr_t i, intptr_t total_ndim = 0) const;
+<span class="lineNum">      72 </span>            : 
+<span class="lineNum">      73 </span>            :     void get_shape(intptr_t ndim, intptr_t i, intptr_t *out_shape, const char *arrmeta, const char *data) const;
+<span class="lineNum">      74 </span>            : 
+<span class="lineNum">      75 </span>            :     axis_order_classification_t classify_axis_order(const char *arrmeta) const;
+<span class="lineNum">      76 </span>            : 
+<span class="lineNum">      77 </span>            :     bool is_lossless_assignment(const type &amp;dst_tp, const type &amp;src_tp) const;
+<span class="lineNum">      78 </span>            : 
+<span class="lineNum">      79 </span>            :     bool operator==(const base_type &amp;rhs) const;
+<span class="lineNum">      80 </span>            : 
+<span class="lineNum">      81 </span>            :     type with_replaced_storage_type(const type &amp;replacement_type) const;
+<span class="lineNum">      82 </span>            : 
+<span class="lineNum">      83 </span>            :     void arrmeta_default_construct(char *arrmeta, bool blockref_alloc) const;
+<span class="lineNum">      84 </span>            :     void arrmeta_copy_construct(char *dst_arrmeta, const char *src_arrmeta,
+<span class="lineNum">      85 </span>            :                                 const intrusive_ptr&lt;memory_block_data&gt; &amp;embedded_reference) const;
+<span class="lineNum">      86 </span>            :     void arrmeta_reset_buffers(char *arrmeta) const;
+<span class="lineNum">      87 </span>            :     void arrmeta_finalize_buffers(char *arrmeta) const;
+<span class="lineNum">      88 </span>            :     void arrmeta_destruct(char *arrmeta) const;
+<span class="lineNum">      89 </span>            :     void arrmeta_debug_print(const char *arrmeta, std::ostream &amp;o, const std::string &amp;indent) const;
+<span class="lineNum">      90 </span>            : 
+<span class="lineNum">      91 </span>            :     bool match(const char *arrmeta, const type &amp;candidate_tp, const char *candidate_arrmeta,
+<span class="lineNum">      92 </span>            :                std::map&lt;std::string, type&gt; &amp;tp_vars) const;
+<span class="lineNum">      93 </span>            : 
+<span class="lineNum">      94 </span>            :     std::map&lt;std::string, nd::callable&gt; get_dynamic_type_properties() const;
+<span class="lineNum">      95 </span>            :     std::map&lt;std::string, nd::callable&gt; get_dynamic_array_functions() const;
+<span class="lineNum">      96 </span>            : 
+<span class="lineNum">      97 </span>            :     static type make(const type &amp;target_tp);
+<span class="lineNum">      98 </span>            :   };
+<span class="lineNum">      99 </span>            : 
+<span class="lineNum">     100 </span>            :   template &lt;typename T&gt;
+<span class="lineNum">     101 </span>            :   struct traits&lt;T *&gt; {
+<span class="lineNum">     102 </span>            :     static const size_t ndim = 0;
+<span class="lineNum">     103 </span>            : 
+<a name="104"><span class="lineNum">     104 </span>            :     static const bool is_same_layout = true;</a>
+<span class="lineNum">     105 </span>            : 
+<span class="lineNum">     106 </span><span class="lineCov">         28 :     static type equivalent() { return pointer_type::make(make_type&lt;T&gt;()); }</span>
+<span class="lineNum">     107 </span>            :   };
+<span class="lineNum">     108 </span>            : 
+<span class="lineNum">     109 </span>            :   inline type make_pointer_type(const type &amp;target_tp) { return pointer_type::make(target_tp); }
+<span class="lineNum">     110 </span>            : 
+<span class="lineNum">     111 </span>            : } // namespace dynd::ndt
+<span class="lineNum">     112 </span>            : } // namespace dynd
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.10</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

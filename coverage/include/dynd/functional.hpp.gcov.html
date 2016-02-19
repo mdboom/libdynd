@@ -1,0 +1,300 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - coverage.info.cleaned - include/dynd/functional.hpp</title>
+  <link rel="stylesheet" type="text/css" href="../../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../../index.html">top level</a> - <a href="index.html">include/dynd</a> - functional.hpp<span style="font-size: 80%;"> (source / <a href="functional.hpp.func.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">coverage.info.cleaned</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">71</td>
+            <td class="headerCovTableEntry">80</td>
+            <td class="headerCovTableEntryMed">88.8 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2016-02-19</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">86</td>
+            <td class="headerCovTableEntry">136</td>
+            <td class="headerCovTableEntryLo">63.2 %</td>
+          </tr>
+          <tr><td><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : //</a>
+<span class="lineNum">       2 </span>            : // Copyright (C) 2011-15 DyND Developers
+<span class="lineNum">       3 </span>            : // BSD 2-Clause License, see LICENSE.txt
+<span class="lineNum">       4 </span>            : //
+<span class="lineNum">       5 </span>            : 
+<span class="lineNum">       6 </span>            : #pragma once
+<span class="lineNum">       7 </span>            : 
+<span class="lineNum">       8 </span>            : #include &lt;numeric&gt;
+<span class="lineNum">       9 </span>            : 
+<span class="lineNum">      10 </span>            : #include &lt;dynd/kernels/adapt_kernel.hpp&gt;
+<span class="lineNum">      11 </span>            : #include &lt;dynd/kernels/call_kernel.hpp&gt;
+<span class="lineNum">      12 </span>            : #include &lt;dynd/kernels/forward_na_kernel.hpp&gt;
+<span class="lineNum">      13 </span>            : #include &lt;dynd/func/elwise.hpp&gt;
+<span class="lineNum">      14 </span>            : #include &lt;dynd/func/outer.hpp&gt;
+<span class="lineNum">      15 </span>            : #include &lt;dynd/func/permute.hpp&gt;
+<span class="lineNum">      16 </span>            : #include &lt;dynd/iterator.hpp&gt;
+<span class="lineNum">      17 </span>            : #include &lt;dynd/callable.hpp&gt;
+<span class="lineNum">      18 </span>            : #include &lt;dynd/kernels/multidispatch_kernel.hpp&gt;
+<span class="lineNum">      19 </span>            : #include &lt;dynd/callables/dispatcher_callable.hpp&gt;
+<span class="lineNum">      20 </span>            : 
+<span class="lineNum">      21 </span>            : namespace dynd {
+<span class="lineNum">      22 </span>            : namespace nd {
+<span class="lineNum">      23 </span>            :   namespace functional {
+<a name="24"><span class="lineNum">      24 </span>            : </a>
+<span class="lineNum">      25 </span>            :     template &lt;typename FuncType&gt;
+<span class="lineNum">      26 </span><span class="lineCov">         73 :     callable call(const ndt::type &amp;tp)</span>
+<span class="lineNum">      27 </span>            :     {
+<span class="lineNum">      28 </span><span class="lineCov">         73 :       return callable::make&lt;call_kernel&lt;FuncType&gt;&gt;(tp);</span>
+<span class="lineNum">      29 </span>            :     }
+<span class="lineNum">      30 </span>            : 
+<span class="lineNum">      31 </span>            :     /**
+<span class="lineNum">      32 </span>            :      * Creates a multiple dispatch callable out of a set of callables. The
+<span class="lineNum">      33 </span>            :      * input callables must have concrete signatures.
+<span class="lineNum">      34 </span>            :      *
+<span class="lineNum">      35 </span>            :      * \param naf  The number of callables provided.
+<span class="lineNum">      36 </span>            :      * \param af  The array of input callables, sized ``naf``.
+<span class="lineNum">      37 </span>            :      */
+<a name="38"><span class="lineNum">      38 </span>            :     DYND_API callable old_multidispatch(intptr_t naf, const callable *af);</a>
+<span class="lineNum">      39 </span>            : 
+<span class="lineNum">      40 </span><span class="lineCov">         22 :     inline callable old_multidispatch(const std::initializer_list&lt;callable&gt; &amp;children)</span>
+<span class="lineNum">      41 </span>            :     {
+<span class="lineNum">      42 </span><span class="lineCov">         22 :       return old_multidispatch(children.size(), children.begin());</span>
+<span class="lineNum">      43 </span>            :     }
+<a name="44"><span class="lineNum">      44 </span>            : </a>
+<span class="lineNum">      45 </span>            :     template &lt;typename DispatcherType&gt;
+<span class="lineNum">      46 </span><span class="lineCov">         31 :     callable dispatch(const ndt::type &amp;tp, const DispatcherType &amp;dispatcher)</span>
+<span class="lineNum">      47 </span>            :     {
+<span class="lineNum">      48 </span><span class="lineCov">         31 :       return make_callable&lt;dispatcher_callable&lt;DispatcherType&gt;, multidispatch_kernel&lt;DispatcherType&gt;&gt;(tp, dispatcher);</span>
+<span class="lineNum">      49 </span>            :     }
+<span class="lineNum">      50 </span>            : 
+<span class="lineNum">      51 </span>            :     namespace detail {
+<a name="52"><span class="lineNum">      52 </span>            : </a>
+<span class="lineNum">      53 </span>            :       template &lt;typename IteratorType, typename DispatcherType, typename OnNullType&gt;
+<span class="lineNum">      54 </span><span class="lineCov">          7 :       callable multidispatch(const ndt::type &amp;tp, const IteratorType &amp;begin_child, const IteratorType &amp;end_child,</span>
+<span class="lineNum">      55 </span>            :                              const DispatcherType &amp;dispatcher, const OnNullType &amp;on_null)
+<span class="lineNum">      56 </span>            :       {
+<span class="lineNum">      57 </span>            :         typedef typename std::result_of&lt;DispatcherType(const ndt::type &amp;, intptr_t, const ndt::type *)&gt;::type key_type;
+<span class="lineNum">      58 </span>            : 
+<span class="lineNum">      59 </span><span class="lineCov">         14 :         std::map&lt;key_type, callable&gt; children;</span>
+<span class="lineNum">      60 </span>            : 
+<span class="lineNum">      61 </span><span class="lineCov">         33 :         for (IteratorType it = begin_child; it != end_child; ++it) {</span>
+<span class="lineNum">      62 </span><span class="lineCov">         26 :           const callable &amp;child = *it;</span>
+<span class="lineNum">      63 </span><span class="lineCov">         26 :           if (child.is_null()) {</span>
+<span class="lineNum">      64 </span><span class="lineNoCov">          0 :             continue;</span>
+<span class="lineNum">      65 </span>            :           }
+<span class="lineNum">      66 </span>            : 
+<span class="lineNum">      67 </span><span class="lineCov">         52 :           std::map&lt;std::string, ndt::type&gt; tp_vars;</span>
+<span class="lineNum">      68 </span><span class="lineCov">         26 :           if (!tp.match(child.get_array_type(), tp_vars)) {</span>
+<span class="lineNum">      69 </span>            :           }
+<span class="lineNum">      70 </span>            : 
+<span class="lineNum">      71 </span><span class="lineCov">         26 :           const ndt::type &amp;ret_tp = child.get_ret_type();</span>
+<span class="lineNum">      72 </span><span class="lineCov">         52 :           const array &amp;arg_tp = child.get_arg_types();</span>
+<span class="lineNum">      73 </span>            : 
+<span class="lineNum">      74 </span><span class="lineCov">         26 :           children[dispatcher(ret_tp, arg_tp.get_dim_size(), reinterpret_cast&lt;const ndt::type *&gt;(arg_tp.cdata()))] =</span>
+<span class="lineNum">      75 </span>            :               child;
+<a name="76"><span class="lineNum">      76 </span>            :         }</a>
+<a name="77"><span class="lineNum">      77 </span>            : </a>
+<span class="lineNum">      78 </span><span class="lineCov">         21 :         return functional::dispatch(tp, [children, dispatcher, on_null](const ndt::type &amp;dst_tp, intptr_t nsrc,</span>
+<span class="lineNum">      79 </span><span class="lineCov">         59 :                                                                         const ndt::type *src_tp) mutable -&gt; callable &amp; {</span>
+<span class="lineNum">      80 </span><span class="lineCov">         59 :           callable &amp;child = children[dispatcher(dst_tp, nsrc, src_tp)];</span>
+<span class="lineNum">      81 </span><span class="lineCov">         59 :           if (child.is_null()) {</span>
+<span class="lineNum">      82 </span><span class="lineCov">          6 :             return on_null();</span>
+<span class="lineNum">      83 </span>            :           }
+<span class="lineNum">      84 </span>            : 
+<span class="lineNum">      85 </span><span class="lineCov">         53 :           return child;</span>
+<span class="lineNum">      86 </span><span class="lineCov">         14 :         });</span>
+<span class="lineNum">      87 </span>            :       }
+<a name="88"><span class="lineNum">      88 </span>            : </a>
+<span class="lineNum">      89 </span>            :       template &lt;typename IteratorType, typename OnNullType&gt;
+<span class="lineNum">      90 </span><span class="lineCov">          5 :       callable multidispatch(const ndt::type &amp;tp, const IteratorType &amp;begin_child, const IteratorType &amp;end_child,</span>
+<span class="lineNum">      91 </span>            :                              const OnNullType &amp;on_null)
+<span class="lineNum">      92 </span>            :       {
+<span class="lineNum">      93 </span><span class="lineCov">          5 :         if (!tp.extended&lt;ndt::callable_type&gt;()-&gt;is_pos_variadic()) {</span>
+<span class="lineNum">      94 </span><span class="lineCov">          3 :           switch (tp.extended&lt;ndt::callable_type&gt;()-&gt;get_npos()) {</span>
+<span class="lineNum">      95 </span>            :           case 0:
+<span class="lineNum">      96 </span><span class="lineNoCov">          0 :             throw std::runtime_error(&quot;cannot multidispatch on a function with no arguments&quot;);</span>
+<a name="97"><span class="lineNum">      97 </span>            :           case 1:</a>
+<a name="98"><span class="lineNum">      98 </span>            :             return multidispatch(tp, begin_child, end_child,</a>
+<span class="lineNum">      99 </span><span class="lineNoCov">          0 :                                  [](const ndt::type &amp;DYND_UNUSED(dst_tp), intptr_t DYND_UNUSED(nsrc),</span>
+<span class="lineNum">     100 </span><span class="lineCov">         21 :                                     const ndt::type *src_tp) { return src_tp[0].get_id(); },</span>
+<span class="lineNum">     101 </span><span class="lineCov">          2 :                                  on_null);</span>
+<a name="102"><span class="lineNum">     102 </span>            :           case 2:</a>
+<a name="103"><span class="lineNum">     103 </span>            :             return multidispatch(tp, begin_child, end_child,</a>
+<span class="lineNum">     104 </span><span class="lineNoCov">          0 :                                  [](const ndt::type &amp;DYND_UNUSED(dst_tp), intptr_t DYND_UNUSED(nsrc),</span>
+<span class="lineNum">     105 </span><span class="lineCov">         24 :                                     const ndt::type *src_tp) -&gt; std::array&lt;type_id_t, 2&gt; {</span>
+<span class="lineNum">     106 </span><span class="lineCov">         24 :                                    return {{src_tp[0].get_id(), src_tp[1].get_id()}};</span>
+<span class="lineNum">     107 </span>            :                                  },
+<span class="lineNum">     108 </span><span class="lineCov">          1 :                                  on_null);</span>
+<a name="109"><span class="lineNum">     109 </span>            :           case 3:</a>
+<a name="110"><span class="lineNum">     110 </span>            :             return multidispatch(tp, begin_child, end_child,</a>
+<span class="lineNum">     111 </span><span class="lineNoCov">          0 :                                  [](const ndt::type &amp;DYND_UNUSED(dst_tp), intptr_t DYND_UNUSED(nsrc),</span>
+<span class="lineNum">     112 </span><span class="lineNoCov">          0 :                                     const ndt::type *src_tp) -&gt; std::array&lt;type_id_t, 3&gt; {</span>
+<span class="lineNum">     113 </span><span class="lineNoCov">          0 :                                    return {{src_tp[0].get_id(), src_tp[1].get_id(), src_tp[2].get_id()}};</span>
+<span class="lineNum">     114 </span>            :                                  },
+<span class="lineNum">     115 </span><span class="lineNoCov">          0 :                                  on_null);</span>
+<span class="lineNum">     116 </span>            :           default:
+<span class="lineNum">     117 </span><span class="lineNoCov">          0 :             break;</span>
+<span class="lineNum">     118 </span>            :           }
+<span class="lineNum">     119 </span>            :         }
+<a name="120"><span class="lineNum">     120 </span>            : </a>
+<span class="lineNum">     121 </span>            :         return multidispatch(tp, begin_child, end_child,
+<span class="lineNum">     122 </span><span class="lineCov">         12 :                              [](const ndt::type &amp;DYND_UNUSED(dst_tp), intptr_t nsrc, const ndt::type *src_tp) {</span>
+<span class="lineNum">     123 </span><span class="lineCov">         12 :                                std::vector&lt;type_id_t&gt; key;</span>
+<span class="lineNum">     124 </span><span class="lineCov">         30 :                                for (std::intptr_t i = 0; i &lt; nsrc; ++i) {</span>
+<span class="lineNum">     125 </span><span class="lineCov">         18 :                                  key.push_back(src_tp[i].get_id());</span>
+<span class="lineNum">     126 </span>            :                                }
+<span class="lineNum">     127 </span><span class="lineCov">         12 :                                return key;</span>
+<span class="lineNum">     128 </span>            :                              },
+<span class="lineNum">     129 </span><span class="lineCov">          2 :                              on_null);</span>
+<span class="lineNum">     130 </span>            :       }
+<a name="131"><span class="lineNum">     131 </span>            : </a>
+<span class="lineNum">     132 </span>            :       template &lt;typename IteratorType, typename OnNullType&gt;
+<span class="lineNum">     133 </span><span class="lineCov">          2 :       callable multidispatch(const ndt::type &amp;tp, const IteratorType &amp;begin_child, const IteratorType &amp;end_child,</span>
+<span class="lineNum">     134 </span>            :                              const std::vector&lt;intptr_t&gt; &amp;permutation, const OnNullType &amp;on_null)
+<a name="135"><span class="lineNum">     135 </span>            :       {</a>
+<a name="136"><span class="lineNum">     136 </span>            :         return multidispatch(tp, begin_child, end_child,</a>
+<span class="lineNum">     137 </span><span class="lineCov">         10 :                              [permutation](const ndt::type &amp;DYND_UNUSED(dst_tp), std::intptr_t DYND_UNUSED(nsrc),</span>
+<span class="lineNum">     138 </span><span class="lineCov">         28 :                                            const ndt::type *src_tp) {</span>
+<span class="lineNum">     139 </span><span class="lineCov">         28 :                                std::vector&lt;type_id_t&gt; key;</span>
+<span class="lineNum">     140 </span><span class="lineCov">         56 :                                for (std::intptr_t i : permutation) {</span>
+<span class="lineNum">     141 </span><span class="lineCov">         28 :                                  key.push_back((src_tp + i)-&gt;get_id());</span>
+<span class="lineNum">     142 </span>            :                                }
+<span class="lineNum">     143 </span><span class="lineCov">         28 :                                return key;</span>
+<span class="lineNum">     144 </span>            :                              },
+<span class="lineNum">     145 </span><span class="lineCov">          2 :                              on_null);</span>
+<span class="lineNum">     146 </span>            :       }
+<span class="lineNum">     147 </span>            : 
+<span class="lineNum">     148 </span>            :     } // namespace dynd::nd::functional::detail
+<a name="149"><span class="lineNum">     149 </span>            : </a>
+<span class="lineNum">     150 </span>            :     template &lt;typename IteratorType&gt;
+<a name="151"><span class="lineNum">     151 </span><span class="lineCov">          5 :     callable multidispatch(const ndt::type &amp;tp, const IteratorType &amp;begin_child, const IteratorType &amp;end_child)</span></a>
+<span class="lineNum">     152 </span>            :     {
+<span class="lineNum">     153 </span><span class="lineCov">          2 :       return detail::multidispatch(tp, begin_child, end_child, []() -&gt; callable &amp; {</span>
+<span class="lineNum">     154 </span><span class="lineCov">          4 :         std::stringstream ss;</span>
+<span class="lineNum">     155 </span><span class="lineCov">          2 :         ss &lt;&lt; &quot;no viable overload for nd::functional::multidispatch &quot;</span>
+<span class="lineNum">     156 </span>            :               &quot;with argument types&quot;;
+<span class="lineNum">     157 </span><span class="lineCov">          2 :         throw std::runtime_error(ss.str());</span>
+<span class="lineNum">     158 </span><span class="lineCov">          5 :       });</span>
+<span class="lineNum">     159 </span>            :     }
+<a name="160"><span class="lineNum">     160 </span>            : </a>
+<span class="lineNum">     161 </span>            :     template &lt;typename IteratorType&gt;
+<span class="lineNum">     162 </span><span class="lineCov">          2 :     callable multidispatch(const IteratorType &amp;begin_child, const IteratorType &amp;end_child)</span>
+<span class="lineNum">     163 </span>            :     {
+<span class="lineNum">     164 </span><span class="lineCov">          2 :       return multidispatch(ndt::type(&quot;(...) -&gt; Any&quot;), begin_child, end_child);</span>
+<a name="165"><span class="lineNum">     165 </span>            :     }</a>
+<span class="lineNum">     166 </span>            : 
+<span class="lineNum">     167 </span><span class="lineCov">          2 :     inline callable multidispatch(const std::initializer_list&lt;callable&gt; &amp;children)</span>
+<span class="lineNum">     168 </span>            :     {
+<span class="lineNum">     169 </span><span class="lineCov">          2 :       return multidispatch(std::begin(children), std::end(children));</span>
+<a name="170"><span class="lineNum">     170 </span>            :     }</a>
+<span class="lineNum">     171 </span>            : 
+<span class="lineNum">     172 </span><span class="lineCov">          2 :     inline callable multidispatch(const ndt::type &amp;tp, const std::initializer_list&lt;callable&gt; &amp;children)</span>
+<span class="lineNum">     173 </span>            :     {
+<span class="lineNum">     174 </span><span class="lineCov">          2 :       return multidispatch(tp, std::begin(children), std::end(children));</span>
+<span class="lineNum">     175 </span>            :     }
+<a name="176"><span class="lineNum">     176 </span>            : </a>
+<span class="lineNum">     177 </span>            :     template &lt;typename IteratorType&gt;
+<span class="lineNum">     178 </span><span class="lineCov">          2 :     callable multidispatch(const ndt::type &amp;tp, const IteratorType &amp;begin_child, const IteratorType &amp;end_child,</span>
+<a name="179"><span class="lineNum">     179 </span>            :                            const std::vector&lt;intptr_t&gt; &amp;permutation)</a>
+<span class="lineNum">     180 </span>            :     {
+<span class="lineNum">     181 </span><span class="lineCov">          4 :       return detail::multidispatch(tp, begin_child, end_child, permutation, []() -&gt; callable &amp; {</span>
+<span class="lineNum">     182 </span><span class="lineCov">          8 :         std::stringstream ss;</span>
+<span class="lineNum">     183 </span><span class="lineCov">          4 :         ss &lt;&lt; &quot;no viable overload for nd::functional::multidispatch &quot;</span>
+<span class="lineNum">     184 </span>            :               &quot;with argument types&quot;;
+<span class="lineNum">     185 </span><span class="lineCov">          4 :         throw std::runtime_error(ss.str());</span>
+<span class="lineNum">     186 </span><span class="lineCov">          2 :       });</span>
+<span class="lineNum">     187 </span>            :     }
+<a name="188"><span class="lineNum">     188 </span>            : </a>
+<span class="lineNum">     189 </span>            :     template &lt;typename IteratorType&gt;
+<span class="lineNum">     190 </span><span class="lineCov">          2 :     callable multidispatch(const IteratorType &amp;begin_child, const IteratorType &amp;end_child,</span>
+<span class="lineNum">     191 </span>            :                            const std::vector&lt;intptr_t&gt; &amp;permutation)
+<span class="lineNum">     192 </span>            :     {
+<span class="lineNum">     193 </span><span class="lineCov">          2 :       return multidispatch(ndt::type(&quot;(...) -&gt; Any&quot;), begin_child, end_child, permutation);</span>
+<a name="194"><span class="lineNum">     194 </span>            :     }</a>
+<span class="lineNum">     195 </span>            : 
+<span class="lineNum">     196 </span><span class="lineCov">          2 :     inline callable multidispatch(const std::initializer_list&lt;callable&gt; &amp;children,</span>
+<span class="lineNum">     197 </span>            :                                   const std::vector&lt;intptr_t&gt; &amp;permutation)
+<span class="lineNum">     198 </span>            :     {
+<span class="lineNum">     199 </span><span class="lineCov">          2 :       return multidispatch(std::begin(children), std::end(children), permutation);</span>
+<span class="lineNum">     200 </span>            :     }
+<span class="lineNum">     201 </span>            : 
+<span class="lineNum">     202 </span>            :     inline callable multidispatch(const ndt::type &amp;tp, const std::initializer_list&lt;callable&gt; &amp;children,
+<span class="lineNum">     203 </span>            :                                   const std::vector&lt;intptr_t&gt; &amp;permutation)
+<span class="lineNum">     204 </span>            :     {
+<span class="lineNum">     205 </span>            :       return multidispatch(tp, std::begin(children), std::end(children), permutation);
+<span class="lineNum">     206 </span>            :     }
+<span class="lineNum">     207 </span>            : 
+<span class="lineNum">     208 </span>            :     inline callable adapt(const ndt::type &amp;value_tp, const callable &amp;forward)
+<span class="lineNum">     209 </span>            :     {
+<span class="lineNum">     210 </span>            :       return callable::make&lt;adapt_kernel&gt;(ndt::callable_type::make(value_tp, {ndt::type(&quot;Any&quot;)}),
+<span class="lineNum">     211 </span>            :                                           adapt_kernel::static_data_type{value_tp, forward});
+<span class="lineNum">     212 </span>            :     }
+<a name="213"><span class="lineNum">     213 </span>            : </a>
+<span class="lineNum">     214 </span>            :     template &lt;int... I&gt;
+<span class="lineNum">     215 </span><span class="lineCov">        132 :     callable forward_na(const callable &amp;child)</span>
+<span class="lineNum">     216 </span>            :     {
+<span class="lineNum">     217 </span><span class="lineCov">        396 :       ndt::type tp = ndt::callable_type::make(ndt::make_type&lt;ndt::option_type&gt;(child.get_ret_type()),</span>
+<span class="lineNum">     218 </span><span class="lineCov">        528 :                                               {ndt::type(&quot;Any&quot;), ndt::type(&quot;Any&quot;)});</span>
+<span class="lineNum">     219 </span><span class="lineCov">        264 :       return callable::make&lt;forward_na_kernel&lt;I...&gt;&gt;(tp, child);</span>
+<span class="lineNum">     220 </span>            :     }
+<span class="lineNum">     221 </span>            : 
+<span class="lineNum">     222 </span>            :   } // namespace dynd::nd::functional
+<span class="lineNum">     223 </span>            : } // namespace dynd::nd
+<span class="lineNum">     224 </span>            : } // namespace dynd
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.10</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

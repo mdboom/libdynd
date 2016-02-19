@@ -1,0 +1,146 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - coverage.info.cleaned - include/dynd/memblock/pod_memory_block.hpp</title>
+  <link rel="stylesheet" type="text/css" href="../../../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../../../index.html">top level</a> - <a href="index.html">include/dynd/memblock</a> - pod_memory_block.hpp<span style="font-size: 80%;"> (source / <a href="pod_memory_block.hpp.func.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">coverage.info.cleaned</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">18</td>
+            <td class="headerCovTableEntry">20</td>
+            <td class="headerCovTableEntryHi">90.0 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2016-02-19</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">3</td>
+            <td class="headerCovTableEntry">3</td>
+            <td class="headerCovTableEntryHi">100.0 %</td>
+          </tr>
+          <tr><td><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : //</a>
+<span class="lineNum">       2 </span>            : // Copyright (C) 2011-15 DyND Developers
+<span class="lineNum">       3 </span>            : // BSD 2-Clause License, see LICENSE.txt
+<span class="lineNum">       4 </span>            : //
+<span class="lineNum">       5 </span>            : 
+<span class="lineNum">       6 </span>            : #pragma once
+<span class="lineNum">       7 </span>            : 
+<span class="lineNum">       8 </span>            : #include &lt;iostream&gt;
+<span class="lineNum">       9 </span>            : #include &lt;string&gt;
+<span class="lineNum">      10 </span>            : 
+<span class="lineNum">      11 </span>            : #include &lt;dynd/type.hpp&gt;
+<span class="lineNum">      12 </span>            : #include &lt;dynd/memblock/memory_block.hpp&gt;
+<span class="lineNum">      13 </span>            : 
+<span class="lineNum">      14 </span>            : namespace dynd {
+<span class="lineNum">      15 </span>            : 
+<span class="lineNum">      16 </span>            : struct pod_memory_block : memory_block_data {
+<span class="lineNum">      17 </span>            :   size_t data_size;
+<span class="lineNum">      18 </span>            :   intptr_t data_alignment;
+<span class="lineNum">      19 </span>            :   intptr_t m_total_allocated_capacity;
+<span class="lineNum">      20 </span>            :   /** The malloc'd memory */
+<span class="lineNum">      21 </span>            :   std::vector&lt;char *&gt; m_memory_handles;
+<span class="lineNum">      22 </span>            :   /** The current malloc'd memory being doled out */
+<span class="lineNum">      23 </span>            :   char *m_memory_begin, *m_memory_current, *m_memory_end;
+<span class="lineNum">      24 </span>            : 
+<span class="lineNum">      25 </span>            :   /**
+<span class="lineNum">      26 </span>            :    * Allocates some new memory from which to dole out
+<a name="27"><span class="lineNum">      27 </span>            :    * more. Adds it to the memory handles vector.</a>
+<span class="lineNum">      28 </span>            :    */
+<span class="lineNum">      29 </span><span class="lineCov">         89 :   void append_memory(intptr_t capacity_bytes)</span>
+<span class="lineNum">      30 </span>            :   {
+<span class="lineNum">      31 </span><span class="lineCov">         89 :     m_memory_handles.push_back(NULL);</span>
+<span class="lineNum">      32 </span><span class="lineCov">         89 :     m_memory_begin = reinterpret_cast&lt;char *&gt;(malloc(capacity_bytes));</span>
+<span class="lineNum">      33 </span><span class="lineCov">         89 :     m_memory_handles.back() = m_memory_begin;</span>
+<span class="lineNum">      34 </span><span class="lineCov">         89 :     if (m_memory_begin == NULL) {</span>
+<span class="lineNum">      35 </span><span class="lineNoCov">          0 :       m_memory_handles.pop_back();</span>
+<span class="lineNum">      36 </span><span class="lineNoCov">          0 :       throw std::bad_alloc();</span>
+<span class="lineNum">      37 </span>            :     }
+<span class="lineNum">      38 </span><span class="lineCov">         89 :     m_memory_current = m_memory_begin;</span>
+<span class="lineNum">      39 </span><span class="lineCov">         89 :     m_memory_end = m_memory_current + capacity_bytes;</span>
+<span class="lineNum">      40 </span><span class="lineCov">         89 :     m_total_allocated_capacity += capacity_bytes;</span>
+<a name="41"><span class="lineNum">      41 </span><span class="lineCov">         89 :   }</span></a>
+<span class="lineNum">      42 </span>            : 
+<span class="lineNum">      43 </span><span class="lineCov">         89 :   pod_memory_block(size_t data_size, intptr_t data_alignment, intptr_t initial_capacity_bytes)</span>
+<span class="lineNum">      44 </span>            :       : memory_block_data(1, pod_memory_block_type), data_size(data_size), data_alignment(data_alignment),
+<span class="lineNum">      45 </span><span class="lineCov">         89 :         m_total_allocated_capacity(0), m_memory_handles()</span>
+<span class="lineNum">      46 </span>            :   {
+<span class="lineNum">      47 </span><span class="lineCov">         89 :     append_memory(initial_capacity_bytes);</span>
+<a name="48"><span class="lineNum">      48 </span><span class="lineCov">         89 :   }</span></a>
+<span class="lineNum">      49 </span>            : 
+<span class="lineNum">      50 </span><span class="lineCov">         89 :   ~pod_memory_block()</span>
+<span class="lineNum">      51 </span><span class="lineCov">         89 :   {</span>
+<span class="lineNum">      52 </span><span class="lineCov">        178 :     for (size_t i = 0, i_end = m_memory_handles.size(); i != i_end; ++i) {</span>
+<span class="lineNum">      53 </span><span class="lineCov">         89 :       free(m_memory_handles[i]);</span>
+<span class="lineNum">      54 </span>            :     }
+<span class="lineNum">      55 </span><span class="lineCov">         89 :   }</span>
+<span class="lineNum">      56 </span>            : };
+<span class="lineNum">      57 </span>            : 
+<span class="lineNum">      58 </span>            : /**
+<span class="lineNum">      59 </span>            :  * Creates a memory block which can be used to allocate POD output memory
+<span class="lineNum">      60 </span>            :  * for blockref types.
+<span class="lineNum">      61 </span>            :  *
+<span class="lineNum">      62 </span>            :  * The initial capacity can be set if a good estimate is known.
+<span class="lineNum">      63 </span>            :  */
+<span class="lineNum">      64 </span>            : DYND_API intrusive_ptr&lt;memory_block_data&gt; make_pod_memory_block(const ndt::type &amp;tp,
+<span class="lineNum">      65 </span>            :                                                                 intptr_t initial_capacity_bytes = 2048);
+<span class="lineNum">      66 </span>            : 
+<span class="lineNum">      67 </span>            : DYND_API void pod_memory_block_debug_print(const memory_block_data *memblock, std::ostream &amp;o,
+<span class="lineNum">      68 </span>            :                                            const std::string &amp;indent);
+<span class="lineNum">      69 </span>            : 
+<span class="lineNum">      70 </span>            : } // namespace dynd
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.10</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

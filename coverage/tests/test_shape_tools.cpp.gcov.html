@@ -1,0 +1,213 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - coverage.info.cleaned - tests/test_shape_tools.cpp</title>
+  <link rel="stylesheet" type="text/css" href="../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../index.html">top level</a> - <a href="index.html">tests</a> - test_shape_tools.cpp<span style="font-size: 80%;"> (source / <a href="test_shape_tools.cpp.func.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">coverage.info.cleaned</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">76</td>
+            <td class="headerCovTableEntry">79</td>
+            <td class="headerCovTableEntryHi">96.2 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2016-02-19</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">14</td>
+            <td class="headerCovTableEntry">14</td>
+            <td class="headerCovTableEntryHi">100.0 %</td>
+          </tr>
+          <tr><td><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : //</a>
+<span class="lineNum">       2 </span>            : // Copyright (C) 2011-15 DyND Developers
+<span class="lineNum">       3 </span>            : // BSD 2-Clause License, see LICENSE.txt
+<span class="lineNum">       4 </span>            : //
+<span class="lineNum">       5 </span>            : 
+<span class="lineNum">       6 </span>            : #include &lt;iostream&gt;
+<span class="lineNum">       7 </span>            : #include &lt;stdexcept&gt;
+<span class="lineNum">       8 </span>            : #include &lt;algorithm&gt;
+<span class="lineNum">       9 </span>            : #include &lt;cmath&gt;
+<span class="lineNum">      10 </span>            : #include &quot;inc_gtest.hpp&quot;
+<span class="lineNum">      11 </span>            : 
+<span class="lineNum">      12 </span>            : #include &quot;dynd/shape_tools.hpp&quot;
+<span class="lineNum">      13 </span>            : #include &quot;dynd/exceptions.hpp&quot;
+<span class="lineNum">      14 </span>            : 
+<span class="lineNum">      15 </span>            : using namespace std;
+<a name="16"><span class="lineNum">      16 </span>            : using namespace dynd;</a>
+<span class="lineNum">      17 </span>            : 
+<span class="lineNum">      18 </span><span class="lineCov">          5 : TEST(ShapeTools, BroadcastToShape) {</span>
+<span class="lineNum">      19 </span><span class="lineCov">          1 :     intptr_t shape0[] = {3,2,5}, shape1[] = {1,3,2,5};</span>
+<span class="lineNum">      20 </span><span class="lineCov">          1 :     intptr_t strides0[] = {1,3,6}, strides1[] = {0,1,3,6}, strides_out[10];</span>
+<span class="lineNum">      21 </span>            : 
+<span class="lineNum">      22 </span><span class="lineCov">          1 :     broadcast_to_shape(4, shape1, 3, shape0, strides0, strides_out);</span>
+<span class="lineNum">      23 </span><span class="lineCov">          1 :     EXPECT_EQ(0, strides_out[0]);</span>
+<span class="lineNum">      24 </span><span class="lineCov">          1 :     EXPECT_EQ(1, strides_out[1]);</span>
+<span class="lineNum">      25 </span><span class="lineCov">          1 :     EXPECT_EQ(3, strides_out[2]);</span>
+<span class="lineNum">      26 </span><span class="lineCov">          1 :     EXPECT_EQ(6, strides_out[3]);</span>
+<span class="lineNum">      27 </span>            : 
+<span class="lineNum">      28 </span>            :     // Cannot broadcast from more to fewer ndim
+<span class="lineNum">      29 </span><span class="lineCov">          2 :     EXPECT_THROW(broadcast_to_shape(3, shape0, 4, shape1, strides1, strides_out),</span>
+<span class="lineNum">      30 </span><span class="lineNoCov">          0 :                     broadcast_error);</span>
+<span class="lineNum">      31 </span>            : 
+<span class="lineNum">      32 </span><span class="lineCov">          1 :     intptr_t shape2[] = {3,1}, shape3[] = {4,3};</span>
+<span class="lineNum">      33 </span><span class="lineCov">          1 :     intptr_t strides2[] = {1,0}, strides3[] = {3,1};</span>
+<span class="lineNum">      34 </span>            :     // Cannot broadcast size 3 to size 4
+<span class="lineNum">      35 </span><span class="lineCov">          2 :     EXPECT_THROW(broadcast_to_shape(2, shape3, 2, shape2, strides2, strides_out),</span>
+<span class="lineNum">      36 </span><span class="lineNoCov">          0 :                     broadcast_error);</span>
+<span class="lineNum">      37 </span>            :     // Cannot broadcast size 3 to size 1
+<span class="lineNum">      38 </span><span class="lineCov">          1 :     shape3[0] = 3;</span>
+<span class="lineNum">      39 </span><span class="lineCov">          2 :     EXPECT_THROW(broadcast_to_shape(2, shape2, 2, shape3, strides3, strides_out),</span>
+<span class="lineNum">      40 </span><span class="lineNoCov">          0 :                     broadcast_error);</span>
+<a name="41"><span class="lineNum">      41 </span><span class="lineCov">          1 : }</span></a>
+<span class="lineNum">      42 </span>            : 
+<span class="lineNum">      43 </span><span class="lineCov">          5 : TEST(ShapeTools, MultiStridesToAxisPerm_OneOp) {</span>
+<span class="lineNum">      44 </span>            :     // Basic test that a single C/F-order array works
+<span class="lineNum">      45 </span><span class="lineCov">          1 :     intptr_t strides_f[] = {1,2,4,8,16,32};</span>
+<span class="lineNum">      46 </span><span class="lineCov">          1 :     intptr_t strides_c[] = {32,16,8,4,2,1};</span>
+<span class="lineNum">      47 </span>            :     intptr_t *stridesptr;
+<span class="lineNum">      48 </span>            :     int axis_perm[6];
+<span class="lineNum">      49 </span>            : 
+<span class="lineNum">      50 </span>            :     // F-Order
+<span class="lineNum">      51 </span><span class="lineCov">          1 :     stridesptr = strides_f;</span>
+<span class="lineNum">      52 </span><span class="lineCov">          1 :     multistrides_to_axis_perm(6, 1, &amp;stridesptr, axis_perm);</span>
+<span class="lineNum">      53 </span><span class="lineCov">          1 :     EXPECT_EQ(0, axis_perm[0]);</span>
+<span class="lineNum">      54 </span><span class="lineCov">          1 :     EXPECT_EQ(1, axis_perm[1]);</span>
+<span class="lineNum">      55 </span><span class="lineCov">          1 :     EXPECT_EQ(2, axis_perm[2]);</span>
+<span class="lineNum">      56 </span><span class="lineCov">          1 :     EXPECT_EQ(3, axis_perm[3]);</span>
+<span class="lineNum">      57 </span><span class="lineCov">          1 :     EXPECT_EQ(4, axis_perm[4]);</span>
+<span class="lineNum">      58 </span><span class="lineCov">          1 :     EXPECT_EQ(5, axis_perm[5]);</span>
+<span class="lineNum">      59 </span>            : 
+<span class="lineNum">      60 </span>            :     // Add some zero-strides in, which the sort tries to keep
+<span class="lineNum">      61 </span>            :     // in the default position while shuffling things around.
+<span class="lineNum">      62 </span><span class="lineCov">          1 :     strides_f[0] = 0;</span>
+<span class="lineNum">      63 </span><span class="lineCov">          1 :     strides_f[3] = 0;</span>
+<span class="lineNum">      64 </span><span class="lineCov">          1 :     strides_f[5] = 0;</span>
+<span class="lineNum">      65 </span><span class="lineCov">          1 :     multistrides_to_axis_perm(6, 1, &amp;stridesptr, axis_perm);</span>
+<span class="lineNum">      66 </span><span class="lineCov">          1 :     EXPECT_EQ(5, axis_perm[0]);</span>
+<span class="lineNum">      67 </span><span class="lineCov">          1 :     EXPECT_EQ(1, axis_perm[1]);</span>
+<span class="lineNum">      68 </span><span class="lineCov">          1 :     EXPECT_EQ(2, axis_perm[2]);</span>
+<span class="lineNum">      69 </span><span class="lineCov">          1 :     EXPECT_EQ(4, axis_perm[3]);</span>
+<span class="lineNum">      70 </span><span class="lineCov">          1 :     EXPECT_EQ(3, axis_perm[4]);</span>
+<span class="lineNum">      71 </span><span class="lineCov">          1 :     EXPECT_EQ(0, axis_perm[5]);</span>
+<span class="lineNum">      72 </span>            : 
+<span class="lineNum">      73 </span>            :     // C-Order
+<span class="lineNum">      74 </span><span class="lineCov">          1 :     stridesptr = strides_c;</span>
+<span class="lineNum">      75 </span><span class="lineCov">          1 :     multistrides_to_axis_perm(6, 1, &amp;stridesptr, axis_perm);</span>
+<span class="lineNum">      76 </span><span class="lineCov">          1 :     EXPECT_EQ(5, axis_perm[0]);</span>
+<span class="lineNum">      77 </span><span class="lineCov">          1 :     EXPECT_EQ(4, axis_perm[1]);</span>
+<span class="lineNum">      78 </span><span class="lineCov">          1 :     EXPECT_EQ(3, axis_perm[2]);</span>
+<span class="lineNum">      79 </span><span class="lineCov">          1 :     EXPECT_EQ(2, axis_perm[3]);</span>
+<span class="lineNum">      80 </span><span class="lineCov">          1 :     EXPECT_EQ(1, axis_perm[4]);</span>
+<span class="lineNum">      81 </span><span class="lineCov">          1 :     EXPECT_EQ(0, axis_perm[5]);</span>
+<span class="lineNum">      82 </span>            : 
+<span class="lineNum">      83 </span>            :     // Add some zero-strides in, which the sort keeps in place
+<span class="lineNum">      84 </span>            :     // while shuffling things around
+<span class="lineNum">      85 </span><span class="lineCov">          1 :     strides_c[0] = 0;</span>
+<span class="lineNum">      86 </span><span class="lineCov">          1 :     strides_c[3] = 0;</span>
+<span class="lineNum">      87 </span><span class="lineCov">          1 :     strides_c[5] = 0;</span>
+<span class="lineNum">      88 </span><span class="lineCov">          1 :     multistrides_to_axis_perm(6, 1, &amp;stridesptr, axis_perm);</span>
+<span class="lineNum">      89 </span><span class="lineCov">          1 :     EXPECT_EQ(5, axis_perm[0]);</span>
+<span class="lineNum">      90 </span><span class="lineCov">          1 :     EXPECT_EQ(4, axis_perm[1]);</span>
+<span class="lineNum">      91 </span><span class="lineCov">          1 :     EXPECT_EQ(3, axis_perm[2]);</span>
+<span class="lineNum">      92 </span><span class="lineCov">          1 :     EXPECT_EQ(2, axis_perm[3]);</span>
+<span class="lineNum">      93 </span><span class="lineCov">          1 :     EXPECT_EQ(1, axis_perm[4]);</span>
+<span class="lineNum">      94 </span><span class="lineCov">          1 :     EXPECT_EQ(0, axis_perm[5]);</span>
+<a name="95"><span class="lineNum">      95 </span><span class="lineCov">          1 : }</span></a>
+<span class="lineNum">      96 </span>            : 
+<span class="lineNum">      97 </span><span class="lineCov">          5 : TEST(ShapeTools, MultiStridesToAxisPerm_TwoOps) {</span>
+<span class="lineNum">      98 </span>            :     // Basic test that a single C/F-order array works
+<span class="lineNum">      99 </span><span class="lineCov">          1 :     intptr_t strides_a[] = {1,2,4,8,0,0};</span>
+<span class="lineNum">     100 </span><span class="lineCov">          1 :     intptr_t strides_b[] = {0,0,8,4,2,1};</span>
+<span class="lineNum">     101 </span><span class="lineCov">          1 :     intptr_t *stridesptr[] = {strides_a, strides_b};</span>
+<span class="lineNum">     102 </span>            :     int axis_perm[6];
+<span class="lineNum">     103 </span>            : 
+<span class="lineNum">     104 </span>            :     // C-order wins the conflicts between different strides
+<span class="lineNum">     105 </span><span class="lineCov">          1 :     multistrides_to_axis_perm(6, 2, stridesptr, axis_perm);</span>
+<span class="lineNum">     106 </span><span class="lineCov">          1 :     EXPECT_EQ(5, axis_perm[0]);</span>
+<span class="lineNum">     107 </span><span class="lineCov">          1 :     EXPECT_EQ(4, axis_perm[1]);</span>
+<span class="lineNum">     108 </span><span class="lineCov">          1 :     EXPECT_EQ(0, axis_perm[2]);</span>
+<span class="lineNum">     109 </span><span class="lineCov">          1 :     EXPECT_EQ(1, axis_perm[3]);</span>
+<span class="lineNum">     110 </span><span class="lineCov">          1 :     EXPECT_EQ(3, axis_perm[4]);</span>
+<span class="lineNum">     111 </span><span class="lineCov">          1 :     EXPECT_EQ(2, axis_perm[5]);</span>
+<span class="lineNum">     112 </span>            : 
+<span class="lineNum">     113 </span>            :     // two mostly F-order arrays put together make the result F-order
+<span class="lineNum">     114 </span>            :     // as long as there are no ambiguities - well, they should, but
+<span class="lineNum">     115 </span>            :     // clearly the insertion short doesn't work properly...
+<span class="lineNum">     116 </span>            :     /*
+<span class="lineNum">     117 </span>            :     intptr_t strides_f1[] = {1,2,4,0};
+<span class="lineNum">     118 </span>            :     intptr_t strides_f2[] = {1,0,4,8};
+<span class="lineNum">     119 </span>            :     stridesptr[0] = strides_f1;
+<span class="lineNum">     120 </span>            :     stridesptr[0] = strides_f2;
+<span class="lineNum">     121 </span>            :     multistrides_to_axis_perm(4, 2, stridesptr, axis_perm);
+<span class="lineNum">     122 </span>            :     EXPECT_EQ(0, axis_perm[0]);
+<span class="lineNum">     123 </span>            :     EXPECT_EQ(1, axis_perm[1]);
+<span class="lineNum">     124 </span>            :     EXPECT_EQ(2, axis_perm[2]);
+<span class="lineNum">     125 </span>            :     EXPECT_EQ(3, axis_perm[3]);
+<span class="lineNum">     126 </span>            :     */
+<span class="lineNum">     127 </span>            : 
+<span class="lineNum">     128 </span><span class="lineCov">          1 :     intptr_t strides_a1[] = {1,2,0,0};</span>
+<span class="lineNum">     129 </span><span class="lineCov">          1 :     intptr_t strides_a2[] = {0,0,2,1};</span>
+<span class="lineNum">     130 </span><span class="lineCov">          1 :     stridesptr[0] = strides_a1;</span>
+<span class="lineNum">     131 </span><span class="lineCov">          1 :     stridesptr[1] = strides_a2;</span>
+<span class="lineNum">     132 </span><span class="lineCov">          1 :     multistrides_to_axis_perm(4, 2, stridesptr, axis_perm);</span>
+<span class="lineNum">     133 </span><span class="lineCov">          1 :     EXPECT_EQ(3, axis_perm[0]);</span>
+<span class="lineNum">     134 </span><span class="lineCov">          1 :     EXPECT_EQ(2, axis_perm[1]);</span>
+<a name="135"><span class="lineNum">     135 </span><span class="lineCov">          1 :     EXPECT_EQ(0, axis_perm[2]);</span></a>
+<span class="lineNum">     136 </span><span class="lineCov">          1 :     EXPECT_EQ(1, axis_perm[3]);</span>
+<span class="lineNum">     137 </span><span class="lineCov">          4 : }</span>
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.10</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

@@ -1,0 +1,525 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - coverage.info.cleaned - src/dynd/types/pointer_type.cpp</title>
+  <link rel="stylesheet" type="text/css" href="../../../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../../../index.html">top level</a> - <a href="index.html">src/dynd/types</a> - pointer_type.cpp<span style="font-size: 80%;"> (source / <a href="pointer_type.cpp.func.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">coverage.info.cleaned</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">108</td>
+            <td class="headerCovTableEntry">213</td>
+            <td class="headerCovTableEntryLo">50.7 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2016-02-19</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">24</td>
+            <td class="headerCovTableEntry">40</td>
+            <td class="headerCovTableEntryLo">60.0 %</td>
+          </tr>
+          <tr><td><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : //</a>
+<span class="lineNum">       2 </span>            : // Copyright (C) 2011-15 DyND Developers
+<span class="lineNum">       3 </span>            : // BSD 2-Clause License, see LICENSE.txt
+<span class="lineNum">       4 </span>            : //
+<span class="lineNum">       5 </span>            : 
+<span class="lineNum">       6 </span>            : #include &lt;dynd/array.hpp&gt;
+<span class="lineNum">       7 </span>            : #include &lt;dynd/callable.hpp&gt;
+<span class="lineNum">       8 </span>            : #include &lt;dynd/types/pointer_type.hpp&gt;
+<span class="lineNum">       9 </span>            : #include &lt;dynd/memblock/pod_memory_block.hpp&gt;
+<span class="lineNum">      10 </span>            : #include &lt;dynd/kernels/assignment_kernels.hpp&gt;
+<span class="lineNum">      11 </span>            : 
+<span class="lineNum">      12 </span>            : #include &lt;algorithm&gt;
+<span class="lineNum">      13 </span>            : 
+<span class="lineNum">      14 </span>            : using namespace std;
+<a name="15"><span class="lineNum">      15 </span>            : using namespace dynd;</a>
+<span class="lineNum">      16 </span>            : 
+<span class="lineNum">      17 </span><span class="lineCov">         23 : ndt::pointer_type::pointer_type(const type &amp;target_tp)</span>
+<span class="lineNum">      18 </span>            :     : base_expr_type(pointer_id, expr_kind, sizeof(void *), sizeof(void *),
+<span class="lineNum">      19 </span>            :                      inherited_flags(target_tp.get_flags(), type_flag_zeroinit | type_flag_blockref),
+<span class="lineNum">      20 </span><span class="lineCov">         46 :                      sizeof(pointer_type_arrmeta) + target_tp.get_arrmeta_size(), target_tp.get_ndim()),</span>
+<span class="lineNum">      21 </span><span class="lineCov">         46 :       m_target_tp(target_tp)</span>
+<span class="lineNum">      22 </span>            : {
+<span class="lineNum">      23 </span>            :   // I'm not 100% sure how blockref pointer types should interact with
+<span class="lineNum">      24 </span>            :   // the computational subsystem, the details will have to shake out
+<span class="lineNum">      25 </span>            :   // when we want to actually do something with them.
+<span class="lineNum">      26 </span><span class="lineCov">         23 :   if (target_tp.get_kind() == expr_kind &amp;&amp; target_tp.get_id() != pointer_id) {</span>
+<span class="lineNum">      27 </span><span class="lineNoCov">          0 :     stringstream ss;</span>
+<span class="lineNum">      28 </span><span class="lineNoCov">          0 :     ss &lt;&lt; &quot;A dynd pointer type's target cannot be the expression type &quot;;</span>
+<span class="lineNum">      29 </span><span class="lineNoCov">          0 :     ss &lt;&lt; target_tp;</span>
+<span class="lineNum">      30 </span><span class="lineNoCov">          0 :     throw dynd::type_error(ss.str());</span>
+<span class="lineNum">      31 </span>            :   }
+<a name="32"><span class="lineNum">      32 </span><span class="lineCov">         23 : }</span></a>
+<span class="lineNum">      33 </span>            : 
+<a name="34"><span class="lineNum">      34 </span><span class="lineCov">         29 : ndt::pointer_type::~pointer_type() {}</span></a>
+<span class="lineNum">      35 </span>            : 
+<span class="lineNum">      36 </span><span class="lineNoCov">          0 : void ndt::pointer_type::print_data(std::ostream &amp;o, const char *arrmeta, const char *data) const</span>
+<span class="lineNum">      37 </span>            : {
+<span class="lineNum">      38 </span><span class="lineNoCov">          0 :   const pointer_type_arrmeta *md = reinterpret_cast&lt;const pointer_type_arrmeta *&gt;(arrmeta);</span>
+<span class="lineNum">      39 </span><span class="lineNoCov">          0 :   const char *target_data = *reinterpret_cast&lt;const char *const *&gt;(data) + md-&gt;offset;</span>
+<span class="lineNum">      40 </span><span class="lineNoCov">          0 :   m_target_tp.print_data(o, arrmeta + sizeof(pointer_type_arrmeta), target_data);</span>
+<a name="41"><span class="lineNum">      41 </span><span class="lineNoCov">          0 : }</span></a>
+<span class="lineNum">      42 </span>            : 
+<a name="43"><span class="lineNum">      43 </span><span class="lineCov">          2 : void ndt::pointer_type::print_type(std::ostream &amp;o) const { o &lt;&lt; &quot;pointer[&quot; &lt;&lt; m_target_tp &lt;&lt; &quot;]&quot;; }</span></a>
+<span class="lineNum">      44 </span>            : 
+<span class="lineNum">      45 </span><span class="lineCov">          3 : bool ndt::pointer_type::is_expression() const</span>
+<span class="lineNum">      46 </span>            : {
+<span class="lineNum">      47 </span>            :   // Even though the pointer is an instance of an base_expr_type,
+<span class="lineNum">      48 </span>            :   // we'll only call it an expression if the target is.
+<span class="lineNum">      49 </span><span class="lineCov">          3 :   return m_target_tp.is_expression();</span>
+<a name="50"><span class="lineNum">      50 </span>            : }</a>
+<span class="lineNum">      51 </span>            : 
+<span class="lineNum">      52 </span><span class="lineNoCov">          0 : bool ndt::pointer_type::is_unique_data_owner(const char *arrmeta) const</span>
+<span class="lineNum">      53 </span>            : {
+<span class="lineNum">      54 </span><span class="lineNoCov">          0 :   const pointer_type_arrmeta *md = reinterpret_cast&lt;const pointer_type_arrmeta *&gt;(*arrmeta);</span>
+<span class="lineNum">      55 </span><span class="lineNoCov">          0 :   if (md-&gt;blockref &amp;&amp; (md-&gt;blockref-&gt;m_use_count != 1 || (md-&gt;blockref-&gt;m_type != pod_memory_block_type &amp;&amp;</span>
+<span class="lineNum">      56 </span><span class="lineNoCov">          0 :                                                           md-&gt;blockref-&gt;m_type != fixed_size_pod_memory_block_type))) {</span>
+<span class="lineNum">      57 </span><span class="lineNoCov">          0 :     return false;</span>
+<span class="lineNum">      58 </span>            :   }
+<span class="lineNum">      59 </span><span class="lineNoCov">          0 :   return true;</span>
+<a name="60"><span class="lineNum">      60 </span>            : }</a>
+<span class="lineNum">      61 </span>            : 
+<span class="lineNum">      62 </span><span class="lineNoCov">          0 : void ndt::pointer_type::transform_child_types(type_transform_fn_t transform_fn, intptr_t arrmeta_offset, void *extra,</span>
+<span class="lineNum">      63 </span>            :                                               type &amp;out_transformed_tp, bool &amp;out_was_transformed) const
+<span class="lineNum">      64 </span>            : {
+<span class="lineNum">      65 </span><span class="lineNoCov">          0 :   type tmp_tp;</span>
+<span class="lineNum">      66 </span><span class="lineNoCov">          0 :   bool was_transformed = false;</span>
+<span class="lineNum">      67 </span><span class="lineNoCov">          0 :   transform_fn(m_target_tp, arrmeta_offset + sizeof(pointer_type_arrmeta), extra, tmp_tp, was_transformed);</span>
+<span class="lineNum">      68 </span><span class="lineNoCov">          0 :   if (was_transformed) {</span>
+<span class="lineNum">      69 </span><span class="lineNoCov">          0 :     out_transformed_tp = make(tmp_tp);</span>
+<span class="lineNum">      70 </span><span class="lineNoCov">          0 :     out_was_transformed = true;</span>
+<span class="lineNum">      71 </span>            :   }
+<span class="lineNum">      72 </span>            :   else {
+<span class="lineNum">      73 </span><span class="lineNoCov">          0 :     out_transformed_tp = type(this, true);</span>
+<span class="lineNum">      74 </span>            :   }
+<a name="75"><span class="lineNum">      75 </span><span class="lineNoCov">          0 : }</span></a>
+<span class="lineNum">      76 </span>            : 
+<span class="lineNum">      77 </span><span class="lineNoCov">          0 : ndt::type ndt::pointer_type::get_canonical_type() const</span>
+<span class="lineNum">      78 </span>            : {
+<span class="lineNum">      79 </span>            :   // The canonical version doesn't include the pointer
+<span class="lineNum">      80 </span><span class="lineNoCov">          0 :   return m_target_tp;</span>
+<a name="81"><span class="lineNum">      81 </span>            : }</a>
+<span class="lineNum">      82 </span>            : 
+<span class="lineNum">      83 </span><span class="lineCov">          2 : const ndt::type &amp;ndt::pointer_type::get_operand_type() const</span>
+<span class="lineNum">      84 </span>            : {
+<span class="lineNum">      85 </span><span class="lineCov">          2 :   static type vpt = make(make_type&lt;void&gt;());</span>
+<span class="lineNum">      86 </span>            : 
+<span class="lineNum">      87 </span><span class="lineCov">          2 :   if (m_target_tp.get_id() == pointer_id) {</span>
+<span class="lineNum">      88 </span><span class="lineNoCov">          0 :     return m_target_tp;</span>
+<span class="lineNum">      89 </span>            :   }
+<span class="lineNum">      90 </span>            :   else {
+<span class="lineNum">      91 </span><span class="lineCov">          2 :     return vpt;</span>
+<span class="lineNum">      92 </span>            :   }
+<a name="93"><span class="lineNum">      93 </span>            : }</a>
+<span class="lineNum">      94 </span>            : 
+<span class="lineNum">      95 </span><span class="lineCov">          1 : ndt::type ndt::pointer_type::apply_linear_index(intptr_t nindices, const irange *indices, size_t current_i,</span>
+<span class="lineNum">      96 </span>            :                                                 const type &amp;root_tp, bool leading_dimension) const
+<span class="lineNum">      97 </span>            : {
+<span class="lineNum">      98 </span><span class="lineCov">          1 :   if (nindices == 0) {</span>
+<span class="lineNum">      99 </span><span class="lineCov">          1 :     return type(this, true);</span>
+<span class="lineNum">     100 </span>            :   }
+<span class="lineNum">     101 </span>            :   else {
+<span class="lineNum">     102 </span><span class="lineNoCov">          0 :     type dt = m_target_tp.apply_linear_index(nindices, indices, current_i, root_tp, leading_dimension);</span>
+<span class="lineNum">     103 </span><span class="lineNoCov">          0 :     if (dt == m_target_tp) {</span>
+<span class="lineNum">     104 </span><span class="lineNoCov">          0 :       return type(this, true);</span>
+<span class="lineNum">     105 </span>            :     }
+<span class="lineNum">     106 </span>            :     else {
+<span class="lineNum">     107 </span><span class="lineNoCov">          0 :       return make(dt);</span>
+<span class="lineNum">     108 </span>            :     }
+<span class="lineNum">     109 </span>            :   }
+<a name="110"><span class="lineNum">     110 </span>            : }</a>
+<span class="lineNum">     111 </span>            : 
+<span class="lineNum">     112 </span><span class="lineCov">          1 : intptr_t ndt::pointer_type::apply_linear_index(intptr_t nindices, const irange *indices, const char *arrmeta,</span>
+<span class="lineNum">     113 </span>            :                                                const type &amp;result_tp, char *out_arrmeta,
+<span class="lineNum">     114 </span>            :                                                const intrusive_ptr&lt;memory_block_data&gt; &amp;embedded_reference,
+<span class="lineNum">     115 </span>            :                                                size_t current_i, const type &amp;root_tp,
+<span class="lineNum">     116 </span>            :                                                bool DYND_UNUSED(leading_dimension), char **DYND_UNUSED(inout_data),
+<span class="lineNum">     117 </span>            :                                                intrusive_ptr&lt;memory_block_data&gt; &amp;DYND_UNUSED(inout_dataref)) const
+<span class="lineNum">     118 </span>            : {
+<span class="lineNum">     119 </span><span class="lineCov">          1 :   const pointer_type_arrmeta *md = reinterpret_cast&lt;const pointer_type_arrmeta *&gt;(arrmeta);</span>
+<span class="lineNum">     120 </span><span class="lineCov">          1 :   pointer_type_arrmeta *out_md = reinterpret_cast&lt;pointer_type_arrmeta *&gt;(out_arrmeta);</span>
+<span class="lineNum">     121 </span>            :   // If there are no more indices, copy the rest verbatim
+<span class="lineNum">     122 </span><span class="lineCov">          1 :   out_md-&gt;blockref = md-&gt;blockref;</span>
+<span class="lineNum">     123 </span><span class="lineCov">          1 :   out_md-&gt;offset = md-&gt;offset;</span>
+<span class="lineNum">     124 </span><span class="lineCov">          1 :   if (!m_target_tp.is_builtin()) {</span>
+<span class="lineNum">     125 </span><span class="lineCov">          2 :     intrusive_ptr&lt;memory_block_data&gt; tmp;</span>
+<span class="lineNum">     126 </span><span class="lineCov">          1 :     const pointer_type *pdt = result_tp.extended&lt;pointer_type&gt;();</span>
+<span class="lineNum">     127 </span>            :     // The indexing may cause a change to the arrmeta offset
+<span class="lineNum">     128 </span><span class="lineCov">          2 :     out_md-&gt;offset += m_target_tp.extended()-&gt;apply_linear_index(</span>
+<span class="lineNum">     129 </span>            :         nindices, indices, arrmeta + sizeof(pointer_type_arrmeta), pdt-&gt;m_target_tp,
+<span class="lineNum">     130 </span><span class="lineCov">          2 :         out_arrmeta + sizeof(pointer_type_arrmeta), embedded_reference, current_i, root_tp, false, NULL, tmp);</span>
+<span class="lineNum">     131 </span>            :   }
+<span class="lineNum">     132 </span><span class="lineCov">          1 :   return 0;</span>
+<a name="133"><span class="lineNum">     133 </span>            : }</a>
+<span class="lineNum">     134 </span>            : 
+<span class="lineNum">     135 </span><span class="lineNoCov">          0 : ndt::type ndt::pointer_type::at_single(intptr_t i0, const char **inout_arrmeta, const char **inout_data) const</span>
+<span class="lineNum">     136 </span>            : {
+<span class="lineNum">     137 </span>            :   // If arrmeta/data is provided, follow the pointer and call the target
+<span class="lineNum">     138 </span>            :   // type's at_single
+<span class="lineNum">     139 </span><span class="lineNoCov">          0 :   if (inout_arrmeta) {</span>
+<span class="lineNum">     140 </span><span class="lineNoCov">          0 :     const pointer_type_arrmeta *md = reinterpret_cast&lt;const pointer_type_arrmeta *&gt;(*inout_arrmeta);</span>
+<span class="lineNum">     141 </span>            :     // Modify the arrmeta
+<span class="lineNum">     142 </span><span class="lineNoCov">          0 :     *inout_arrmeta += sizeof(pointer_type_arrmeta);</span>
+<span class="lineNum">     143 </span>            :     // If requested, modify the data pointer
+<span class="lineNum">     144 </span><span class="lineNoCov">          0 :     if (inout_data) {</span>
+<span class="lineNum">     145 </span><span class="lineNoCov">          0 :       *inout_data = *reinterpret_cast&lt;const char *const *&gt;(inout_data) + md-&gt;offset;</span>
+<span class="lineNum">     146 </span>            :     }
+<span class="lineNum">     147 </span>            :   }
+<span class="lineNum">     148 </span>            :   // In at_single, we can't maintain a pointer wrapper, this would result in
+<span class="lineNum">     149 </span>            :   // a type inconsistent with its arrmeta.
+<span class="lineNum">     150 </span><span class="lineNoCov">          0 :   return m_target_tp.at_single(i0, inout_arrmeta, inout_data);</span>
+<a name="151"><span class="lineNum">     151 </span>            : }</a>
+<span class="lineNum">     152 </span>            : 
+<span class="lineNum">     153 </span><span class="lineNoCov">          0 : ndt::type ndt::pointer_type::get_type_at_dimension(char **inout_arrmeta, intptr_t i, intptr_t total_ndim) const</span>
+<span class="lineNum">     154 </span>            : {
+<span class="lineNum">     155 </span><span class="lineNoCov">          0 :   if (i == 0) {</span>
+<span class="lineNum">     156 </span><span class="lineNoCov">          0 :     return type(this, true);</span>
+<span class="lineNum">     157 </span>            :   }
+<span class="lineNum">     158 </span>            :   else {
+<span class="lineNum">     159 </span><span class="lineNoCov">          0 :     if (inout_arrmeta != NULL) {</span>
+<span class="lineNum">     160 </span><span class="lineNoCov">          0 :       *inout_arrmeta += sizeof(pointer_type_arrmeta);</span>
+<span class="lineNum">     161 </span>            :     }
+<span class="lineNum">     162 </span><span class="lineNoCov">          0 :     return make(m_target_tp.get_type_at_dimension(inout_arrmeta, i, total_ndim));</span>
+<span class="lineNum">     163 </span>            :   }
+<a name="164"><span class="lineNum">     164 </span>            : }</a>
+<span class="lineNum">     165 </span>            : 
+<span class="lineNum">     166 </span><span class="lineNoCov">          0 : void ndt::pointer_type::get_shape(intptr_t ndim, intptr_t i, intptr_t *out_shape, const char *arrmeta,</span>
+<span class="lineNum">     167 </span>            :                                   const char *data) const
+<span class="lineNum">     168 </span>            : {
+<span class="lineNum">     169 </span><span class="lineNoCov">          0 :   if (!m_target_tp.is_builtin()) {</span>
+<span class="lineNum">     170 </span><span class="lineNoCov">          0 :     const char *target_data = NULL;</span>
+<span class="lineNum">     171 </span><span class="lineNoCov">          0 :     if (arrmeta != NULL &amp;&amp; data != NULL) {</span>
+<span class="lineNum">     172 </span><span class="lineNoCov">          0 :       const pointer_type_arrmeta *md = reinterpret_cast&lt;const pointer_type_arrmeta *&gt;(arrmeta);</span>
+<span class="lineNum">     173 </span><span class="lineNoCov">          0 :       target_data = *reinterpret_cast&lt;const char *const *&gt;(data) + md-&gt;offset;</span>
+<span class="lineNum">     174 </span>            :     }
+<span class="lineNum">     175 </span><span class="lineNoCov">          0 :     m_target_tp.extended()-&gt;get_shape(ndim, i, out_shape, arrmeta ? (arrmeta + sizeof(pointer_type_arrmeta)) : NULL,</span>
+<span class="lineNum">     176 </span><span class="lineNoCov">          0 :                                       target_data);</span>
+<span class="lineNum">     177 </span>            :   }
+<span class="lineNum">     178 </span>            :   else {
+<span class="lineNum">     179 </span><span class="lineNoCov">          0 :     stringstream ss;</span>
+<span class="lineNum">     180 </span><span class="lineNoCov">          0 :     ss &lt;&lt; &quot;requested too many dimensions from type &quot; &lt;&lt; m_target_tp;</span>
+<span class="lineNum">     181 </span><span class="lineNoCov">          0 :     throw runtime_error(ss.str());</span>
+<span class="lineNum">     182 </span>            :   }
+<a name="183"><span class="lineNum">     183 </span><span class="lineNoCov">          0 : }</span></a>
+<span class="lineNum">     184 </span>            : 
+<span class="lineNum">     185 </span><span class="lineNoCov">          0 : axis_order_classification_t ndt::pointer_type::classify_axis_order(const char *arrmeta) const</span>
+<span class="lineNum">     186 </span>            : {
+<span class="lineNum">     187 </span>            :   // Return the classification of the target type
+<span class="lineNum">     188 </span><span class="lineNoCov">          0 :   if (m_target_tp.get_ndim() &gt; 1) {</span>
+<span class="lineNum">     189 </span><span class="lineNoCov">          0 :     return m_target_tp.extended()-&gt;classify_axis_order(arrmeta + sizeof(pointer_type_arrmeta));</span>
+<span class="lineNum">     190 </span>            :   }
+<span class="lineNum">     191 </span>            :   else {
+<span class="lineNum">     192 </span><span class="lineNoCov">          0 :     return axis_order_none;</span>
+<span class="lineNum">     193 </span>            :   }
+<a name="194"><span class="lineNum">     194 </span>            : }</a>
+<span class="lineNum">     195 </span>            : 
+<span class="lineNum">     196 </span><span class="lineNoCov">          0 : bool ndt::pointer_type::is_lossless_assignment(const type &amp;dst_tp, const type &amp;src_tp) const</span>
+<span class="lineNum">     197 </span>            : {
+<span class="lineNum">     198 </span><span class="lineNoCov">          0 :   if (dst_tp.extended() == this) {</span>
+<span class="lineNum">     199 </span><span class="lineNoCov">          0 :     return ::is_lossless_assignment(m_target_tp, src_tp);</span>
+<span class="lineNum">     200 </span>            :   }
+<span class="lineNum">     201 </span>            :   else {
+<span class="lineNum">     202 </span><span class="lineNoCov">          0 :     return ::is_lossless_assignment(dst_tp, m_target_tp);</span>
+<span class="lineNum">     203 </span>            :   }
+<a name="204"><span class="lineNum">     204 </span>            : }</a>
+<span class="lineNum">     205 </span>            : 
+<span class="lineNum">     206 </span><span class="lineCov">          5 : bool ndt::pointer_type::operator==(const base_type &amp;rhs) const</span>
+<span class="lineNum">     207 </span>            : {
+<span class="lineNum">     208 </span><span class="lineCov">          5 :   if (this == &amp;rhs) {</span>
+<span class="lineNum">     209 </span><span class="lineCov">          2 :     return true;</span>
+<span class="lineNum">     210 </span>            :   }
+<span class="lineNum">     211 </span><span class="lineCov">          3 :   else if (rhs.get_id() != pointer_id) {</span>
+<span class="lineNum">     212 </span><span class="lineNoCov">          0 :     return false;</span>
+<span class="lineNum">     213 </span>            :   }
+<span class="lineNum">     214 </span>            :   else {
+<span class="lineNum">     215 </span><span class="lineCov">          3 :     const pointer_type *dt = static_cast&lt;const pointer_type *&gt;(&amp;rhs);</span>
+<span class="lineNum">     216 </span><span class="lineCov">          3 :     return m_target_tp == dt-&gt;m_target_tp;</span>
+<span class="lineNum">     217 </span>            :   }
+<a name="218"><span class="lineNum">     218 </span>            : }</a>
+<span class="lineNum">     219 </span>            : 
+<span class="lineNum">     220 </span><span class="lineNoCov">          0 : ndt::type ndt::pointer_type::with_replaced_storage_type(const type &amp; /*replacement_tp*/) const</span>
+<span class="lineNum">     221 </span>            : {
+<span class="lineNum">     222 </span><span class="lineNoCov">          0 :   throw runtime_error(&quot;TODO: implement pointer_type::with_replaced_storage_type&quot;);</span>
+<a name="223"><span class="lineNum">     223 </span>            : }</a>
+<span class="lineNum">     224 </span>            : 
+<span class="lineNum">     225 </span><span class="lineNoCov">          0 : void ndt::pointer_type::arrmeta_default_construct(char *arrmeta, bool blockref_alloc) const</span>
+<span class="lineNum">     226 </span>            : {
+<span class="lineNum">     227 </span>            :   // Simply allocate a POD memory block
+<span class="lineNum">     228 </span>            :   // TODO: Will need a different kind of memory block if the data isn't POD.
+<span class="lineNum">     229 </span><span class="lineNoCov">          0 :   if (blockref_alloc) {</span>
+<span class="lineNum">     230 </span><span class="lineNoCov">          0 :     pointer_type_arrmeta *md = reinterpret_cast&lt;pointer_type_arrmeta *&gt;(arrmeta);</span>
+<span class="lineNum">     231 </span><span class="lineNoCov">          0 :     md-&gt;blockref = make_pod_memory_block(m_target_tp).release();</span>
+<span class="lineNum">     232 </span>            :   }
+<span class="lineNum">     233 </span><span class="lineNoCov">          0 :   if (!m_target_tp.is_builtin()) {</span>
+<span class="lineNum">     234 </span><span class="lineNoCov">          0 :     m_target_tp.extended()-&gt;arrmeta_default_construct(arrmeta + sizeof(pointer_type_arrmeta), blockref_alloc);</span>
+<span class="lineNum">     235 </span>            :   }
+<a name="236"><span class="lineNum">     236 </span><span class="lineNoCov">          0 : }</span></a>
+<span class="lineNum">     237 </span>            : 
+<span class="lineNum">     238 </span><span class="lineNoCov">          0 : void ndt::pointer_type::arrmeta_copy_construct(char *dst_arrmeta, const char *src_arrmeta,</span>
+<span class="lineNum">     239 </span>            :                                                const intrusive_ptr&lt;memory_block_data&gt; &amp;embedded_reference) const
+<span class="lineNum">     240 </span>            : {
+<span class="lineNum">     241 </span>            :   // Copy the blockref, switching it to the embedded_reference if necessary
+<span class="lineNum">     242 </span><span class="lineNoCov">          0 :   const pointer_type_arrmeta *src_md = reinterpret_cast&lt;const pointer_type_arrmeta *&gt;(src_arrmeta);</span>
+<span class="lineNum">     243 </span><span class="lineNoCov">          0 :   pointer_type_arrmeta *dst_md = reinterpret_cast&lt;pointer_type_arrmeta *&gt;(dst_arrmeta);</span>
+<span class="lineNum">     244 </span><span class="lineNoCov">          0 :   dst_md-&gt;blockref = src_md-&gt;blockref ? src_md-&gt;blockref : embedded_reference;</span>
+<span class="lineNum">     245 </span><span class="lineNoCov">          0 :   dst_md-&gt;offset = src_md-&gt;offset;</span>
+<span class="lineNum">     246 </span>            :   // Copy the target arrmeta
+<span class="lineNum">     247 </span><span class="lineNoCov">          0 :   if (!m_target_tp.is_builtin()) {</span>
+<span class="lineNum">     248 </span><span class="lineNoCov">          0 :     m_target_tp.extended()-&gt;arrmeta_copy_construct(dst_arrmeta + sizeof(pointer_type_arrmeta),</span>
+<span class="lineNum">     249 </span><span class="lineNoCov">          0 :                                                    src_arrmeta + sizeof(pointer_type_arrmeta), embedded_reference);</span>
+<span class="lineNum">     250 </span>            :   }
+<a name="251"><span class="lineNum">     251 </span><span class="lineNoCov">          0 : }</span></a>
+<span class="lineNum">     252 </span>            : 
+<span class="lineNum">     253 </span><span class="lineNoCov">          0 : void ndt::pointer_type::arrmeta_reset_buffers(char *DYND_UNUSED(arrmeta)) const</span>
+<span class="lineNum">     254 </span>            : {
+<span class="lineNum">     255 </span><span class="lineNoCov">          0 :   throw runtime_error(&quot;TODO implement pointer_type::arrmeta_reset_buffers&quot;);</span>
+<a name="256"><span class="lineNum">     256 </span>            : }</a>
+<span class="lineNum">     257 </span>            : 
+<span class="lineNum">     258 </span><span class="lineNoCov">          0 : void ndt::pointer_type::arrmeta_finalize_buffers(char *arrmeta) const</span>
+<span class="lineNum">     259 </span>            : {
+<span class="lineNum">     260 </span><span class="lineNoCov">          0 :   pointer_type_arrmeta *md = reinterpret_cast&lt;pointer_type_arrmeta *&gt;(arrmeta);</span>
+<span class="lineNum">     261 </span><span class="lineNoCov">          0 :   if (md-&gt;blockref) {</span>
+<span class="lineNum">     262 </span>            :     // Finalize the memory block
+<span class="lineNum">     263 </span><span class="lineNoCov">          0 :     md-&gt;blockref-&gt;finalize();</span>
+<span class="lineNum">     264 </span>            :   }
+<a name="265"><span class="lineNum">     265 </span><span class="lineNoCov">          0 : }</span></a>
+<span class="lineNum">     266 </span>            : 
+<span class="lineNum">     267 </span><span class="lineCov">          2 : void ndt::pointer_type::arrmeta_destruct(char *arrmeta) const</span>
+<span class="lineNum">     268 </span>            : {
+<span class="lineNum">     269 </span><span class="lineCov">          2 :   pointer_type_arrmeta *md = reinterpret_cast&lt;pointer_type_arrmeta *&gt;(arrmeta);</span>
+<span class="lineNum">     270 </span><span class="lineCov">          2 :   md-&gt;~pointer_type_arrmeta();</span>
+<span class="lineNum">     271 </span><span class="lineCov">          2 :   if (!m_target_tp.is_builtin()) {</span>
+<span class="lineNum">     272 </span><span class="lineCov">          2 :     m_target_tp.extended()-&gt;arrmeta_destruct(arrmeta + sizeof(pointer_type_arrmeta));</span>
+<span class="lineNum">     273 </span>            :   }
+<a name="274"><span class="lineNum">     274 </span><span class="lineCov">          2 : }</span></a>
+<span class="lineNum">     275 </span>            : 
+<span class="lineNum">     276 </span><span class="lineNoCov">          0 : void ndt::pointer_type::arrmeta_debug_print(const char *arrmeta, std::ostream &amp;o, const std::string &amp;indent) const</span>
+<span class="lineNum">     277 </span>            : {
+<span class="lineNum">     278 </span><span class="lineNoCov">          0 :   const pointer_type_arrmeta *md = reinterpret_cast&lt;const pointer_type_arrmeta *&gt;(arrmeta);</span>
+<span class="lineNum">     279 </span><span class="lineNoCov">          0 :   o &lt;&lt; indent &lt;&lt; &quot;pointer arrmeta\n&quot;;</span>
+<span class="lineNum">     280 </span><span class="lineNoCov">          0 :   o &lt;&lt; indent &lt;&lt; &quot; offset: &quot; &lt;&lt; md-&gt;offset &lt;&lt; &quot;\n&quot;;</span>
+<span class="lineNum">     281 </span><span class="lineNoCov">          0 :   memory_block_debug_print(md-&gt;blockref.get(), o, indent + &quot; &quot;);</span>
+<span class="lineNum">     282 </span><span class="lineNoCov">          0 :   if (!m_target_tp.is_builtin()) {</span>
+<span class="lineNum">     283 </span><span class="lineNoCov">          0 :     m_target_tp.extended()-&gt;arrmeta_debug_print(arrmeta + sizeof(pointer_type_arrmeta), o, indent + &quot; &quot;);</span>
+<span class="lineNum">     284 </span>            :   }
+<a name="285"><span class="lineNum">     285 </span><span class="lineNoCov">          0 : }</span></a>
+<span class="lineNum">     286 </span>            : 
+<span class="lineNum">     287 </span><span class="lineNoCov">          0 : bool ndt::pointer_type::match(const char *arrmeta, const type &amp;candidate_tp, const char *candidate_arrmeta,</span>
+<span class="lineNum">     288 </span>            :                               std::map&lt;std::string, type&gt; &amp;tp_vars) const
+<span class="lineNum">     289 </span>            : {
+<span class="lineNum">     290 </span><span class="lineNoCov">          0 :   if (candidate_tp.get_id() != pointer_id) {</span>
+<span class="lineNum">     291 </span><span class="lineNoCov">          0 :     return false;</span>
+<span class="lineNum">     292 </span>            :   }
+<span class="lineNum">     293 </span>            : 
+<span class="lineNum">     294 </span>            :   // TODO XXX If the arrmeta is non-null, need to compare the offset and the
+<span class="lineNum">     295 </span>            :   //          data reference
+<span class="lineNum">     296 </span><span class="lineNoCov">          0 :   return m_target_tp.match(DYND_INC_IF_NOT_NULL(arrmeta, sizeof(pointer_type_arrmeta)),</span>
+<span class="lineNum">     297 </span><span class="lineNoCov">          0 :                            candidate_tp.extended&lt;pointer_type&gt;()-&gt;m_target_tp,</span>
+<span class="lineNum">     298 </span><span class="lineNoCov">          0 :                            DYND_INC_IF_NOT_NULL(candidate_arrmeta, sizeof(pointer_type_arrmeta)), tp_vars);</span>
+<a name="299"><span class="lineNum">     299 </span>            : }</a>
+<span class="lineNum">     300 </span>            : 
+<span class="lineNum">     301 </span><span class="lineCov">          1 : static ndt::type property_get_target_type(ndt::type tp)</span>
+<span class="lineNum">     302 </span>            : {
+<span class="lineNum">     303 </span><span class="lineCov">          1 :   const ndt::pointer_type *pd = tp.extended&lt;ndt::pointer_type&gt;();</span>
+<span class="lineNum">     304 </span><span class="lineCov">          1 :   return pd-&gt;get_target_type();</span>
+<a name="305"><span class="lineNum">     305 </span>            : }</a>
+<span class="lineNum">     306 </span>            : 
+<span class="lineNum">     307 </span><span class="lineCov">          1 : std::map&lt;std::string, nd::callable&gt; ndt::pointer_type::get_dynamic_type_properties() const</span>
+<span class="lineNum">     308 </span>            : {
+<span class="lineNum">     309 </span><span class="lineCov">          1 :   std::map&lt;std::string, nd::callable&gt; properties;</span>
+<span class="lineNum">     310 </span><span class="lineCov">          1 :   properties[&quot;target_type&quot;] = nd::functional::apply(&amp;property_get_target_type, &quot;self&quot;);</span>
+<span class="lineNum">     311 </span>            : 
+<span class="lineNum">     312 </span><span class="lineCov">          1 :   return properties;</span>
+<a name="313"><span class="lineNum">     313 </span>            : }</a>
+<span class="lineNum">     314 </span>            : 
+<span class="lineNum">     315 </span><span class="lineCov">          1 : struct dereference_kernel : nd::base_kernel&lt;dereference_kernel&gt; {</span>
+<a name="316"><span class="lineNum">     316 </span>            :   nd::array self;</a>
+<span class="lineNum">     317 </span>            : 
+<a name="318"><span class="lineNum">     318 </span><span class="lineCov">          1 :   dereference_kernel(const nd::array &amp;self) : self(self) {}</span></a>
+<span class="lineNum">     319 </span>            : 
+<a name="320"><span class="lineNum">     320 </span><span class="lineCov">          1 :   void call(nd::array *dst, const nd::array *DYND_UNUSED(src)) { *dst = helper(self); }</span></a>
+<span class="lineNum">     321 </span>            : 
+<span class="lineNum">     322 </span><span class="lineCov">          1 :   static void resolve_dst_type(char *DYND_UNUSED(static_data), char *DYND_UNUSED(data), ndt::type &amp;dst_tp,</span>
+<span class="lineNum">     323 </span>            :                                intptr_t DYND_UNUSED(nsrc), const ndt::type *DYND_UNUSED(src_tp),
+<span class="lineNum">     324 </span>            :                                intptr_t DYND_UNUSED(nkwd), const nd::array *kwds,
+<span class="lineNum">     325 </span>            :                                const std::map&lt;std::string, ndt::type&gt; &amp;DYND_UNUSED(tp_vars))
+<span class="lineNum">     326 </span>            :   {
+<span class="lineNum">     327 </span><span class="lineCov">          1 :     dst_tp = helper(kwds[0]).get_type();</span>
+<a name="328"><span class="lineNum">     328 </span><span class="lineCov">          1 :   }</span></a>
+<span class="lineNum">     329 </span>            : 
+<span class="lineNum">     330 </span><span class="lineCov">          1 :   static void instantiate(char *DYND_UNUSED(static_data), char *DYND_UNUSED(data), nd::kernel_builder *ckb,</span>
+<span class="lineNum">     331 </span>            :                           const ndt::type &amp;DYND_UNUSED(dst_tp), const char *DYND_UNUSED(dst_arrmeta),
+<span class="lineNum">     332 </span>            :                           intptr_t DYND_UNUSED(nsrc), const ndt::type *DYND_UNUSED(src_tp),
+<span class="lineNum">     333 </span>            :                           const char *const *DYND_UNUSED(src_arrmeta), kernel_request_t kernreq,
+<span class="lineNum">     334 </span>            :                           intptr_t DYND_UNUSED(nkwd), const nd::array *kwds,
+<span class="lineNum">     335 </span>            :                           const std::map&lt;std::string, ndt::type&gt; &amp;DYND_UNUSED(tp_vars))
+<span class="lineNum">     336 </span>            :   {
+<span class="lineNum">     337 </span><span class="lineCov">          1 :     ckb-&gt;emplace_back&lt;dereference_kernel&gt;(kernreq, kwds[0]);</span>
+<a name="338"><span class="lineNum">     338 </span><span class="lineCov">          1 :   }</span></a>
+<span class="lineNum">     339 </span>            : 
+<span class="lineNum">     340 </span><span class="lineCov">          2 :   static nd::array helper(const nd::array &amp;self)</span>
+<span class="lineNum">     341 </span>            :   {
+<span class="lineNum">     342 </span>            :     // Follow the pointers to eliminate them
+<span class="lineNum">     343 </span><span class="lineCov">          4 :     ndt::type dt = self.get_type();</span>
+<span class="lineNum">     344 </span><span class="lineCov">          2 :     const char *arrmeta = self.get()-&gt;metadata();</span>
+<span class="lineNum">     345 </span><span class="lineCov">          2 :     char *data = self.get()-&gt;data;</span>
+<span class="lineNum">     346 </span><span class="lineCov">          2 :     memory_block_data *dataref = self.get()-&gt;owner.get();</span>
+<span class="lineNum">     347 </span><span class="lineCov">          2 :     if (dataref == NULL) {</span>
+<span class="lineNum">     348 </span><span class="lineNoCov">          0 :       dataref = self.get();</span>
+<span class="lineNum">     349 </span>            :     }
+<span class="lineNum">     350 </span><span class="lineCov">          2 :     uint64_t flags = self.get()-&gt;flags;</span>
+<span class="lineNum">     351 </span>            : 
+<span class="lineNum">     352 </span><span class="lineCov">          6 :     while (dt.get_id() == pointer_id) {</span>
+<span class="lineNum">     353 </span><span class="lineCov">          2 :       const pointer_type_arrmeta *md = reinterpret_cast&lt;const pointer_type_arrmeta *&gt;(arrmeta);</span>
+<span class="lineNum">     354 </span><span class="lineCov">          2 :       dt = dt.extended&lt;ndt::pointer_type&gt;()-&gt;get_target_type();</span>
+<span class="lineNum">     355 </span><span class="lineCov">          2 :       arrmeta += sizeof(pointer_type_arrmeta);</span>
+<span class="lineNum">     356 </span><span class="lineCov">          2 :       data = *reinterpret_cast&lt;char **&gt;(data) + md-&gt;offset;</span>
+<span class="lineNum">     357 </span><span class="lineCov">          2 :       dataref = md-&gt;blockref.get();</span>
+<span class="lineNum">     358 </span>            :     }
+<span class="lineNum">     359 </span>            : 
+<span class="lineNum">     360 </span>            :     // Create an array without the pointers
+<span class="lineNum">     361 </span><span class="lineCov">          2 :     nd::array result = nd::empty(dt);</span>
+<span class="lineNum">     362 </span><span class="lineCov">          2 :     if (!dt.is_builtin()) {</span>
+<span class="lineNum">     363 </span><span class="lineCov">          6 :       dt.extended()-&gt;arrmeta_copy_construct(result.get()-&gt;metadata(), arrmeta,</span>
+<span class="lineNum">     364 </span><span class="lineCov">          4 :                                             intrusive_ptr&lt;memory_block_data&gt;(self.get(), true));</span>
+<span class="lineNum">     365 </span>            :     }
+<span class="lineNum">     366 </span><span class="lineCov">          2 :     result.get()-&gt;tp = dt;</span>
+<span class="lineNum">     367 </span><span class="lineCov">          2 :     result.get()-&gt;data = data;</span>
+<span class="lineNum">     368 </span><span class="lineCov">          2 :     result.get()-&gt;owner = dataref;</span>
+<span class="lineNum">     369 </span><span class="lineCov">          2 :     result.get()-&gt;flags = flags;</span>
+<span class="lineNum">     370 </span><span class="lineCov">          4 :     return result;</span>
+<span class="lineNum">     371 </span>            :   }
+<a name="372"><span class="lineNum">     372 </span>            : };</a>
+<span class="lineNum">     373 </span>            : 
+<span class="lineNum">     374 </span><span class="lineCov">          4 : std::map&lt;std::string, nd::callable&gt; ndt::pointer_type::get_dynamic_array_functions() const</span>
+<span class="lineNum">     375 </span>            : {
+<span class="lineNum">     376 </span><span class="lineCov">          4 :   std::map&lt;std::string, nd::callable&gt; functions;</span>
+<span class="lineNum">     377 </span><span class="lineCov">          4 :   functions[&quot;dereference&quot;] = nd::callable::make&lt;dereference_kernel&gt;(ndt::type(&quot;(self: Any) -&gt; Any&quot;));</span>
+<span class="lineNum">     378 </span>            : 
+<span class="lineNum">     379 </span><span class="lineCov">          4 :   return functions;</span>
+<span class="lineNum">     380 </span>            : }
+<span class="lineNum">     381 </span>            : 
+<span class="lineNum">     382 </span>            : namespace {
+<a name="383"><span class="lineNum">     383 </span>            : // TODO: use the PP meta stuff, but DYND_PP_LEN_MAX is set to 8 right now, would</a>
+<span class="lineNum">     384 </span>            : // need to be 19
+<span class="lineNum">     385 </span><span class="lineCov">          1 : struct static_pointer {</span>
+<span class="lineNum">     386 </span>            :   ndt::pointer_type bt1;
+<span class="lineNum">     387 </span>            :   ndt::pointer_type bt2;
+<span class="lineNum">     388 </span>            :   ndt::pointer_type bt3;
+<span class="lineNum">     389 </span>            :   ndt::pointer_type bt4;
+<span class="lineNum">     390 </span>            :   ndt::pointer_type bt5;
+<span class="lineNum">     391 </span>            :   ndt::pointer_type bt6;
+<span class="lineNum">     392 </span>            :   ndt::pointer_type bt7;
+<span class="lineNum">     393 </span>            :   ndt::pointer_type bt8;
+<span class="lineNum">     394 </span>            :   ndt::pointer_type bt9;
+<span class="lineNum">     395 </span>            :   ndt::pointer_type bt10;
+<span class="lineNum">     396 </span>            :   ndt::pointer_type bt11;
+<span class="lineNum">     397 </span>            :   ndt::pointer_type bt12;
+<span class="lineNum">     398 </span>            :   ndt::pointer_type bt13;
+<span class="lineNum">     399 </span>            :   ndt::pointer_type bt14;
+<span class="lineNum">     400 </span>            :   ndt::pointer_type bt15;
+<span class="lineNum">     401 </span>            :   ndt::pointer_type bt16;
+<span class="lineNum">     402 </span>            :   ndt::pointer_type bt17;
+<span class="lineNum">     403 </span>            : 
+<a name="404"><span class="lineNum">     404 </span>            :   ndt::type static_builtins_instance[builtin_id_count];</a>
+<span class="lineNum">     405 </span>            : 
+<span class="lineNum">     406 </span><span class="lineCov">          1 :   static_pointer()</span>
+<span class="lineNum">     407 </span>            :       : bt1(ndt::type((type_id_t)1)), bt2(ndt::type((type_id_t)2)), bt3(ndt::type((type_id_t)3)),
+<span class="lineNum">     408 </span>            :         bt4(ndt::type((type_id_t)4)), bt5(ndt::type((type_id_t)5)), bt6(ndt::type((type_id_t)6)),
+<span class="lineNum">     409 </span>            :         bt7(ndt::type((type_id_t)7)), bt8(ndt::type((type_id_t)8)), bt9(ndt::type((type_id_t)9)),
+<span class="lineNum">     410 </span>            :         bt10(ndt::type((type_id_t)10)), bt11(ndt::type((type_id_t)11)), bt12(ndt::type((type_id_t)12)),
+<span class="lineNum">     411 </span>            :         bt13(ndt::type((type_id_t)13)), bt14(ndt::type((type_id_t)14)), bt15(ndt::type((type_id_t)15)),
+<span class="lineNum">     412 </span><span class="lineCov">          1 :         bt16(ndt::type((type_id_t)16)), bt17(ndt::type((type_id_t)17))</span>
+<span class="lineNum">     413 </span>            :   {
+<span class="lineNum">     414 </span><span class="lineCov">          1 :     static_builtins_instance[1] = ndt::type(&amp;bt1, true);</span>
+<span class="lineNum">     415 </span><span class="lineCov">          1 :     static_builtins_instance[2] = ndt::type(&amp;bt2, true);</span>
+<span class="lineNum">     416 </span><span class="lineCov">          1 :     static_builtins_instance[3] = ndt::type(&amp;bt3, true);</span>
+<span class="lineNum">     417 </span><span class="lineCov">          1 :     static_builtins_instance[4] = ndt::type(&amp;bt4, true);</span>
+<span class="lineNum">     418 </span><span class="lineCov">          1 :     static_builtins_instance[5] = ndt::type(&amp;bt5, true);</span>
+<span class="lineNum">     419 </span><span class="lineCov">          1 :     static_builtins_instance[6] = ndt::type(&amp;bt6, true);</span>
+<span class="lineNum">     420 </span><span class="lineCov">          1 :     static_builtins_instance[7] = ndt::type(&amp;bt7, true);</span>
+<span class="lineNum">     421 </span><span class="lineCov">          1 :     static_builtins_instance[8] = ndt::type(&amp;bt8, true);</span>
+<span class="lineNum">     422 </span><span class="lineCov">          1 :     static_builtins_instance[9] = ndt::type(&amp;bt9, true);</span>
+<span class="lineNum">     423 </span><span class="lineCov">          1 :     static_builtins_instance[10] = ndt::type(&amp;bt10, true);</span>
+<span class="lineNum">     424 </span><span class="lineCov">          1 :     static_builtins_instance[11] = ndt::type(&amp;bt11, true);</span>
+<span class="lineNum">     425 </span><span class="lineCov">          1 :     static_builtins_instance[12] = ndt::type(&amp;bt12, true);</span>
+<span class="lineNum">     426 </span><span class="lineCov">          1 :     static_builtins_instance[13] = ndt::type(&amp;bt13, true);</span>
+<span class="lineNum">     427 </span><span class="lineCov">          1 :     static_builtins_instance[14] = ndt::type(&amp;bt14, true);</span>
+<span class="lineNum">     428 </span><span class="lineCov">          1 :     static_builtins_instance[15] = ndt::type(&amp;bt15, true);</span>
+<span class="lineNum">     429 </span><span class="lineCov">          1 :     static_builtins_instance[16] = ndt::type(&amp;bt16, true);</span>
+<span class="lineNum">     430 </span><span class="lineCov">          1 :     static_builtins_instance[17] = ndt::type(&amp;bt17, true);</span>
+<span class="lineNum">     431 </span><span class="lineCov">          1 :   }</span>
+<span class="lineNum">     432 </span>            : };
+<a name="433"><span class="lineNum">     433 </span>            : } // anonymous namespace</a>
+<span class="lineNum">     434 </span>            : 
+<span class="lineNum">     435 </span><span class="lineCov">         48 : ndt::type ndt::pointer_type::make(const type &amp;target_tp)</span>
+<span class="lineNum">     436 </span>            : {
+<span class="lineNum">     437 </span>            :   // Static instances of the type, which have a reference
+<span class="lineNum">     438 </span>            :   // count &gt; 0 for the lifetime of the program. This static
+<span class="lineNum">     439 </span>            :   // construction is inside a function to ensure correct creation
+<span class="lineNum">     440 </span>            :   // order during startup.
+<span class="lineNum">     441 </span><span class="lineCov">         48 :   static static_pointer sp;</span>
+<span class="lineNum">     442 </span>            : 
+<span class="lineNum">     443 </span><span class="lineCov">         48 :   if (target_tp.is_builtin()) {</span>
+<span class="lineNum">     444 </span><span class="lineCov">         42 :     return sp.static_builtins_instance[target_tp.get_id()];</span>
+<span class="lineNum">     445 </span>            :   }
+<span class="lineNum">     446 </span>            :   else {
+<a name="447"><span class="lineNum">     447 </span><span class="lineCov">          6 :     return type(new pointer_type(target_tp), false);</span></a>
+<span class="lineNum">     448 </span>            :   }
+<span class="lineNum">     449 </span><span class="lineCov">          3 : }</span>
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.10</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

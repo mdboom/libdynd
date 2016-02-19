@@ -1,0 +1,558 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - coverage.info.cleaned - include/dynd/kernels/parse_kernel.hpp</title>
+  <link rel="stylesheet" type="text/css" href="../../../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../../../index.html">top level</a> - <a href="index.html">include/dynd/kernels</a> - parse_kernel.hpp<span style="font-size: 80%;"> (source / <a href="parse_kernel.hpp.func.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">coverage.info.cleaned</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">174</td>
+            <td class="headerCovTableEntry">210</td>
+            <td class="headerCovTableEntryMed">82.9 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2016-02-19</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">41</td>
+            <td class="headerCovTableEntry">41</td>
+            <td class="headerCovTableEntryHi">100.0 %</td>
+          </tr>
+          <tr><td><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : //</a>
+<span class="lineNum">       2 </span>            : // Copyright (C) 2011-15 DyND Developers
+<span class="lineNum">       3 </span>            : // BSD 2-Clause License, see LICENSE.txt
+<span class="lineNum">       4 </span>            : //
+<span class="lineNum">       5 </span>            : 
+<span class="lineNum">       6 </span>            : #pragma once
+<span class="lineNum">       7 </span>            : 
+<span class="lineNum">       8 </span>            : #include &lt;dynd/option.hpp&gt;
+<span class="lineNum">       9 </span>            : #include &lt;dynd/kernels/base_kernel.hpp&gt;
+<span class="lineNum">      10 </span>            : 
+<span class="lineNum">      11 </span>            : namespace dynd {
+<span class="lineNum">      12 </span>            : namespace nd {
+<a name="13"><span class="lineNum">      13 </span>            :   namespace json {</a>
+<span class="lineNum">      14 </span>            : 
+<span class="lineNum">      15 </span><span class="lineCov">         46 :     inline bool _parse_number(const char *&amp;rbegin, const char *&amp;end)</span>
+<span class="lineNum">      16 </span>            :     {
+<span class="lineNum">      17 </span><span class="lineCov">         46 :       const char *begin = rbegin;</span>
+<span class="lineNum">      18 </span><span class="lineCov">         46 :       if (begin == end) {</span>
+<span class="lineNum">      19 </span><span class="lineNoCov">          0 :         return false;</span>
+<span class="lineNum">      20 </span>            :       }
+<span class="lineNum">      21 </span>            :       // Optional minus sign
+<span class="lineNum">      22 </span><span class="lineCov">         46 :       if (*begin == '-') {</span>
+<span class="lineNum">      23 </span><span class="lineCov">          5 :         ++begin;</span>
+<span class="lineNum">      24 </span>            :       }
+<span class="lineNum">      25 </span><span class="lineCov">         46 :       if (begin == end) {</span>
+<span class="lineNum">      26 </span><span class="lineNoCov">          0 :         return false;</span>
+<span class="lineNum">      27 </span>            :       }
+<span class="lineNum">      28 </span>            :       // Either '0' or a non-zero digit followed by digits
+<span class="lineNum">      29 </span><span class="lineCov">         46 :       if (*begin == '0') {</span>
+<span class="lineNum">      30 </span><span class="lineCov">          7 :         ++begin;</span>
+<span class="lineNum">      31 </span>            :       }
+<span class="lineNum">      32 </span><span class="lineCov">         78 :       else if ('1' &lt;= *begin &amp;&amp; *begin &lt;= '9') {</span>
+<span class="lineNum">      33 </span><span class="lineCov">         39 :         ++begin;</span>
+<span class="lineNum">      34 </span><span class="lineCov">        133 :         while (begin &lt; end &amp;&amp; ('0' &lt;= *begin &amp;&amp; *begin &lt;= '9')) {</span>
+<span class="lineNum">      35 </span><span class="lineCov">         47 :           ++begin;</span>
+<span class="lineNum">      36 </span>            :         }
+<span class="lineNum">      37 </span>            :       }
+<span class="lineNum">      38 </span>            :       else {
+<span class="lineNum">      39 </span><span class="lineNoCov">          0 :         return false;</span>
+<span class="lineNum">      40 </span>            :       }
+<span class="lineNum">      41 </span>            :       // Optional decimal point, followed by one or more digits
+<span class="lineNum">      42 </span><span class="lineCov">         46 :       if (begin &lt; end &amp;&amp; *begin == '.') {</span>
+<span class="lineNum">      43 </span><span class="lineNoCov">          0 :         if (++begin == end) {</span>
+<span class="lineNum">      44 </span><span class="lineNoCov">          0 :           return false;</span>
+<span class="lineNum">      45 </span>            :         }
+<span class="lineNum">      46 </span><span class="lineNoCov">          0 :         if (!('0' &lt;= *begin &amp;&amp; *begin &lt;= '9')) {</span>
+<span class="lineNum">      47 </span><span class="lineNoCov">          0 :           return false;</span>
+<span class="lineNum">      48 </span>            :         }
+<span class="lineNum">      49 </span><span class="lineNoCov">          0 :         ++begin;</span>
+<span class="lineNum">      50 </span><span class="lineNoCov">          0 :         while (begin &lt; end &amp;&amp; ('0' &lt;= *begin &amp;&amp; *begin &lt;= '9')) {</span>
+<span class="lineNum">      51 </span><span class="lineNoCov">          0 :           ++begin;</span>
+<span class="lineNum">      52 </span>            :         }
+<span class="lineNum">      53 </span>            :       }
+<span class="lineNum">      54 </span>            :       // Optional exponent, followed by +/- and some digits
+<span class="lineNum">      55 </span><span class="lineCov">         46 :       if (begin &lt; end &amp;&amp; (*begin == 'e' || *begin == 'E')) {</span>
+<span class="lineNum">      56 </span><span class="lineNoCov">          0 :         if (++begin == end) {</span>
+<span class="lineNum">      57 </span><span class="lineNoCov">          0 :           return false;</span>
+<span class="lineNum">      58 </span>            :         }
+<span class="lineNum">      59 </span>            :         // +/- is optional
+<span class="lineNum">      60 </span><span class="lineNoCov">          0 :         if (*begin == '+' || *begin == '-') {</span>
+<span class="lineNum">      61 </span><span class="lineNoCov">          0 :           if (++begin == end) {</span>
+<span class="lineNum">      62 </span><span class="lineNoCov">          0 :             return false;</span>
+<span class="lineNum">      63 </span>            :           }
+<span class="lineNum">      64 </span>            :         }
+<span class="lineNum">      65 </span>            :         // At least one digit is required
+<span class="lineNum">      66 </span><span class="lineNoCov">          0 :         if (!('0' &lt;= *begin &amp;&amp; *begin &lt;= '9')) {</span>
+<span class="lineNum">      67 </span><span class="lineNoCov">          0 :           return false;</span>
+<span class="lineNum">      68 </span>            :         }
+<span class="lineNum">      69 </span><span class="lineNoCov">          0 :         ++begin;</span>
+<span class="lineNum">      70 </span><span class="lineNoCov">          0 :         while (begin &lt; end &amp;&amp; ('0' &lt;= *begin &amp;&amp; *begin &lt;= '9')) {</span>
+<span class="lineNum">      71 </span><span class="lineNoCov">          0 :           ++begin;</span>
+<span class="lineNum">      72 </span>            :         }
+<span class="lineNum">      73 </span>            :       }
+<span class="lineNum">      74 </span>            : 
+<span class="lineNum">      75 </span><span class="lineCov">         46 :       end = begin;</span>
+<span class="lineNum">      76 </span><span class="lineCov">         46 :       return true;</span>
+<a name="77"><span class="lineNum">      77 </span>            :     }</a>
+<span class="lineNum">      78 </span>            : 
+<span class="lineNum">      79 </span><span class="lineCov">         35 :     inline bool _parse_na(const char *&amp;begin, const char *end)</span>
+<span class="lineNum">      80 </span>            :     {
+<span class="lineNum">      81 </span><span class="lineCov">         35 :       size_t size = end - begin;</span>
+<span class="lineNum">      82 </span>            : 
+<span class="lineNum">      83 </span><span class="lineCov">         35 :       if (size &gt;= 4) {</span>
+<span class="lineNum">      84 </span><span class="lineCov">         50 :         if (((begin[0] == 'N' || begin[0] == 'n') &amp;&amp; (begin[1] == 'U' || begin[1] == 'u') &amp;&amp;</span>
+<span class="lineNum">      85 </span><span class="lineCov">         38 :              (begin[2] == 'L' || begin[2] == 'l') &amp;&amp; (begin[3] == 'L' || begin[3] == 'l'))) {</span>
+<span class="lineNum">      86 </span><span class="lineCov">         20 :           begin += 4;</span>
+<span class="lineNum">      87 </span><span class="lineCov">         20 :           return true;</span>
+<span class="lineNum">      88 </span>            :         }
+<span class="lineNum">      89 </span><span class="lineCov">         10 :         if (begin[0] == 'N' &amp;&amp; begin[1] == 'o' &amp;&amp; begin[2] == 'n' &amp;&amp; begin[3] == 'e') {</span>
+<span class="lineNum">      90 </span><span class="lineNoCov">          0 :           begin += 4;</span>
+<span class="lineNum">      91 </span><span class="lineNoCov">          0 :           return true;</span>
+<span class="lineNum">      92 </span>            :         }
+<span class="lineNum">      93 </span>            :       }
+<span class="lineNum">      94 </span>            : 
+<span class="lineNum">      95 </span><span class="lineCov">         15 :       if (size &gt;= 2 &amp;&amp; begin[0] == 'N' &amp;&amp; begin[1] == 'A') {</span>
+<span class="lineNum">      96 </span><span class="lineCov">          2 :         begin += 2;</span>
+<span class="lineNum">      97 </span><span class="lineCov">          2 :         return true;</span>
+<span class="lineNum">      98 </span>            :       }
+<span class="lineNum">      99 </span>            : 
+<span class="lineNum">     100 </span><span class="lineCov">         13 :       if (size == 0) {</span>
+<span class="lineNum">     101 </span><span class="lineNoCov">          0 :         return true;</span>
+<span class="lineNum">     102 </span>            :       }
+<span class="lineNum">     103 </span>            : 
+<span class="lineNum">     104 </span><span class="lineCov">         13 :       return false;</span>
+<span class="lineNum">     105 </span>            :     }
+<span class="lineNum">     106 </span>            : 
+<span class="lineNum">     107 </span>            :     template &lt;type_id_t RetTypeID&gt;
+<span class="lineNum">     108 </span>            :     struct parse_kernel : base_kernel&lt;parse_kernel&lt;RetTypeID&gt;, 2&gt; {
+<a name="109"><span class="lineNum">     109 </span>            :       typedef typename type_of&lt;RetTypeID&gt;::type ret_type;</a>
+<span class="lineNum">     110 </span>            : 
+<span class="lineNum">     111 </span><span class="lineCov">         46 :       void single(char *ret, char *const *args)</span>
+<span class="lineNum">     112 </span>            :       {
+<span class="lineNum">     113 </span><span class="lineCov">         46 :         const char *begin = *reinterpret_cast&lt;const char **&gt;(args[0]);</span>
+<span class="lineNum">     114 </span><span class="lineCov">         46 :         const char *end = *reinterpret_cast&lt;const char **&gt;(args[1]);</span>
+<span class="lineNum">     115 </span>            : 
+<span class="lineNum">     116 </span><span class="lineCov">         46 :         if (!_parse_number(begin, end)) {</span>
+<span class="lineNum">     117 </span><span class="lineNoCov">          0 :           throw std::runtime_error(&quot;JSON error&quot;);</span>
+<span class="lineNum">     118 </span>            :         }
+<span class="lineNum">     119 </span>            : 
+<span class="lineNum">     120 </span><span class="lineCov">         46 :         *reinterpret_cast&lt;ret_type *&gt;(ret) = dynd::parse&lt;ret_type&gt;(begin, end);</span>
+<span class="lineNum">     121 </span><span class="lineCov">         46 :         *reinterpret_cast&lt;const char **&gt;(args[0]) = end;</span>
+<span class="lineNum">     122 </span><span class="lineCov">         46 :       }</span>
+<span class="lineNum">     123 </span>            :     };
+<span class="lineNum">     124 </span>            : 
+<a name="125"><span class="lineNum">     125 </span>            :     template &lt;&gt;</a>
+<span class="lineNum">     126 </span>            :     struct parse_kernel&lt;bool_id&gt; : base_kernel&lt;parse_kernel&lt;bool_id&gt;, 2&gt; {
+<span class="lineNum">     127 </span><span class="lineCov">         43 :       void single(char *ret, char *const *args)</span>
+<span class="lineNum">     128 </span>            :       {
+<span class="lineNum">     129 </span><span class="lineCov">         39 :         *reinterpret_cast&lt;bool1 *&gt;(ret) =</span>
+<span class="lineNum">     130 </span><span class="lineCov">         82 :             parse_bool(*reinterpret_cast&lt;const char **&gt;(args[0]), *reinterpret_cast&lt;const char **&gt;(args[1]));</span>
+<span class="lineNum">     131 </span><span class="lineCov">         39 :       }</span>
+<span class="lineNum">     132 </span>            :     };
+<span class="lineNum">     133 </span>            : 
+<a name="134"><span class="lineNum">     134 </span>            :     template &lt;&gt;</a>
+<span class="lineNum">     135 </span>            :     struct parse_kernel&lt;string_id&gt; : base_kernel&lt;parse_kernel&lt;string_id&gt;, 2&gt; {
+<span class="lineNum">     136 </span><span class="lineCov">          4 :       void single(char *res, char *const *args)</span>
+<span class="lineNum">     137 </span>            :       {
+<span class="lineNum">     138 </span><span class="lineCov">          4 :         const char *&amp;rbegin = *reinterpret_cast&lt;const char **&gt;(args[0]);</span>
+<span class="lineNum">     139 </span><span class="lineCov">          4 :         const char *begin = *reinterpret_cast&lt;const char **&gt;(args[0]);</span>
+<span class="lineNum">     140 </span><span class="lineCov">          4 :         const char *end = *reinterpret_cast&lt;const char **&gt;(args[1]);</span>
+<span class="lineNum">     141 </span>            : 
+<span class="lineNum">     142 </span><span class="lineCov">          4 :         skip_whitespace(begin, end);</span>
+<span class="lineNum">     143 </span>            :         const char *strbegin, *strend;
+<span class="lineNum">     144 </span>            :         bool escaped;
+<span class="lineNum">     145 </span>            : 
+<span class="lineNum">     146 </span><span class="lineCov">          4 :         if (parse_doublequote_string_no_ws(begin, end, strbegin, strend, escaped)) {</span>
+<span class="lineNum">     147 </span><span class="lineCov">          6 :           std::string val;</span>
+<span class="lineNum">     148 </span><span class="lineCov">          3 :           unescape_string(strbegin, strend, val);</span>
+<span class="lineNum">     149 </span><span class="lineCov">          3 :           reinterpret_cast&lt;string *&gt;(res)-&gt;assign(strbegin, strend - strbegin);</span>
+<span class="lineNum">     150 </span>            : 
+<span class="lineNum">     151 </span>            :           /*
+<span class="lineNum">     152 </span>            :                     try {
+<span class="lineNum">     153 </span>            :                       if (!escaped) {
+<span class="lineNum">     154 </span>            :                         bsd-&gt;set_from_utf8_string(arrmeta, out_data, strbegin, strend, ectx);
+<span class="lineNum">     155 </span>            :                       }
+<span class="lineNum">     156 </span>            :                       else {
+<span class="lineNum">     157 </span>            :                         std::string val;
+<span class="lineNum">     158 </span>            :                         unescape_string(strbegin, strend, val);
+<span class="lineNum">     159 </span>            :                         bsd-&gt;set_from_utf8_string(arrmeta, out_data, val, ectx);
+<span class="lineNum">     160 </span>            :                       }
+<span class="lineNum">     161 </span>            :                     }
+<span class="lineNum">     162 </span>            :                     catch (const std::exception &amp;e) {
+<span class="lineNum">     163 </span>            :                       skip_whitespace(rbegin, begin);
+<span class="lineNum">     164 </span>            :                       throw json_parse_error(rbegin, e.what(), tp);
+<span class="lineNum">     165 </span>            :                     }
+<span class="lineNum">     166 </span>            :                     catch (const dynd::dynd_exception &amp;e) {
+<span class="lineNum">     167 </span>            :                       skip_whitespace(rbegin, begin);
+<span class="lineNum">     168 </span>            :                       throw json_parse_error(rbegin, e.what(), tp);
+<span class="lineNum">     169 </span>            :                     }
+<span class="lineNum">     170 </span>            :           */
+<span class="lineNum">     171 </span>            :         }
+<span class="lineNum">     172 </span>            :         else {
+<span class="lineNum">     173 </span><span class="lineCov">          1 :           throw json_parse_error(begin, &quot;expected a string&quot;, ndt::type());</span>
+<span class="lineNum">     174 </span>            :         }
+<span class="lineNum">     175 </span><span class="lineCov">          3 :         rbegin = begin;</span>
+<span class="lineNum">     176 </span><span class="lineCov">          3 :       }</span>
+<span class="lineNum">     177 </span>            :     };
+<span class="lineNum">     178 </span>            : 
+<span class="lineNum">     179 </span>            :     /*
+<span class="lineNum">     180 </span>            :     static void parse_string_json(const ndt::type &amp;tp, const char *arrmeta, char *out_data, const char *&amp;rbegin,
+<span class="lineNum">     181 </span>            :                                   const char *end, const eval::eval_context *ectx)
+<span class="lineNum">     182 </span>            :     {
+<span class="lineNum">     183 </span>            :       const char *begin = rbegin;
+<span class="lineNum">     184 </span>            :       skip_whitespace(begin, end);
+<span class="lineNum">     185 </span>            :       const char *strbegin, *strend;
+<span class="lineNum">     186 </span>            :       bool escaped;
+<span class="lineNum">     187 </span>            :       if (parse_doublequote_string_no_ws(begin, end, strbegin, strend, escaped)) {
+<span class="lineNum">     188 </span>            :         const ndt::base_string_type *bsd = tp.extended&lt;ndt::base_string_type&gt;();
+<span class="lineNum">     189 </span>            :         try {
+<span class="lineNum">     190 </span>            :           if (!escaped) {
+<span class="lineNum">     191 </span>            :             bsd-&gt;set_from_utf8_string(arrmeta, out_data, strbegin, strend, ectx);
+<span class="lineNum">     192 </span>            :           }
+<span class="lineNum">     193 </span>            :           else {
+<span class="lineNum">     194 </span>            :             std::string val;
+<span class="lineNum">     195 </span>            :             unescape_string(strbegin, strend, val);
+<span class="lineNum">     196 </span>            :             bsd-&gt;set_from_utf8_string(arrmeta, out_data, val, ectx);
+<span class="lineNum">     197 </span>            :           }
+<span class="lineNum">     198 </span>            :         }
+<span class="lineNum">     199 </span>            :         catch (const std::exception &amp;e) {
+<span class="lineNum">     200 </span>            :           skip_whitespace(rbegin, begin);
+<span class="lineNum">     201 </span>            :           throw json_parse_error(rbegin, e.what(), tp);
+<span class="lineNum">     202 </span>            :         }
+<span class="lineNum">     203 </span>            :         catch (const dynd::dynd_exception &amp;e) {
+<span class="lineNum">     204 </span>            :           skip_whitespace(rbegin, begin);
+<span class="lineNum">     205 </span>            :           throw json_parse_error(rbegin, e.what(), tp);
+<span class="lineNum">     206 </span>            :         }
+<span class="lineNum">     207 </span>            :       }
+<span class="lineNum">     208 </span>            :       else {
+<span class="lineNum">     209 </span>            :         throw json_parse_error(begin, &quot;expected a string&quot;, tp);
+<span class="lineNum">     210 </span>            :       }
+<span class="lineNum">     211 </span>            :       rbegin = begin;
+<span class="lineNum">     212 </span>            :     }
+<span class="lineNum">     213 </span>            :     */
+<span class="lineNum">     214 </span>            : 
+<span class="lineNum">     215 </span>            :     template &lt;&gt;
+<span class="lineNum">     216 </span>            :     struct parse_kernel&lt;option_id&gt; : base_kernel&lt;parse_kernel&lt;option_id&gt;&gt; {
+<a name="217"><span class="lineNum">     217 </span>            :       intptr_t parse_offset;</a>
+<span class="lineNum">     218 </span>            : 
+<span class="lineNum">     219 </span><span class="lineCov">         20 :       ~parse_kernel()</span>
+<span class="lineNum">     220 </span><span class="lineCov">         20 :       {</span>
+<span class="lineNum">     221 </span><span class="lineCov">         20 :         get_child()-&gt;destroy();</span>
+<span class="lineNum">     222 </span><span class="lineCov">         20 :         get_child(parse_offset)-&gt;destroy();</span>
+<a name="223"><span class="lineNum">     223 </span><span class="lineCov">         20 :       }</span></a>
+<span class="lineNum">     224 </span>            : 
+<span class="lineNum">     225 </span><span class="lineCov">         35 :       void single(char *ret, char *const *args)</span>
+<span class="lineNum">     226 </span>            :       {
+<span class="lineNum">     227 </span><span class="lineCov">         35 :         const char *begin = *reinterpret_cast&lt;const char **&gt;(args[0]);</span>
+<span class="lineNum">     228 </span><span class="lineCov">         35 :         const char *end = *reinterpret_cast&lt;const char **&gt;(args[1]);</span>
+<span class="lineNum">     229 </span>            : 
+<span class="lineNum">     230 </span><span class="lineCov">         35 :         if (_parse_na(begin, end)) {</span>
+<span class="lineNum">     231 </span><span class="lineCov">         22 :           get_child()-&gt;single(ret, nullptr);</span>
+<span class="lineNum">     232 </span><span class="lineCov">         22 :           *reinterpret_cast&lt;const char **&gt;(args[0]) = begin;</span>
+<span class="lineNum">     233 </span>            :         }
+<span class="lineNum">     234 </span>            :         else {
+<span class="lineNum">     235 </span><span class="lineCov">         13 :           get_child(parse_offset)-&gt;single(ret, args);</span>
+<span class="lineNum">     236 </span>            :         }
+<a name="237"><span class="lineNum">     237 </span><span class="lineCov">         35 :       }</span></a>
+<span class="lineNum">     238 </span>            : 
+<span class="lineNum">     239 </span><span class="lineCov">         20 :       static void instantiate(char *DYND_UNUSED(static_data), char *data, kernel_builder *ckb, const ndt::type &amp;dst_tp,</span>
+<span class="lineNum">     240 </span>            :                               const char *dst_arrmeta, intptr_t nsrc, const ndt::type *src_tp,
+<span class="lineNum">     241 </span>            :                               const char *const *src_arrmeta, kernel_request_t kernreq, intptr_t nkwd,
+<span class="lineNum">     242 </span>            :                               const nd::array *kwds, const std::map&lt;std::string, ndt::type&gt; &amp;tp_vars)
+<span class="lineNum">     243 </span>            :       {
+<span class="lineNum">     244 </span><span class="lineCov">         20 :         intptr_t ckb_offset = ckb-&gt;size();</span>
+<span class="lineNum">     245 </span><span class="lineCov">         20 :         intptr_t self_offset = ckb_offset;</span>
+<span class="lineNum">     246 </span><span class="lineCov">         20 :         ckb-&gt;emplace_back&lt;parse_kernel&gt;(kernreq);</span>
+<span class="lineNum">     247 </span><span class="lineCov">         20 :         ckb_offset = ckb-&gt;size();</span>
+<span class="lineNum">     248 </span>            : 
+<span class="lineNum">     249 </span><span class="lineCov">         20 :         assign_na::get()-&gt;instantiate(assign_na::get()-&gt;static_data(), data, ckb, dst_tp, dst_arrmeta, 0, nullptr,</span>
+<span class="lineNum">     250 </span><span class="lineCov">         20 :                                       nullptr, kernreq | kernel_request_data_only, nkwd, kwds, tp_vars);</span>
+<span class="lineNum">     251 </span><span class="lineCov">         20 :         ckb_offset = ckb-&gt;size();</span>
+<span class="lineNum">     252 </span>            : 
+<span class="lineNum">     253 </span><span class="lineCov">         20 :         ckb-&gt;get_at&lt;parse_kernel&gt;(self_offset)-&gt;parse_offset = ckb_offset - self_offset;</span>
+<span class="lineNum">     254 </span><span class="lineCov">         40 :         parse::get()-&gt;instantiate(parse::get()-&gt;static_data(), data, ckb,</span>
+<span class="lineNum">     255 </span><span class="lineCov">         20 :                                   dst_tp.extended&lt;ndt::option_type&gt;()-&gt;get_value_type(), dst_arrmeta, nsrc, src_tp,</span>
+<span class="lineNum">     256 </span><span class="lineCov">         20 :                                   src_arrmeta, kernreq | kernel_request_data_only, nkwd, kwds, tp_vars);</span>
+<span class="lineNum">     257 </span><span class="lineCov">         20 :         ckb_offset = ckb-&gt;size();</span>
+<span class="lineNum">     258 </span><span class="lineCov">         20 :       }</span>
+<span class="lineNum">     259 </span>            :     };
+<span class="lineNum">     260 </span>            : 
+<span class="lineNum">     261 </span>            :     template &lt;&gt;
+<span class="lineNum">     262 </span>            :     struct parse_kernel&lt;struct_id&gt; : base_kernel&lt;parse_kernel&lt;struct_id&gt;, 2&gt; {
+<span class="lineNum">     263 </span>            :       ndt::type res_tp;
+<span class="lineNum">     264 </span>            :       size_t field_count;
+<span class="lineNum">     265 </span>            :       const size_t *data_offsets;
+<a name="266"><span class="lineNum">     266 </span>            :       std::vector&lt;intptr_t&gt; child_offsets;</a>
+<span class="lineNum">     267 </span>            : 
+<span class="lineNum">     268 </span><span class="lineCov">          1 :       parse_kernel(const ndt::type &amp;res_tp, size_t field_count, const size_t *data_offsets)</span>
+<span class="lineNum">     269 </span><span class="lineCov">          1 :           : res_tp(res_tp), field_count(field_count), data_offsets(data_offsets), child_offsets(field_count)</span>
+<span class="lineNum">     270 </span>            :       {
+<a name="271"><span class="lineNum">     271 </span><span class="lineCov">          1 :       }</span></a>
+<span class="lineNum">     272 </span>            : 
+<span class="lineNum">     273 </span><span class="lineCov">          1 :       ~parse_kernel()</span>
+<span class="lineNum">     274 </span><span class="lineCov">          1 :       {</span>
+<span class="lineNum">     275 </span><span class="lineCov">          3 :         for (intptr_t offset : child_offsets) {</span>
+<span class="lineNum">     276 </span><span class="lineCov">          2 :           get_child(offset)-&gt;destroy();</span>
+<span class="lineNum">     277 </span>            :         }
+<a name="278"><span class="lineNum">     278 </span><span class="lineCov">          1 :       }</span></a>
+<span class="lineNum">     279 </span>            : 
+<span class="lineNum">     280 </span><span class="lineCov">          1 :       void single(char *res, char *const *args)</span>
+<span class="lineNum">     281 </span>            :       {
+<span class="lineNum">     282 </span>            : 
+<span class="lineNum">     283 </span><span class="lineCov">          1 :         const char *&amp;begin = *reinterpret_cast&lt;const char **&gt;(args[0]);</span>
+<span class="lineNum">     284 </span><span class="lineCov">          1 :         const char *&amp;end = *reinterpret_cast&lt;const char **&gt;(args[1]);</span>
+<span class="lineNum">     285 </span>            : 
+<span class="lineNum">     286 </span>            :         //        const char *saved_begin = *reinterpret_cast&lt;const char **&gt;(args[0]);
+<span class="lineNum">     287 </span><span class="lineCov">          1 :         if (!parse_token(args, &quot;{&quot;)) {</span>
+<span class="lineNum">     288 </span><span class="lineNoCov">          0 :           throw json_parse_error(args, &quot;expected object dict starting with '{'&quot;, res_tp);</span>
+<span class="lineNum">     289 </span>            :         }
+<span class="lineNum">     290 </span>            : 
+<span class="lineNum">     291 </span><span class="lineCov">          2 :         shortvector&lt;bool&gt; populated_fields(field_count);</span>
+<span class="lineNum">     292 </span><span class="lineCov">          1 :         memset(populated_fields.get(), 0, sizeof(bool) * field_count);</span>
+<span class="lineNum">     293 </span>            : 
+<span class="lineNum">     294 </span><span class="lineCov">          1 :         if (!parse_token(args, &quot;}&quot;)) {</span>
+<span class="lineNum">     295 </span><span class="lineCov">          1 :           for (;;) {</span>
+<span class="lineNum">     296 </span>            :             const char *strbegin, *strend;
+<span class="lineNum">     297 </span>            :             bool escaped;
+<span class="lineNum">     298 </span><span class="lineCov">          2 :             skip_whitespace(args);</span>
+<span class="lineNum">     299 </span><span class="lineCov">          2 :             if (!parse_doublequote_string_no_ws(begin, end, strbegin, strend, escaped)) {</span>
+<span class="lineNum">     300 </span><span class="lineNoCov">          0 :               throw json_parse_error(args, &quot;expected string for name in object dict&quot;, res_tp);</span>
+<span class="lineNum">     301 </span>            :             }
+<span class="lineNum">     302 </span><span class="lineCov">          2 :             if (!parse_token(args, &quot;:&quot;)) {</span>
+<span class="lineNum">     303 </span><span class="lineNoCov">          0 :               throw json_parse_error(args, &quot;expected ':' separating name from value in object dict&quot;, res_tp);</span>
+<span class="lineNum">     304 </span>            :             }
+<span class="lineNum">     305 </span>            :             intptr_t i;
+<span class="lineNum">     306 </span><span class="lineCov">          2 :             if (escaped) {</span>
+<span class="lineNum">     307 </span><span class="lineNoCov">          0 :               std::string name;</span>
+<span class="lineNum">     308 </span><span class="lineNoCov">          0 :               unescape_string(strbegin, strend, name);</span>
+<span class="lineNum">     309 </span><span class="lineNoCov">          0 :               i = res_tp.extended&lt;ndt::struct_type&gt;()-&gt;get_field_index(name);</span>
+<span class="lineNum">     310 </span>            :             }
+<span class="lineNum">     311 </span>            :             else {
+<span class="lineNum">     312 </span><span class="lineCov">          2 :               i = res_tp.extended&lt;ndt::struct_type&gt;()-&gt;get_field_index(std::string(strbegin, strend));</span>
+<span class="lineNum">     313 </span>            :             }
+<span class="lineNum">     314 </span>            : 
+<span class="lineNum">     315 </span><span class="lineCov">          2 :             get_child(child_offsets[i])-&gt;single(res + data_offsets[i], args);</span>
+<span class="lineNum">     316 </span><span class="lineCov">          2 :             populated_fields[i] = true;</span>
+<span class="lineNum">     317 </span><span class="lineCov">          2 :             if (!parse_token(args, &quot;,&quot;)) {</span>
+<span class="lineNum">     318 </span><span class="lineCov">          1 :               break;</span>
+<span class="lineNum">     319 </span>            :             }
+<span class="lineNum">     320 </span>            :           }
+<span class="lineNum">     321 </span>            :         }
+<span class="lineNum">     322 </span>            : 
+<span class="lineNum">     323 </span><span class="lineCov">          1 :         if (!parse_token(args, &quot;}&quot;)) {</span>
+<span class="lineNum">     324 </span><span class="lineNoCov">          0 :           throw json_parse_error(args, &quot;expected object dict separator ',' or terminator '}'&quot;, res_tp);</span>
+<span class="lineNum">     325 </span>            :         }
+<a name="326"><span class="lineNum">     326 </span><span class="lineCov">          1 :       }</span></a>
+<span class="lineNum">     327 </span>            : 
+<span class="lineNum">     328 </span><span class="lineCov">          1 :       static void instantiate(char *DYND_UNUSED(static_data), char *data, kernel_builder *ckb, const ndt::type &amp;dst_tp,</span>
+<span class="lineNum">     329 </span>            :                               const char *dst_arrmeta, intptr_t nsrc, const ndt::type *src_tp,
+<span class="lineNum">     330 </span>            :                               const char *const *src_arrmeta, kernel_request_t kernreq, intptr_t nkwd,
+<span class="lineNum">     331 </span>            :                               const nd::array *kwds, const std::map&lt;std::string, ndt::type&gt; &amp;tp_vars)
+<span class="lineNum">     332 </span>            :       {
+<span class="lineNum">     333 </span><span class="lineCov">          1 :         intptr_t ckb_offset = ckb-&gt;size();</span>
+<span class="lineNum">     334 </span><span class="lineCov">          1 :         size_t field_count = dst_tp.extended&lt;ndt::struct_type&gt;()-&gt;get_field_count();</span>
+<span class="lineNum">     335 </span><span class="lineCov">          1 :         const std::vector&lt;uintptr_t&gt; &amp;arrmeta_offsets = dst_tp.extended&lt;ndt::struct_type&gt;()-&gt;get_arrmeta_offsets();</span>
+<span class="lineNum">     336 </span>            : 
+<span class="lineNum">     337 </span><span class="lineCov">          1 :         intptr_t self_offset = ckb_offset;</span>
+<span class="lineNum">     338 </span><span class="lineCov">          2 :         ckb-&gt;emplace_back&lt;parse_kernel&gt;(kernreq, dst_tp, field_count,</span>
+<span class="lineNum">     339 </span><span class="lineCov">          2 :                                         dst_tp.extended&lt;ndt::struct_type&gt;()-&gt;get_data_offsets(dst_arrmeta));</span>
+<span class="lineNum">     340 </span><span class="lineCov">          1 :         ckb_offset = ckb-&gt;size();</span>
+<span class="lineNum">     341 </span>            : 
+<span class="lineNum">     342 </span><span class="lineCov">          3 :         for (size_t i = 0; i &lt; field_count; ++i) {</span>
+<span class="lineNum">     343 </span><span class="lineCov">          2 :           ckb-&gt;get_at&lt;parse_kernel&gt;(self_offset)-&gt;child_offsets[i] = ckb_offset - self_offset;</span>
+<span class="lineNum">     344 </span><span class="lineCov">          6 :           json::parse::get()-&gt;instantiate(</span>
+<span class="lineNum">     345 </span><span class="lineCov">          2 :               json::parse::get()-&gt;static_data(), data, ckb, dst_tp.extended&lt;ndt::struct_type&gt;()-&gt;get_field_type(i),</span>
+<span class="lineNum">     346 </span><span class="lineCov">          4 :               dst_arrmeta + arrmeta_offsets[i], nsrc, src_tp, src_arrmeta, kernreq, nkwd, kwds, tp_vars);</span>
+<span class="lineNum">     347 </span><span class="lineCov">          2 :           ckb_offset = ckb-&gt;size();</span>
+<span class="lineNum">     348 </span>            :         }
+<span class="lineNum">     349 </span><span class="lineCov">          1 :       }</span>
+<span class="lineNum">     350 </span>            :     };
+<span class="lineNum">     351 </span>            : 
+<span class="lineNum">     352 </span>            :     template &lt;&gt;
+<span class="lineNum">     353 </span>            :     struct parse_kernel&lt;fixed_dim_id&gt; : base_kernel&lt;parse_kernel&lt;fixed_dim_id&gt;&gt; {
+<span class="lineNum">     354 </span>            :       ndt::type ret_tp;
+<span class="lineNum">     355 </span>            :       size_t _size;
+<a name="356"><span class="lineNum">     356 </span>            :       intptr_t stride;</a>
+<span class="lineNum">     357 </span>            : 
+<a name="358"><span class="lineNum">     358 </span><span class="lineCov">         15 :       ~parse_kernel() { get_child()-&gt;destroy(); }</span></a>
+<span class="lineNum">     359 </span>            : 
+<span class="lineNum">     360 </span><span class="lineCov">         15 :       parse_kernel(const ndt::type &amp;ret_tp, size_t size, intptr_t stride) : ret_tp(ret_tp), _size(size), stride(stride)</span>
+<span class="lineNum">     361 </span>            :       {
+<a name="362"><span class="lineNum">     362 </span><span class="lineCov">         15 :       }</span></a>
+<span class="lineNum">     363 </span>            : 
+<span class="lineNum">     364 </span><span class="lineCov">         16 :       void single(char *ret, char *const *args)</span>
+<span class="lineNum">     365 </span>            :       {
+<span class="lineNum">     366 </span><span class="lineCov">         16 :         if (!parse_token(args, &quot;[&quot;)) {</span>
+<span class="lineNum">     367 </span><span class="lineNoCov">          0 :           throw json_parse_error(args, &quot;expected list starting with '['&quot;, ret_tp);</span>
+<span class="lineNum">     368 </span>            :         }
+<span class="lineNum">     369 </span><span class="lineCov">         16 :         skip_whitespace(args);</span>
+<span class="lineNum">     370 </span>            : 
+<span class="lineNum">     371 </span><span class="lineCov">         16 :         kernel_prefix *child = get_child();</span>
+<span class="lineNum">     372 </span><span class="lineCov">         65 :         for (size_t i = 0; i &lt; _size; ++i) {</span>
+<span class="lineNum">     373 </span><span class="lineCov">         50 :           child-&gt;single(ret, args);</span>
+<span class="lineNum">     374 </span><span class="lineCov">         50 :           if (i &lt; _size - 1 &amp;&amp; !parse_token(args, &quot;,&quot;)) {</span>
+<span class="lineNum">     375 </span><span class="lineCov">          1 :             throw json_parse_error(args, &quot;array is too short, expected ',' list item separator&quot;, ret_tp);</span>
+<span class="lineNum">     376 </span>            :           }
+<span class="lineNum">     377 </span><span class="lineCov">         49 :           skip_whitespace(args);</span>
+<span class="lineNum">     378 </span>            : 
+<span class="lineNum">     379 </span><span class="lineCov">         49 :           ret += stride;</span>
+<span class="lineNum">     380 </span>            :         }
+<span class="lineNum">     381 </span>            : 
+<span class="lineNum">     382 </span><span class="lineCov">         15 :         if (!parse_token(args, &quot;]&quot;)) {</span>
+<span class="lineNum">     383 </span><span class="lineCov">          1 :           throw json_parse_error(args, &quot;array is too long, expected list terminator ']'&quot;, ret_tp);</span>
+<span class="lineNum">     384 </span>            :         }
+<a name="385"><span class="lineNum">     385 </span><span class="lineCov">         14 :       }</span></a>
+<span class="lineNum">     386 </span>            : 
+<span class="lineNum">     387 </span><span class="lineCov">         15 :       static void instantiate(char *DYND_UNUSED(static_data), char *data, kernel_builder *ckb, const ndt::type &amp;dst_tp,</span>
+<span class="lineNum">     388 </span>            :                               const char *dst_arrmeta, intptr_t nsrc, const ndt::type *src_tp,
+<span class="lineNum">     389 </span>            :                               const char *const *src_arrmeta, kernel_request_t kernreq, intptr_t nkwd,
+<span class="lineNum">     390 </span>            :                               const nd::array *kwds, const std::map&lt;std::string, ndt::type&gt; &amp;tp_vars)
+<span class="lineNum">     391 </span>            :       {
+<span class="lineNum">     392 </span><span class="lineCov">         15 :         ckb-&gt;emplace_back&lt;parse_kernel&gt;(kernreq, dst_tp, reinterpret_cast&lt;const size_stride_t *&gt;(dst_arrmeta)-&gt;dim_size,</span>
+<span class="lineNum">     393 </span><span class="lineCov">         15 :                                         reinterpret_cast&lt;const size_stride_t *&gt;(dst_arrmeta)-&gt;stride);</span>
+<span class="lineNum">     394 </span>            : 
+<span class="lineNum">     395 </span><span class="lineCov">         15 :         const ndt::type &amp;child_dst_tp = dst_tp.extended&lt;ndt::fixed_dim_type&gt;()-&gt;get_element_type();</span>
+<span class="lineNum">     396 </span><span class="lineCov">         30 :         json::parse::get()-&gt;instantiate(json::parse::get()-&gt;static_data(), data, ckb, child_dst_tp,</span>
+<span class="lineNum">     397 </span>            :                                         dst_arrmeta + sizeof(ndt::fixed_dim_type::metadata_type), nsrc, src_tp,
+<span class="lineNum">     398 </span><span class="lineCov">         30 :                                         src_arrmeta, kernreq, nkwd, kwds, tp_vars);</span>
+<span class="lineNum">     399 </span><span class="lineCov">         15 :       }</span>
+<span class="lineNum">     400 </span>            :     };
+<span class="lineNum">     401 </span>            : 
+<span class="lineNum">     402 </span>            :     template &lt;&gt;
+<span class="lineNum">     403 </span>            :     struct parse_kernel&lt;var_dim_id&gt; : base_kernel&lt;parse_kernel&lt;var_dim_id&gt;&gt; {
+<span class="lineNum">     404 </span>            :       typedef ndt::var_dim_type::data_type ret_type;
+<span class="lineNum">     405 </span>            : 
+<span class="lineNum">     406 </span>            :       ndt::type ret_tp;
+<span class="lineNum">     407 </span>            :       intrusive_ptr&lt;memory_block_data&gt; blockref;
+<a name="408"><span class="lineNum">     408 </span>            :       intptr_t stride;</a>
+<span class="lineNum">     409 </span>            : 
+<span class="lineNum">     410 </span><span class="lineCov">          7 :       parse_kernel(const ndt::type &amp;ret_tp, const intrusive_ptr&lt;memory_block_data&gt; &amp;blockref, intptr_t stride)</span>
+<span class="lineNum">     411 </span><span class="lineCov">          7 :           : ret_tp(ret_tp), blockref(blockref), stride(stride)</span>
+<span class="lineNum">     412 </span>            :       {
+<a name="413"><span class="lineNum">     413 </span><span class="lineCov">          7 :       }</span></a>
+<span class="lineNum">     414 </span>            : 
+<a name="415"><span class="lineNum">     415 </span><span class="lineCov">          7 :       ~parse_kernel() { get_child()-&gt;destroy(); }</span></a>
+<span class="lineNum">     416 </span>            : 
+<span class="lineNum">     417 </span><span class="lineCov">          9 :       void single(char *ret, char *const *args)</span>
+<span class="lineNum">     418 </span>            :       {
+<span class="lineNum">     419 </span><span class="lineCov">          9 :         if (!parse_token(args, &quot;[&quot;)) {</span>
+<span class="lineNum">     420 </span><span class="lineNoCov">          0 :           throw json_parse_error(args, &quot;expected list starting with '['&quot;, ret_tp);</span>
+<span class="lineNum">     421 </span>            :         }
+<span class="lineNum">     422 </span><span class="lineCov">          9 :         skip_whitespace(args);</span>
+<span class="lineNum">     423 </span>            : 
+<span class="lineNum">     424 </span><span class="lineCov">          9 :         size_t size = 0, allocated_size = 8;</span>
+<span class="lineNum">     425 </span><span class="lineCov">          9 :         reinterpret_cast&lt;ret_type *&gt;(ret)-&gt;begin = blockref-&gt;alloc(allocated_size);</span>
+<span class="lineNum">     426 </span>            : 
+<span class="lineNum">     427 </span><span class="lineCov">          9 :         kernel_prefix *child = get_child();</span>
+<span class="lineNum">     428 </span><span class="lineCov">         35 :         for (char *data = reinterpret_cast&lt;ret_type *&gt;(ret)-&gt;begin;; data += stride) {</span>
+<span class="lineNum">     429 </span>            :           // Increase the allocated array size if necessary
+<span class="lineNum">     430 </span><span class="lineCov">         35 :           if (size == allocated_size) {</span>
+<span class="lineNum">     431 </span><span class="lineNoCov">          0 :             allocated_size *= 2;</span>
+<span class="lineNum">     432 </span>            :             reinterpret_cast&lt;ret_type *&gt;(ret)-&gt;begin =
+<span class="lineNum">     433 </span><span class="lineNoCov">          0 :                 blockref-&gt;resize(reinterpret_cast&lt;ret_type *&gt;(ret)-&gt;begin, allocated_size);</span>
+<span class="lineNum">     434 </span>            :           }
+<span class="lineNum">     435 </span><span class="lineCov">         35 :           ++size;</span>
+<span class="lineNum">     436 </span><span class="lineCov">         35 :           reinterpret_cast&lt;ndt::var_dim_type::data_type *&gt;(ret)-&gt;size = size;</span>
+<span class="lineNum">     437 </span>            : 
+<span class="lineNum">     438 </span><span class="lineCov">         35 :           child-&gt;single(data, args);</span>
+<span class="lineNum">     439 </span>            : 
+<span class="lineNum">     440 </span><span class="lineCov">         35 :           if (!parse_token(args, &quot;,&quot;)) {</span>
+<span class="lineNum">     441 </span><span class="lineCov">          9 :             break;</span>
+<span class="lineNum">     442 </span>            :           }
+<span class="lineNum">     443 </span><span class="lineCov">         26 :           skip_whitespace(args);</span>
+<span class="lineNum">     444 </span>            :         }
+<span class="lineNum">     445 </span>            : 
+<span class="lineNum">     446 </span><span class="lineCov">          9 :         if (!parse_token(args, &quot;]&quot;)) {</span>
+<span class="lineNum">     447 </span><span class="lineNoCov">          0 :           throw json_parse_error(args, &quot;array is too long, expected list terminator ']'&quot;, ret_tp);</span>
+<span class="lineNum">     448 </span>            :         }
+<span class="lineNum">     449 </span>            : 
+<span class="lineNum">     450 </span>            :         // Shrink-wrap the memory to just fit the string
+<span class="lineNum">     451 </span><span class="lineCov">          9 :         reinterpret_cast&lt;ret_type *&gt;(ret)-&gt;begin = blockref-&gt;resize(reinterpret_cast&lt;ret_type *&gt;(ret)-&gt;begin, size);</span>
+<span class="lineNum">     452 </span><span class="lineCov">          9 :         reinterpret_cast&lt;ret_type *&gt;(ret)-&gt;size = size;</span>
+<a name="453"><span class="lineNum">     453 </span><span class="lineCov">          9 :       }</span></a>
+<span class="lineNum">     454 </span>            : 
+<span class="lineNum">     455 </span><span class="lineCov">          7 :       static void instantiate(char *DYND_UNUSED(static_data), char *data, kernel_builder *ckb, const ndt::type &amp;dst_tp,</span>
+<span class="lineNum">     456 </span>            :                               const char *dst_arrmeta, intptr_t nsrc, const ndt::type *src_tp,
+<span class="lineNum">     457 </span>            :                               const char *const *src_arrmeta, kernel_request_t kernreq, intptr_t nkwd,
+<span class="lineNum">     458 </span>            :                               const nd::array *kwds, const std::map&lt;std::string, ndt::type&gt; &amp;tp_vars)
+<span class="lineNum">     459 </span>            :       {
+<span class="lineNum">     460 </span><span class="lineCov">          7 :         ckb-&gt;emplace_back&lt;parse_kernel&gt;(</span>
+<span class="lineNum">     461 </span>            :             kernreq, dst_tp, reinterpret_cast&lt;const ndt::var_dim_type::metadata_type *&gt;(dst_arrmeta)-&gt;blockref,
+<span class="lineNum">     462 </span><span class="lineCov">          7 :             reinterpret_cast&lt;const ndt::var_dim_type::metadata_type *&gt;(dst_arrmeta)-&gt;stride);</span>
+<span class="lineNum">     463 </span>            : 
+<span class="lineNum">     464 </span><span class="lineCov">          7 :         const ndt::type &amp;child_dst_tp = dst_tp.extended&lt;ndt::var_dim_type&gt;()-&gt;get_element_type();</span>
+<span class="lineNum">     465 </span><span class="lineCov">         14 :         json::parse::get()-&gt;instantiate(json::parse::get()-&gt;static_data(), data, ckb, child_dst_tp,</span>
+<span class="lineNum">     466 </span>            :                                         dst_arrmeta + sizeof(ndt::var_dim_type::metadata_type), nsrc, src_tp,
+<span class="lineNum">     467 </span><span class="lineCov">         14 :                                         src_arrmeta, kernreq, nkwd, kwds, tp_vars);</span>
+<span class="lineNum">     468 </span><span class="lineCov">          7 :       }</span>
+<span class="lineNum">     469 </span>            :     };
+<span class="lineNum">     470 </span>            : 
+<span class="lineNum">     471 </span>            :   } // namespace dynd::nd::json
+<span class="lineNum">     472 </span>            : } // namespace dynd::nd
+<span class="lineNum">     473 </span>            : 
+<span class="lineNum">     474 </span>            : namespace ndt {
+<span class="lineNum">     475 </span>            : 
+<a name="476"><span class="lineNum">     476 </span>            :   template &lt;type_id_t DstTypeID&gt;</a>
+<span class="lineNum">     477 </span>            :   struct traits&lt;nd::json::parse_kernel&lt;DstTypeID&gt;&gt; {
+<span class="lineNum">     478 </span><span class="lineCov">         14 :     static type equivalent() { return callable_type::make(DstTypeID, {make_type&lt;char *&gt;(), make_type&lt;char *&gt;()}); }</span>
+<span class="lineNum">     479 </span>            :   };
+<span class="lineNum">     480 </span>            : 
+<span class="lineNum">     481 </span>            : } // namespace dynd::ndt
+<span class="lineNum">     482 </span>            : } // namespace dynd
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.10</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

@@ -1,0 +1,246 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - coverage.info.cleaned - src/dynd/callable_registry.cpp</title>
+  <link rel="stylesheet" type="text/css" href="../../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../../index.html">top level</a> - <a href="index.html">src/dynd</a> - callable_registry.cpp<span style="font-size: 80%;"> (source / <a href="callable_registry.cpp.func.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">coverage.info.cleaned</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">51</td>
+            <td class="headerCovTableEntry">73</td>
+            <td class="headerCovTableEntryLo">69.9 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2016-02-19</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">13</td>
+            <td class="headerCovTableEntry">38</td>
+            <td class="headerCovTableEntryLo">34.2 %</td>
+          </tr>
+          <tr><td><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : //</a>
+<span class="lineNum">       2 </span>            : // Copyright (C) 2011-15 DyND Developers
+<span class="lineNum">       3 </span>            : // BSD 2-Clause License, see LICENSE.txt
+<span class="lineNum">       4 </span>            : //
+<span class="lineNum">       5 </span>            : 
+<span class="lineNum">       6 </span>            : #include &lt;map&gt;
+<span class="lineNum">       7 </span>            : #include &lt;cmath&gt;
+<span class="lineNum">       8 </span>            : 
+<span class="lineNum">       9 </span>            : #include &lt;dynd/callable_registry.hpp&gt;
+<span class="lineNum">      10 </span>            : #include &lt;dynd/functional.hpp&gt;
+<span class="lineNum">      11 </span>            : #include &lt;dynd/option.hpp&gt;
+<span class="lineNum">      12 </span>            : #include &lt;dynd/func/random.hpp&gt;
+<span class="lineNum">      13 </span>            : #include &lt;dynd/func/arithmetic.hpp&gt;
+<span class="lineNum">      14 </span>            : #include &lt;dynd/func/assignment.hpp&gt;
+<span class="lineNum">      15 </span>            : #include &lt;dynd/func/take.hpp&gt;
+<span class="lineNum">      16 </span>            : #include &lt;dynd/func/sum.hpp&gt;
+<span class="lineNum">      17 </span>            : #include &lt;dynd/func/min.hpp&gt;
+<span class="lineNum">      18 </span>            : #include &lt;dynd/func/max.hpp&gt;
+<span class="lineNum">      19 </span>            : #include &lt;dynd/func/complex.hpp&gt;
+<span class="lineNum">      20 </span>            : 
+<span class="lineNum">      21 </span>            : using namespace std;
+<span class="lineNum">      22 </span>            : using namespace dynd;
+<span class="lineNum">      23 </span>            : 
+<span class="lineNum">      24 </span>            : namespace {
+<a name="25"><span class="lineNum">      25 </span>            : </a>
+<span class="lineNum">      26 </span>            : template &lt;typename... T&gt;
+<span class="lineNum">      27 </span><span class="lineCov">         22 : nd::callable make_ufunc(T... f)</span>
+<span class="lineNum">      28 </span>            : {
+<span class="lineNum">      29 </span><span class="lineCov">         22 :   return nd::functional::elwise(nd::functional::old_multidispatch({nd::functional::apply(f)...}));</span>
+<span class="lineNum">      30 </span>            : }
+<span class="lineNum">      31 </span>            : 
+<a name="32"><span class="lineNum">      32 </span>            : template &lt;typename T&gt;</a>
+<span class="lineNum">      33 </span>            : struct divide {
+<span class="lineNum">      34 </span><span class="lineCov">          2 :   inline T operator()(T x, T y) const { return x / y; }</span>
+<span class="lineNum">      35 </span>            : };
+<a name="36"><span class="lineNum">      36 </span>            : template &lt;typename T&gt;</a>
+<span class="lineNum">      37 </span>            : struct negative {
+<span class="lineNum">      38 </span><span class="lineNoCov">          0 :   inline T operator()(T x) const { return -x; }</span>
+<span class="lineNum">      39 </span>            : };
+<span class="lineNum">      40 </span>            : template &lt;typename T&gt;
+<span class="lineNum">      41 </span>            : struct sign {
+<a name="42"><span class="lineNum">      42 </span>            :   // Note that by returning `x` in the else case, NaN will pass</a>
+<span class="lineNum">      43 </span>            :   // through
+<span class="lineNum">      44 </span><span class="lineNoCov">          0 :   inline T operator()(T x) const { return x &gt; T(0) ? 1 : (x &lt; T(0) ? -1 : x); }</span>
+<span class="lineNum">      45 </span>            : };
+<a name="46"><span class="lineNum">      46 </span>            : template &lt;&gt;</a>
+<span class="lineNum">      47 </span>            : struct sign&lt;int128&gt; {
+<span class="lineNum">      48 </span><span class="lineNoCov">          0 :   inline int128 operator()(const int128 &amp;x) const { return x.is_negative() ? -1 : (x == 0 ? 0 : 1); }</span>
+<span class="lineNum">      49 </span>            : };
+<span class="lineNum">      50 </span>            : template &lt;&gt;
+<span class="lineNum">      51 </span>            : struct sign&lt;uint128&gt; {
+<span class="lineNum">      52 </span>            :   inline uint128 operator()(const uint128 &amp;x) const { return x == 0 ? 0 : 1; }
+<span class="lineNum">      53 </span>            : };
+<a name="54"><span class="lineNum">      54 </span>            : template &lt;typename T&gt;</a>
+<span class="lineNum">      55 </span>            : struct conj_fn {
+<span class="lineNum">      56 </span><span class="lineNoCov">          0 :   inline T operator()(T x) const { return conj(x); };</span>
+<span class="lineNum">      57 </span>            : };
+<span class="lineNum">      58 </span>            : #if !(defined(_MSC_VER) &amp;&amp; _MSC_VER &lt; 1700)
+<a name="59"><span class="lineNum">      59 </span>            : template &lt;typename T&gt;</a>
+<span class="lineNum">      60 </span>            : struct logaddexp {
+<span class="lineNum">      61 </span><span class="lineNoCov">          0 :   inline T operator()(T x, T y) const</span>
+<span class="lineNum">      62 </span>            :   {
+<span class="lineNum">      63 </span>            :     // log(exp(x) + exp(y))
+<span class="lineNum">      64 </span><span class="lineNoCov">          0 :     if (x &gt; y) {</span>
+<span class="lineNum">      65 </span><span class="lineNoCov">          0 :       return x + log1p(exp(y - x));</span>
+<span class="lineNum">      66 </span>            :     }
+<span class="lineNum">      67 </span><span class="lineNoCov">          0 :     else if (x &lt;= y) {</span>
+<span class="lineNum">      68 </span><span class="lineNoCov">          0 :       return y + log1p(exp(x - y));</span>
+<span class="lineNum">      69 </span>            :     }
+<span class="lineNum">      70 </span>            :     else {
+<span class="lineNum">      71 </span>            :       // a NaN, +inf/+inf, or -inf/-inf
+<span class="lineNum">      72 </span><span class="lineNoCov">          0 :       return x + y;</span>
+<span class="lineNum">      73 </span>            :     }
+<span class="lineNum">      74 </span>            :   }
+<span class="lineNum">      75 </span>            : };
+<a name="76"><span class="lineNum">      76 </span>            : template &lt;typename T&gt;</a>
+<span class="lineNum">      77 </span>            : struct logaddexp2 {
+<span class="lineNum">      78 </span><span class="lineNoCov">          0 :   inline T operator()(T x, T y) const</span>
+<span class="lineNum">      79 </span>            :   {
+<span class="lineNum">      80 </span><span class="lineNoCov">          0 :     const T log2_e = T(1.442695040888963407359924681001892137);</span>
+<span class="lineNum">      81 </span>            :     // log2(exp2(x) + exp2(y))
+<span class="lineNum">      82 </span><span class="lineNoCov">          0 :     if (x &gt; y) {</span>
+<span class="lineNum">      83 </span><span class="lineNoCov">          0 :       return x + log2_e * log1p(exp2(y - x));</span>
+<span class="lineNum">      84 </span>            :     }
+<span class="lineNum">      85 </span><span class="lineNoCov">          0 :     else if (x &lt;= y) {</span>
+<span class="lineNum">      86 </span><span class="lineNoCov">          0 :       return y + log2_e * log1p(exp2(x - y));</span>
+<span class="lineNum">      87 </span>            :     }
+<span class="lineNum">      88 </span>            :     else {
+<span class="lineNum">      89 </span>            :       // a NaN, +inf/+inf, or -inf/-inf
+<span class="lineNum">      90 </span><span class="lineNoCov">          0 :       return x + y;</span>
+<span class="lineNum">      91 </span>            :     }
+<span class="lineNum">      92 </span>            :   }
+<span class="lineNum">      93 </span>            : };
+<span class="lineNum">      94 </span>            : #endif
+<a name="95"><span class="lineNum">      95 </span>            : } // anonymous namespace</a>
+<span class="lineNum">      96 </span>            : 
+<span class="lineNum">      97 </span><span class="lineCov">         18 : std::map&lt;std::string, nd::callable&gt; &amp;nd::callable_registry::get_regfunctions()</span>
+<span class="lineNum">      98 </span>            : {
+<span class="lineNum">      99 </span><span class="lineCov">         18 :   static map&lt;std::string, nd::callable&gt; registry;</span>
+<span class="lineNum">     100 </span><span class="lineCov">         18 :   if (registry.empty()) {</span>
+<span class="lineNum">     101 </span><span class="lineCov">          1 :     registry[&quot;add&quot;] = nd::add::get();</span>
+<span class="lineNum">     102 </span><span class="lineCov">          1 :     registry[&quot;subtract&quot;] = nd::subtract::get();</span>
+<span class="lineNum">     103 </span><span class="lineCov">          1 :     registry[&quot;multiply&quot;] = nd::multiply::get();</span>
+<span class="lineNum">     104 </span><span class="lineCov">          2 :     registry[&quot;divide&quot;] =</span>
+<span class="lineNum">     105 </span><span class="lineCov">          2 :         make_ufunc(::divide&lt;int32_t&gt;(), ::divide&lt;int64_t&gt;(), ::divide&lt;uint32_t&gt;(), ::divide&lt;uint64_t&gt;(),</span>
+<span class="lineNum">     106 </span><span class="lineCov">          1 :                    ::divide&lt;float&gt;(), ::divide&lt;double&gt;(), ::divide&lt;complex&lt;float&gt;&gt;(), ::divide&lt;complex&lt;double&gt;&gt;());</span>
+<span class="lineNum">     107 </span><span class="lineCov">          2 :     registry[&quot;negative&quot;] = make_ufunc(negative&lt;int32_t&gt;(), negative&lt;int64_t&gt;(), negative&lt;int128&gt;(), negative&lt;float&gt;(),</span>
+<span class="lineNum">     108 </span><span class="lineCov">          1 :                                       negative&lt;double&gt;(), negative&lt;complex&lt;float&gt;&gt;(), negative&lt;complex&lt;double&gt;&gt;());</span>
+<span class="lineNum">     109 </span><span class="lineCov">          1 :     registry[&quot;sign&quot;] = make_ufunc(sign&lt;int32_t&gt;(), sign&lt;int64_t&gt;(), sign&lt;int128&gt;(), sign&lt;float&gt;(), sign&lt;double&gt;());</span>
+<span class="lineNum">     110 </span><span class="lineCov">          1 :     registry[&quot;conj&quot;] = make_ufunc(conj_fn&lt;std::complex&lt;float&gt;&gt;(), conj_fn&lt;std::complex&lt;double&gt;&gt;());</span>
+<span class="lineNum">     111 </span>            : 
+<span class="lineNum">     112 </span>            : #if !(defined(_MSC_VER) &amp;&amp; _MSC_VER &lt; 1700)
+<span class="lineNum">     113 </span><span class="lineCov">          1 :     registry[&quot;logaddexp&quot;] = make_ufunc(logaddexp&lt;float&gt;(), logaddexp&lt;double&gt;());</span>
+<span class="lineNum">     114 </span><span class="lineCov">          1 :     registry[&quot;logaddexp2&quot;] = make_ufunc(logaddexp2&lt;float&gt;(), logaddexp2&lt;double&gt;());</span>
+<span class="lineNum">     115 </span>            : #endif
+<span class="lineNum">     116 </span>            : 
+<span class="lineNum">     117 </span>            :     // Trig functions
+<span class="lineNum">     118 </span><span class="lineCov">          1 :     registry[&quot;sin&quot;] = make_ufunc(&amp;::sinf, static_cast&lt;double (*)(double)&gt;(&amp;::sin));</span>
+<span class="lineNum">     119 </span><span class="lineCov">          1 :     registry[&quot;cos&quot;] = make_ufunc(&amp;::cosf, static_cast&lt;double (*)(double)&gt;(&amp;::cos));</span>
+<span class="lineNum">     120 </span><span class="lineCov">          1 :     registry[&quot;tan&quot;] = make_ufunc(&amp;::tanf, static_cast&lt;double (*)(double)&gt;(&amp;::tan));</span>
+<span class="lineNum">     121 </span><span class="lineCov">          1 :     registry[&quot;exp&quot;] = make_ufunc(&amp;::expf, static_cast&lt;double (*)(double)&gt;(&amp;::exp));</span>
+<span class="lineNum">     122 </span><span class="lineCov">          1 :     registry[&quot;arcsin&quot;] = make_ufunc(&amp;::asinf, static_cast&lt;double (*)(double)&gt;(&amp;::asin));</span>
+<span class="lineNum">     123 </span><span class="lineCov">          1 :     registry[&quot;arccos&quot;] = make_ufunc(&amp;::acosf, static_cast&lt;double (*)(double)&gt;(&amp;::acos));</span>
+<span class="lineNum">     124 </span><span class="lineCov">          1 :     registry[&quot;arctan&quot;] = make_ufunc(&amp;::atanf, static_cast&lt;double (*)(double)&gt;(&amp;::atan));</span>
+<span class="lineNum">     125 </span><span class="lineCov">          1 :     registry[&quot;arctan2&quot;] = make_ufunc(&amp;::atan2f, static_cast&lt;double (*)(double, double)&gt;(&amp;::atan2));</span>
+<span class="lineNum">     126 </span><span class="lineCov">          1 :     registry[&quot;hypot&quot;] = make_ufunc(&amp;::hypotf, static_cast&lt;double (*)(double, double)&gt;(&amp;::hypot));</span>
+<span class="lineNum">     127 </span><span class="lineCov">          1 :     registry[&quot;sinh&quot;] = make_ufunc(&amp;::sinhf, static_cast&lt;double (*)(double)&gt;(&amp;::sinh));</span>
+<span class="lineNum">     128 </span><span class="lineCov">          1 :     registry[&quot;cosh&quot;] = make_ufunc(&amp;::coshf, static_cast&lt;double (*)(double)&gt;(&amp;::cosh));</span>
+<span class="lineNum">     129 </span><span class="lineCov">          1 :     registry[&quot;tanh&quot;] = make_ufunc(&amp;::tanhf, static_cast&lt;double (*)(double)&gt;(&amp;::tanh));</span>
+<span class="lineNum">     130 </span>            : #if !(defined(_MSC_VER) &amp;&amp; _MSC_VER &lt; 1700)
+<span class="lineNum">     131 </span><span class="lineCov">          1 :     registry[&quot;asinh&quot;] = make_ufunc(&amp;::asinhf, static_cast&lt;double (*)(double)&gt;(&amp;::asinh));</span>
+<span class="lineNum">     132 </span><span class="lineCov">          1 :     registry[&quot;acosh&quot;] = make_ufunc(&amp;::acoshf, static_cast&lt;double (*)(double)&gt;(&amp;::acosh));</span>
+<span class="lineNum">     133 </span><span class="lineCov">          1 :     registry[&quot;atanh&quot;] = make_ufunc(&amp;::atanhf, static_cast&lt;double (*)(double)&gt;(&amp;::atanh));</span>
+<span class="lineNum">     134 </span>            : #endif
+<span class="lineNum">     135 </span>            : 
+<span class="lineNum">     136 </span><span class="lineCov">          1 :     registry[&quot;power&quot;] = make_ufunc(&amp;powf, static_cast&lt;double (*)(double, double)&gt;(&amp;::pow));</span>
+<span class="lineNum">     137 </span>            : 
+<span class="lineNum">     138 </span><span class="lineCov">          1 :     registry[&quot;uniform&quot;] = nd::random::uniform::get();</span>
+<span class="lineNum">     139 </span><span class="lineCov">          1 :     registry[&quot;take&quot;] = nd::take::get();</span>
+<span class="lineNum">     140 </span><span class="lineCov">          1 :     registry[&quot;sum&quot;] = nd::sum::get();</span>
+<span class="lineNum">     141 </span><span class="lineCov">          1 :     registry[&quot;is_na&quot;] = nd::is_na::get();</span>
+<span class="lineNum">     142 </span><span class="lineCov">          1 :     registry[&quot;min&quot;] = nd::min::get();</span>
+<span class="lineNum">     143 </span><span class="lineCov">          1 :     registry[&quot;max&quot;] = nd::max::get();</span>
+<span class="lineNum">     144 </span><span class="lineCov">          1 :     registry[&quot;assign&quot;] = nd::assign::get();</span>
+<span class="lineNum">     145 </span><span class="lineCov">          1 :     registry[&quot;real&quot;] = real::get();</span>
+<span class="lineNum">     146 </span><span class="lineCov">          1 :     registry[&quot;imag&quot;] = imag::get();</span>
+<span class="lineNum">     147 </span><span class="lineCov">          1 :     registry[&quot;conj&quot;] = conj::get();</span>
+<span class="lineNum">     148 </span>            :   }
+<span class="lineNum">     149 </span>            : 
+<span class="lineNum">     150 </span><span class="lineCov">         18 :   return registry;</span>
+<a name="151"><span class="lineNum">     151 </span>            : }</a>
+<span class="lineNum">     152 </span>            : 
+<span class="lineNum">     153 </span><span class="lineCov">         18 : nd::callable &amp;nd::callable_registry::operator[](const std::string &amp;name)</span>
+<span class="lineNum">     154 </span>            : {
+<span class="lineNum">     155 </span><span class="lineCov">         18 :   std::map&lt;std::string, nd::callable&gt; &amp;registry = get_regfunctions();</span>
+<span class="lineNum">     156 </span>            : 
+<span class="lineNum">     157 </span><span class="lineCov">         18 :   auto it = registry.find(name);</span>
+<span class="lineNum">     158 </span><span class="lineCov">         18 :   if (it != registry.end()) {</span>
+<span class="lineNum">     159 </span><span class="lineCov">         36 :     return it-&gt;second;</span>
+<span class="lineNum">     160 </span>            :   }
+<span class="lineNum">     161 </span>            :   else {
+<span class="lineNum">     162 </span><span class="lineNoCov">          0 :     stringstream ss;</span>
+<span class="lineNum">     163 </span><span class="lineNoCov">          0 :     ss &lt;&lt; &quot;No dynd function &quot;;</span>
+<span class="lineNum">     164 </span><span class="lineNoCov">          0 :     print_escaped_utf8_string(ss, name);</span>
+<span class="lineNum">     165 </span><span class="lineNoCov">          0 :     ss &lt;&lt; &quot; has been registered&quot;;</span>
+<span class="lineNum">     166 </span><span class="lineNoCov">          0 :     throw invalid_argument(ss.str());</span>
+<span class="lineNum">     167 </span>            :   }
+<a name="168"><span class="lineNum">     168 </span>            : }</a>
+<span class="lineNum">     169 </span>            : 
+<span class="lineNum">     170 </span><span class="lineCov">          3 : DYND_API class nd::callable_registry nd::callable_registry;</span>
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.10</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

@@ -1,0 +1,1675 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - coverage.info.cleaned - src/dynd/types/datashape_parser.cpp</title>
+  <link rel="stylesheet" type="text/css" href="../../../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../../../index.html">top level</a> - <a href="index.html">src/dynd/types</a> - datashape_parser.cpp<span style="font-size: 80%;"> (source / <a href="datashape_parser.cpp.func.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">coverage.info.cleaned</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">699</td>
+            <td class="headerCovTableEntry">848</td>
+            <td class="headerCovTableEntryMed">82.4 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2016-02-19</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">46</td>
+            <td class="headerCovTableEntry">49</td>
+            <td class="headerCovTableEntryHi">93.9 %</td>
+          </tr>
+          <tr><td><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : //</a>
+<span class="lineNum">       2 </span>            : // Copyright (C) 2011-15 DyND Developers
+<span class="lineNum">       3 </span>            : // BSD 2-Clause License, see LICENSE.txt
+<span class="lineNum">       4 </span>            : //
+<span class="lineNum">       5 </span>            : 
+<span class="lineNum">       6 </span>            : #include &lt;map&gt;
+<span class="lineNum">       7 </span>            : #include &lt;set&gt;
+<span class="lineNum">       8 </span>            : #include &lt;stdexcept&gt;
+<span class="lineNum">       9 </span>            : 
+<span class="lineNum">      10 </span>            : #include &lt;dynd/types/datashape_parser.hpp&gt;
+<span class="lineNum">      11 </span>            : #include &lt;dynd/parse.hpp&gt;
+<span class="lineNum">      12 </span>            : #include &lt;dynd/callable.hpp&gt;
+<span class="lineNum">      13 </span>            : #include &lt;dynd/types/array_type.hpp&gt;
+<span class="lineNum">      14 </span>            : #include &lt;dynd/types/option_type.hpp&gt;
+<span class="lineNum">      15 </span>            : #include &lt;dynd/types/callable_type.hpp&gt;
+<span class="lineNum">      16 </span>            : #include &lt;dynd/types/c_contiguous_type.hpp&gt;
+<span class="lineNum">      17 </span>            : #include &lt;dynd/types/fixed_dim_kind_type.hpp&gt;
+<span class="lineNum">      18 </span>            : #include &lt;dynd/types/var_dim_type.hpp&gt;
+<span class="lineNum">      19 </span>            : #include &lt;dynd/types/fixed_dim_type.hpp&gt;
+<span class="lineNum">      20 </span>            : #include &lt;dynd/types/struct_type.hpp&gt;
+<span class="lineNum">      21 </span>            : #include &lt;dynd/types/tuple_type.hpp&gt;
+<span class="lineNum">      22 </span>            : #include &lt;dynd/types/string_type.hpp&gt;
+<span class="lineNum">      23 </span>            : #include &lt;dynd/types/fixed_string_kind_type.hpp&gt;
+<span class="lineNum">      24 </span>            : #include &lt;dynd/types/fixed_string_type.hpp&gt;
+<span class="lineNum">      25 </span>            : #include &lt;dynd/types/date_type.hpp&gt;
+<span class="lineNum">      26 </span>            : #include &lt;dynd/types/fixed_bytes_kind_type.hpp&gt;
+<span class="lineNum">      27 </span>            : #include &lt;dynd/types/fixed_bytes_type.hpp&gt;
+<span class="lineNum">      28 </span>            : #include &lt;dynd/types/bytes_type.hpp&gt;
+<span class="lineNum">      29 </span>            : #include &lt;dynd/types/type_type.hpp&gt;
+<span class="lineNum">      30 </span>            : #include &lt;dynd/types/pointer_type.hpp&gt;
+<span class="lineNum">      31 </span>            : #include &lt;dynd/types/char_type.hpp&gt;
+<span class="lineNum">      32 </span>            : #include &lt;dynd/types/cuda_host_type.hpp&gt;
+<span class="lineNum">      33 </span>            : #include &lt;dynd/types/cuda_device_type.hpp&gt;
+<span class="lineNum">      34 </span>            : #include &lt;dynd/types/typevar_type.hpp&gt;
+<span class="lineNum">      35 </span>            : #include &lt;dynd/types/typevar_dim_type.hpp&gt;
+<span class="lineNum">      36 </span>            : #include &lt;dynd/types/pow_dimsym_type.hpp&gt;
+<span class="lineNum">      37 </span>            : #include &lt;dynd/types/ellipsis_dim_type.hpp&gt;
+<span class="lineNum">      38 </span>            : #include &lt;dynd/types/option_type.hpp&gt;
+<span class="lineNum">      39 </span>            : #include &lt;dynd/types/categorical_kind_type.hpp&gt;
+<span class="lineNum">      40 </span>            : #include &lt;dynd/types/any_kind_type.hpp&gt;
+<span class="lineNum">      41 </span>            : #include &lt;dynd/types/scalar_kind_type.hpp&gt;
+<span class="lineNum">      42 </span>            : #include &lt;dynd/types/kind_sym_type.hpp&gt;
+<span class="lineNum">      43 </span>            : #include &lt;dynd/types/int_kind_sym_type.hpp&gt;
+<span class="lineNum">      44 </span>            : #include &lt;dynd/types/typevar_constructed_type.hpp&gt;
+<span class="lineNum">      45 </span>            : #include &lt;dynd/types/var_dim_type.hpp&gt;
+<span class="lineNum">      46 </span>            : 
+<span class="lineNum">      47 </span>            : using namespace std;
+<span class="lineNum">      48 </span>            : using namespace dynd;
+<span class="lineNum">      49 </span>            : 
+<span class="lineNum">      50 </span>            : namespace {
+<span class="lineNum">      51 </span>            : class datashape_parse_error {
+<span class="lineNum">      52 </span>            :   const char *m_position;
+<span class="lineNum">      53 </span>            :   const char *m_message;
+<a name="54"><span class="lineNum">      54 </span>            : </a>
+<a name="55"><span class="lineNum">      55 </span>            : public:</a>
+<a name="56"><span class="lineNum">      56 </span><span class="lineCov">         22 :   datashape_parse_error(const char *position, const char *message) : m_position(position), m_message(message) {}</span></a>
+<a name="57"><span class="lineNum">      57 </span><span class="lineCov">         22 :   virtual ~datashape_parse_error() {}</span></a>
+<span class="lineNum">      58 </span><span class="lineCov">         22 :   const char *get_position() const { return m_position; }</span>
+<span class="lineNum">      59 </span><span class="lineCov">         22 :   const char *get_message() const { return m_message; }</span>
+<span class="lineNum">      60 </span>            : };
+<span class="lineNum">      61 </span>            : } // anonymous namespace
+<span class="lineNum">      62 </span>            : 
+<span class="lineNum">      63 </span>            : // Simple recursive descent parser for a subset of the Blaze datashape grammar.
+<span class="lineNum">      64 </span>            : // (Blaze grammar modified slightly to work this way)
+<span class="lineNum">      65 </span>            : 
+<a name="66"><span class="lineNum">      66 </span>            : static ndt::type parse_datashape(const char *&amp;begin, const char *end, map&lt;std::string, ndt::type&gt; &amp;symtable);</a>
+<span class="lineNum">      67 </span>            : 
+<span class="lineNum">      68 </span><span class="lineCov">       1032 : static const map&lt;std::string, ndt::type&gt; &amp;builtin_types()</span>
+<span class="lineNum">      69 </span>            : {
+<span class="lineNum">      70 </span><span class="lineCov">       1032 :   static map&lt;std::string, ndt::type&gt; bit;</span>
+<span class="lineNum">      71 </span><span class="lineCov">       1032 :   if (bit.empty()) {</span>
+<span class="lineNum">      72 </span><span class="lineCov">          1 :     bit[&quot;void&quot;] = ndt::make_type&lt;void&gt;();</span>
+<span class="lineNum">      73 </span><span class="lineCov">          1 :     bit[&quot;bool&quot;] = ndt::make_type&lt;bool1&gt;();</span>
+<span class="lineNum">      74 </span><span class="lineCov">          1 :     bit[&quot;int8&quot;] = ndt::make_type&lt;int8&gt;();</span>
+<span class="lineNum">      75 </span><span class="lineCov">          1 :     bit[&quot;int16&quot;] = ndt::make_type&lt;int16&gt;();</span>
+<span class="lineNum">      76 </span><span class="lineCov">          1 :     bit[&quot;int32&quot;] = ndt::make_type&lt;int32&gt;();</span>
+<span class="lineNum">      77 </span><span class="lineCov">          1 :     bit[&quot;int&quot;] = ndt::make_type&lt;int32&gt;();</span>
+<span class="lineNum">      78 </span><span class="lineCov">          1 :     bit[&quot;int64&quot;] = ndt::make_type&lt;int64&gt;();</span>
+<span class="lineNum">      79 </span><span class="lineCov">          1 :     bit[&quot;int128&quot;] = ndt::make_type&lt;int128&gt;();</span>
+<span class="lineNum">      80 </span><span class="lineCov">          1 :     bit[&quot;intptr&quot;] = ndt::make_type&lt;intptr_t&gt;();</span>
+<span class="lineNum">      81 </span><span class="lineCov">          1 :     bit[&quot;uint8&quot;] = ndt::make_type&lt;uint8&gt;();</span>
+<span class="lineNum">      82 </span><span class="lineCov">          1 :     bit[&quot;uint16&quot;] = ndt::make_type&lt;uint16&gt;();</span>
+<span class="lineNum">      83 </span><span class="lineCov">          1 :     bit[&quot;uint32&quot;] = ndt::make_type&lt;uint32&gt;();</span>
+<span class="lineNum">      84 </span><span class="lineCov">          1 :     bit[&quot;uint64&quot;] = ndt::make_type&lt;uint64&gt;();</span>
+<span class="lineNum">      85 </span><span class="lineCov">          1 :     bit[&quot;uint128&quot;] = ndt::make_type&lt;uint128&gt;();</span>
+<span class="lineNum">      86 </span><span class="lineCov">          1 :     bit[&quot;uintptr&quot;] = ndt::make_type&lt;uintptr_t&gt;();</span>
+<span class="lineNum">      87 </span><span class="lineCov">          1 :     bit[&quot;float16&quot;] = ndt::make_type&lt;float16&gt;();</span>
+<span class="lineNum">      88 </span><span class="lineCov">          1 :     bit[&quot;float32&quot;] = ndt::make_type&lt;float32&gt;();</span>
+<span class="lineNum">      89 </span><span class="lineCov">          1 :     bit[&quot;float64&quot;] = ndt::make_type&lt;float64&gt;();</span>
+<span class="lineNum">      90 </span><span class="lineCov">          1 :     bit[&quot;real&quot;] = ndt::make_type&lt;double&gt;();</span>
+<span class="lineNum">      91 </span><span class="lineCov">          1 :     bit[&quot;float128&quot;] = ndt::make_type&lt;float128&gt;();</span>
+<span class="lineNum">      92 </span><span class="lineCov">          1 :     bit[&quot;complex64&quot;] = ndt::make_type&lt;dynd::complex&lt;float&gt;&gt;();</span>
+<span class="lineNum">      93 </span><span class="lineCov">          1 :     bit[&quot;complex128&quot;] = ndt::make_type&lt;dynd::complex&lt;double&gt;&gt;();</span>
+<span class="lineNum">      94 </span><span class="lineCov">          1 :     bit[&quot;complex&quot;] = ndt::make_type&lt;dynd::complex&lt;double&gt;&gt;();</span>
+<span class="lineNum">      95 </span><span class="lineCov">          1 :     bit[&quot;bytes&quot;] = ndt::bytes_type::make(1);</span>
+<span class="lineNum">      96 </span><span class="lineCov">          1 :     bit[&quot;type&quot;] = ndt::make_type&lt;ndt::type_type&gt;();</span>
+<span class="lineNum">      97 </span>            :   }
+<span class="lineNum">      98 </span>            : 
+<span class="lineNum">      99 </span><span class="lineCov">       1032 :   return bit;</span>
+<span class="lineNum">     100 </span>            : }
+<span class="lineNum">     101 </span>            : 
+<span class="lineNum">     102 </span>            : /**
+<span class="lineNum">     103 </span>            :  * Parses a token, skipping whitespace based on datashape's
+<span class="lineNum">     104 </span>            :  * definition of whitespace + comments.
+<a name="105"><span class="lineNum">     105 </span>            :  */</a>
+<span class="lineNum">     106 </span>            : template &lt;int N&gt;
+<span class="lineNum">     107 </span><span class="lineCov">      18678 : inline bool parse_token_ds(const char *&amp;rbegin, const char *end, const char(&amp;token)[N])</span>
+<span class="lineNum">     108 </span>            : {
+<span class="lineNum">     109 </span><span class="lineCov">      18678 :   const char *begin = rbegin;</span>
+<span class="lineNum">     110 </span><span class="lineCov">      18678 :   skip_whitespace_and_pound_comments(begin, end);</span>
+<span class="lineNum">     111 </span><span class="lineCov">      18678 :   if (parse_token_no_ws(begin, end, token)) {</span>
+<span class="lineNum">     112 </span><span class="lineCov">        540 :     rbegin = begin;</span>
+<span class="lineNum">     113 </span><span class="lineCov">        540 :     return true;</span>
+<span class="lineNum">     114 </span>            :   }
+<span class="lineNum">     115 </span>            :   else {
+<span class="lineNum">     116 </span><span class="lineCov">      18138 :     return false;</span>
+<span class="lineNum">     117 </span>            :   }
+<span class="lineNum">     118 </span>            : }
+<span class="lineNum">     119 </span>            : 
+<span class="lineNum">     120 </span>            : /**
+<span class="lineNum">     121 </span>            :  * Parses a token, skipping whitespace based on datashape's
+<a name="122"><span class="lineNum">     122 </span>            :  * definition of whitespace + comments.</a>
+<span class="lineNum">     123 </span>            :  */
+<span class="lineNum">     124 </span><span class="lineCov">      21529 : inline bool parse_token_ds(const char *&amp;rbegin, const char *end, char token)</span>
+<span class="lineNum">     125 </span>            : {
+<span class="lineNum">     126 </span><span class="lineCov">      21529 :   const char *begin = rbegin;</span>
+<span class="lineNum">     127 </span><span class="lineCov">      21529 :   skip_whitespace_and_pound_comments(begin, end);</span>
+<span class="lineNum">     128 </span><span class="lineCov">      21529 :   if (parse_token_no_ws(begin, end, token)) {</span>
+<span class="lineNum">     129 </span><span class="lineCov">       3135 :     rbegin = begin;</span>
+<span class="lineNum">     130 </span><span class="lineCov">       3135 :     return true;</span>
+<span class="lineNum">     131 </span>            :   }
+<span class="lineNum">     132 </span>            :   else {
+<span class="lineNum">     133 </span><span class="lineCov">      18394 :     return false;</span>
+<span class="lineNum">     134 </span>            :   }
+<a name="135"><span class="lineNum">     135 </span>            : }</a>
+<span class="lineNum">     136 </span>            : 
+<span class="lineNum">     137 </span><span class="lineCov">       9353 : static bool parse_name_or_number(const char *&amp;rbegin, const char *end, const char *&amp;out_nbegin, const char *&amp;out_nend)</span>
+<span class="lineNum">     138 </span>            : {
+<span class="lineNum">     139 </span><span class="lineCov">       9353 :   const char *begin = rbegin;</span>
+<span class="lineNum">     140 </span>            :   // NAME
+<span class="lineNum">     141 </span><span class="lineCov">      13939 :   if (parse_name_no_ws(begin, end, out_nbegin, out_nend) ||</span>
+<span class="lineNum">     142 </span><span class="lineCov">       4586 :       parse_unsigned_int_no_ws(begin, end, out_nbegin, out_nend)) {</span>
+<span class="lineNum">     143 </span><span class="lineCov">       5226 :     rbegin = begin;</span>
+<span class="lineNum">     144 </span><span class="lineCov">       5226 :     return true;</span>
+<span class="lineNum">     145 </span>            :   }
+<span class="lineNum">     146 </span><span class="lineCov">       4127 :   return false;</span>
+<a name="147"><span class="lineNum">     147 </span>            : }</a>
+<span class="lineNum">     148 </span>            : 
+<span class="lineNum">     149 </span><span class="lineCov">         35 : static std::string parse_number(const char *&amp;rbegin, const char *end)</span>
+<span class="lineNum">     150 </span>            : {
+<span class="lineNum">     151 </span><span class="lineCov">         35 :   const char *begin = rbegin;</span>
+<span class="lineNum">     152 </span>            :   const char *result_begin, *result_end;
+<span class="lineNum">     153 </span>            :   // NUMBER
+<span class="lineNum">     154 </span><span class="lineCov">         35 :   skip_whitespace_and_pound_comments(begin, end);</span>
+<span class="lineNum">     155 </span><span class="lineCov">         35 :   if (!parse_unsigned_int_no_ws(begin, end, result_begin, result_end)) {</span>
+<span class="lineNum">     156 </span><span class="lineCov">          1 :     return std::string();</span>
+<span class="lineNum">     157 </span>            :   }
+<span class="lineNum">     158 </span><span class="lineCov">         34 :   rbegin = begin;</span>
+<span class="lineNum">     159 </span><span class="lineCov">         34 :   return std::string(result_begin, result_end);</span>
+<a name="160"><span class="lineNum">     160 </span>            : }</a>
+<span class="lineNum">     161 </span>            : 
+<span class="lineNum">     162 </span><span class="lineCov">        102 : static bool parse_quoted_string(const char *&amp;rbegin, const char *end, std::string &amp;out_val)</span>
+<span class="lineNum">     163 </span>            : {
+<span class="lineNum">     164 </span><span class="lineCov">        102 :   const char *begin = rbegin;</span>
+<span class="lineNum">     165 </span><span class="lineCov">        102 :   char beginning_quote = 0;</span>
+<span class="lineNum">     166 </span><span class="lineCov">        102 :   out_val = &quot;&quot;;</span>
+<span class="lineNum">     167 </span><span class="lineCov">        102 :   if (parse_token_ds(begin, end, '\'')) {</span>
+<span class="lineNum">     168 </span><span class="lineCov">         81 :     beginning_quote = '\'';</span>
+<span class="lineNum">     169 </span>            :   }
+<span class="lineNum">     170 </span><span class="lineCov">         21 :   else if (parse_token_ds(begin, end, '&quot;')) {</span>
+<span class="lineNum">     171 </span><span class="lineCov">          8 :     beginning_quote = '&quot;';</span>
+<span class="lineNum">     172 </span>            :   }
+<span class="lineNum">     173 </span>            :   else {
+<span class="lineNum">     174 </span><span class="lineCov">         13 :     return false;</span>
+<span class="lineNum">     175 </span>            :   }
+<span class="lineNum">     176 </span><span class="lineCov">        913 :   for (;;) {</span>
+<span class="lineNum">     177 </span><span class="lineCov">       1002 :     if (begin == end) {</span>
+<span class="lineNum">     178 </span><span class="lineNoCov">          0 :       begin = rbegin;</span>
+<span class="lineNum">     179 </span><span class="lineNoCov">          0 :       skip_whitespace_and_pound_comments(begin, end);</span>
+<span class="lineNum">     180 </span><span class="lineNoCov">          0 :       throw datashape_parse_error(begin, &quot;string has no ending quote&quot;);</span>
+<span class="lineNum">     181 </span>            :     }
+<span class="lineNum">     182 </span><span class="lineCov">       1002 :     char c = *begin++;</span>
+<span class="lineNum">     183 </span><span class="lineCov">       1002 :     if (c == '\\') {</span>
+<span class="lineNum">     184 </span><span class="lineCov">         33 :       if (begin == end) {</span>
+<span class="lineNum">     185 </span><span class="lineNoCov">          0 :         begin = rbegin;</span>
+<span class="lineNum">     186 </span><span class="lineNoCov">          0 :         skip_whitespace_and_pound_comments(begin, end);</span>
+<span class="lineNum">     187 </span><span class="lineNoCov">          0 :         throw datashape_parse_error(begin, &quot;string has no ending quote&quot;);</span>
+<span class="lineNum">     188 </span>            :       }
+<span class="lineNum">     189 </span><span class="lineCov">         33 :       c = *begin++;</span>
+<span class="lineNum">     190 </span><span class="lineCov">         33 :       switch (c) {</span>
+<span class="lineNum">     191 </span>            :       case '&quot;':
+<span class="lineNum">     192 </span>            :       case '\'':
+<span class="lineNum">     193 </span>            :       case '\\':
+<span class="lineNum">     194 </span>            :       case '/':
+<span class="lineNum">     195 </span><span class="lineCov">         31 :         out_val += c;</span>
+<span class="lineNum">     196 </span><span class="lineCov">         31 :         break;</span>
+<span class="lineNum">     197 </span>            :       case 'b':
+<span class="lineNum">     198 </span><span class="lineNoCov">          0 :         out_val += '\b';</span>
+<span class="lineNum">     199 </span><span class="lineNoCov">          0 :         break;</span>
+<span class="lineNum">     200 </span>            :       case 'f':
+<span class="lineNum">     201 </span><span class="lineNoCov">          0 :         out_val += '\f';</span>
+<span class="lineNum">     202 </span><span class="lineNoCov">          0 :         break;</span>
+<span class="lineNum">     203 </span>            :       case 'n':
+<span class="lineNum">     204 </span><span class="lineCov">          1 :         out_val += '\n';</span>
+<span class="lineNum">     205 </span><span class="lineCov">          1 :         break;</span>
+<span class="lineNum">     206 </span>            :       case 'r':
+<span class="lineNum">     207 </span><span class="lineCov">          1 :         out_val += '\r';</span>
+<span class="lineNum">     208 </span><span class="lineCov">          1 :         break;</span>
+<span class="lineNum">     209 </span>            :       case 't':
+<span class="lineNum">     210 </span><span class="lineNoCov">          0 :         out_val += '\t';</span>
+<span class="lineNum">     211 </span><span class="lineNoCov">          0 :         break;</span>
+<span class="lineNum">     212 </span>            :       case 'u': {
+<span class="lineNum">     213 </span><span class="lineNoCov">          0 :         if (end - begin &lt; 4) {</span>
+<span class="lineNum">     214 </span><span class="lineNoCov">          0 :           throw datashape_parse_error(begin - 2, &quot;invalid unicode escape sequence in string&quot;);</span>
+<span class="lineNum">     215 </span>            :         }
+<span class="lineNum">     216 </span><span class="lineNoCov">          0 :         uint32_t cp = 0;</span>
+<span class="lineNum">     217 </span><span class="lineNoCov">          0 :         for (int i = 0; i &lt; 4; ++i) {</span>
+<span class="lineNum">     218 </span><span class="lineNoCov">          0 :           char d = *begin++;</span>
+<span class="lineNum">     219 </span><span class="lineNoCov">          0 :           cp *= 16;</span>
+<span class="lineNum">     220 </span><span class="lineNoCov">          0 :           if ('0' &lt;= d &amp;&amp; d &lt;= '9') {</span>
+<span class="lineNum">     221 </span><span class="lineNoCov">          0 :             cp += d - '0';</span>
+<span class="lineNum">     222 </span>            :           }
+<span class="lineNum">     223 </span><span class="lineNoCov">          0 :           else if ('A' &lt;= d &amp;&amp; d &lt;= 'F') {</span>
+<span class="lineNum">     224 </span><span class="lineNoCov">          0 :             cp += d - 'A' + 10;</span>
+<span class="lineNum">     225 </span>            :           }
+<span class="lineNum">     226 </span><span class="lineNoCov">          0 :           else if ('a' &lt;= d &amp;&amp; d &lt;= 'f') {</span>
+<span class="lineNum">     227 </span><span class="lineNoCov">          0 :             cp += d - 'a' + 10;</span>
+<span class="lineNum">     228 </span>            :           }
+<span class="lineNum">     229 </span>            :           else {
+<span class="lineNum">     230 </span><span class="lineNoCov">          0 :             throw datashape_parse_error(begin - 1, &quot;invalid unicode escape sequence in string&quot;);</span>
+<span class="lineNum">     231 </span>            :           }
+<span class="lineNum">     232 </span>            :         }
+<span class="lineNum">     233 </span><span class="lineNoCov">          0 :         append_utf8_codepoint(cp, out_val);</span>
+<span class="lineNum">     234 </span><span class="lineNoCov">          0 :         break;</span>
+<span class="lineNum">     235 </span>            :       }
+<span class="lineNum">     236 </span>            :       default:
+<span class="lineNum">     237 </span><span class="lineNoCov">          0 :         throw datashape_parse_error(begin - 2, &quot;invalid escape sequence in string&quot;);</span>
+<span class="lineNum">     238 </span>            :       }
+<span class="lineNum">     239 </span>            :     }
+<span class="lineNum">     240 </span><span class="lineCov">        969 :     else if (c != beginning_quote) {</span>
+<span class="lineNum">     241 </span><span class="lineCov">        880 :       out_val += c;</span>
+<span class="lineNum">     242 </span>            :     }
+<span class="lineNum">     243 </span>            :     else {
+<span class="lineNum">     244 </span><span class="lineCov">         89 :       rbegin = begin;</span>
+<span class="lineNum">     245 </span><span class="lineCov">         89 :       return true;</span>
+<span class="lineNum">     246 </span>            :     }
+<span class="lineNum">     247 </span>            :   }
+<span class="lineNum">     248 </span>            : }
+<a name="249"><span class="lineNum">     249 </span>            : </a>
+<span class="lineNum">     250 </span>            : // fixed_type : fixed[N] * rhs_expression
+<span class="lineNum">     251 </span><span class="lineCov">          1 : static ndt::type parse_fixed_dim_parameters(const char *&amp;rbegin, const char *end, map&lt;std::string, ndt::type&gt; &amp;symtable)</span>
+<span class="lineNum">     252 </span>            : {
+<span class="lineNum">     253 </span><span class="lineCov">          1 :   const char *begin = rbegin;</span>
+<span class="lineNum">     254 </span><span class="lineCov">          1 :   if (parse_token_ds(begin, end, '[')) {</span>
+<span class="lineNum">     255 </span><span class="lineCov">          1 :     const char *saved_begin = begin;</span>
+<span class="lineNum">     256 </span><span class="lineCov">          2 :     std::string dim_size_str = parse_number(begin, end);</span>
+<span class="lineNum">     257 </span><span class="lineCov">          1 :     if (dim_size_str.empty()) {</span>
+<span class="lineNum">     258 </span><span class="lineNoCov">          0 :       throw datashape_parse_error(saved_begin, &quot;expected dimension size&quot;);</span>
+<span class="lineNum">     259 </span>            :     }
+<span class="lineNum">     260 </span><span class="lineCov">          1 :     intptr_t dim_size = (intptr_t)std::atoll(dim_size_str.c_str());</span>
+<span class="lineNum">     261 </span><span class="lineCov">          1 :     if (!parse_token_ds(begin, end, ']')) {</span>
+<span class="lineNum">     262 </span><span class="lineNoCov">          0 :       throw datashape_parse_error(begin, &quot;expected closing ']'&quot;);</span>
+<span class="lineNum">     263 </span>            :     }
+<span class="lineNum">     264 </span><span class="lineCov">          1 :     if (!parse_token_ds(begin, end, '*')) {</span>
+<span class="lineNum">     265 </span><span class="lineNoCov">          0 :       throw datashape_parse_error(begin, &quot;expected dimension separator '*'&quot;);</span>
+<span class="lineNum">     266 </span>            :     }
+<span class="lineNum">     267 </span><span class="lineCov">          2 :     ndt::type element_tp = parse_datashape(begin, end, symtable);</span>
+<span class="lineNum">     268 </span><span class="lineCov">          1 :     if (element_tp.is_null()) {</span>
+<span class="lineNum">     269 </span><span class="lineNoCov">          0 :       throw datashape_parse_error(begin, &quot;expected element type&quot;);</span>
+<span class="lineNum">     270 </span>            :     }
+<span class="lineNum">     271 </span><span class="lineCov">          1 :     rbegin = begin;</span>
+<span class="lineNum">     272 </span><span class="lineCov">          2 :     return ndt::make_fixed_dim(dim_size, element_tp);</span>
+<span class="lineNum">     273 </span>            :   }
+<span class="lineNum">     274 </span>            :   else {
+<span class="lineNum">     275 </span><span class="lineNoCov">          0 :     throw datashape_parse_error(begin, &quot;expected opening '['&quot;);</span>
+<span class="lineNum">     276 </span>            :   }
+<a name="277"><span class="lineNum">     277 </span>            : }</a>
+<span class="lineNum">     278 </span>            : 
+<span class="lineNum">     279 </span><span class="lineCov">          5 : static ndt::type parse_option_parameters(const char *&amp;rbegin, const char *end, map&lt;std::string, ndt::type&gt; &amp;symtable)</span>
+<span class="lineNum">     280 </span>            : {
+<span class="lineNum">     281 </span><span class="lineCov">          5 :   const char *begin = rbegin;</span>
+<span class="lineNum">     282 </span><span class="lineCov">          5 :   if (!parse_token_ds(begin, end, '[')) {</span>
+<span class="lineNum">     283 </span><span class="lineNoCov">          0 :     throw datashape_parse_error(begin, &quot;expected opening '[' after 'option'&quot;);</span>
+<span class="lineNum">     284 </span>            :   }
+<span class="lineNum">     285 </span><span class="lineCov">         10 :   ndt::type tp = parse_datashape(begin, end, symtable);</span>
+<span class="lineNum">     286 </span><span class="lineCov">          5 :   if (tp.is_null()) {</span>
+<span class="lineNum">     287 </span><span class="lineNoCov">          0 :     throw datashape_parse_error(begin, &quot;expected a data type&quot;);</span>
+<span class="lineNum">     288 </span>            :   }
+<span class="lineNum">     289 </span><span class="lineCov">          5 :   if (!parse_token_ds(begin, end, ']')) {</span>
+<span class="lineNum">     290 </span><span class="lineNoCov">          0 :     throw datashape_parse_error(begin, &quot;expected closing ']'&quot;);</span>
+<span class="lineNum">     291 </span>            :   }
+<span class="lineNum">     292 </span>            :   // TODO catch errors, convert them to datashape_parse_error so the position is
+<span class="lineNum">     293 </span>            :   // shown
+<span class="lineNum">     294 </span><span class="lineCov">          5 :   rbegin = begin;</span>
+<span class="lineNum">     295 </span><span class="lineCov">          9 :   return ndt::make_type&lt;ndt::option_type&gt;(tp);</span>
+<a name="296"><span class="lineNum">     296 </span>            : }</a>
+<span class="lineNum">     297 </span>            : 
+<span class="lineNum">     298 </span><span class="lineCov">         13 : static string_encoding_t string_to_encoding(const char *error_begin, const std::string &amp;estr)</span>
+<span class="lineNum">     299 </span>            : {
+<span class="lineNum">     300 </span><span class="lineCov">         13 :   if (estr == &quot;A&quot; || estr == &quot;ascii&quot; || estr == &quot;us-ascii&quot;) {</span>
+<span class="lineNum">     301 </span><span class="lineCov">          5 :     return string_encoding_ascii;</span>
+<span class="lineNum">     302 </span>            :   }
+<span class="lineNum">     303 </span><span class="lineCov">          8 :   else if (estr == &quot;U8&quot; || estr == &quot;utf8&quot; || estr == &quot;utf-8&quot; || estr == &quot;utf_8&quot;) {</span>
+<span class="lineNum">     304 </span><span class="lineCov">          2 :     return string_encoding_utf_8;</span>
+<span class="lineNum">     305 </span>            :   }
+<span class="lineNum">     306 </span><span class="lineCov">          6 :   else if (estr == &quot;U16&quot; || estr == &quot;utf16&quot; || estr == &quot;utf-16&quot; || estr == &quot;utf_16&quot;) {</span>
+<span class="lineNum">     307 </span><span class="lineCov">          2 :     return string_encoding_utf_16;</span>
+<span class="lineNum">     308 </span>            :   }
+<span class="lineNum">     309 </span><span class="lineCov">          4 :   else if (estr == &quot;U32&quot; || estr == &quot;utf32&quot; || estr == &quot;utf-32&quot; || estr == &quot;utf_32&quot;) {</span>
+<span class="lineNum">     310 </span><span class="lineCov">          2 :     return string_encoding_utf_32;</span>
+<span class="lineNum">     311 </span>            :   }
+<span class="lineNum">     312 </span><span class="lineCov">          2 :   else if (estr == &quot;ucs2&quot; || estr == &quot;ucs-2&quot; || estr == &quot;ucs_2&quot;) {</span>
+<span class="lineNum">     313 </span><span class="lineCov">          2 :     return string_encoding_ucs_2;</span>
+<span class="lineNum">     314 </span>            :   }
+<span class="lineNum">     315 </span>            :   else {
+<span class="lineNum">     316 </span><span class="lineNoCov">          0 :     throw datashape_parse_error(error_begin, &quot;unrecognized string encoding&quot;);</span>
+<span class="lineNum">     317 </span>            :   }
+<span class="lineNum">     318 </span>            : }
+<span class="lineNum">     319 </span>            : 
+<a name="320"><span class="lineNum">     320 </span>            : // string_type : string</a>
+<span class="lineNum">     321 </span>            : // This is called after 'string' is already matched
+<span class="lineNum">     322 </span><span class="lineCov">         47 : static ndt::type parse_string_parameters(const char *&amp;DYND_UNUSED(rbegin), const char *DYND_UNUSED(end))</span>
+<span class="lineNum">     323 </span>            : {
+<span class="lineNum">     324 </span><span class="lineCov">         47 :   return ndt::make_type&lt;ndt::string_type&gt;();</span>
+<span class="lineNum">     325 </span>            : }
+<span class="lineNum">     326 </span>            : 
+<span class="lineNum">     327 </span>            : // fixed_string_type : fixed_string[NUMBER] |
+<a name="328"><span class="lineNum">     328 </span>            : //                     fixed_string[NUMBER,'encoding']</a>
+<span class="lineNum">     329 </span>            : // This is called after 'fixed_string' is already matched
+<span class="lineNum">     330 </span><span class="lineCov">         25 : static ndt::type parse_fixed_string_parameters(const char *&amp;rbegin, const char *end)</span>
+<span class="lineNum">     331 </span>            : {
+<span class="lineNum">     332 </span><span class="lineCov">         25 :   const char *begin = rbegin;</span>
+<span class="lineNum">     333 </span><span class="lineCov">         25 :   if (parse_token_ds(begin, end, '[')) {</span>
+<span class="lineNum">     334 </span><span class="lineCov">         25 :     const char *saved_begin = begin;</span>
+<span class="lineNum">     335 </span><span class="lineCov">         50 :     std::string value = parse_number(begin, end);</span>
+<span class="lineNum">     336 </span><span class="lineCov">         50 :     std::string encoding_str;</span>
+<span class="lineNum">     337 </span><span class="lineCov">         25 :     string_encoding_t encoding = string_encoding_utf_8;</span>
+<span class="lineNum">     338 </span><span class="lineCov">         25 :     int string_size = 0;</span>
+<span class="lineNum">     339 </span><span class="lineCov">         25 :     if (!value.empty()) {</span>
+<span class="lineNum">     340 </span><span class="lineCov">         24 :       string_size = atoi(value.c_str());</span>
+<span class="lineNum">     341 </span><span class="lineCov">         24 :       if (string_size == 0) {</span>
+<span class="lineNum">     342 </span><span class="lineCov">          1 :         throw datashape_parse_error(saved_begin, &quot;string size cannot be zero&quot;);</span>
+<span class="lineNum">     343 </span>            :       }
+<span class="lineNum">     344 </span><span class="lineCov">         23 :       if (parse_token_ds(begin, end, ',')) {</span>
+<span class="lineNum">     345 </span><span class="lineCov">          8 :         saved_begin = begin;</span>
+<span class="lineNum">     346 </span><span class="lineCov">          8 :         if (!parse_quoted_string(begin, end, encoding_str)) {</span>
+<span class="lineNum">     347 </span><span class="lineCov">          1 :           throw datashape_parse_error(saved_begin, &quot;expected a string encoding&quot;);</span>
+<span class="lineNum">     348 </span>            :         }
+<span class="lineNum">     349 </span><span class="lineCov">          7 :         encoding = string_to_encoding(saved_begin, encoding_str);</span>
+<span class="lineNum">     350 </span>            :       }
+<span class="lineNum">     351 </span>            :     }
+<span class="lineNum">     352 </span>            :     else {
+<span class="lineNum">     353 </span><span class="lineCov">          1 :       if (!parse_quoted_string(begin, end, encoding_str)) {</span>
+<span class="lineNum">     354 </span><span class="lineCov">          1 :         throw datashape_parse_error(saved_begin, &quot;expected a size integer&quot;);</span>
+<span class="lineNum">     355 </span>            :       }
+<span class="lineNum">     356 </span><span class="lineNoCov">          0 :       encoding = string_to_encoding(saved_begin, encoding_str);</span>
+<span class="lineNum">     357 </span>            :     }
+<span class="lineNum">     358 </span><span class="lineCov">         22 :     if (!parse_token_ds(begin, end, ']')) {</span>
+<span class="lineNum">     359 </span><span class="lineCov">          1 :       throw datashape_parse_error(begin, &quot;expected closing ']'&quot;);</span>
+<span class="lineNum">     360 </span>            :     }
+<span class="lineNum">     361 </span><span class="lineCov">         21 :     rbegin = begin;</span>
+<span class="lineNum">     362 </span><span class="lineCov">         42 :     return ndt::fixed_string_type::make(string_size, encoding);</span>
+<span class="lineNum">     363 </span>            :   }
+<span class="lineNum">     364 </span>            : 
+<span class="lineNum">     365 </span><span class="lineNoCov">          0 :   throw datashape_parse_error(begin, &quot;expected opening '['&quot;);</span>
+<span class="lineNum">     366 </span>            : }
+<span class="lineNum">     367 </span>            : 
+<a name="368"><span class="lineNum">     368 </span>            : // char_type : char | char[encoding]</a>
+<span class="lineNum">     369 </span>            : // This is called after 'char' is already matched
+<span class="lineNum">     370 </span><span class="lineCov">         12 : static ndt::type parse_char_parameters(const char *&amp;rbegin, const char *end)</span>
+<span class="lineNum">     371 </span>            : {
+<span class="lineNum">     372 </span><span class="lineCov">         12 :   const char *begin = rbegin;</span>
+<span class="lineNum">     373 </span><span class="lineCov">         12 :   if (parse_token_ds(begin, end, '[')) {</span>
+<span class="lineNum">     374 </span><span class="lineCov">          6 :     const char *saved_begin = begin;</span>
+<span class="lineNum">     375 </span><span class="lineCov">         12 :     std::string encoding_str;</span>
+<span class="lineNum">     376 </span><span class="lineCov">          6 :     if (!parse_quoted_string(begin, end, encoding_str)) {</span>
+<span class="lineNum">     377 </span><span class="lineNoCov">          0 :       throw datashape_parse_error(saved_begin, &quot;expected a string encoding&quot;);</span>
+<span class="lineNum">     378 </span>            :     }
+<span class="lineNum">     379 </span>            :     string_encoding_t encoding;
+<span class="lineNum">     380 </span><span class="lineCov">          6 :     if (!encoding_str.empty()) {</span>
+<span class="lineNum">     381 </span><span class="lineCov">          6 :       encoding = string_to_encoding(saved_begin, encoding_str);</span>
+<span class="lineNum">     382 </span>            :     }
+<span class="lineNum">     383 </span>            :     else {
+<span class="lineNum">     384 </span><span class="lineNoCov">          0 :       throw datashape_parse_error(begin, &quot;expected string encoding&quot;);</span>
+<span class="lineNum">     385 </span>            :     }
+<span class="lineNum">     386 </span><span class="lineCov">          6 :     if (!parse_token_ds(begin, end, ']')) {</span>
+<span class="lineNum">     387 </span><span class="lineNoCov">          0 :       throw datashape_parse_error(begin, &quot;expected closing ']'&quot;);</span>
+<span class="lineNum">     388 </span>            :     }
+<span class="lineNum">     389 </span><span class="lineCov">          6 :     rbegin = begin;</span>
+<span class="lineNum">     390 </span><span class="lineCov">          6 :     return ndt::make_type&lt;ndt::char_type&gt;(encoding);</span>
+<span class="lineNum">     391 </span>            :   }
+<span class="lineNum">     392 </span>            :   else {
+<span class="lineNum">     393 </span><span class="lineCov">          6 :     return ndt::make_type&lt;ndt::char_type&gt;();</span>
+<span class="lineNum">     394 </span>            :   }
+<span class="lineNum">     395 </span>            : }
+<span class="lineNum">     396 </span>            : 
+<a name="397"><span class="lineNum">     397 </span>            : // complex_type : complex[float_type]</a>
+<span class="lineNum">     398 </span>            : // This is called after 'complex' is already matched
+<span class="lineNum">     399 </span><span class="lineCov">         17 : static ndt::type parse_complex_parameters(const char *&amp;rbegin, const char *end, map&lt;std::string, ndt::type&gt; &amp;symtable)</span>
+<span class="lineNum">     400 </span>            : {
+<span class="lineNum">     401 </span><span class="lineCov">         17 :   const char *begin = rbegin;</span>
+<span class="lineNum">     402 </span><span class="lineCov">         17 :   if (parse_token_ds(begin, end, '[')) {</span>
+<span class="lineNum">     403 </span><span class="lineCov">          8 :     const char *saved_begin = begin;</span>
+<span class="lineNum">     404 </span><span class="lineCov">         16 :     ndt::type tp = parse_datashape(begin, end, symtable);</span>
+<span class="lineNum">     405 </span><span class="lineCov">          8 :     if (tp.is_null()) {</span>
+<span class="lineNum">     406 </span><span class="lineNoCov">          0 :       throw datashape_parse_error(begin, &quot;expected a type parameter&quot;);</span>
+<span class="lineNum">     407 </span>            :     }
+<span class="lineNum">     408 </span><span class="lineCov">          8 :     if (!parse_token_ds(begin, end, ']')) {</span>
+<span class="lineNum">     409 </span><span class="lineNoCov">          0 :       throw datashape_parse_error(begin, &quot;expected closing ']'&quot;);</span>
+<span class="lineNum">     410 </span>            :     }
+<span class="lineNum">     411 </span><span class="lineCov">          8 :     if (tp.get_id() == float32_id) {</span>
+<span class="lineNum">     412 </span><span class="lineCov">          5 :       rbegin = begin;</span>
+<span class="lineNum">     413 </span><span class="lineCov">          5 :       return ndt::make_type&lt;dynd::complex&lt;float&gt;&gt;();</span>
+<span class="lineNum">     414 </span>            :     }
+<span class="lineNum">     415 </span><span class="lineCov">          3 :     else if (tp.get_id() == float64_id) {</span>
+<span class="lineNum">     416 </span><span class="lineCov">          3 :       rbegin = begin;</span>
+<span class="lineNum">     417 </span><span class="lineCov">          3 :       return ndt::make_type&lt;dynd::complex&lt;double&gt;&gt;();</span>
+<span class="lineNum">     418 </span>            :     }
+<span class="lineNum">     419 </span>            :     else {
+<span class="lineNum">     420 </span><span class="lineNoCov">          0 :       throw datashape_parse_error(saved_begin, &quot;unsupported real type for complex numbers&quot;);</span>
+<span class="lineNum">     421 </span>            :     }
+<span class="lineNum">     422 </span>            :   }
+<span class="lineNum">     423 </span>            :   else {
+<span class="lineNum">     424 </span>            :     // Default to complex[double] if no parameters are provided
+<span class="lineNum">     425 </span><span class="lineCov">          9 :     return ndt::make_type&lt;dynd::complex&lt;double&gt;&gt;();</span>
+<span class="lineNum">     426 </span>            :   }
+<span class="lineNum">     427 </span>            : }
+<span class="lineNum">     428 </span>            : 
+<a name="429"><span class="lineNum">     429 </span>            : // bytes_type : bytes[align=&lt;alignment&gt;]</a>
+<span class="lineNum">     430 </span>            : // This is called after 'bytes' is already matched
+<span class="lineNum">     431 </span><span class="lineCov">          6 : static ndt::type parse_bytes_parameters(const char *&amp;rbegin, const char *end)</span>
+<span class="lineNum">     432 </span>            : {
+<span class="lineNum">     433 </span><span class="lineCov">          6 :   const char *begin = rbegin;</span>
+<span class="lineNum">     434 </span><span class="lineCov">          6 :   if (parse_token_ds(begin, end, '[')) {</span>
+<span class="lineNum">     435 </span><span class="lineCov">          4 :     if (parse_token_ds(begin, end, &quot;align&quot;)) {</span>
+<span class="lineNum">     436 </span>            :       // bytes type with an alignment
+<span class="lineNum">     437 </span><span class="lineCov">          4 :       if (!parse_token_ds(begin, end, '=')) {</span>
+<span class="lineNum">     438 </span><span class="lineNoCov">          0 :         throw datashape_parse_error(begin, &quot;expected an =&quot;);</span>
+<span class="lineNum">     439 </span>            :       }
+<span class="lineNum">     440 </span><span class="lineCov">          8 :       std::string align_val = parse_number(begin, end);</span>
+<span class="lineNum">     441 </span><span class="lineCov">          4 :       if (align_val.empty()) {</span>
+<span class="lineNum">     442 </span><span class="lineNoCov">          0 :         throw datashape_parse_error(begin, &quot;expected an integer&quot;);</span>
+<span class="lineNum">     443 </span>            :       }
+<span class="lineNum">     444 </span><span class="lineCov">          4 :       if (!parse_token_ds(begin, end, ']')) {</span>
+<span class="lineNum">     445 </span><span class="lineNoCov">          0 :         throw datashape_parse_error(begin, &quot;expected closing ']'&quot;);</span>
+<span class="lineNum">     446 </span>            :       }
+<span class="lineNum">     447 </span><span class="lineCov">          4 :       rbegin = begin;</span>
+<span class="lineNum">     448 </span><span class="lineCov">          4 :       return ndt::bytes_type::make(atoi(align_val.c_str()));</span>
+<span class="lineNum">     449 </span>            :     }
+<span class="lineNum">     450 </span><span class="lineNoCov">          0 :     throw datashape_parse_error(begin, &quot;expected 'align'&quot;);</span>
+<span class="lineNum">     451 </span>            :   }
+<span class="lineNum">     452 </span>            :   else {
+<span class="lineNum">     453 </span><span class="lineCov">          2 :     return ndt::bytes_type::make(1);</span>
+<span class="lineNum">     454 </span>            :   }
+<span class="lineNum">     455 </span>            : }
+<span class="lineNum">     456 </span>            : 
+<span class="lineNum">     457 </span>            : // fixed_bytes_type : fixed_bytes[&lt;size&gt;] | fixed_bytes[&lt;size&gt;,
+<a name="458"><span class="lineNum">     458 </span>            : // align=&lt;alignment&gt;]</a>
+<span class="lineNum">     459 </span>            : // This is called after 'fixed_bytes' is already matched
+<span class="lineNum">     460 </span><span class="lineCov">          4 : static ndt::type parse_fixed_bytes_parameters(const char *&amp;rbegin, const char *end)</span>
+<span class="lineNum">     461 </span>            : {
+<span class="lineNum">     462 </span><span class="lineCov">          4 :   const char *begin = rbegin;</span>
+<span class="lineNum">     463 </span><span class="lineCov">          4 :   if (parse_token_ds(begin, end, '[')) {</span>
+<span class="lineNum">     464 </span><span class="lineCov">          8 :     std::string size_val = parse_number(begin, end);</span>
+<span class="lineNum">     465 </span><span class="lineCov">          4 :     if (size_val.empty()) {</span>
+<span class="lineNum">     466 </span><span class="lineNoCov">          0 :       throw datashape_parse_error(begin, &quot;expected 'align' or an integer&quot;);</span>
+<span class="lineNum">     467 </span>            :     }
+<span class="lineNum">     468 </span><span class="lineCov">          4 :     if (parse_token_ds(begin, end, ']')) {</span>
+<span class="lineNum">     469 </span>            :       // Fixed bytes with just a size parameter
+<span class="lineNum">     470 </span><span class="lineCov">          3 :       rbegin = begin;</span>
+<span class="lineNum">     471 </span><span class="lineCov">          3 :       return ndt::make_fixed_bytes(atoi(size_val.c_str()), 1);</span>
+<span class="lineNum">     472 </span>            :     }
+<span class="lineNum">     473 </span><span class="lineCov">          1 :     if (!parse_token_ds(begin, end, ',')) {</span>
+<span class="lineNum">     474 </span><span class="lineNoCov">          0 :       throw datashape_parse_error(begin, &quot;expected closing ']' or another argument&quot;);</span>
+<span class="lineNum">     475 </span>            :     }
+<span class="lineNum">     476 </span><span class="lineCov">          1 :     if (!parse_token_ds(begin, end, &quot;align&quot;)) {</span>
+<span class="lineNum">     477 </span><span class="lineNoCov">          0 :       throw datashape_parse_error(begin, &quot;expected align= parameter&quot;);</span>
+<span class="lineNum">     478 </span>            :     }
+<span class="lineNum">     479 </span><span class="lineCov">          1 :     if (!parse_token_ds(begin, end, '=')) {</span>
+<span class="lineNum">     480 </span><span class="lineNoCov">          0 :       throw datashape_parse_error(begin, &quot;expected an =&quot;);</span>
+<span class="lineNum">     481 </span>            :     }
+<span class="lineNum">     482 </span><span class="lineCov">          2 :     std::string align_val = parse_number(begin, end);</span>
+<span class="lineNum">     483 </span><span class="lineCov">          1 :     if (align_val.empty()) {</span>
+<span class="lineNum">     484 </span><span class="lineNoCov">          0 :       throw datashape_parse_error(begin, &quot;expected an integer&quot;);</span>
+<span class="lineNum">     485 </span>            :     }
+<span class="lineNum">     486 </span><span class="lineCov">          1 :     if (!parse_token_ds(begin, end, ']')) {</span>
+<span class="lineNum">     487 </span><span class="lineNoCov">          0 :       throw datashape_parse_error(begin, &quot;expected closing ']'&quot;);</span>
+<span class="lineNum">     488 </span>            :     }
+<span class="lineNum">     489 </span><span class="lineCov">          1 :     rbegin = begin;</span>
+<span class="lineNum">     490 </span><span class="lineCov">          1 :     return ndt::make_fixed_bytes(atoi(size_val.c_str()), atoi(align_val.c_str()));</span>
+<span class="lineNum">     491 </span>            :   }
+<span class="lineNum">     492 </span><span class="lineNoCov">          0 :   throw datashape_parse_error(begin, &quot;expected opening '['&quot;);</span>
+<span class="lineNum">     493 </span>            : }
+<span class="lineNum">     494 </span>            : 
+<a name="495"><span class="lineNum">     495 </span>            : // c_contiguous_type : C[child_type]</a>
+<span class="lineNum">     496 </span>            : // This is called after 'C' is already matched
+<span class="lineNum">     497 </span><span class="lineCov">         17 : static ndt::type parse_c_contiguous_parameters(const char *&amp;rbegin, const char *end,</span>
+<span class="lineNum">     498 </span>            :                                                map&lt;std::string, ndt::type&gt; &amp;symtable)
+<span class="lineNum">     499 </span>            : {
+<span class="lineNum">     500 </span><span class="lineCov">         17 :   const char *begin = rbegin;</span>
+<span class="lineNum">     501 </span><span class="lineCov">         17 :   if (parse_token_ds(begin, end, '[')) {</span>
+<span class="lineNum">     502 </span><span class="lineCov">         34 :     ndt::type tp = parse_datashape(begin, end, symtable);</span>
+<span class="lineNum">     503 </span><span class="lineCov">         17 :     if (tp.is_null()) {</span>
+<span class="lineNum">     504 </span><span class="lineNoCov">          0 :       throw datashape_parse_error(begin, &quot;expected a type parameter&quot;);</span>
+<span class="lineNum">     505 </span>            :     }
+<span class="lineNum">     506 </span><span class="lineCov">         17 :     if (!parse_token_ds(begin, end, ']')) {</span>
+<span class="lineNum">     507 </span><span class="lineNoCov">          0 :       throw datashape_parse_error(begin, &quot;expected closing ']'&quot;);</span>
+<span class="lineNum">     508 </span>            :     }
+<span class="lineNum">     509 </span><span class="lineCov">         17 :     rbegin = begin;</span>
+<span class="lineNum">     510 </span><span class="lineCov">         34 :     return ndt::c_contiguous_type::make(tp);</span>
+<span class="lineNum">     511 </span>            :   }
+<span class="lineNum">     512 </span>            :   else {
+<span class="lineNum">     513 </span><span class="lineNoCov">          0 :     throw datashape_parse_error(begin, &quot;expected opening '['&quot;);</span>
+<span class="lineNum">     514 </span>            :   }
+<span class="lineNum">     515 </span>            : }
+<span class="lineNum">     516 </span>            : 
+<a name="517"><span class="lineNum">     517 </span>            : // cuda_host_type : cuda_host[storage_type]</a>
+<span class="lineNum">     518 </span>            : // This is called after 'cuda_host' is already matched
+<span class="lineNum">     519 </span><span class="lineNoCov">          0 : static ndt::type parse_cuda_host_parameters(const char *&amp;rbegin, const char *end, map&lt;std::string, ndt::type&gt; &amp;symtable)</span>
+<span class="lineNum">     520 </span>            : {
+<span class="lineNum">     521 </span><span class="lineNoCov">          0 :   const char *begin = rbegin;</span>
+<span class="lineNum">     522 </span><span class="lineNoCov">          0 :   if (parse_token_ds(begin, end, '[')) {</span>
+<span class="lineNum">     523 </span>            : #ifdef DYND_CUDA
+<span class="lineNum">     524 </span>            :     ndt::type tp = parse_datashape(begin, end, symtable);
+<span class="lineNum">     525 </span>            :     if (tp.is_null()) {
+<span class="lineNum">     526 </span>            :       throw datashape_parse_error(begin, &quot;expected a type parameter&quot;);
+<span class="lineNum">     527 </span>            :     }
+<span class="lineNum">     528 </span>            :     if (!parse_token_ds(begin, end, ']')) {
+<span class="lineNum">     529 </span>            :       throw datashape_parse_error(begin, &quot;expected closing ']'&quot;);
+<span class="lineNum">     530 </span>            :     }
+<span class="lineNum">     531 </span>            :     rbegin = begin;
+<span class="lineNum">     532 </span>            :     return ndt::make_cuda_host(tp);
+<span class="lineNum">     533 </span>            : #else
+<span class="lineNum">     534 </span>            :     // Silence the unused parameter warning
+<span class="lineNum">     535 </span><span class="lineNoCov">          0 :     symtable.empty();</span>
+<span class="lineNum">     536 </span><span class="lineNoCov">          0 :     throw datashape_parse_error(begin, &quot;cuda_host type is not available&quot;);</span>
+<span class="lineNum">     537 </span>            : #endif // DYND_CUDA
+<span class="lineNum">     538 </span>            :   }
+<span class="lineNum">     539 </span>            :   else {
+<span class="lineNum">     540 </span><span class="lineNoCov">          0 :     throw datashape_parse_error(begin, &quot;expected opening '['&quot;);</span>
+<span class="lineNum">     541 </span>            :   }
+<span class="lineNum">     542 </span>            : }
+<span class="lineNum">     543 </span>            : 
+<a name="544"><span class="lineNum">     544 </span>            : // cuda_device_type : cuda_device[storage_type]</a>
+<span class="lineNum">     545 </span>            : // This is called after 'cuda_device' is already matched
+<span class="lineNum">     546 </span><span class="lineNoCov">          0 : static ndt::type parse_cuda_device_parameters(const char *&amp;rbegin, const char *end,</span>
+<span class="lineNum">     547 </span>            :                                               map&lt;std::string, ndt::type&gt; &amp;symtable)
+<span class="lineNum">     548 </span>            : {
+<span class="lineNum">     549 </span><span class="lineNoCov">          0 :   const char *begin = rbegin;</span>
+<span class="lineNum">     550 </span><span class="lineNoCov">          0 :   if (parse_token_ds(begin, end, '[')) {</span>
+<span class="lineNum">     551 </span>            : #ifdef DYND_CUDA
+<span class="lineNum">     552 </span>            :     ndt::type tp = parse_datashape(begin, end, symtable);
+<span class="lineNum">     553 </span>            :     if (tp.is_null()) {
+<span class="lineNum">     554 </span>            :       throw datashape_parse_error(begin, &quot;expected a type parameter&quot;);
+<span class="lineNum">     555 </span>            :     }
+<span class="lineNum">     556 </span>            :     if (!parse_token_ds(begin, end, ']')) {
+<span class="lineNum">     557 </span>            :       throw datashape_parse_error(begin, &quot;expected closing ']'&quot;);
+<span class="lineNum">     558 </span>            :     }
+<span class="lineNum">     559 </span>            :     rbegin = begin;
+<span class="lineNum">     560 </span>            :     return ndt::make_cuda_device(tp);
+<span class="lineNum">     561 </span>            : #else
+<span class="lineNum">     562 </span>            :     // Silence the unused parameter warning
+<span class="lineNum">     563 </span><span class="lineNoCov">          0 :     symtable.empty();</span>
+<span class="lineNum">     564 </span><span class="lineNoCov">          0 :     throw datashape_parse_error(begin, &quot;cuda_device type is not available&quot;);</span>
+<span class="lineNum">     565 </span>            : #endif // DYND_CUDA
+<span class="lineNum">     566 </span>            :   }
+<span class="lineNum">     567 </span>            :   else {
+<span class="lineNum">     568 </span><span class="lineNoCov">          0 :     throw datashape_parse_error(begin, &quot;expected opening '['&quot;);</span>
+<span class="lineNum">     569 </span>            :   }
+<a name="570"><span class="lineNum">     570 </span>            : }</a>
+<span class="lineNum">     571 </span>            : 
+<span class="lineNum">     572 </span><span class="lineCov">         12 : static ndt::type parse_pointer_parameters(const char *&amp;rbegin, const char *end, map&lt;std::string, ndt::type&gt; &amp;symtable)</span>
+<span class="lineNum">     573 </span>            : {
+<span class="lineNum">     574 </span><span class="lineCov">         12 :   const char *begin = rbegin;</span>
+<span class="lineNum">     575 </span><span class="lineCov">         12 :   if (!parse_token_ds(begin, end, '[')) {</span>
+<span class="lineNum">     576 </span><span class="lineNoCov">          0 :     throw datashape_parse_error(begin, &quot;expected opening '[' after 'pointer'&quot;);</span>
+<span class="lineNum">     577 </span>            :   }
+<span class="lineNum">     578 </span><span class="lineCov">         24 :   ndt::type tp = parse_datashape(begin, end, symtable);</span>
+<span class="lineNum">     579 </span><span class="lineCov">         12 :   if (tp.is_null()) {</span>
+<span class="lineNum">     580 </span><span class="lineNoCov">          0 :     throw datashape_parse_error(begin, &quot;expected a data type&quot;);</span>
+<span class="lineNum">     581 </span>            :   }
+<span class="lineNum">     582 </span><span class="lineCov">         12 :   if (!parse_token_ds(begin, end, ']')) {</span>
+<span class="lineNum">     583 </span><span class="lineNoCov">          0 :     throw datashape_parse_error(begin, &quot;expected closing ']'&quot;);</span>
+<span class="lineNum">     584 </span>            :   }
+<span class="lineNum">     585 </span>            :   // TODO catch errors, convert them to datashape_parse_error so the position is
+<span class="lineNum">     586 </span>            :   // shown
+<span class="lineNum">     587 </span><span class="lineCov">         12 :   rbegin = begin;</span>
+<span class="lineNum">     588 </span><span class="lineCov">         24 :   return ndt::pointer_type::make(tp);</span>
+<a name="589"><span class="lineNum">     589 </span>            : }</a>
+<span class="lineNum">     590 </span>            : 
+<span class="lineNum">     591 </span><span class="lineCov">          1 : static ndt::type parse_array_parameters(const char *&amp;rbegin, const char *end, map&lt;std::string, ndt::type&gt; &amp;symtable)</span>
+<span class="lineNum">     592 </span>            : {
+<span class="lineNum">     593 </span><span class="lineCov">          1 :   const char *begin = rbegin;</span>
+<span class="lineNum">     594 </span><span class="lineCov">          1 :   if (!parse_token_ds(begin, end, '[')) {</span>
+<span class="lineNum">     595 </span><span class="lineNoCov">          0 :     throw datashape_parse_error(begin, &quot;expected opening '[' after 'array'&quot;);</span>
+<span class="lineNum">     596 </span>            :   }
+<span class="lineNum">     597 </span><span class="lineCov">          2 :   ndt::type tp = parse_datashape(begin, end, symtable);</span>
+<span class="lineNum">     598 </span><span class="lineCov">          1 :   if (tp.is_null()) {</span>
+<span class="lineNum">     599 </span><span class="lineNoCov">          0 :     throw datashape_parse_error(begin, &quot;expected a data type&quot;);</span>
+<span class="lineNum">     600 </span>            :   }
+<span class="lineNum">     601 </span><span class="lineCov">          1 :   if (!parse_token_ds(begin, end, ']')) {</span>
+<span class="lineNum">     602 </span><span class="lineNoCov">          0 :     throw datashape_parse_error(begin, &quot;expected closing ']'&quot;);</span>
+<span class="lineNum">     603 </span>            :   }
+<span class="lineNum">     604 </span>            :   // TODO catch errors, convert them to datashape_parse_error so the position is
+<span class="lineNum">     605 </span>            :   // shown
+<span class="lineNum">     606 </span><span class="lineCov">          1 :   rbegin = begin;</span>
+<span class="lineNum">     607 </span><span class="lineCov">          2 :   return ndt::array_type::make(tp);</span>
+<span class="lineNum">     608 </span>            : }
+<span class="lineNum">     609 </span>            : 
+<a name="610"><span class="lineNum">     610 </span>            : // datashape_list : datashape COMMA datashape_list RBRACKET</a>
+<span class="lineNum">     611 </span>            : //                | datashape RBRACKET
+<span class="lineNum">     612 </span><span class="lineCov">          2 : static nd::array parse_datashape_list(const char *&amp;rbegin, const char *end, map&lt;std::string, ndt::type&gt; &amp;symtable)</span>
+<span class="lineNum">     613 </span>            : {
+<span class="lineNum">     614 </span><span class="lineCov">          2 :   const char *begin = rbegin;</span>
+<span class="lineNum">     615 </span>            : 
+<span class="lineNum">     616 </span><span class="lineCov">          4 :   vector&lt;ndt::type&gt; dlist;</span>
+<span class="lineNum">     617 </span><span class="lineCov">          4 :   ndt::type arg = parse_datashape(begin, end, symtable);</span>
+<span class="lineNum">     618 </span><span class="lineCov">          2 :   if (arg.is_null()) {</span>
+<span class="lineNum">     619 </span><span class="lineNoCov">          0 :     return nd::array();</span>
+<span class="lineNum">     620 </span>            :   }
+<span class="lineNum">     621 </span><span class="lineCov">          2 :   dlist.push_back(arg);</span>
+<span class="lineNum">     622 </span><span class="lineCov">          4 :   for (;;) {</span>
+<span class="lineNum">     623 </span><span class="lineCov">          6 :     if (!parse_token_ds(begin, end, ',')) {</span>
+<span class="lineNum">     624 </span><span class="lineCov">          2 :       if (!parse_token_ds(begin, end, ']')) {</span>
+<span class="lineNum">     625 </span><span class="lineNoCov">          0 :         return nd::array();</span>
+<span class="lineNum">     626 </span>            :       }
+<span class="lineNum">     627 </span>            :       else {
+<span class="lineNum">     628 </span><span class="lineCov">          2 :         break;</span>
+<span class="lineNum">     629 </span>            :       }
+<span class="lineNum">     630 </span>            :     }
+<span class="lineNum">     631 </span><span class="lineCov">          4 :     arg = parse_datashape(begin, end, symtable);</span>
+<span class="lineNum">     632 </span><span class="lineCov">          4 :     if (arg.is_null()) {</span>
+<span class="lineNum">     633 </span><span class="lineNoCov">          0 :       throw datashape_parse_error(begin, &quot;Expected a dynd type or a terminating ']'&quot;);</span>
+<span class="lineNum">     634 </span>            :     }
+<span class="lineNum">     635 </span><span class="lineCov">          4 :     dlist.push_back(arg);</span>
+<span class="lineNum">     636 </span>            :   }
+<span class="lineNum">     637 </span>            : 
+<span class="lineNum">     638 </span><span class="lineCov">          2 :   rbegin = begin;</span>
+<span class="lineNum">     639 </span><span class="lineCov">          2 :   return dlist;</span>
+<span class="lineNum">     640 </span>            : }
+<span class="lineNum">     641 </span>            : 
+<a name="642"><span class="lineNum">     642 </span>            : // integer_list : INTEGER COMMA integer_list RBRACKET</a>
+<span class="lineNum">     643 </span>            : //              | INTEGER RBRACKET
+<span class="lineNum">     644 </span><span class="lineCov">          7 : static nd::array parse_integer_list(const char *&amp;rbegin, const char *end)</span>
+<span class="lineNum">     645 </span>            : {
+<span class="lineNum">     646 </span><span class="lineCov">          7 :   const char *begin = rbegin;</span>
+<span class="lineNum">     647 </span>            : 
+<span class="lineNum">     648 </span><span class="lineCov">         14 :   vector&lt;int64_t&gt; dlist;</span>
+<span class="lineNum">     649 </span>            :   const char *strbegin, *strend;
+<span class="lineNum">     650 </span><span class="lineCov">          7 :   if (!parse_int_no_ws(begin, end, strbegin, strend)) {</span>
+<span class="lineNum">     651 </span><span class="lineCov">          2 :     return nd::array();</span>
+<span class="lineNum">     652 </span>            :   }
+<span class="lineNum">     653 </span><span class="lineCov">          5 :   dlist.push_back(parse&lt;int64_t&gt;(strbegin, strend));</span>
+<span class="lineNum">     654 </span><span class="lineCov">          6 :   for (;;) {</span>
+<span class="lineNum">     655 </span><span class="lineCov">         11 :     if (!parse_token_ds(begin, end, ',')) {</span>
+<span class="lineNum">     656 </span><span class="lineCov">          5 :       if (parse_token_ds(begin, end, ']')) {</span>
+<span class="lineNum">     657 </span><span class="lineCov">          3 :         rbegin = begin;</span>
+<span class="lineNum">     658 </span><span class="lineCov">          3 :         return dlist;</span>
+<span class="lineNum">     659 </span>            :       }
+<span class="lineNum">     660 </span>            :       else {
+<span class="lineNum">     661 </span><span class="lineCov">          2 :         return nd::array();</span>
+<span class="lineNum">     662 </span>            :       }
+<span class="lineNum">     663 </span>            :     }
+<span class="lineNum">     664 </span><span class="lineCov">          6 :     skip_whitespace_and_pound_comments(begin, end);</span>
+<span class="lineNum">     665 </span><span class="lineCov">          6 :     if (!parse_int_no_ws(begin, end, strbegin, strend)) {</span>
+<span class="lineNum">     666 </span><span class="lineNoCov">          0 :       throw datashape_parse_error(begin, &quot;Expected an integer or a terminating ']'&quot;);</span>
+<span class="lineNum">     667 </span>            :     }
+<span class="lineNum">     668 </span><span class="lineCov">          6 :     dlist.push_back(parse&lt;int64_t&gt;(strbegin, strend));</span>
+<span class="lineNum">     669 </span>            :   }
+<span class="lineNum">     670 </span>            : }
+<span class="lineNum">     671 </span>            : 
+<a name="672"><span class="lineNum">     672 </span>            : // string_list : STRING COMMA string_list RBRACKET</a>
+<span class="lineNum">     673 </span>            : //             | STRING RBRACKET
+<span class="lineNum">     674 </span><span class="lineCov">          4 : static nd::array parse_string_list(const char *&amp;rbegin, const char *end)</span>
+<span class="lineNum">     675 </span>            : {
+<span class="lineNum">     676 </span><span class="lineCov">          4 :   const char *begin = rbegin;</span>
+<span class="lineNum">     677 </span>            : 
+<span class="lineNum">     678 </span><span class="lineCov">          8 :   vector&lt;std::string&gt; dlist;</span>
+<span class="lineNum">     679 </span><span class="lineCov">          8 :   std::string str;</span>
+<span class="lineNum">     680 </span><span class="lineCov">          4 :   if (!parse_quoted_string(begin, end, str)) {</span>
+<span class="lineNum">     681 </span><span class="lineCov">          2 :     return nd::array();</span>
+<span class="lineNum">     682 </span>            :   }
+<span class="lineNum">     683 </span><span class="lineCov">          2 :   dlist.push_back(str);</span>
+<span class="lineNum">     684 </span><span class="lineCov">          2 :   for (;;) {</span>
+<span class="lineNum">     685 </span><span class="lineCov">          4 :     if (!parse_token_ds(begin, end, ',')) {</span>
+<span class="lineNum">     686 </span><span class="lineCov">          2 :       if (!parse_token_ds(begin, end, ']')) {</span>
+<span class="lineNum">     687 </span><span class="lineNoCov">          0 :         return nd::array();</span>
+<span class="lineNum">     688 </span>            :       }
+<span class="lineNum">     689 </span>            :       else {
+<span class="lineNum">     690 </span><span class="lineCov">          2 :         break;</span>
+<span class="lineNum">     691 </span>            :       }
+<span class="lineNum">     692 </span>            :     }
+<span class="lineNum">     693 </span><span class="lineCov">          2 :     if (!parse_quoted_string(begin, end, str)) {</span>
+<span class="lineNum">     694 </span><span class="lineNoCov">          0 :       throw datashape_parse_error(begin, &quot;Expected a string&quot;);</span>
+<span class="lineNum">     695 </span>            :     }
+<span class="lineNum">     696 </span><span class="lineCov">          2 :     dlist.push_back(str);</span>
+<span class="lineNum">     697 </span>            :   }
+<span class="lineNum">     698 </span>            : 
+<span class="lineNum">     699 </span><span class="lineCov">          2 :   rbegin = begin;</span>
+<span class="lineNum">     700 </span><span class="lineCov">          2 :   return dlist;</span>
+<span class="lineNum">     701 </span>            : }
+<span class="lineNum">     702 </span>            : 
+<span class="lineNum">     703 </span>            : // list_type_arg : LBRACKET RBRACKET
+<span class="lineNum">     704 </span>            : //               | LBRACKET datashape_list
+<span class="lineNum">     705 </span>            : //               | LBRACKET integer_list
+<span class="lineNum">     706 </span>            : //               | LBRACKET string_list
+<span class="lineNum">     707 </span>            : // type_arg : datashape
+<span class="lineNum">     708 </span>            : //          | INTEGER
+<a name="709"><span class="lineNum">     709 </span>            : //          | STRING</a>
+<span class="lineNum">     710 </span>            : //          | list_type_arg
+<span class="lineNum">     711 </span><span class="lineCov">         19 : static nd::array parse_type_arg(const char *&amp;rbegin, const char *end, map&lt;std::string, ndt::type&gt; &amp;symtable)</span>
+<span class="lineNum">     712 </span>            : {
+<span class="lineNum">     713 </span><span class="lineCov">         19 :   const char *begin = rbegin;</span>
+<span class="lineNum">     714 </span>            : 
+<span class="lineNum">     715 </span><span class="lineCov">         19 :   skip_whitespace_and_pound_comments(begin, end);</span>
+<span class="lineNum">     716 </span>            : 
+<span class="lineNum">     717 </span>            :   const char *strbegin, *strend;
+<span class="lineNum">     718 </span><span class="lineCov">         19 :   if (parse_int_no_ws(begin, end, strbegin, strend)) {</span>
+<span class="lineNum">     719 </span><span class="lineCov">          6 :     rbegin = begin;</span>
+<span class="lineNum">     720 </span><span class="lineCov">          6 :     return parse&lt;int64_t&gt;(strbegin, strend);</span>
+<span class="lineNum">     721 </span>            :   }
+<span class="lineNum">     722 </span>            : 
+<span class="lineNum">     723 </span><span class="lineCov">         26 :   std::string str;</span>
+<span class="lineNum">     724 </span><span class="lineCov">         13 :   if (parse_quoted_string(begin, end, str)) {</span>
+<span class="lineNum">     725 </span><span class="lineCov">          4 :     rbegin = begin;</span>
+<span class="lineNum">     726 </span><span class="lineCov">          4 :     return str;</span>
+<span class="lineNum">     727 </span>            :   }
+<span class="lineNum">     728 </span>            : 
+<span class="lineNum">     729 </span><span class="lineCov">          9 :   if (parse_token(begin, end, '[')) {</span>
+<span class="lineNum">     730 </span><span class="lineCov">         14 :     nd::array result;</span>
+<span class="lineNum">     731 </span><span class="lineCov">          7 :     result = parse_integer_list(begin, end);</span>
+<span class="lineNum">     732 </span><span class="lineCov">          7 :     if (result.is_null()) {</span>
+<span class="lineNum">     733 </span><span class="lineCov">          4 :       result = parse_string_list(begin, end);</span>
+<span class="lineNum">     734 </span>            :     }
+<span class="lineNum">     735 </span><span class="lineCov">          7 :     if (result.is_null()) {</span>
+<span class="lineNum">     736 </span><span class="lineCov">          2 :       result = parse_datashape_list(begin, end, symtable);</span>
+<span class="lineNum">     737 </span>            :     }
+<span class="lineNum">     738 </span><span class="lineCov">          7 :     if (result.is_null()) {</span>
+<span class="lineNum">     739 </span><span class="lineNoCov">          0 :       result = nd::empty(0, ndt::make_type&lt;void&gt;());</span>
+<span class="lineNum">     740 </span>            :     }
+<span class="lineNum">     741 </span><span class="lineCov">          7 :     rbegin = begin;</span>
+<span class="lineNum">     742 </span><span class="lineCov">          7 :     return result;</span>
+<span class="lineNum">     743 </span>            :   }
+<span class="lineNum">     744 </span>            : 
+<span class="lineNum">     745 </span><span class="lineCov">          4 :   ndt::type tp = parse_datashape(begin, end, symtable);</span>
+<span class="lineNum">     746 </span><span class="lineCov">          2 :   if (!tp.is_null()) {</span>
+<span class="lineNum">     747 </span><span class="lineCov">          2 :     rbegin = begin;</span>
+<span class="lineNum">     748 </span><span class="lineCov">          2 :     return tp;</span>
+<span class="lineNum">     749 </span>            :   }
+<span class="lineNum">     750 </span>            : 
+<span class="lineNum">     751 </span><span class="lineNoCov">          0 :   return nd::array();</span>
+<span class="lineNum">     752 </span>            : }
+<span class="lineNum">     753 </span>            : 
+<span class="lineNum">     754 </span>            : // type_arg_list : type_arg COMMA type_arg_list
+<span class="lineNum">     755 </span>            : //               | type_kwarg_list
+<span class="lineNum">     756 </span>            : //               | type_arg
+<span class="lineNum">     757 </span>            : // type_kwarg_list : type_kwarg COMMA type_kwarg_list
+<span class="lineNum">     758 </span>            : //                 | type_kwarg
+<a name="759"><span class="lineNum">     759 </span>            : // type_kwarg : NAME_LOWER EQUAL type_arg</a>
+<span class="lineNum">     760 </span>            : // type_constr_args : LBRACKET type_arg_list RBRACKET
+<span class="lineNum">     761 </span><span class="lineCov">          6 : nd::array dynd::parse_type_constr_args(const char *&amp;rbegin, const char *end, map&lt;std::string, ndt::type&gt; &amp;symtable)</span>
+<span class="lineNum">     762 </span>            : {
+<span class="lineNum">     763 </span><span class="lineCov">         12 :   nd::array result;</span>
+<span class="lineNum">     764 </span>            : 
+<span class="lineNum">     765 </span><span class="lineCov">          6 :   const char *begin = rbegin;</span>
+<span class="lineNum">     766 </span><span class="lineCov">          6 :   if (!parse_token_ds(begin, end, '[')) {</span>
+<span class="lineNum">     767 </span>            :     // Return an empty array if there is no leading bracket
+<span class="lineNum">     768 </span><span class="lineNoCov">          0 :     return result;</span>
+<span class="lineNum">     769 </span>            :   }
+<span class="lineNum">     770 </span>            : 
+<span class="lineNum">     771 </span><span class="lineCov">          6 :   if (parse_token_ds(begin, end, ']')) {</span>
+<span class="lineNum">     772 </span><span class="lineCov">          1 :     return nd::empty(ndt::tuple_type::make({ndt::tuple_type::make(), ndt::struct_type::make()}));</span>
+<span class="lineNum">     773 </span>            :   }
+<span class="lineNum">     774 </span>            : 
+<span class="lineNum">     775 </span><span class="lineCov">         10 :   vector&lt;nd::array&gt; pos_args;</span>
+<span class="lineNum">     776 </span><span class="lineCov">         10 :   vector&lt;nd::array&gt; kw_args;</span>
+<span class="lineNum">     777 </span><span class="lineCov">         10 :   vector&lt;std::string&gt; kw_names;</span>
+<span class="lineNum">     778 </span>            : 
+<span class="lineNum">     779 </span>            :   const char *field_name_begin, *field_name_end;
+<span class="lineNum">     780 </span><span class="lineCov">          5 :   bool done = false;</span>
+<span class="lineNum">     781 </span>            : 
+<span class="lineNum">     782 </span>            :   // First parse all the positional arguments
+<span class="lineNum">     783 </span><span class="lineCov">         11 :   for (;;) {</span>
+<span class="lineNum">     784 </span><span class="lineCov">         16 :     skip_whitespace_and_pound_comments(begin, end);</span>
+<span class="lineNum">     785 </span>            :     // Look ahead to see the ']' or whether there's a keyword argument
+<span class="lineNum">     786 </span><span class="lineCov">         16 :     const char *saved_begin = begin;</span>
+<span class="lineNum">     787 </span><span class="lineCov">         16 :     if (parse_name_no_ws(begin, end, field_name_begin, field_name_end) &amp;&amp; parse_token_ds(begin, end, ':')) {</span>
+<span class="lineNum">     788 </span><span class="lineCov">          3 :       begin = saved_begin;</span>
+<span class="lineNum">     789 </span><span class="lineCov">          8 :       break;</span>
+<span class="lineNum">     790 </span>            :     }
+<span class="lineNum">     791 </span><span class="lineCov">         13 :     begin = saved_begin;</span>
+<span class="lineNum">     792 </span>            :     // Parse one positional argument
+<span class="lineNum">     793 </span><span class="lineCov">         24 :     nd::array arg = parse_type_arg(begin, end, symtable);</span>
+<span class="lineNum">     794 </span><span class="lineCov">         13 :     if (arg.is_null()) {</span>
+<span class="lineNum">     795 </span><span class="lineNoCov">          0 :       throw datashape_parse_error(saved_begin, &quot;Expected a positional or keyword type argument&quot;);</span>
+<span class="lineNum">     796 </span>            :     }
+<span class="lineNum">     797 </span><span class="lineCov">         13 :     pos_args.push_back(arg);</span>
+<span class="lineNum">     798 </span><span class="lineCov">         13 :     if (!parse_token_ds(begin, end, ',')) {</span>
+<span class="lineNum">     799 </span><span class="lineCov">          2 :       if (parse_token_ds(begin, end, ']')) {</span>
+<span class="lineNum">     800 </span><span class="lineCov">          2 :         done = true;</span>
+<span class="lineNum">     801 </span>            :       }
+<span class="lineNum">     802 </span><span class="lineCov">          2 :       break;</span>
+<span class="lineNum">     803 </span>            :     }
+<span class="lineNum">     804 </span>            :   }
+<span class="lineNum">     805 </span>            : 
+<span class="lineNum">     806 </span>            :   // Now parse all the keyword arguments
+<span class="lineNum">     807 </span><span class="lineCov">          5 :   if (!done) {</span>
+<span class="lineNum">     808 </span><span class="lineCov">          3 :     for (;;) {</span>
+<span class="lineNum">     809 </span><span class="lineCov">          6 :       const char *saved_begin = begin;</span>
+<span class="lineNum">     810 </span><span class="lineCov">          6 :       skip_whitespace_and_pound_comments(begin, end);</span>
+<span class="lineNum">     811 </span><span class="lineCov">          6 :       if (!parse_name_no_ws(begin, end, field_name_begin, field_name_end)) {</span>
+<span class="lineNum">     812 </span><span class="lineNoCov">          0 :         throw datashape_parse_error(saved_begin, &quot;Expected a keyword name or terminating ']'&quot;);</span>
+<span class="lineNum">     813 </span>            :       }
+<span class="lineNum">     814 </span><span class="lineCov">          6 :       if (!parse_token_ds(begin, end, ':')) {</span>
+<span class="lineNum">     815 </span><span class="lineNoCov">          0 :         throw datashape_parse_error(begin, &quot;Expected ':' between keyword name and parameter&quot;);</span>
+<span class="lineNum">     816 </span>            :       }
+<span class="lineNum">     817 </span><span class="lineCov">          9 :       nd::array arg = parse_type_arg(begin, end, symtable);</span>
+<span class="lineNum">     818 </span><span class="lineCov">          6 :       if (arg.is_null()) {</span>
+<span class="lineNum">     819 </span><span class="lineNoCov">          0 :         throw datashape_parse_error(begin, &quot;Expected keyword argument value&quot;);</span>
+<span class="lineNum">     820 </span>            :       }
+<span class="lineNum">     821 </span><span class="lineCov">          6 :       kw_args.push_back(arg);</span>
+<span class="lineNum">     822 </span><span class="lineCov">          6 :       kw_names.push_back(std::string(field_name_begin, field_name_end));</span>
+<span class="lineNum">     823 </span><span class="lineCov">          6 :       if (!parse_token_ds(begin, end, ',')) {</span>
+<span class="lineNum">     824 </span><span class="lineCov">          3 :         if (!parse_token_ds(begin, end, ']')) {</span>
+<span class="lineNum">     825 </span><span class="lineNoCov">          0 :           throw datashape_parse_error(begin, &quot;Expected a ',' or ']'&quot;);</span>
+<span class="lineNum">     826 </span>            :         }
+<span class="lineNum">     827 </span>            :         else {
+<span class="lineNum">     828 </span><span class="lineCov">          3 :           break;</span>
+<span class="lineNum">     829 </span>            :         }
+<span class="lineNum">     830 </span>            :       }
+<span class="lineNum">     831 </span>            :     }
+<span class="lineNum">     832 </span>            :   }
+<span class="lineNum">     833 </span>            : 
+<span class="lineNum">     834 </span>            :   // Create type &quot;((type0, ...), {kw0: kwtype0, ...})&quot;
+<a name="835"><span class="lineNum">     835 </span><span class="lineCov">         10 :   vector&lt;ndt::type&gt; pos_arg_types;</span></a>
+<span class="lineNum">     836 </span>            :   transform(pos_args.begin(), pos_args.end(), back_inserter(pos_arg_types),
+<span class="lineNum">     837 </span><span class="lineCov">         18 :             [](const nd::array &amp;a) { return a.get_type(); });</span>
+<span class="lineNum">     838 </span>            : 
+<a name="839"><span class="lineNum">     839 </span><span class="lineCov">         10 :   vector&lt;ndt::type&gt; kw_arg_types;</span></a>
+<span class="lineNum">     840 </span>            :   transform(kw_args.begin(), kw_args.end(), back_inserter(kw_arg_types),
+<span class="lineNum">     841 </span><span class="lineCov">         11 :             [](const nd::array &amp;a) { return a.get_type(); });</span>
+<span class="lineNum">     842 </span>            : 
+<span class="lineNum">     843 </span>            :   ndt::type result_tp =
+<span class="lineNum">     844 </span><span class="lineCov">         10 :       ndt::tuple_type::make({ndt::tuple_type::make(pos_arg_types), ndt::struct_type::make(kw_names, kw_arg_types)});</span>
+<span class="lineNum">     845 </span>            : 
+<span class="lineNum">     846 </span><span class="lineCov">          5 :   result = nd::empty(result_tp);</span>
+<span class="lineNum">     847 </span><span class="lineCov">         10 :   nd::array pos = result(0);</span>
+<span class="lineNum">     848 </span><span class="lineCov">         18 :   for (size_t i = 0; i != pos_args.size(); ++i) {</span>
+<span class="lineNum">     849 </span><span class="lineCov">         13 :     pos.vals_at(i) = pos_args[i];</span>
+<span class="lineNum">     850 </span>            :   }
+<span class="lineNum">     851 </span><span class="lineCov">         10 :   nd::array kw = result(1);</span>
+<span class="lineNum">     852 </span><span class="lineCov">         11 :   for (size_t i = 0; i != kw_args.size(); ++i) {</span>
+<span class="lineNum">     853 </span><span class="lineCov">          6 :     kw.vals_at(i) = kw_args[i];</span>
+<span class="lineNum">     854 </span>            :   }
+<span class="lineNum">     855 </span>            : 
+<span class="lineNum">     856 </span><span class="lineCov">          5 :   rbegin = begin;</span>
+<span class="lineNum">     857 </span><span class="lineCov">          5 :   return result;</span>
+<span class="lineNum">     858 </span>            : }
+<a name="859"><span class="lineNum">     859 </span>            : </a>
+<span class="lineNum">     860 </span>            : // record_item_bare : BARENAME COLON rhs_expression
+<span class="lineNum">     861 </span><span class="lineCov">         48 : static bool parse_struct_item_bare(const char *&amp;rbegin, const char *end, map&lt;std::string, ndt::type&gt; &amp;symtable,</span>
+<span class="lineNum">     862 </span>            :                                    std::string &amp;out_field_name, ndt::type &amp;out_field_type)
+<span class="lineNum">     863 </span>            : {
+<span class="lineNum">     864 </span><span class="lineCov">         48 :   const char *begin = rbegin;</span>
+<span class="lineNum">     865 </span>            :   const char *field_name_begin, *field_name_end;
+<span class="lineNum">     866 </span><span class="lineCov">         48 :   skip_whitespace_and_pound_comments(begin, end);</span>
+<span class="lineNum">     867 </span><span class="lineCov">         48 :   if (parse_name_no_ws(begin, end, field_name_begin, field_name_end)) {</span>
+<span class="lineNum">     868 </span>            :     // We successfully parsed a name with no whitespace
+<span class="lineNum">     869 </span>            :     // We don't need to do anything else, because field_name_begin
+<span class="lineNum">     870 </span>            :   }
+<span class="lineNum">     871 </span>            :   else {
+<span class="lineNum">     872 </span>            :     // This struct item cannot be parsed. Ergo, we return false for failure.
+<span class="lineNum">     873 </span><span class="lineCov">          1 :     return false;</span>
+<span class="lineNum">     874 </span>            :   }
+<span class="lineNum">     875 </span><span class="lineCov">         47 :   if (!parse_token_ds(begin, end, ':')) {</span>
+<span class="lineNum">     876 </span><span class="lineNoCov">          0 :     throw datashape_parse_error(begin, &quot;expected ':' after record item name&quot;);</span>
+<span class="lineNum">     877 </span>            :   }
+<span class="lineNum">     878 </span><span class="lineCov">         47 :   out_field_type = parse_datashape(begin, end, symtable);</span>
+<span class="lineNum">     879 </span><span class="lineCov">         47 :   if (out_field_type.is_null()) {</span>
+<span class="lineNum">     880 </span><span class="lineNoCov">          0 :     throw datashape_parse_error(begin, &quot;expected a data type&quot;);</span>
+<span class="lineNum">     881 </span>            :   }
+<span class="lineNum">     882 </span>            : 
+<span class="lineNum">     883 </span><span class="lineCov">         47 :   out_field_name.assign(field_name_begin, field_name_end);</span>
+<span class="lineNum">     884 </span><span class="lineCov">         47 :   rbegin = begin;</span>
+<span class="lineNum">     885 </span><span class="lineCov">         47 :   return true;</span>
+<span class="lineNum">     886 </span>            : }
+<span class="lineNum">     887 </span>            : 
+<a name="888"><span class="lineNum">     888 </span>            : // struct_item_general : struct_item_bare |</a>
+<span class="lineNum">     889 </span>            : //                       QUOTEDNAME COLON rhs_expression
+<span class="lineNum">     890 </span><span class="lineCov">        327 : static bool parse_struct_item_general(const char *&amp;rbegin, const char *end, map&lt;std::string, ndt::type&gt; &amp;symtable,</span>
+<span class="lineNum">     891 </span>            :                                       std::string &amp;out_field_name, ndt::type &amp;out_field_type)
+<span class="lineNum">     892 </span>            : {
+<span class="lineNum">     893 </span><span class="lineCov">        327 :   const char *begin = rbegin;</span>
+<span class="lineNum">     894 </span>            :   const char *field_name_begin, *field_name_end;
+<span class="lineNum">     895 </span>            :   // quoted_out_val and quoted_name are used to hold the field name and to
+<span class="lineNum">     896 </span>            :   // denote if the data given
+<span class="lineNum">     897 </span>            :   //  to this function needed special handling due to quoting of the struct
+<span class="lineNum">     898 </span>            :   //  field names.
+<span class="lineNum">     899 </span><span class="lineCov">        654 :   std::string quoted_out_val;</span>
+<span class="lineNum">     900 </span><span class="lineCov">        327 :   bool quoted_name = false;</span>
+<span class="lineNum">     901 </span><span class="lineCov">        327 :   skip_whitespace_and_pound_comments(begin, end);</span>
+<span class="lineNum">     902 </span><span class="lineCov">        327 :   if (parse_name_no_ws(begin, end, field_name_begin, field_name_end)) {</span>
+<span class="lineNum">     903 </span>            :     // We successfully parsed a name with no whitespace
+<span class="lineNum">     904 </span>            :     // We don't need to do anything else, because field_name_begin
+<span class="lineNum">     905 </span>            :   }
+<span class="lineNum">     906 </span><span class="lineCov">         68 :   else if (parse_quoted_string(begin, end, quoted_out_val)) {</span>
+<span class="lineNum">     907 </span>            :     // parse_quoted_string must return a new string for us to use because it
+<span class="lineNum">     908 </span>            :     // will parse
+<span class="lineNum">     909 </span>            :     //  and potentially replace things in the string (like escaped characters)
+<span class="lineNum">     910 </span>            :     // It will also remove the surrounding quotes.
+<span class="lineNum">     911 </span><span class="lineCov">         68 :     quoted_name = true;</span>
+<span class="lineNum">     912 </span>            :   }
+<span class="lineNum">     913 </span>            :   else {
+<span class="lineNum">     914 </span>            :     // This struct item cannot be parsed. Ergo, we return false for failure.
+<span class="lineNum">     915 </span><span class="lineNoCov">          0 :     return false;</span>
+<span class="lineNum">     916 </span>            :   }
+<span class="lineNum">     917 </span><span class="lineCov">        327 :   if (!parse_token_ds(begin, end, ':')) {</span>
+<span class="lineNum">     918 </span><span class="lineCov">          4 :     throw datashape_parse_error(begin, &quot;expected ':' after record item name&quot;);</span>
+<span class="lineNum">     919 </span>            :   }
+<span class="lineNum">     920 </span><span class="lineCov">        323 :   out_field_type = parse_datashape(begin, end, symtable);</span>
+<span class="lineNum">     921 </span><span class="lineCov">        321 :   if (out_field_type.is_null()) {</span>
+<span class="lineNum">     922 </span><span class="lineCov">          1 :     throw datashape_parse_error(begin, &quot;expected a data type&quot;);</span>
+<span class="lineNum">     923 </span>            :   }
+<span class="lineNum">     924 </span>            : 
+<span class="lineNum">     925 </span><span class="lineCov">        320 :   if (!quoted_name) {</span>
+<span class="lineNum">     926 </span>            :     // A name that isn't quoted is probably the common case
+<span class="lineNum">     927 </span><span class="lineCov">        252 :     out_field_name.assign(field_name_begin, field_name_end);</span>
+<span class="lineNum">     928 </span>            :   }
+<span class="lineNum">     929 </span>            :   else {
+<span class="lineNum">     930 </span>            :     // If a field name was quoted, parse_quoted_string() will have parsed and
+<span class="lineNum">     931 </span>            :     // un/re-escaped everything and returned a new string
+<span class="lineNum">     932 </span>            :     // The Return of the String is why we have two different
+<span class="lineNum">     933 </span>            :     // out_field_name.assign() cases
+<span class="lineNum">     934 </span><span class="lineCov">         68 :     out_field_name.assign(quoted_out_val);</span>
+<span class="lineNum">     935 </span>            :   }
+<span class="lineNum">     936 </span><span class="lineCov">        320 :   rbegin = begin;</span>
+<span class="lineNum">     937 </span><span class="lineCov">        320 :   return true;</span>
+<span class="lineNum">     938 </span>            : }
+<a name="939"><span class="lineNum">     939 </span>            : </a>
+<span class="lineNum">     940 </span>            : // struct : LBRACE record_item record_item* RBRACE
+<span class="lineNum">     941 </span><span class="lineCov">       4122 : static ndt::type parse_struct(const char *&amp;rbegin, const char *end, map&lt;std::string, ndt::type&gt; &amp;symtable)</span>
+<span class="lineNum">     942 </span>            : {
+<span class="lineNum">     943 </span><span class="lineCov">       4122 :   const char *begin = rbegin;</span>
+<span class="lineNum">     944 </span><span class="lineCov">       8244 :   vector&lt;std::string&gt; field_name_list;</span>
+<span class="lineNum">     945 </span><span class="lineCov">       8244 :   vector&lt;ndt::type&gt; field_type_list;</span>
+<span class="lineNum">     946 </span><span class="lineCov">       8244 :   std::string field_name;</span>
+<span class="lineNum">     947 </span><span class="lineCov">       8244 :   ndt::type field_type;</span>
+<span class="lineNum">     948 </span><span class="lineCov">       4122 :   bool variadic = false;</span>
+<span class="lineNum">     949 </span>            : 
+<span class="lineNum">     950 </span><span class="lineCov">       4122 :   if (!parse_token_ds(begin, end, '{')) {</span>
+<span class="lineNum">     951 </span><span class="lineCov">       3955 :     return ndt::type(uninitialized_id);</span>
+<span class="lineNum">     952 </span>            :   }
+<span class="lineNum">     953 </span><span class="lineCov">        167 :   if (parse_token_ds(begin, end, '}')) {</span>
+<span class="lineNum">     954 </span>            :     // Empty struct
+<span class="lineNum">     955 </span><span class="lineCov">          2 :     rbegin = begin;</span>
+<span class="lineNum">     956 </span><span class="lineCov">          2 :     return ndt::struct_type::make();</span>
+<span class="lineNum">     957 </span>            :   }
+<span class="lineNum">     958 </span><span class="lineCov">        183 :   for (;;) {</span>
+<span class="lineNum">     959 </span><span class="lineCov">        348 :     if (parse_token_ds(begin, end, &quot;...&quot;)) {</span>
+<span class="lineNum">     960 </span><span class="lineCov">         21 :       if (!parse_token_ds(begin, end, '}')) {</span>
+<span class="lineNum">     961 </span><span class="lineNoCov">          0 :         throw datashape_parse_error(begin, &quot;expected '}'&quot;);</span>
+<span class="lineNum">     962 </span>            :       }
+<span class="lineNum">     963 </span><span class="lineCov">         21 :       variadic = true;</span>
+<span class="lineNum">     964 </span><span class="lineCov">         21 :       break;</span>
+<span class="lineNum">     965 </span>            :     }
+<span class="lineNum">     966 </span>            : 
+<span class="lineNum">     967 </span><span class="lineCov">        327 :     const char *saved_begin = begin;</span>
+<span class="lineNum">     968 </span><span class="lineCov">        327 :     skip_whitespace_and_pound_comments(begin, end);</span>
+<span class="lineNum">     969 </span><span class="lineCov">        327 :     if (parse_struct_item_general(begin, end, symtable, field_name, field_type)) {</span>
+<span class="lineNum">     970 </span><span class="lineCov">        320 :       field_name_list.push_back(field_name);</span>
+<span class="lineNum">     971 </span><span class="lineCov">        320 :       field_type_list.push_back(field_type);</span>
+<span class="lineNum">     972 </span>            :     }
+<span class="lineNum">     973 </span>            :     else {
+<span class="lineNum">     974 </span><span class="lineNoCov">          0 :       throw datashape_parse_error(saved_begin, &quot;expected a record item&quot;);</span>
+<span class="lineNum">     975 </span>            :     }
+<span class="lineNum">     976 </span>            : 
+<span class="lineNum">     977 </span><span class="lineCov">        320 :     if (parse_token_ds(begin, end, ',')) {</span>
+<span class="lineNum">     978 </span><span class="lineCov">        195 :       if (!field_name_list.empty() &amp;&amp; parse_token_ds(begin, end, '}')) {</span>
+<span class="lineNum">     979 </span><span class="lineCov">         12 :         break;</span>
+<span class="lineNum">     980 </span>            :       }
+<span class="lineNum">     981 </span>            :     }
+<span class="lineNum">     982 </span><span class="lineCov">        125 :     else if (parse_token_ds(begin, end, '}')) {</span>
+<span class="lineNum">     983 </span><span class="lineCov">        124 :       break;</span>
+<span class="lineNum">     984 </span>            :     }
+<span class="lineNum">     985 </span>            :     else {
+<span class="lineNum">     986 </span><span class="lineCov">          1 :       throw datashape_parse_error(begin, &quot;expected ',' or '}'&quot;);</span>
+<span class="lineNum">     987 </span>            :     }
+<span class="lineNum">     988 </span>            :   }
+<span class="lineNum">     989 </span>            : 
+<span class="lineNum">     990 </span><span class="lineCov">        157 :   rbegin = begin;</span>
+<span class="lineNum">     991 </span><span class="lineCov">        157 :   return ndt::struct_type::make(field_name_list, field_type_list, variadic);</span>
+<span class="lineNum">     992 </span>            : }
+<a name="993"><span class="lineNum">     993 </span>            : </a>
+<span class="lineNum">     994 </span>            : // funcproto_kwds : record_item, record_item*
+<span class="lineNum">     995 </span><span class="lineCov">         35 : static ndt::type parse_funcproto_kwds(const char *&amp;rbegin, const char *end, map&lt;std::string, ndt::type&gt; &amp;symtable)</span>
+<span class="lineNum">     996 </span>            : {
+<span class="lineNum">     997 </span><span class="lineCov">         35 :   const char *begin = rbegin;</span>
+<span class="lineNum">     998 </span><span class="lineCov">         70 :   vector&lt;std::string&gt; field_name_list;</span>
+<span class="lineNum">     999 </span><span class="lineCov">         70 :   vector&lt;ndt::type&gt; field_type_list;</span>
+<span class="lineNum">    1000 </span><span class="lineCov">         70 :   std::string field_name;</span>
+<span class="lineNum">    1001 </span><span class="lineCov">         70 :   ndt::type field_type;</span>
+<span class="lineNum">    1002 </span><span class="lineCov">         35 :   bool variadic = false;</span>
+<span class="lineNum">    1003 </span>            : 
+<span class="lineNum">    1004 </span><span class="lineCov">         16 :   for (;;) {</span>
+<span class="lineNum">    1005 </span>            :     // Check for variadic ending
+<span class="lineNum">    1006 </span><span class="lineCov">         51 :     if (parse_token_ds(begin, end, &quot;...&quot;)) {</span>
+<span class="lineNum">    1007 </span><span class="lineCov">          3 :       if (!parse_token_ds(begin, end, ')')) {</span>
+<span class="lineNum">    1008 </span><span class="lineNoCov">          0 :         throw datashape_parse_error(begin, &quot;expected ',' or ')' in callable prototype&quot;);</span>
+<span class="lineNum">    1009 </span>            :       }
+<span class="lineNum">    1010 </span><span class="lineCov">          3 :       variadic = true;</span>
+<span class="lineNum">    1011 </span><span class="lineCov">          3 :       break;</span>
+<span class="lineNum">    1012 </span>            :     }
+<span class="lineNum">    1013 </span>            : 
+<span class="lineNum">    1014 </span><span class="lineCov">         48 :     const char *saved_begin = begin;</span>
+<span class="lineNum">    1015 </span><span class="lineCov">         48 :     skip_whitespace_and_pound_comments(begin, end);</span>
+<span class="lineNum">    1016 </span><span class="lineCov">         48 :     if (parse_struct_item_bare(begin, end, symtable, field_name, field_type)) {</span>
+<span class="lineNum">    1017 </span><span class="lineCov">         47 :       field_name_list.push_back(field_name);</span>
+<span class="lineNum">    1018 </span><span class="lineCov">         47 :       field_type_list.push_back(field_type);</span>
+<span class="lineNum">    1019 </span>            :     }
+<span class="lineNum">    1020 </span>            :     else {
+<span class="lineNum">    1021 </span><span class="lineCov">          1 :       throw datashape_parse_error(saved_begin, &quot;expected a kwd arg in callable prototype&quot;);</span>
+<span class="lineNum">    1022 </span>            :     }
+<span class="lineNum">    1023 </span>            : 
+<span class="lineNum">    1024 </span><span class="lineCov">         47 :     if (parse_token_ds(begin, end, ',')) {</span>
+<span class="lineNum">    1025 </span><span class="lineCov">         16 :       if (!field_name_list.empty() &amp;&amp; parse_token_ds(begin, end, ')')) {</span>
+<span class="lineNum">    1026 </span><span class="lineNoCov">          0 :         break;</span>
+<span class="lineNum">    1027 </span>            :       }
+<span class="lineNum">    1028 </span>            :     }
+<span class="lineNum">    1029 </span><span class="lineCov">         31 :     else if (parse_token_ds(begin, end, ')')) {</span>
+<span class="lineNum">    1030 </span><span class="lineCov">         31 :       break;</span>
+<span class="lineNum">    1031 </span>            :     }
+<span class="lineNum">    1032 </span>            :     else {
+<span class="lineNum">    1033 </span><span class="lineNoCov">          0 :       throw datashape_parse_error(begin, &quot;expected ',' or ')' in callable prototype&quot;);</span>
+<span class="lineNum">    1034 </span>            :     }
+<span class="lineNum">    1035 </span>            :   }
+<span class="lineNum">    1036 </span>            : 
+<span class="lineNum">    1037 </span><span class="lineCov">         34 :   rbegin = begin;</span>
+<span class="lineNum">    1038 </span><span class="lineCov">         68 :   return ndt::struct_type::make(field_name_list, field_type_list, variadic);</span>
+<span class="lineNum">    1039 </span>            : }
+<span class="lineNum">    1040 </span>            : 
+<a name="1041"><span class="lineNum">    1041 </span>            : // tuple : LPAREN tuple_item tuple_item* RPAREN</a>
+<span class="lineNum">    1042 </span>            : // funcproto : tuple -&gt; type
+<span class="lineNum">    1043 </span><span class="lineCov">       3955 : static ndt::type parse_tuple_or_funcproto(const char *&amp;rbegin, const char *end, map&lt;std::string, ndt::type&gt; &amp;symtable)</span>
+<span class="lineNum">    1044 </span>            : {
+<span class="lineNum">    1045 </span><span class="lineCov">       3955 :   const char *begin = rbegin;</span>
+<span class="lineNum">    1046 </span><span class="lineCov">       7910 :   vector&lt;ndt::type&gt; field_type_list;</span>
+<span class="lineNum">    1047 </span><span class="lineCov">       3955 :   bool variadic = false;</span>
+<span class="lineNum">    1048 </span>            : 
+<span class="lineNum">    1049 </span><span class="lineCov">       3955 :   if (!parse_token_ds(begin, end, '(')) {</span>
+<span class="lineNum">    1050 </span><span class="lineCov">       3569 :     return ndt::type(uninitialized_id);</span>
+<span class="lineNum">    1051 </span>            :   }
+<span class="lineNum">    1052 </span><span class="lineCov">        386 :   if (!parse_token_ds(begin, end, ')')) {</span>
+<span class="lineNum">    1053 </span><span class="lineCov">        247 :     for (;;) {</span>
+<span class="lineNum">    1054 </span><span class="lineCov">        864 :       ndt::type tp;</span>
+<span class="lineNum">    1055 </span>            :       // Look ahead to see if we've got &quot;BARENAME:&quot; or &quot;..., BARENAME:&quot; coming
+<span class="lineNum">    1056 </span>            :       // next, and if so, parse the keyword arguments and return.
+<span class="lineNum">    1057 </span><span class="lineCov">        616 :       const char *saved_begin = begin, *kwds_begin = begin;</span>
+<span class="lineNum">    1058 </span>            :       const char *field_name_begin, *field_name_end;
+<span class="lineNum">    1059 </span><span class="lineCov">        616 :       if (parse_token_ds(begin, end, &quot;...&quot;) &amp;&amp; parse_token_ds(begin, end, ',')) {</span>
+<span class="lineNum">    1060 </span><span class="lineCov">          4 :         variadic = true;</span>
+<span class="lineNum">    1061 </span><span class="lineCov">          4 :         kwds_begin = begin;</span>
+<span class="lineNum">    1062 </span>            :       }
+<span class="lineNum">    1063 </span><span class="lineCov">        616 :       skip_whitespace_and_pound_comments(begin, end);</span>
+<span class="lineNum">    1064 </span><span class="lineCov">        616 :       if (parse_name_no_ws(begin, end, field_name_begin, field_name_end)) {</span>
+<span class="lineNum">    1065 </span><span class="lineCov">        430 :         if (parse_token_ds(begin, end, ':')) {</span>
+<span class="lineNum">    1066 </span>            :           // process the keyword arguments
+<span class="lineNum">    1067 </span><span class="lineCov">         70 :           ndt::type funcproto_kwd;</span>
+<span class="lineNum">    1068 </span><span class="lineCov">         35 :           begin = kwds_begin;</span>
+<span class="lineNum">    1069 </span><span class="lineCov">         35 :           funcproto_kwd = parse_funcproto_kwds(begin, end, symtable);</span>
+<span class="lineNum">    1070 </span><span class="lineCov">         34 :           if (!funcproto_kwd.is_null()) {</span>
+<span class="lineNum">    1071 </span><span class="lineCov">         34 :             if (!parse_token_ds(begin, end, &quot;-&gt;&quot;)) {</span>
+<span class="lineNum">    1072 </span><span class="lineNoCov">          0 :               rbegin = begin;</span>
+<span class="lineNum">    1073 </span><span class="lineNoCov">          0 :               return ndt::tuple_type::make(field_type_list);</span>
+<span class="lineNum">    1074 </span>            :             }
+<span class="lineNum">    1075 </span>            : 
+<span class="lineNum">    1076 </span><span class="lineCov">         68 :             ndt::type return_type = parse_datashape(begin, end, symtable);</span>
+<span class="lineNum">    1077 </span><span class="lineCov">         34 :             if (return_type.is_null()) {</span>
+<span class="lineNum">    1078 </span><span class="lineNoCov">          0 :               throw datashape_parse_error(begin, &quot;expected function prototype return type&quot;);</span>
+<span class="lineNum">    1079 </span>            :             }
+<span class="lineNum">    1080 </span><span class="lineCov">         34 :             rbegin = begin;</span>
+<span class="lineNum">    1081 </span><span class="lineCov">         68 :             return ndt::callable_type::make(return_type, ndt::tuple_type::make(field_type_list, variadic),</span>
+<span class="lineNum">    1082 </span><span class="lineCov">         34 :                                             funcproto_kwd);</span>
+<span class="lineNum">    1083 </span>            :           }
+<span class="lineNum">    1084 </span>            :           else {
+<span class="lineNum">    1085 </span><span class="lineNoCov">          0 :             throw datashape_parse_error(begin, &quot;expected funcproto keyword arguments&quot;);</span>
+<span class="lineNum">    1086 </span>            :           }
+<span class="lineNum">    1087 </span>            :         }
+<span class="lineNum">    1088 </span>            :       }
+<span class="lineNum">    1089 </span><span class="lineCov">        581 :       begin = saved_begin;</span>
+<span class="lineNum">    1090 </span>            : 
+<span class="lineNum">    1091 </span>            :       // Look ahead again to see if the tuple ends with &quot;...)&quot;, in which case
+<span class="lineNum">    1092 </span>            :       // it's a variadic tuple.
+<span class="lineNum">    1093 </span><span class="lineCov">        581 :       if (parse_token_ds(begin, end, &quot;...&quot;)) {</span>
+<span class="lineNum">    1094 </span><span class="lineCov">         32 :         if (parse_token_ds(begin, end, ')')) {</span>
+<span class="lineNum">    1095 </span><span class="lineCov">         32 :           variadic = true;</span>
+<span class="lineNum">    1096 </span><span class="lineCov">         32 :           break;</span>
+<span class="lineNum">    1097 </span>            :         }
+<span class="lineNum">    1098 </span>            :       }
+<span class="lineNum">    1099 </span><span class="lineCov">        549 :       begin = saved_begin;</span>
+<span class="lineNum">    1100 </span>            : 
+<span class="lineNum">    1101 </span><span class="lineCov">        549 :       tp = parse_datashape(begin, end, symtable);</span>
+<span class="lineNum">    1102 </span>            : 
+<span class="lineNum">    1103 </span><span class="lineCov">        549 :       if (tp.get_id() != uninitialized_id) {</span>
+<span class="lineNum">    1104 </span><span class="lineCov">        549 :         field_type_list.push_back(tp);</span>
+<span class="lineNum">    1105 </span>            :       }
+<span class="lineNum">    1106 </span>            :       else {
+<span class="lineNum">    1107 </span><span class="lineNoCov">          0 :         throw datashape_parse_error(begin, &quot;expected a type&quot;);</span>
+<span class="lineNum">    1108 </span>            :       }
+<span class="lineNum">    1109 </span>            : 
+<span class="lineNum">    1110 </span><span class="lineCov">        549 :       if (parse_token_ds(begin, end, ',')) {</span>
+<span class="lineNum">    1111 </span><span class="lineCov">        247 :         if (!field_type_list.empty() &amp;&amp; parse_token_ds(begin, end, ')')) {</span>
+<span class="lineNum">    1112 </span><span class="lineNoCov">          0 :           break;</span>
+<span class="lineNum">    1113 </span>            :         }
+<span class="lineNum">    1114 </span>            :       }
+<span class="lineNum">    1115 </span><span class="lineCov">        302 :       else if (parse_token_ds(begin, end, ')')) {</span>
+<span class="lineNum">    1116 </span><span class="lineCov">        302 :         break;</span>
+<span class="lineNum">    1117 </span>            :       }
+<span class="lineNum">    1118 </span>            :       else {
+<span class="lineNum">    1119 </span><span class="lineNoCov">          0 :         throw datashape_parse_error(begin, &quot;expected ',' or ')'&quot;);</span>
+<span class="lineNum">    1120 </span>            :       }
+<span class="lineNum">    1121 </span>            :     }
+<span class="lineNum">    1122 </span>            :   }
+<span class="lineNum">    1123 </span>            : 
+<span class="lineNum">    1124 </span>            :   // It might be a function prototype, check for the &quot;-&gt;&quot; token
+<span class="lineNum">    1125 </span><span class="lineCov">        351 :   if (!parse_token_ds(begin, end, &quot;-&gt;&quot;)) {</span>
+<span class="lineNum">    1126 </span><span class="lineCov">         57 :     rbegin = begin;</span>
+<span class="lineNum">    1127 </span><span class="lineCov">         57 :     return ndt::tuple_type::make(field_type_list, variadic);</span>
+<span class="lineNum">    1128 </span>            :   }
+<span class="lineNum">    1129 </span>            : 
+<span class="lineNum">    1130 </span><span class="lineCov">        588 :   ndt::type return_type = parse_datashape(begin, end, symtable);</span>
+<span class="lineNum">    1131 </span><span class="lineCov">        294 :   if (return_type.is_null()) {</span>
+<span class="lineNum">    1132 </span><span class="lineNoCov">          0 :     throw datashape_parse_error(begin, &quot;expected function prototype return type&quot;);</span>
+<span class="lineNum">    1133 </span>            :   }
+<span class="lineNum">    1134 </span><span class="lineCov">        294 :   rbegin = begin;</span>
+<span class="lineNum">    1135 </span>            :   // TODO: I suspect because of the change away from immutable default
+<span class="lineNum">    1136 </span>            :   // construction, and
+<span class="lineNum">    1137 </span>            :   //       the requirement that arrays into callable constructors are
+<span class="lineNum">    1138 </span>            :   //       immutable, that too
+<span class="lineNum">    1139 </span>            :   //       many copies may be occurring.
+<span class="lineNum">    1140 </span><span class="lineCov">        294 :   return ndt::callable_type::make(return_type, ndt::tuple_type::make(field_type_list, variadic));</span>
+<span class="lineNum">    1141 </span>            : }
+<span class="lineNum">    1142 </span>            : 
+<a name="1143"><span class="lineNum">    1143 </span>            : //    datashape_nooption : dim ASTERISK datashape</a>
+<span class="lineNum">    1144 </span>            : //                       | dtype
+<span class="lineNum">    1145 </span><span class="lineCov">       9291 : static ndt::type parse_datashape_nooption(const char *&amp;rbegin, const char *end, map&lt;std::string, ndt::type&gt; &amp;symtable)</span>
+<span class="lineNum">    1146 </span>            : {
+<span class="lineNum">    1147 </span><span class="lineCov">      18582 :   ndt::type result;</span>
+<span class="lineNum">    1148 </span><span class="lineCov">       9291 :   const char *begin = rbegin;</span>
+<span class="lineNum">    1149 </span><span class="lineCov">       9291 :   skip_whitespace_and_pound_comments(begin, end);</span>
+<span class="lineNum">    1150 </span>            :   // First try &quot;dim ASTERISK ASTERISK datashape&quot;, then &quot;dim ASTERISK datashape&quot;
+<span class="lineNum">    1151 </span>            :   const char *nbegin, *nend;
+<span class="lineNum">    1152 </span><span class="lineCov">       9291 :   if (parse_name_or_number(begin, end, nbegin, nend)) {</span>
+<span class="lineNum">    1153 </span><span class="lineCov">       5164 :     if (parse_token_ds(begin, end, &quot;**&quot;)) {</span>
+<span class="lineNum">    1154 </span>            :       // Save the extents of the base dim token
+<span class="lineNum">    1155 </span><span class="lineCov">         62 :       const char *bbegin = nbegin;</span>
+<span class="lineNum">    1156 </span><span class="lineCov">         62 :       const char *bend = nend;</span>
+<span class="lineNum">    1157 </span><span class="lineCov">         62 :       if (parse_name_or_number(begin, end, nbegin, nend)) {</span>
+<span class="lineNum">    1158 </span><span class="lineCov">         62 :         if ('1' &lt;= *nbegin &amp;&amp; *nbegin &lt;= '9') {</span>
+<span class="lineNum">    1159 </span><span class="lineCov">         15 :           intptr_t exponent = parse&lt;intptr_t&gt;(nbegin, nend);</span>
+<span class="lineNum">    1160 </span><span class="lineCov">         15 :           if (!parse_token_ds(begin, end, '*')) {</span>
+<span class="lineNum">    1161 </span><span class="lineNoCov">          0 :             throw datashape_parse_error(begin, &quot;expected a '*' after dimensional power&quot;);</span>
+<span class="lineNum">    1162 </span>            :           }
+<span class="lineNum">    1163 </span><span class="lineCov">         30 :           ndt::type element_tp = parse_datashape(begin, end, symtable);</span>
+<span class="lineNum">    1164 </span><span class="lineCov">         15 :           if ('0' &lt;= *bbegin &amp;&amp; *bbegin &lt;= '9') {</span>
+<span class="lineNum">    1165 </span><span class="lineCov">          3 :             intptr_t dim_size = parse&lt;intptr_t&gt;(bbegin, bend);</span>
+<span class="lineNum">    1166 </span><span class="lineCov">          3 :             result = ndt::make_fixed_dim(dim_size, element_tp, exponent);</span>
+<span class="lineNum">    1167 </span>            :           }
+<span class="lineNum">    1168 </span><span class="lineCov">         12 :           else if (compare_range_to_literal(bbegin, bend, &quot;var&quot;)) {</span>
+<span class="lineNum">    1169 </span><span class="lineCov">          3 :             result = ndt::var_dim_type::make(element_tp, exponent);</span>
+<span class="lineNum">    1170 </span>            :           }
+<span class="lineNum">    1171 </span><span class="lineCov">          9 :           else if (compare_range_to_literal(bbegin, bend, &quot;Fixed&quot;)) {</span>
+<span class="lineNum">    1172 </span><span class="lineCov">          8 :             result = make_fixed_dim_kind(element_tp, exponent);</span>
+<span class="lineNum">    1173 </span>            :           }
+<span class="lineNum">    1174 </span><span class="lineCov">          1 :           else if (isupper(*bbegin)) {</span>
+<span class="lineNum">    1175 </span><span class="lineCov">          1 :             result = ndt::typevar_dim_type::make(std::string(bbegin, bend), element_tp, exponent);</span>
+<span class="lineNum">    1176 </span>            :           }
+<span class="lineNum">    1177 </span>            :           else {
+<span class="lineNum">    1178 </span><span class="lineNoCov">          0 :             throw datashape_parse_error(bbegin, &quot;invalid dimension type for base of dimensional power&quot;);</span>
+<span class="lineNum">    1179 </span><span class="lineCov">         15 :           }</span>
+<span class="lineNum">    1180 </span>            :         }
+<span class="lineNum">    1181 </span><span class="lineCov">         47 :         else if (isupper(*nbegin)) {</span>
+<span class="lineNum">    1182 </span><span class="lineCov">         94 :           std::string exponent_name(nbegin, nend);</span>
+<span class="lineNum">    1183 </span><span class="lineCov">         47 :           if (parse_token_ds(begin, end, '*')) {</span>
+<span class="lineNum">    1184 </span><span class="lineCov">         47 :             if ('0' &lt;= *bbegin &amp;&amp; *bbegin &lt;= '9') {</span>
+<span class="lineNum">    1185 </span><span class="lineCov">         10 :               intptr_t dim_size = parse&lt;intptr_t&gt;(bbegin, bend);</span>
+<span class="lineNum">    1186 </span><span class="lineCov">         20 :               result = ndt::make_pow_dimsym(ndt::make_fixed_dim(dim_size, ndt::make_type&lt;void&gt;()), exponent_name,</span>
+<span class="lineNum">    1187 </span><span class="lineCov">         30 :                                             parse_datashape(begin, end, symtable));</span>
+<span class="lineNum">    1188 </span>            :             }
+<span class="lineNum">    1189 </span><span class="lineCov">         37 :             else if (compare_range_to_literal(bbegin, bend, &quot;var&quot;)) {</span>
+<span class="lineNum">    1190 </span><span class="lineCov">          2 :               result = ndt::make_pow_dimsym(ndt::var_dim_type::make(ndt::make_type&lt;void&gt;()), exponent_name,</span>
+<span class="lineNum">    1191 </span><span class="lineCov">          3 :                                             parse_datashape(begin, end, symtable));</span>
+<span class="lineNum">    1192 </span>            :             }
+<span class="lineNum">    1193 </span><span class="lineCov">         36 :             else if (compare_range_to_literal(bbegin, bend, &quot;Fixed&quot;)) {</span>
+<span class="lineNum">    1194 </span><span class="lineCov">         24 :               result = ndt::make_pow_dimsym(ndt::make_fixed_dim_kind(ndt::make_type&lt;void&gt;()), exponent_name,</span>
+<span class="lineNum">    1195 </span><span class="lineCov">         36 :                                             parse_datashape(begin, end, symtable));</span>
+<span class="lineNum">    1196 </span>            :             }
+<span class="lineNum">    1197 </span><span class="lineCov">         24 :             else if (isupper(*bbegin)) {</span>
+<span class="lineNum">    1198 </span>            :               result =
+<span class="lineNum">    1199 </span><span class="lineCov">         48 :                   ndt::make_pow_dimsym(ndt::typevar_dim_type::make(std::string(bbegin, bend), ndt::make_type&lt;void&gt;()),</span>
+<span class="lineNum">    1200 </span><span class="lineCov">         72 :                                        exponent_name, parse_datashape(begin, end, symtable));</span>
+<span class="lineNum">    1201 </span>            :             }
+<span class="lineNum">    1202 </span>            :             else {
+<span class="lineNum">    1203 </span><span class="lineNoCov">          0 :               throw datashape_parse_error(bbegin, &quot;invalid dimension type for base of dimensional power&quot;);</span>
+<span class="lineNum">    1204 </span>            :             }
+<span class="lineNum">    1205 </span>            :           }
+<span class="lineNum">    1206 </span>            :         }
+<span class="lineNum">    1207 </span>            :         else {
+<span class="lineNum">    1208 </span><span class="lineNoCov">          0 :           throw datashape_parse_error(begin, &quot;expected a number or a typevar symbol&quot;);</span>
+<span class="lineNum">    1209 </span>            :         }
+<span class="lineNum">    1210 </span>            :       }
+<span class="lineNum">    1211 </span>            :       else {
+<span class="lineNum">    1212 </span><span class="lineNoCov">          0 :         throw datashape_parse_error(begin, &quot;expected a number or a typevar symbol&quot;);</span>
+<span class="lineNum">    1213 </span>            :       }
+<span class="lineNum">    1214 </span>            :     }
+<span class="lineNum">    1215 </span><span class="lineCov">       5102 :     else if (parse_token_ds(begin, end, '*')) {</span>
+<span class="lineNum">    1216 </span><span class="lineCov">       1463 :       ndt::type element_tp = parse_datashape(begin, end, symtable);</span>
+<span class="lineNum">    1217 </span><span class="lineCov">        731 :       if (element_tp.is_null()) {</span>
+<span class="lineNum">    1218 </span><span class="lineNoCov">          0 :         throw datashape_parse_error(begin, &quot;expected a dynd type&quot;);</span>
+<span class="lineNum">    1219 </span>            :       }
+<span class="lineNum">    1220 </span>            :       // No type constructor args, just a dim type
+<span class="lineNum">    1221 </span><span class="lineCov">        731 :       if ('0' &lt;= *nbegin &amp;&amp; *nbegin &lt;= '9') {</span>
+<span class="lineNum">    1222 </span><span class="lineCov">        430 :         intptr_t size = parse&lt;intptr_t&gt;(nbegin, nend);</span>
+<span class="lineNum">    1223 </span><span class="lineCov">        430 :         result = ndt::make_fixed_dim(size, element_tp);</span>
+<span class="lineNum">    1224 </span>            :       }
+<span class="lineNum">    1225 </span><span class="lineCov">        301 :       else if (compare_range_to_literal(nbegin, nend, &quot;var&quot;)) {</span>
+<span class="lineNum">    1226 </span><span class="lineCov">        145 :         result = ndt::var_dim_type::make(element_tp);</span>
+<span class="lineNum">    1227 </span>            :       }
+<span class="lineNum">    1228 </span><span class="lineCov">        156 :       else if (compare_range_to_literal(nbegin, nend, &quot;Fixed&quot;)) {</span>
+<span class="lineNum">    1229 </span><span class="lineCov">         80 :         result = ndt::make_fixed_dim_kind(element_tp);</span>
+<span class="lineNum">    1230 </span>            :       }
+<span class="lineNum">    1231 </span><span class="lineCov">         76 :       else if (isupper(*nbegin)) {</span>
+<span class="lineNum">    1232 </span><span class="lineCov">         75 :         result = ndt::typevar_dim_type::make(std::string(nbegin, nend), element_tp);</span>
+<span class="lineNum">    1233 </span>            :       }
+<span class="lineNum">    1234 </span>            :       else {
+<span class="lineNum">    1235 </span><span class="lineCov">          1 :         skip_whitespace_and_pound_comments(rbegin, end);</span>
+<span class="lineNum">    1236 </span><span class="lineCov">          1 :         throw datashape_parse_error(rbegin, &quot;unrecognized dimension type&quot;);</span>
+<span class="lineNum">    1237 </span>            :       }
+<span class="lineNum">    1238 </span>            :     }
+<span class="lineNum">    1239 </span><span class="lineCov">       4370 :     else if (parse_token_ds(begin, end, &quot;...&quot;)) { // ELLIPSIS</span>
+<span class="lineNum">    1240 </span>            :       // A named ellipsis dim
+<span class="lineNum">    1241 </span><span class="lineCov">         39 :       if (parse_token_ds(begin, end, '*')) { // ASTERISK</span>
+<span class="lineNum">    1242 </span>            :         // An unnamed ellipsis dim
+<span class="lineNum">    1243 </span><span class="lineCov">         78 :         ndt::type element_tp = parse_datashape(begin, end, symtable);</span>
+<span class="lineNum">    1244 </span><span class="lineCov">         39 :         if (element_tp.is_null()) {</span>
+<span class="lineNum">    1245 </span><span class="lineNoCov">          0 :           throw datashape_parse_error(begin, &quot;expected a dynd type&quot;);</span>
+<span class="lineNum">    1246 </span>            :         }
+<span class="lineNum">    1247 </span><span class="lineCov">         39 :         result = ndt::make_ellipsis_dim(std::string(nbegin, nend), element_tp);</span>
+<span class="lineNum">    1248 </span>            :       }
+<span class="lineNum">    1249 </span>            :       else {
+<span class="lineNum">    1250 </span><span class="lineNoCov">          0 :         throw datashape_parse_error(begin, &quot;expected a '*'&quot;);</span>
+<span class="lineNum">    1251 </span>            :       }
+<span class="lineNum">    1252 </span>            :     }
+<span class="lineNum">    1253 </span><span class="lineCov">       4331 :     else if (parse_token_ds(begin, end, '|')) {</span>
+<span class="lineNum">    1254 </span><span class="lineNoCov">          0 :       result = ndt::make_type&lt;ndt::type_type&gt;(parse_datashape(begin, end, symtable));</span>
+<span class="lineNum">    1255 </span>            :     }
+<span class="lineNum">    1256 </span><span class="lineCov">       4331 :     else if (compare_range_to_literal(nbegin, nend, &quot;string&quot;)) {</span>
+<span class="lineNum">    1257 </span><span class="lineCov">         47 :       result = parse_string_parameters(begin, end);</span>
+<span class="lineNum">    1258 </span>            :     }
+<span class="lineNum">    1259 </span><span class="lineCov">       4284 :     else if (compare_range_to_literal(nbegin, nend, &quot;fixed_string&quot;)) {</span>
+<span class="lineNum">    1260 </span><span class="lineCov">         25 :       result = parse_fixed_string_parameters(begin, end);</span>
+<span class="lineNum">    1261 </span>            :     }
+<span class="lineNum">    1262 </span><span class="lineCov">       4259 :     else if (compare_range_to_literal(nbegin, nend, &quot;complex&quot;)) {</span>
+<span class="lineNum">    1263 </span><span class="lineCov">         17 :       result = parse_complex_parameters(begin, end, symtable);</span>
+<span class="lineNum">    1264 </span>            :     }
+<span class="lineNum">    1265 </span><span class="lineCov">       4242 :     else if (compare_range_to_literal(nbegin, nend, &quot;pointer&quot;)) {</span>
+<span class="lineNum">    1266 </span><span class="lineCov">         12 :       result = parse_pointer_parameters(begin, end, symtable);</span>
+<span class="lineNum">    1267 </span>            :     }
+<span class="lineNum">    1268 </span><span class="lineCov">       4230 :     else if (compare_range_to_literal(nbegin, nend, &quot;array&quot;)) {</span>
+<span class="lineNum">    1269 </span><span class="lineCov">          1 :       result = parse_array_parameters(begin, end, symtable);</span>
+<span class="lineNum">    1270 </span>            :     }
+<span class="lineNum">    1271 </span><span class="lineCov">       4229 :     else if (compare_range_to_literal(nbegin, nend, &quot;char&quot;)) {</span>
+<span class="lineNum">    1272 </span><span class="lineCov">         12 :       result = parse_char_parameters(begin, end);</span>
+<span class="lineNum">    1273 </span>            :     }
+<span class="lineNum">    1274 </span><span class="lineCov">       4217 :     else if (compare_range_to_literal(nbegin, nend, &quot;bytes&quot;)) {</span>
+<span class="lineNum">    1275 </span><span class="lineCov">          6 :       result = parse_bytes_parameters(begin, end);</span>
+<span class="lineNum">    1276 </span>            :     }
+<span class="lineNum">    1277 </span><span class="lineCov">       4211 :     else if (compare_range_to_literal(nbegin, nend, &quot;fixed_bytes&quot;)) {</span>
+<span class="lineNum">    1278 </span><span class="lineCov">          4 :       result = parse_fixed_bytes_parameters(begin, end);</span>
+<span class="lineNum">    1279 </span>            :     }
+<span class="lineNum">    1280 </span><span class="lineCov">       4207 :     else if (compare_range_to_literal(nbegin, nend, &quot;C&quot;)) {</span>
+<span class="lineNum">    1281 </span><span class="lineCov">         17 :       result = parse_c_contiguous_parameters(begin, end, symtable);</span>
+<span class="lineNum">    1282 </span>            :     }
+<span class="lineNum">    1283 </span><span class="lineCov">       4190 :     else if (compare_range_to_literal(nbegin, nend, &quot;cuda_host&quot;)) {</span>
+<span class="lineNum">    1284 </span><span class="lineNoCov">          0 :       result = parse_cuda_host_parameters(begin, end, symtable);</span>
+<span class="lineNum">    1285 </span>            :     }
+<span class="lineNum">    1286 </span><span class="lineCov">       4190 :     else if (compare_range_to_literal(nbegin, nend, &quot;cuda_device&quot;)) {</span>
+<span class="lineNum">    1287 </span><span class="lineNoCov">          0 :       result = parse_cuda_device_parameters(begin, end, symtable);</span>
+<span class="lineNum">    1288 </span>            :     }
+<span class="lineNum">    1289 </span><span class="lineCov">       4190 :     else if (compare_range_to_literal(nbegin, nend, &quot;fixed&quot;)) {</span>
+<span class="lineNum">    1290 </span><span class="lineCov">          1 :       result = parse_fixed_dim_parameters(begin, end, symtable);</span>
+<span class="lineNum">    1291 </span>            :     }
+<span class="lineNum">    1292 </span><span class="lineCov">       4189 :     else if (compare_range_to_literal(nbegin, nend, &quot;option&quot;)) {</span>
+<span class="lineNum">    1293 </span><span class="lineCov">          5 :       result = parse_option_parameters(begin, end, symtable);</span>
+<span class="lineNum">    1294 </span>            :     }
+<span class="lineNum">    1295 </span><span class="lineCov">       4184 :     else if (compare_range_to_literal(nbegin, nend, &quot;Any&quot;)) {</span>
+<span class="lineNum">    1296 </span><span class="lineCov">       2610 :       result = ndt::any_kind_type::make();</span>
+<span class="lineNum">    1297 </span>            :     }
+<span class="lineNum">    1298 </span><span class="lineCov">       1574 :     else if (compare_range_to_literal(nbegin, nend, &quot;Scalar&quot;)) {</span>
+<span class="lineNum">    1299 </span><span class="lineCov">        323 :       result = ndt::scalar_kind_type::make();</span>
+<span class="lineNum">    1300 </span>            :     }
+<span class="lineNum">    1301 </span><span class="lineCov">       1251 :     else if (compare_range_to_literal(nbegin, nend, &quot;Categorical&quot;)) {</span>
+<span class="lineNum">    1302 </span><span class="lineNoCov">          0 :       result = ndt::categorical_kind_type::make();</span>
+<span class="lineNum">    1303 </span>            :     }
+<span class="lineNum">    1304 </span><span class="lineCov">       1251 :     else if (compare_range_to_literal(nbegin, nend, &quot;FixedBytes&quot;)) {</span>
+<span class="lineNum">    1305 </span><span class="lineCov">          5 :       result = ndt::fixed_bytes_kind_type::make();</span>
+<span class="lineNum">    1306 </span>            :     }
+<span class="lineNum">    1307 </span><span class="lineCov">       1246 :     else if (compare_range_to_literal(nbegin, nend, &quot;FixedString&quot;)) {</span>
+<span class="lineNum">    1308 </span><span class="lineCov">          5 :       result = ndt::fixed_string_kind_type::make();</span>
+<span class="lineNum">    1309 </span>            :     }
+<span class="lineNum">    1310 </span><span class="lineCov">       1241 :     else if (compare_range_to_literal(nbegin, nend, &quot;Bool&quot;)) {</span>
+<span class="lineNum">    1311 </span><span class="lineCov">          4 :       result = ndt::make_kind_sym(bool_kind);</span>
+<span class="lineNum">    1312 </span>            :     }
+<span class="lineNum">    1313 </span><span class="lineCov">       1237 :     else if (compare_range_to_literal(nbegin, nend, &quot;Int&quot;)) {</span>
+<span class="lineNum">    1314 </span><span class="lineCov">          3 :       result = ndt::make_int_kind_sym();</span>
+<span class="lineNum">    1315 </span>            :     }
+<span class="lineNum">    1316 </span><span class="lineCov">       1234 :     else if (compare_range_to_literal(nbegin, nend, &quot;UInt&quot;)) {</span>
+<span class="lineNum">    1317 </span><span class="lineCov">          3 :       result = ndt::make_kind_sym(uint_kind);</span>
+<span class="lineNum">    1318 </span>            :     }
+<span class="lineNum">    1319 </span><span class="lineCov">       1231 :     else if (compare_range_to_literal(nbegin, nend, &quot;SInt&quot;)) {</span>
+<span class="lineNum">    1320 </span><span class="lineCov">          3 :       result = ndt::make_kind_sym(sint_kind);</span>
+<span class="lineNum">    1321 </span>            :     }
+<span class="lineNum">    1322 </span><span class="lineCov">       1228 :     else if (compare_range_to_literal(nbegin, nend, &quot;Real&quot;)) {</span>
+<span class="lineNum">    1323 </span><span class="lineCov">          2 :       result = ndt::make_kind_sym(real_kind);</span>
+<span class="lineNum">    1324 </span>            :     }
+<span class="lineNum">    1325 </span><span class="lineCov">       1226 :     else if (compare_range_to_literal(nbegin, nend, &quot;Complex&quot;)) {</span>
+<span class="lineNum">    1326 </span><span class="lineCov">          3 :       result = ndt::make_kind_sym(complex_kind);</span>
+<span class="lineNum">    1327 </span>            :     }
+<span class="lineNum">    1328 </span><span class="lineCov">       1223 :     else if (isupper(*nbegin)) {</span>
+<span class="lineNum">    1329 </span><span class="lineCov">        205 :       if (!parse_token_ds(begin, end, '[')) {</span>
+<span class="lineNum">    1330 </span><span class="lineCov">        202 :         result = ndt::typevar_type::make(std::string(nbegin, nend));</span>
+<span class="lineNum">    1331 </span>            :       }
+<span class="lineNum">    1332 </span>            :       else {
+<span class="lineNum">    1333 </span><span class="lineCov">          6 :         ndt::type arg_tp = parse_datashape(begin, end, symtable);</span>
+<span class="lineNum">    1334 </span><span class="lineCov">          3 :         if (arg_tp.is_null()) {</span>
+<span class="lineNum">    1335 </span><span class="lineNoCov">          0 :           throw datashape_parse_error(begin, &quot;expected a dynd type&quot;);</span>
+<span class="lineNum">    1336 </span>            :         }
+<span class="lineNum">    1337 </span><span class="lineCov">          3 :         if (!parse_token_ds(begin, end, ']')) {</span>
+<span class="lineNum">    1338 </span><span class="lineNoCov">          0 :           throw datashape_parse_error(begin, &quot;expected closing ']'&quot;);</span>
+<span class="lineNum">    1339 </span>            :         }
+<span class="lineNum">    1340 </span><span class="lineCov">          3 :         result = ndt::typevar_constructed_type::make(std::string(nbegin, nend), arg_tp);</span>
+<span class="lineNum">    1341 </span>            :       }
+<span class="lineNum">    1342 </span>            :     }
+<span class="lineNum">    1343 </span>            :     else {
+<span class="lineNum">    1344 </span><span class="lineCov">       2032 :       std::string n(nbegin, nend);</span>
+<span class="lineNum">    1345 </span><span class="lineCov">       1018 :       const map&lt;std::string, ndt::type&gt; &amp;bit = builtin_types();</span>
+<span class="lineNum">    1346 </span><span class="lineCov">       1018 :       map&lt;std::string, ndt::type&gt;::const_iterator i = bit.find(n);</span>
+<span class="lineNum">    1347 </span><span class="lineCov">       1018 :       if (i != bit.end()) {</span>
+<span class="lineNum">    1348 </span><span class="lineCov">       1014 :         result = i-&gt;second;</span>
+<span class="lineNum">    1349 </span>            :       }
+<span class="lineNum">    1350 </span>            :       else {
+<span class="lineNum">    1351 </span><span class="lineCov">          4 :         i = symtable.find(n);</span>
+<span class="lineNum">    1352 </span><span class="lineCov">          4 :         if (i != symtable.end()) {</span>
+<span class="lineNum">    1353 </span><span class="lineNoCov">          0 :           result = i-&gt;second;</span>
+<span class="lineNum">    1354 </span>            :         }
+<span class="lineNum">    1355 </span>            :         else {
+<span class="lineNum">    1356 </span><span class="lineCov">          4 :           skip_whitespace_and_pound_comments(rbegin, end);</span>
+<span class="lineNum">    1357 </span><span class="lineCov">          4 :           throw datashape_parse_error(rbegin, &quot;unrecognized data type&quot;);</span>
+<span class="lineNum">    1358 </span>            :         }
+<span class="lineNum">    1359 </span>            :       }
+<span class="lineNum">    1360 </span>            :     }
+<span class="lineNum">    1361 </span>            :   }
+<span class="lineNum">    1362 </span><span class="lineCov">       4127 :   else if (parse_token_no_ws(begin, end, &quot;...&quot;)) {</span>
+<span class="lineNum">    1363 </span>            :     // An unnamed ellipsis dim
+<span class="lineNum">    1364 </span><span class="lineCov">          5 :     if (parse_token_ds(begin, end, '*')) { // ASTERISK</span>
+<span class="lineNum">    1365 </span><span class="lineCov">         10 :       ndt::type element_type = parse_datashape(begin, end, symtable);</span>
+<span class="lineNum">    1366 </span><span class="lineCov">          5 :       if (element_type.is_null()) {</span>
+<span class="lineNum">    1367 </span><span class="lineNoCov">          0 :         throw datashape_parse_error(begin, &quot;expected a dynd type&quot;);</span>
+<span class="lineNum">    1368 </span>            :       }
+<span class="lineNum">    1369 </span><span class="lineCov">          5 :       result = ndt::make_ellipsis_dim(element_type);</span>
+<span class="lineNum">    1370 </span>            :     }
+<span class="lineNum">    1371 </span>            :     else {
+<span class="lineNum">    1372 </span><span class="lineNoCov">          0 :       throw datashape_parse_error(begin, &quot;expected a '*'&quot;);</span>
+<span class="lineNum">    1373 </span>            :     }
+<span class="lineNum">    1374 </span>            :   }
+<span class="lineNum">    1375 </span>            :   // struct
+<span class="lineNum">    1376 </span><span class="lineCov">       9280 :   if (result.is_null()) {</span>
+<span class="lineNum">    1377 </span><span class="lineCov">       4122 :     result = parse_struct(begin, end, symtable);</span>
+<span class="lineNum">    1378 </span>            :   }
+<span class="lineNum">    1379 </span>            :   // tuple or funcproto
+<span class="lineNum">    1380 </span><span class="lineCov">       9272 :   if (result.is_null()) {</span>
+<span class="lineNum">    1381 </span><span class="lineCov">       3955 :     result = parse_tuple_or_funcproto(begin, end, symtable);</span>
+<span class="lineNum">    1382 </span>            :   }
+<span class="lineNum">    1383 </span><span class="lineCov">       9271 :   if (!result.is_null()) {</span>
+<span class="lineNum">    1384 </span><span class="lineCov">       5702 :     rbegin = begin;</span>
+<span class="lineNum">    1385 </span><span class="lineCov">       5702 :     return result;</span>
+<span class="lineNum">    1386 </span>            :   }
+<span class="lineNum">    1387 </span>            :   else {
+<span class="lineNum">    1388 </span><span class="lineCov">       3569 :     return ndt::type();</span>
+<span class="lineNum">    1389 </span>            :   }
+<span class="lineNum">    1390 </span>            : }
+<span class="lineNum">    1391 </span>            : 
+<span class="lineNum">    1392 </span>            : // This is what parses a single datashape as an ndt::type
+<a name="1393"><span class="lineNum">    1393 </span>            : //    datashape : datashape_nooption</a>
+<span class="lineNum">    1394 </span>            : //              | QUESTIONMARK datashape_nooption
+<span class="lineNum">    1395 </span><span class="lineCov">       9291 : static ndt::type parse_datashape(const char *&amp;rbegin, const char *end, map&lt;std::string, ndt::type&gt; &amp;symtable)</span>
+<span class="lineNum">    1396 </span>            : {
+<span class="lineNum">    1397 </span><span class="lineCov">       9291 :   const char *begin = rbegin;</span>
+<span class="lineNum">    1398 </span><span class="lineCov">       9291 :   skip_whitespace_and_pound_comments(begin, end);</span>
+<span class="lineNum">    1399 </span><span class="lineCov">       9291 :   if (parse_token_no_ws(begin, end, '?')) {</span>
+<span class="lineNum">    1400 </span><span class="lineCov">        688 :     ndt::type val_tp = parse_datashape_nooption(begin, end, symtable);</span>
+<span class="lineNum">    1401 </span><span class="lineCov">        344 :     if (!val_tp.is_null()) {</span>
+<span class="lineNum">    1402 </span><span class="lineCov">        344 :       rbegin = begin;</span>
+<span class="lineNum">    1403 </span><span class="lineCov">        344 :       return ndt::make_type&lt;ndt::option_type&gt;(val_tp);</span>
+<span class="lineNum">    1404 </span>            :     }
+<span class="lineNum">    1405 </span>            :     else {
+<span class="lineNum">    1406 </span><span class="lineNoCov">          0 :       return ndt::type();</span>
+<span class="lineNum">    1407 </span>            :     }
+<span class="lineNum">    1408 </span>            :   }
+<span class="lineNum">    1409 </span>            :   else {
+<span class="lineNum">    1410 </span><span class="lineCov">       8947 :     return parse_datashape_nooption(rbegin, end, symtable);</span>
+<span class="lineNum">    1411 </span>            :   }
+<a name="1412"><span class="lineNum">    1412 </span>            : }</a>
+<span class="lineNum">    1413 </span>            : 
+<span class="lineNum">    1414 </span><span class="lineCov">       7158 : static ndt::type parse_stmt(const char *&amp;rbegin, const char *end, map&lt;std::string, ndt::type&gt; &amp;symtable)</span>
+<span class="lineNum">    1415 </span>            : {
+<span class="lineNum">    1416 </span><span class="lineCov">       7158 :   const char *begin = rbegin;</span>
+<span class="lineNum">    1417 </span>            :   // stmt : TYPE name EQUALS rhs_expression
+<span class="lineNum">    1418 </span>            :   // NOTE that this doesn't support parameterized lhs_expression, this is subset
+<span class="lineNum">    1419 </span>            :   // of Blaze datashape
+<span class="lineNum">    1420 </span><span class="lineCov">       7158 :   if (parse_token_ds(begin, end, &quot;type&quot;)) {</span>
+<span class="lineNum">    1421 </span><span class="lineCov">         14 :     const map&lt;std::string, ndt::type&gt; &amp;bit = builtin_types();</span>
+<span class="lineNum">    1422 </span><span class="lineCov">         14 :     const char *saved_begin = begin;</span>
+<span class="lineNum">    1423 </span>            :     const char *tname_begin, *tname_end;
+<span class="lineNum">    1424 </span><span class="lineCov">         14 :     if (!skip_required_whitespace(begin, end)) {</span>
+<span class="lineNum">    1425 </span><span class="lineCov">          5 :       if (begin == end) {</span>
+<span class="lineNum">    1426 </span>            :         // If it's only &quot;type&quot; by itself, return the &quot;type&quot; type
+<span class="lineNum">    1427 </span><span class="lineCov">          5 :         rbegin = begin;</span>
+<span class="lineNum">    1428 </span><span class="lineCov">          5 :         return bit.find(&quot;type&quot;)-&gt;second;</span>
+<span class="lineNum">    1429 </span>            :       }
+<span class="lineNum">    1430 </span>            :       else {
+<span class="lineNum">    1431 </span><span class="lineNoCov">          0 :         return ndt::type();</span>
+<span class="lineNum">    1432 </span>            :       }
+<span class="lineNum">    1433 </span>            :     }
+<span class="lineNum">    1434 </span><span class="lineCov">          9 :     if (parse_token_ds(begin, end, '|')) {</span>
+<span class="lineNum">    1435 </span><span class="lineCov">          4 :       ndt::type pattern = parse_datashape(begin, end, symtable);</span>
+<span class="lineNum">    1436 </span><span class="lineCov">          2 :       if (pattern.is_null()) {</span>
+<span class="lineNum">    1437 </span><span class="lineNoCov">          0 :         throw datashape_parse_error(begin, &quot;expected a data type&quot;);</span>
+<span class="lineNum">    1438 </span>            :       }
+<span class="lineNum">    1439 </span><span class="lineCov">          2 :       rbegin = begin;</span>
+<span class="lineNum">    1440 </span><span class="lineCov">          2 :       return ndt::make_type&lt;ndt::type_type&gt;(pattern);</span>
+<span class="lineNum">    1441 </span>            :     }
+<span class="lineNum">    1442 </span><span class="lineCov">          7 :     if (!parse_name_no_ws(begin, end, tname_begin, tname_end)) {</span>
+<span class="lineNum">    1443 </span><span class="lineCov">          1 :       skip_whitespace_and_pound_comments(begin, end);</span>
+<span class="lineNum">    1444 </span><span class="lineCov">          1 :       if (begin == end) {</span>
+<span class="lineNum">    1445 </span>            :         // If it's only &quot;type&quot; by itself, return the &quot;type&quot; type
+<span class="lineNum">    1446 </span><span class="lineNoCov">          0 :         rbegin = begin;</span>
+<span class="lineNum">    1447 </span><span class="lineNoCov">          0 :         return bit.find(&quot;type&quot;)-&gt;second;</span>
+<span class="lineNum">    1448 </span>            :       }
+<span class="lineNum">    1449 </span>            :       else {
+<span class="lineNum">    1450 </span><span class="lineCov">          1 :         throw datashape_parse_error(saved_begin, &quot;expected an identifier for a type name&quot;);</span>
+<span class="lineNum">    1451 </span>            :       }
+<span class="lineNum">    1452 </span>            :     }
+<span class="lineNum">    1453 </span><span class="lineCov">          6 :     if (!parse_token_ds(begin, end, '=')) {</span>
+<span class="lineNum">    1454 </span><span class="lineCov">          1 :       throw datashape_parse_error(begin, &quot;expected an '='&quot;);</span>
+<span class="lineNum">    1455 </span>            :     }
+<span class="lineNum">    1456 </span><span class="lineCov">         10 :     ndt::type result = parse_datashape(begin, end, symtable);</span>
+<span class="lineNum">    1457 </span><span class="lineCov">          5 :     if (result.is_null()) {</span>
+<span class="lineNum">    1458 </span><span class="lineCov">          1 :       throw datashape_parse_error(begin, &quot;expected a data type&quot;);</span>
+<span class="lineNum">    1459 </span>            :     }
+<span class="lineNum">    1460 </span><span class="lineCov">          8 :     std::string tname(tname_begin, tname_end);</span>
+<span class="lineNum">    1461 </span>            :     // ACTION: Put the parsed type in the symbol table
+<span class="lineNum">    1462 </span><span class="lineCov">          4 :     if (bit.find(tname) != bit.end()) {</span>
+<span class="lineNum">    1463 </span><span class="lineCov">          1 :       skip_whitespace_and_pound_comments(saved_begin, end);</span>
+<span class="lineNum">    1464 </span><span class="lineCov">          1 :       throw datashape_parse_error(saved_begin, &quot;cannot redefine a builtin type&quot;);</span>
+<span class="lineNum">    1465 </span>            :     }
+<span class="lineNum">    1466 </span><span class="lineCov">          3 :     if (symtable.find(tname) != symtable.end()) {</span>
+<span class="lineNum">    1467 </span><span class="lineCov">          1 :       skip_whitespace_and_pound_comments(saved_begin, end);</span>
+<span class="lineNum">    1468 </span><span class="lineCov">          1 :       throw datashape_parse_error(saved_begin, &quot;type name already defined in datashape string&quot;);</span>
+<span class="lineNum">    1469 </span>            :     }
+<span class="lineNum">    1470 </span><span class="lineCov">          2 :     symtable[tname] = result;</span>
+<span class="lineNum">    1471 </span><span class="lineCov">          2 :     rbegin = begin;</span>
+<span class="lineNum">    1472 </span><span class="lineCov">          2 :     return result;</span>
+<span class="lineNum">    1473 </span>            :   }
+<span class="lineNum">    1474 </span>            :   else {
+<span class="lineNum">    1475 </span>            :     // stmt : rhs_expression
+<span class="lineNum">    1476 </span><span class="lineCov">       7144 :     return parse_datashape(rbegin, end, symtable);</span>
+<span class="lineNum">    1477 </span>            :   }
+<span class="lineNum">    1478 </span>            : }
+<a name="1479"><span class="lineNum">    1479 </span>            : </a>
+<span class="lineNum">    1480 </span>            : // top : stmt stmt*
+<span class="lineNum">    1481 </span><span class="lineCov">       3590 : static ndt::type parse_top(const char *&amp;begin, const char *end, map&lt;std::string, ndt::type&gt; &amp;symtable)</span>
+<span class="lineNum">    1482 </span>            : {
+<span class="lineNum">    1483 </span><span class="lineCov">       3590 :   ndt::type result = parse_stmt(begin, end, symtable);</span>
+<span class="lineNum">    1484 </span><span class="lineCov">       3568 :   if (result.is_null()) {</span>
+<span class="lineNum">    1485 </span><span class="lineNoCov">          0 :     throw datashape_parse_error(begin, &quot;expected a datashape statement&quot;);</span>
+<span class="lineNum">    1486 </span>            :   }
+<span class="lineNum">    1487 </span><span class="lineNoCov">          0 :   for (;;) {</span>
+<span class="lineNum">    1488 </span><span class="lineCov">       3569 :     ndt::type next = parse_stmt(begin, end, symtable);</span>
+<span class="lineNum">    1489 </span><span class="lineCov">       3567 :     if (next.is_null()) {</span>
+<span class="lineNum">    1490 </span><span class="lineCov">       3567 :       skip_whitespace_and_pound_comments(begin, end);</span>
+<span class="lineNum">    1491 </span><span class="lineCov">       3567 :       if (begin != end) {</span>
+<span class="lineNum">    1492 </span><span class="lineCov">          1 :         throw datashape_parse_error(begin, &quot;unexpected token in datashape&quot;);</span>
+<span class="lineNum">    1493 </span>            :       }
+<span class="lineNum">    1494 </span><span class="lineCov">       7132 :       return result;</span>
+<span class="lineNum">    1495 </span>            :     }
+<span class="lineNum">    1496 </span>            :     else {
+<span class="lineNum">    1497 </span><span class="lineNoCov">          0 :       result = next;</span>
+<span class="lineNum">    1498 </span>            :     }
+<span class="lineNum">    1499 </span>            :   }
+<span class="lineNum">    1500 </span>            : }
+<span class="lineNum">    1501 </span>            : 
+<span class="lineNum">    1502 </span>            : /**
+<span class="lineNum">    1503 </span>            :  * Returns the row/column where the error occured, as well as the current and
+<span class="lineNum">    1504 </span>            :  * previous
+<a name="1505"><span class="lineNum">    1505 </span>            :  * lines for printing some context.</a>
+<span class="lineNum">    1506 </span>            :  */
+<span class="lineNum">    1507 </span><span class="lineCov">         22 : static void get_error_line_column(const char *begin, const char *end, const char *position, std::string &amp;out_line_prev,</span>
+<span class="lineNum">    1508 </span>            :                                   std::string &amp;out_line_cur, int &amp;out_line, int &amp;out_column)
+<span class="lineNum">    1509 </span>            : {
+<span class="lineNum">    1510 </span><span class="lineCov">         22 :   out_line_prev = &quot;&quot;;</span>
+<span class="lineNum">    1511 </span><span class="lineCov">         22 :   out_line_cur = &quot;&quot;;</span>
+<span class="lineNum">    1512 </span><span class="lineCov">         22 :   out_line = 1;</span>
+<span class="lineNum">    1513 </span><span class="lineCov">         60 :   while (begin &lt; end) {</span>
+<span class="lineNum">    1514 </span><span class="lineCov">         41 :     const char *line_end = (const char *)memchr(begin, '\n', end - begin);</span>
+<span class="lineNum">    1515 </span><span class="lineCov">         41 :     out_line_prev.swap(out_line_cur);</span>
+<span class="lineNum">    1516 </span>            :     // If no \n was found
+<span class="lineNum">    1517 </span><span class="lineCov">         41 :     if (line_end == NULL) {</span>
+<span class="lineNum">    1518 </span><span class="lineCov">         12 :       out_column = int(position - begin + 1);</span>
+<span class="lineNum">    1519 </span><span class="lineCov">         12 :       out_line_cur = std::string(begin, end);</span>
+<span class="lineNum">    1520 </span><span class="lineCov">         12 :       return;</span>
+<span class="lineNum">    1521 </span>            :     }
+<span class="lineNum">    1522 </span>            :     else {
+<span class="lineNum">    1523 </span><span class="lineCov">         29 :       out_line_cur = std::string(begin, line_end);</span>
+<span class="lineNum">    1524 </span><span class="lineCov">         29 :       ++line_end;</span>
+<span class="lineNum">    1525 </span><span class="lineCov">         29 :       if (position &lt; line_end) {</span>
+<span class="lineNum">    1526 </span><span class="lineCov">         10 :         out_column = int(position - begin + 1);</span>
+<span class="lineNum">    1527 </span><span class="lineCov">         10 :         return;</span>
+<span class="lineNum">    1528 </span>            :       }
+<span class="lineNum">    1529 </span>            :     }
+<span class="lineNum">    1530 </span><span class="lineCov">         19 :     begin = line_end;</span>
+<span class="lineNum">    1531 </span><span class="lineCov">         19 :     ++out_line;</span>
+<span class="lineNum">    1532 </span>            :   }
+<span class="lineNum">    1533 </span>            : 
+<span class="lineNum">    1534 </span><span class="lineNoCov">          0 :   throw runtime_error(&quot;Cannot get line number of error, its position is out of range&quot;);</span>
+<a name="1535"><span class="lineNum">    1535 </span>            : }</a>
+<span class="lineNum">    1536 </span>            : 
+<span class="lineNum">    1537 </span><span class="lineCov">       3590 : ndt::type dynd::type_from_datashape(const char *datashape_begin, const char *datashape_end)</span>
+<span class="lineNum">    1538 </span>            : {
+<span class="lineNum">    1539 </span>            :   try {
+<span class="lineNum">    1540 </span>            :     // Symbol table for intermediate types declared in the datashape
+<span class="lineNum">    1541 </span><span class="lineCov">       7180 :     map&lt;std::string, ndt::type&gt; symtable;</span>
+<span class="lineNum">    1542 </span>            :     // Parse the datashape and construct the type
+<span class="lineNum">    1543 </span><span class="lineCov">       3590 :     const char *begin = datashape_begin, *end = datashape_end;</span>
+<span class="lineNum">    1544 </span><span class="lineCov">       7156 :     return parse_top(begin, end, symtable);</span>
+<span class="lineNum">    1545 </span>            :   }
+<span class="lineNum">    1546 </span><span class="lineCov">         44 :   catch (const datashape_parse_error &amp;e) {</span>
+<span class="lineNum">    1547 </span><span class="lineCov">         44 :     stringstream ss;</span>
+<span class="lineNum">    1548 </span><span class="lineCov">         44 :     std::string line_prev, line_cur;</span>
+<span class="lineNum">    1549 </span>            :     int line, column;
+<span class="lineNum">    1550 </span><span class="lineCov">         22 :     get_error_line_column(datashape_begin, datashape_end, e.get_position(), line_prev, line_cur, line, column);</span>
+<span class="lineNum">    1551 </span><span class="lineCov">         22 :     ss &lt;&lt; &quot;Error parsing datashape at line &quot; &lt;&lt; line &lt;&lt; &quot;, column &quot; &lt;&lt; column &lt;&lt; &quot;\n&quot;;</span>
+<span class="lineNum">    1552 </span><span class="lineCov">         22 :     ss &lt;&lt; &quot;Message: &quot; &lt;&lt; e.get_message() &lt;&lt; &quot;\n&quot;;</span>
+<span class="lineNum">    1553 </span><span class="lineCov">         22 :     if (line &gt; 1) {</span>
+<span class="lineNum">    1554 </span><span class="lineCov">         10 :       ss &lt;&lt; line_prev &lt;&lt; &quot;\n&quot;;</span>
+<span class="lineNum">    1555 </span>            :     }
+<span class="lineNum">    1556 </span><span class="lineCov">         22 :     ss &lt;&lt; line_cur &lt;&lt; &quot;\n&quot;;</span>
+<span class="lineNum">    1557 </span><span class="lineCov">        207 :     for (int i = 0; i &lt; column - 1; ++i) {</span>
+<span class="lineNum">    1558 </span><span class="lineCov">        185 :       ss &lt;&lt; &quot; &quot;;</span>
+<span class="lineNum">    1559 </span>            :     }
+<span class="lineNum">    1560 </span><span class="lineCov">         22 :     ss &lt;&lt; &quot;^\n&quot;;</span>
+<span class="lineNum">    1561 </span><span class="lineCov">         22 :     throw runtime_error(ss.str());</span>
+<span class="lineNum">    1562 </span>            :   }
+<a name="1563"><span class="lineNum">    1563 </span>            : }</a>
+<span class="lineNum">    1564 </span>            : 
+<span class="lineNum">    1565 </span><span class="lineCov">          6 : nd::array dynd::parse_type_constr_args(const std::string &amp;str)</span>
+<span class="lineNum">    1566 </span>            : {
+<span class="lineNum">    1567 </span><span class="lineCov">          6 :   nd::array result;</span>
+<span class="lineNum">    1568 </span><span class="lineCov">         12 :   std::map&lt;std::string, ndt::type&gt; symtable;</span>
+<span class="lineNum">    1569 </span><span class="lineCov">          6 :   if (!str.empty()) {</span>
+<span class="lineNum">    1570 </span><span class="lineCov">          6 :     const char *begin = &amp;str[0], *end = &amp;str[0] + str.size();</span>
+<span class="lineNum">    1571 </span>            :     try {
+<span class="lineNum">    1572 </span><span class="lineCov">          6 :       result = parse_type_constr_args(begin, end, symtable);</span>
+<span class="lineNum">    1573 </span>            :     }
+<span class="lineNum">    1574 </span><span class="lineNoCov">          0 :     catch (const datashape_parse_error &amp;e) {</span>
+<span class="lineNum">    1575 </span><span class="lineNoCov">          0 :       stringstream ss;</span>
+<span class="lineNum">    1576 </span><span class="lineNoCov">          0 :       std::string line_prev, line_cur;</span>
+<span class="lineNum">    1577 </span>            :       int line, column;
+<span class="lineNum">    1578 </span><span class="lineNoCov">          0 :       get_error_line_column(&amp;str[0], end, e.get_position(), line_prev, line_cur, line, column);</span>
+<span class="lineNum">    1579 </span><span class="lineNoCov">          0 :       ss &lt;&lt; &quot;Error parsing datashape at line &quot; &lt;&lt; line &lt;&lt; &quot;, column &quot; &lt;&lt; column &lt;&lt; &quot;\n&quot;;</span>
+<span class="lineNum">    1580 </span><span class="lineNoCov">          0 :       ss &lt;&lt; &quot;Message: &quot; &lt;&lt; e.get_message() &lt;&lt; &quot;\n&quot;;</span>
+<span class="lineNum">    1581 </span><span class="lineNoCov">          0 :       if (line &gt; 1) {</span>
+<span class="lineNum">    1582 </span><span class="lineNoCov">          0 :         ss &lt;&lt; line_prev &lt;&lt; &quot;\n&quot;;</span>
+<span class="lineNum">    1583 </span>            :       }
+<span class="lineNum">    1584 </span><span class="lineNoCov">          0 :       ss &lt;&lt; line_cur &lt;&lt; &quot;\n&quot;;</span>
+<span class="lineNum">    1585 </span><span class="lineNoCov">          0 :       for (int i = 0; i &lt; column - 1; ++i) {</span>
+<span class="lineNum">    1586 </span><span class="lineNoCov">          0 :         ss &lt;&lt; &quot; &quot;;</span>
+<span class="lineNum">    1587 </span>            :       }
+<span class="lineNum">    1588 </span><span class="lineNoCov">          0 :       ss &lt;&lt; &quot;^\n&quot;;</span>
+<span class="lineNum">    1589 </span><span class="lineNoCov">          0 :       throw runtime_error(ss.str());</span>
+<span class="lineNum">    1590 </span>            :     }
+<span class="lineNum">    1591 </span>            :   }
+<span class="lineNum">    1592 </span><span class="lineCov">          6 :   if (result.is_null()) {</span>
+<span class="lineNum">    1593 </span><span class="lineNoCov">          0 :     stringstream ss;</span>
+<span class="lineNum">    1594 </span><span class="lineNoCov">          0 :     ss &lt;&lt; &quot;Cannot parse \&quot;&quot; &lt;&lt; str &lt;&lt; &quot;\&quot; as a dynd type&quot;;</span>
+<span class="lineNum">    1595 </span><span class="lineNoCov">          0 :     throw runtime_error(ss.str());</span>
+<span class="lineNum">    1596 </span>            :   }
+<a name="1597"><span class="lineNum">    1597 </span>            : </a>
+<span class="lineNum">    1598 </span><span class="lineCov">         12 :   return result;</span>
+<span class="lineNum">    1599 </span><span class="lineCov">          3 : }</span>
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.10</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

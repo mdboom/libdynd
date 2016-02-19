@@ -1,0 +1,202 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - coverage.info.cleaned - include/dynd/types/base_dim_type.hpp</title>
+  <link rel="stylesheet" type="text/css" href="../../../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../../../index.html">top level</a> - <a href="index.html">include/dynd/types</a> - base_dim_type.hpp<span style="font-size: 80%;"> (source / <a href="base_dim_type.hpp.func.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">coverage.info.cleaned</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">18</td>
+            <td class="headerCovTableEntry">25</td>
+            <td class="headerCovTableEntryLo">72.0 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2016-02-19</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">5</td>
+            <td class="headerCovTableEntry">7</td>
+            <td class="headerCovTableEntryLo">71.4 %</td>
+          </tr>
+          <tr><td><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : //</a>
+<span class="lineNum">       2 </span>            : // Copyright (C) 2011-15 DyND Developers
+<span class="lineNum">       3 </span>            : // BSD 2-Clause License, see LICENSE.txt
+<span class="lineNum">       4 </span>            : //
+<span class="lineNum">       5 </span>            : 
+<span class="lineNum">       6 </span>            : #pragma once
+<span class="lineNum">       7 </span>            : 
+<span class="lineNum">       8 </span>            : #include &lt;dynd/types/base_type.hpp&gt;
+<span class="lineNum">       9 </span>            : #include &lt;dynd/type.hpp&gt;
+<span class="lineNum">      10 </span>            : 
+<span class="lineNum">      11 </span>            : namespace dynd {
+<span class="lineNum">      12 </span>            : namespace ndt {
+<span class="lineNum">      13 </span>            : 
+<span class="lineNum">      14 </span>            :   /**
+<span class="lineNum">      15 </span>            :    * Base class for all array dimension types. If a type
+<span class="lineNum">      16 </span>            :    * has kind dim_kind, it must be a subclass of
+<span class="lineNum">      17 </span>            :    * base_dim_type.
+<span class="lineNum">      18 </span>            :    */
+<span class="lineNum">      19 </span>            :   class DYND_API base_dim_type : public base_type {
+<span class="lineNum">      20 </span>            :   protected:
+<span class="lineNum">      21 </span>            :     type m_element_tp;
+<span class="lineNum">      22 </span>            :     size_t m_element_arrmeta_offset;
+<a name="23"><span class="lineNum">      23 </span>            : </a>
+<span class="lineNum">      24 </span>            :   public:
+<span class="lineNum">      25 </span><span class="lineCov">       3416 :     base_dim_type(type_id_t type_id, type_kind_t tp_kind, const type &amp;element_tp, size_t data_size, size_t alignment,</span>
+<span class="lineNum">      26 </span>            :                   size_t element_arrmeta_offset, flags_type flags, bool strided)
+<span class="lineNum">      27 </span>            :         : base_type(type_id, tp_kind, data_size, alignment, flags | type_flag_indexable,
+<span class="lineNum">      28 </span><span class="lineCov">       6832 :                     element_arrmeta_offset + element_tp.get_arrmeta_size(), 1 + element_tp.get_ndim(),</span>
+<span class="lineNum">      29 </span><span class="lineCov">       1852 :                     strided ? (1 + element_tp.get_strided_ndim()) : 0),</span>
+<span class="lineNum">      30 </span><span class="lineCov">      12100 :           m_element_tp(element_tp), m_element_arrmeta_offset(element_arrmeta_offset)</span>
+<span class="lineNum">      31 </span>            :     {
+<span class="lineNum">      32 </span><span class="lineCov">       3416 :       if (m_element_tp.get_kind() == memory_kind) {</span>
+<span class="lineNum">      33 </span><span class="lineNoCov">          0 :         throw std::invalid_argument(&quot;a memory_type cannot be an element of a dim_type&quot;);</span>
+<span class="lineNum">      34 </span>            :       }
+<a name="35"><span class="lineNum">      35 </span><span class="lineCov">       3416 :     }</span></a>
+<span class="lineNum">      36 </span>            : 
+<span class="lineNum">      37 </span><span class="lineCov">       2132 :     base_dim_type(type_id_t tp_id, const type &amp;element_tp, size_t data_size, size_t data_alignment,</span>
+<span class="lineNum">      38 </span>            :                   size_t element_arrmeta_offset, flags_type flags, bool strided)
+<span class="lineNum">      39 </span><span class="lineCov">       2132 :         : base_dim_type(tp_id, dim_kind, element_tp, data_size, data_alignment, element_arrmeta_offset, flags, strided)</span>
+<span class="lineNum">      40 </span>            :     {
+<span class="lineNum">      41 </span><span class="lineCov">       2132 :     }</span>
+<span class="lineNum">      42 </span>            : 
+<span class="lineNum">      43 </span>            :     virtual ~base_dim_type();
+<a name="44"><span class="lineNum">      44 </span>            : </a>
+<span class="lineNum">      45 </span>            :     /** The element type. */
+<span class="lineNum">      46 </span><span class="lineCov">       2670 :     const type &amp;get_element_type() const { return m_element_tp; }</span>
+<span class="lineNum">      47 </span>            : 
+<span class="lineNum">      48 </span>            :     void get_element_types(std::size_t ndim, const type **element_tp) const;
+<span class="lineNum">      49 </span>            : 
+<span class="lineNum">      50 </span>            :     std::vector&lt;const type *&gt; get_element_types(std::size_t ndim) const
+<span class="lineNum">      51 </span>            :     {
+<span class="lineNum">      52 </span>            :       std::vector&lt;const type *&gt; element_tp(ndim);
+<span class="lineNum">      53 </span>            :       get_element_types(ndim, element_tp.data());
+<span class="lineNum">      54 </span>            : 
+<span class="lineNum">      55 </span>            :       return element_tp;
+<a name="56"><span class="lineNum">      56 </span>            :     }</a>
+<span class="lineNum">      57 </span>            : 
+<span class="lineNum">      58 </span><span class="lineCov">         27 :     bool is_type_subarray(const type &amp;subarray_tp) const</span>
+<span class="lineNum">      59 </span>            :     {
+<span class="lineNum">      60 </span>            :       // Uniform dimensions can share one implementation
+<span class="lineNum">      61 </span><span class="lineCov">         27 :       intptr_t this_ndim = get_ndim(), stp_ndim = subarray_tp.get_ndim();</span>
+<span class="lineNum">      62 </span><span class="lineCov">         27 :       if (this_ndim &gt; stp_ndim) {</span>
+<span class="lineNum">      63 </span><span class="lineCov">         11 :         return get_element_type().is_type_subarray(subarray_tp);</span>
+<span class="lineNum">      64 </span>            :       }
+<span class="lineNum">      65 </span><span class="lineCov">         16 :       else if (this_ndim == stp_ndim) {</span>
+<span class="lineNum">      66 </span><span class="lineCov">         14 :         return (*this) == (*subarray_tp.extended());</span>
+<span class="lineNum">      67 </span>            :       }
+<span class="lineNum">      68 </span>            :       else {
+<span class="lineNum">      69 </span><span class="lineCov">          2 :         return false;</span>
+<span class="lineNum">      70 </span>            :       }
+<span class="lineNum">      71 </span>            :     }
+<span class="lineNum">      72 </span>            : 
+<span class="lineNum">      73 </span>            :     /**
+<span class="lineNum">      74 </span>            :      * The offset to add to the arrmeta to get to the
+<a name="75"><span class="lineNum">      75 </span>            :      * element type's arrmeta.</a>
+<span class="lineNum">      76 </span>            :      */
+<span class="lineNum">      77 </span><span class="lineCov">         59 :     size_t get_element_arrmeta_offset() const { return m_element_arrmeta_offset; }</span>
+<span class="lineNum">      78 </span>            : 
+<span class="lineNum">      79 </span>            :     /**
+<span class="lineNum">      80 </span>            :      * The dimension size, or -1 if it can't be determined
+<span class="lineNum">      81 </span>            :      * from the information given.
+<span class="lineNum">      82 </span>            :      *
+<span class="lineNum">      83 </span>            :      * \param arrmeta  A arrmeta instance for the type, or NULL.
+<span class="lineNum">      84 </span>            :      * \param data  A data instance for the type/arrmeta, or NULL.
+<span class="lineNum">      85 </span>            :      *
+<span class="lineNum">      86 </span>            :      * \returns  The size of the dimension, or -1.
+<span class="lineNum">      87 </span>            :      */
+<a name="88"><span class="lineNum">      88 </span>            :     virtual intptr_t get_dim_size(const char *arrmeta = NULL, const char *data = NULL) const = 0;</a>
+<span class="lineNum">      89 </span>            : 
+<span class="lineNum">      90 </span><span class="lineNoCov">          0 :     intptr_t get_size(const char *arrmeta) const</span>
+<span class="lineNum">      91 </span>            :     {
+<span class="lineNum">      92 </span><span class="lineNoCov">          0 :       std::intptr_t dim_size = get_dim_size(arrmeta, NULL);</span>
+<span class="lineNum">      93 </span><span class="lineNoCov">          0 :       if (dim_size == -1) {</span>
+<span class="lineNum">      94 </span><span class="lineNoCov">          0 :         return -1;</span>
+<span class="lineNum">      95 </span>            :       }
+<span class="lineNum">      96 </span>            : 
+<span class="lineNum">      97 </span><span class="lineNoCov">          0 :       return dim_size * m_element_tp.get_size(NULL);</span>
+<a name="98"><span class="lineNum">      98 </span>            :     }</a>
+<span class="lineNum">      99 </span>            : 
+<span class="lineNum">     100 </span><span class="lineNoCov">          0 :     virtual void get_vars(std::unordered_set&lt;std::string&gt; &amp;vars) const { m_element_tp.get_vars(vars); }</span>
+<span class="lineNum">     101 </span>            : 
+<span class="lineNum">     102 </span>            :     /**
+<span class="lineNum">     103 </span>            :      * Constructs the nd::array arrmeta for one dimension of this type, leaving
+<span class="lineNum">     104 </span>            :      * the arrmeta for deeper dimensions uninitialized. Returns the size of
+<span class="lineNum">     105 </span>            :      * the arrmeta that was copied.
+<span class="lineNum">     106 </span>            :      *
+<span class="lineNum">     107 </span>            :      * \param dst_arrmeta  The new arrmeta memory which is constructed.
+<span class="lineNum">     108 </span>            :      * \param src_arrmeta   Existing arrmeta memory from which to copy.
+<span class="lineNum">     109 </span>            :      * \param embedded_reference  For references which are NULL, add this
+<span class="lineNum">     110 </span>            :      *                            reference in the output.
+<span class="lineNum">     111 </span>            :      *                            A NULL means the data was embedded in the
+<span class="lineNum">     112 </span>            :      *                            original nd::array, so
+<span class="lineNum">     113 </span>            :      *                            when putting it in a new nd::array, need to
+<span class="lineNum">     114 </span>            :      *                            hold a reference to that memory.
+<span class="lineNum">     115 </span>            :      */
+<span class="lineNum">     116 </span>            :     virtual size_t arrmeta_copy_construct_onedim(char *dst_arrmeta, const char *src_arrmeta,
+<span class="lineNum">     117 </span>            :                                                  const intrusive_ptr&lt;memory_block_data&gt; &amp;embedded_reference) const = 0;
+<span class="lineNum">     118 </span>            : 
+<span class="lineNum">     119 </span>            :     virtual bool match(const char *arrmeta, const type &amp;candidate_tp, const char *candidate_arrmeta,
+<span class="lineNum">     120 </span>            :                        std::map&lt;std::string, type&gt; &amp;tp_vars) const;
+<span class="lineNum">     121 </span>            : 
+<span class="lineNum">     122 </span>            :     virtual type with_element_type(const type &amp;element_tp) const = 0;
+<span class="lineNum">     123 </span>            :   };
+<span class="lineNum">     124 </span>            : 
+<span class="lineNum">     125 </span>            : } // namespace dynd::ndt
+<span class="lineNum">     126 </span>            : } // namespace dynd
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.10</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

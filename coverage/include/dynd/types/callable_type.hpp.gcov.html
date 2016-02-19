@@ -1,0 +1,257 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - coverage.info.cleaned - include/dynd/types/callable_type.hpp</title>
+  <link rel="stylesheet" type="text/css" href="../../../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../../../index.html">top level</a> - <a href="index.html">include/dynd/types</a> - callable_type.hpp<span style="font-size: 80%;"> (source / <a href="callable_type.hpp.func.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">coverage.info.cleaned</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">40</td>
+            <td class="headerCovTableEntry">41</td>
+            <td class="headerCovTableEntryHi">97.6 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2016-02-19</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">233</td>
+            <td class="headerCovTableEntry">351</td>
+            <td class="headerCovTableEntryLo">66.4 %</td>
+          </tr>
+          <tr><td><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : //</a>
+<span class="lineNum">       2 </span>            : // Copyright (C) 2011-15 DyND Developers
+<span class="lineNum">       3 </span>            : // BSD 2-Clause License, see LICENSE.txt
+<span class="lineNum">       4 </span>            : //
+<span class="lineNum">       5 </span>            : 
+<span class="lineNum">       6 </span>            : #pragma once
+<span class="lineNum">       7 </span>            : 
+<span class="lineNum">       8 </span>            : #include &lt;dynd/array.hpp&gt;
+<span class="lineNum">       9 </span>            : #include &lt;dynd/types/fixed_dim_type.hpp&gt;
+<span class="lineNum">      10 </span>            : #include &lt;dynd/types/fixed_dim_kind_type.hpp&gt;
+<span class="lineNum">      11 </span>            : #include &lt;dynd/types/tuple_type.hpp&gt;
+<span class="lineNum">      12 </span>            : #include &lt;dynd/types/struct_type.hpp&gt;
+<span class="lineNum">      13 </span>            : 
+<span class="lineNum">      14 </span>            : namespace dynd {
+<a name="15"><span class="lineNum">      15 </span>            : namespace ndt {</a>
+<span class="lineNum">      16 </span>            : 
+<span class="lineNum">      17 </span><span class="lineCov">      11334 :   class DYND_API callable_type : public base_type {</span>
+<span class="lineNum">      18 </span>            :     type m_return_type;
+<span class="lineNum">      19 </span>            :     // Always a tuple type containing the types for positional args
+<span class="lineNum">      20 </span>            :     type m_pos_tuple;
+<span class="lineNum">      21 </span>            :     // Always a struct type containing the names and types for keyword args
+<span class="lineNum">      22 </span>            :     type m_kwd_struct;
+<span class="lineNum">      23 </span>            : 
+<span class="lineNum">      24 </span>            :     // Indices of the optional args
+<span class="lineNum">      25 </span>            :     std::vector&lt;intptr_t&gt; m_opt_kwd_indices;
+<span class="lineNum">      26 </span>            : 
+<span class="lineNum">      27 </span>            :     struct get_pos_types_kernel;
+<span class="lineNum">      28 </span>            : 
+<span class="lineNum">      29 </span>            :   public:
+<span class="lineNum">      30 </span>            :     typedef nd::callable data_type;
+<span class="lineNum">      31 </span>            : 
+<a name="32"><span class="lineNum">      32 </span>            :     callable_type(const type &amp;ret_type, const type &amp;pos_types, const type &amp;kwd_types);</a>
+<span class="lineNum">      33 </span>            : 
+<a name="34"><span class="lineNum">      34 </span><span class="lineCov">       9234 :     const type &amp;get_return_type() const { return m_return_type; }</span></a>
+<span class="lineNum">      35 </span>            : 
+<a name="36"><span class="lineNum">      36 </span><span class="lineCov">         14 :     const type &amp;get_pos_tuple() const { return m_pos_tuple; }</span></a>
+<span class="lineNum">      37 </span>            : 
+<a name="38"><span class="lineNum">      38 </span><span class="lineCov">        392 :     const std::vector&lt;type&gt; &amp;get_pos_types() const { return m_pos_tuple.extended&lt;tuple_type&gt;()-&gt;get_field_types(); }</span></a>
+<span class="lineNum">      39 </span>            : 
+<a name="40"><span class="lineNum">      40 </span><span class="lineCov">      10909 :     bool is_pos_variadic() const { return m_pos_tuple.extended&lt;tuple_type&gt;()-&gt;is_variadic(); }</span></a>
+<span class="lineNum">      41 </span>            : 
+<a name="42"><span class="lineNum">      42 </span><span class="lineCov">       2906 :     bool is_kwd_variadic() const { return m_kwd_struct.extended&lt;struct_type&gt;()-&gt;is_variadic(); }</span></a>
+<span class="lineNum">      43 </span>            : 
+<a name="44"><span class="lineNum">      44 </span><span class="lineCov">        395 :     const type &amp;get_kwd_struct() const { return m_kwd_struct; }</span></a>
+<span class="lineNum">      45 </span>            : 
+<a name="46"><span class="lineNum">      46 </span><span class="lineCov">          4 :     const std::vector&lt;type&gt; &amp;get_kwd_types() const { return m_kwd_struct.extended&lt;struct_type&gt;()-&gt;get_field_types(); }</span></a>
+<span class="lineNum">      47 </span>            : 
+<span class="lineNum">      48 </span><span class="lineCov">          2 :     const std::vector&lt;std::string&gt; &amp;get_kwd_names() const</span>
+<span class="lineNum">      49 </span>            :     {
+<span class="lineNum">      50 </span><span class="lineCov">          2 :       return m_kwd_struct.extended&lt;struct_type&gt;()-&gt;get_field_names();</span>
+<a name="51"><span class="lineNum">      51 </span>            :     }</a>
+<span class="lineNum">      52 </span>            : 
+<span class="lineNum">      53 </span><span class="lineCov">       6391 :     const type &amp;get_pos_type(intptr_t i) const</span>
+<span class="lineNum">      54 </span>            :     {
+<span class="lineNum">      55 </span><span class="lineCov">       6391 :       if (i == -1) {</span>
+<span class="lineNum">      56 </span><span class="lineNoCov">          0 :         return get_return_type();</span>
+<span class="lineNum">      57 </span>            :       }
+<span class="lineNum">      58 </span>            : 
+<span class="lineNum">      59 </span><span class="lineCov">       6391 :       return m_pos_tuple.extended&lt;tuple_type&gt;()-&gt;get_field_type(i);</span>
+<a name="60"><span class="lineNum">      60 </span>            :     }</a>
+<span class="lineNum">      61 </span>            : 
+<a name="62"><span class="lineNum">      62 </span><span class="lineCov">       1065 :     const type &amp;get_kwd_type(intptr_t i) const { return m_kwd_struct.extended&lt;struct_type&gt;()-&gt;get_field_type(i); }</span></a>
+<span class="lineNum">      63 </span>            : 
+<a name="64"><span class="lineNum">      64 </span><span class="lineCov">          8 :     std::string get_kwd_name(intptr_t i) const { return m_kwd_struct.extended&lt;struct_type&gt;()-&gt;get_field_name(i); }</span></a>
+<span class="lineNum">      65 </span>            : 
+<span class="lineNum">      66 </span><span class="lineCov">       1856 :     intptr_t get_kwd_index(const std::string &amp;arg_name) const</span>
+<span class="lineNum">      67 </span>            :     {
+<span class="lineNum">      68 </span><span class="lineCov">       1856 :       return m_kwd_struct.extended&lt;struct_type&gt;()-&gt;get_field_index(arg_name);</span>
+<span class="lineNum">      69 </span>            :     }
+<span class="lineNum">      70 </span>            : 
+<span class="lineNum">      71 </span>            :     void get_vars(std::unordered_set&lt;std::string&gt; &amp;vars) const;
+<span class="lineNum">      72 </span>            : 
+<a name="73"><span class="lineNum">      73 </span>            :     bool has_kwd(const std::string &amp;name) const { return get_kwd_index(name) != -1; }</a>
+<span class="lineNum">      74 </span>            : 
+<span class="lineNum">      75 </span><span class="lineCov">       2894 :     const std::vector&lt;intptr_t&gt; &amp;get_option_kwd_indices() const { return m_opt_kwd_indices; }</span>
+<a name="76"><span class="lineNum">      76 </span>            : </a>
+<span class="lineNum">      77 </span>            :     /** Returns the number of arguments, both positional and keyword. */
+<span class="lineNum">      78 </span><span class="lineCov">         81 :     intptr_t get_narg() const { return get_npos() + get_nkwd(); }</span>
+<a name="79"><span class="lineNum">      79 </span>            : </a>
+<span class="lineNum">      80 </span>            :     /** Returns the number of positional arguments. */
+<span class="lineNum">      81 </span><span class="lineCov">      13998 :     intptr_t get_npos() const { return m_pos_tuple.extended&lt;tuple_type&gt;()-&gt;get_field_count(); }</span>
+<a name="82"><span class="lineNum">      82 </span>            : </a>
+<span class="lineNum">      83 </span>            :     /** Returns the number of keyword arguments. */
+<span class="lineNum">      84 </span><span class="lineCov">      15374 :     intptr_t get_nkwd() const { return m_kwd_struct.extended&lt;tuple_type&gt;()-&gt;get_field_count(); }</span>
+<span class="lineNum">      85 </span>            : 
+<span class="lineNum">      86 </span>            :     /** Returns the number of optional arguments. */
+<span class="lineNum">      87 </span>            :     intptr_t get_nopt() const { return m_opt_kwd_indices.size(); }
+<span class="lineNum">      88 </span>            : 
+<span class="lineNum">      89 </span>            :     void print_data(std::ostream &amp;o, const char *arrmeta, const char *data) const;
+<span class="lineNum">      90 </span>            : 
+<span class="lineNum">      91 </span>            :     void print_type(std::ostream &amp;o) const;
+<span class="lineNum">      92 </span>            : 
+<span class="lineNum">      93 </span>            :     void transform_child_types(type_transform_fn_t transform_fn, intptr_t arrmeta_offset, void *extra,
+<span class="lineNum">      94 </span>            :                                type &amp;out_transformed_tp, bool &amp;out_was_transformed) const;
+<span class="lineNum">      95 </span>            :     type get_canonical_type() const;
+<span class="lineNum">      96 </span>            : 
+<span class="lineNum">      97 </span>            :     type apply_linear_index(intptr_t nindices, const irange *indices, size_t current_i, const type &amp;root_tp,
+<span class="lineNum">      98 </span>            :                             bool leading_dimension) const;
+<span class="lineNum">      99 </span>            :     intptr_t apply_linear_index(intptr_t nindices, const irange *indices, const char *arrmeta, const type &amp;result_tp,
+<span class="lineNum">     100 </span>            :                                 char *out_arrmeta, const intrusive_ptr&lt;memory_block_data&gt; &amp;embedded_reference,
+<span class="lineNum">     101 </span>            :                                 size_t current_i, const type &amp;root_tp, bool leading_dimension, char **inout_data,
+<span class="lineNum">     102 </span>            :                                 intrusive_ptr&lt;memory_block_data&gt; &amp;inout_dataref) const;
+<span class="lineNum">     103 </span>            : 
+<span class="lineNum">     104 </span>            :     bool is_lossless_assignment(const type &amp;dst_tp, const type &amp;src_tp) const;
+<span class="lineNum">     105 </span>            : 
+<span class="lineNum">     106 </span>            :     bool operator==(const base_type &amp;rhs) const;
+<span class="lineNum">     107 </span>            : 
+<span class="lineNum">     108 </span>            :     void arrmeta_default_construct(char *arrmeta, bool blockref_alloc) const;
+<span class="lineNum">     109 </span>            :     void arrmeta_copy_construct(char *dst_arrmeta, const char *src_arrmeta,
+<span class="lineNum">     110 </span>            :                                 const intrusive_ptr&lt;memory_block_data&gt; &amp;embedded_reference) const;
+<span class="lineNum">     111 </span>            :     void arrmeta_reset_buffers(char *arrmeta) const;
+<span class="lineNum">     112 </span>            :     void arrmeta_finalize_buffers(char *arrmeta) const;
+<span class="lineNum">     113 </span>            :     void arrmeta_destruct(char *arrmeta) const;
+<span class="lineNum">     114 </span>            : 
+<span class="lineNum">     115 </span>            :     void data_destruct(const char *arrmeta, char *data) const;
+<span class="lineNum">     116 </span>            :     void data_destruct_strided(const char *arrmeta, char *data, intptr_t stride, size_t count) const;
+<span class="lineNum">     117 </span>            : 
+<span class="lineNum">     118 </span>            :     bool match(const char *arrmeta, const type &amp;candidate_tp, const char *candidate_arrmeta,
+<span class="lineNum">     119 </span>            :                std::map&lt;std::string, type&gt; &amp;tp_vars) const;
+<span class="lineNum">     120 </span>            : 
+<span class="lineNum">     121 </span>            :     std::map&lt;std::string, nd::callable&gt; get_dynamic_type_properties() const;
+<span class="lineNum">     122 </span>            :     std::map&lt;std::string, nd::callable&gt; get_dynamic_array_functions() const;
+<a name="123"><span class="lineNum">     123 </span>            : </a>
+<span class="lineNum">     124 </span>            :     /** Makes an callable type with both positional and keyword arguments */
+<span class="lineNum">     125 </span><span class="lineCov">       5667 :     static type make(const type &amp;ret_tp, const type &amp;tuple_tp, const type &amp;struct_tp)</span>
+<span class="lineNum">     126 </span>            :     {
+<span class="lineNum">     127 </span><span class="lineCov">       5667 :       return type(new callable_type(ret_tp, tuple_tp, struct_tp), false);</span>
+<span class="lineNum">     128 </span>            :     }
+<a name="129"><span class="lineNum">     129 </span>            : </a>
+<span class="lineNum">     130 </span>            :     /** Makes an callable type with both positional and keyword arguments */
+<span class="lineNum">     131 </span><span class="lineCov">       1119 :     static type make(const type &amp;ret_tp, const std::vector&lt;type&gt; &amp;pos_tp, const std::vector&lt;std::string&gt; &amp;kwd_names,</span>
+<span class="lineNum">     132 </span>            :                      const std::vector&lt;type&gt; &amp;kwd_tp)
+<span class="lineNum">     133 </span>            :     {
+<span class="lineNum">     134 </span><span class="lineCov">       1119 :       return make(ret_tp, tuple_type::make(pos_tp), struct_type::make(kwd_names, kwd_tp));</span>
+<span class="lineNum">     135 </span>            :     }
+<a name="136"><span class="lineNum">     136 </span>            : </a>
+<span class="lineNum">     137 </span>            :     /** Makes an callable type with just positional arguments */
+<span class="lineNum">     138 </span><span class="lineCov">        457 :     static type make(const type &amp;ret_tp, const type &amp;tuple_tp)</span>
+<span class="lineNum">     139 </span>            :     {
+<span class="lineNum">     140 </span><span class="lineCov">        457 :       if (tuple_tp.get_id() != tuple_id) {</span>
+<span class="lineNum">     141 </span><span class="lineCov">        162 :         return make(ret_tp, tuple_type::make({tuple_tp}), struct_type::make());</span>
+<span class="lineNum">     142 </span>            :       }
+<span class="lineNum">     143 </span>            : 
+<span class="lineNum">     144 </span><span class="lineCov">        295 :       return make(ret_tp, tuple_tp, struct_type::make(tuple_tp.extended&lt;tuple_type&gt;()-&gt;is_variadic()));</span>
+<span class="lineNum">     145 </span>            :     }
+<a name="146"><span class="lineNum">     146 </span>            : </a>
+<span class="lineNum">     147 </span>            :     /** Makes an callable type with just positional arguments */
+<span class="lineNum">     148 </span><span class="lineCov">       1894 :     static type make(const type &amp;ret_tp, const std::vector&lt;type&gt; &amp;pos_tp)</span>
+<span class="lineNum">     149 </span>            :     {
+<span class="lineNum">     150 </span><span class="lineCov">       1894 :       return make(ret_tp, tuple_type::make(pos_tp), struct_type::make());</span>
+<span class="lineNum">     151 </span>            :     }
+<a name="152"><span class="lineNum">     152 </span>            : </a>
+<span class="lineNum">     153 </span>            :     /** Makes an callable type with no arguments */
+<span class="lineNum">     154 </span><span class="lineCov">         21 :     static type make(const type &amp;ret_tp) { return make(ret_tp, tuple_type::make(), struct_type::make()); }</span>
+<span class="lineNum">     155 </span>            :   };
+<span class="lineNum">     156 </span>            : 
+<a name="157"><span class="lineNum">     157 </span>            :   template &lt;typename R&gt;</a>
+<span class="lineNum">     158 </span>            :   struct traits&lt;R()&gt; {
+<span class="lineNum">     159 </span><span class="lineCov">          7 :     static type equivalent() { return callable_type::make(make_type&lt;R&gt;()); }</span>
+<span class="lineNum">     160 </span>            :   };
+<span class="lineNum">     161 </span>            : 
+<a name="162"><span class="lineNum">     162 </span>            :   template &lt;typename R, typename A0, typename... A&gt;</a>
+<span class="lineNum">     163 </span>            :   struct traits&lt;R(A0, A...)&gt; {
+<span class="lineNum">     164 </span><span class="lineCov">        753 :     static type equivalent() { return callable_type::make(make_type&lt;R&gt;(), {make_type&lt;A0&gt;(), make_type&lt;A&gt;()...}); }</span>
+<a name="165"><span class="lineNum">     165 </span>            : </a>
+<span class="lineNum">     166 </span>            :     template &lt;typename... T&gt;
+<span class="lineNum">     167 </span><span class="lineCov">        836 :     static type equivalent(const T &amp;... names)</span>
+<span class="lineNum">     168 </span>            :     {
+<span class="lineNum">     169 </span><span class="lineCov">        836 :       size_t num_pos = 1 + sizeof...(A) - sizeof...(T);</span>
+<span class="lineNum">     170 </span><span class="lineCov">       1672 :       const std::vector&lt;type&gt; tp{make_type&lt;A0&gt;(), make_type&lt;A&gt;()...};</span>
+<span class="lineNum">     171 </span><span class="lineCov">       1672 :       const std::vector&lt;type&gt; pos(tp.begin(), tp.begin() + num_pos);</span>
+<span class="lineNum">     172 </span><span class="lineCov">       1672 :       const std::vector&lt;type&gt; kwargs(tp.begin() + num_pos, tp.end());</span>
+<span class="lineNum">     173 </span>            : 
+<span class="lineNum">     174 </span><span class="lineCov">       1672 :       return callable_type::make(make_type&lt;R&gt;(), pos, {names...}, kwargs);</span>
+<span class="lineNum">     175 </span>            :     }
+<span class="lineNum">     176 </span>            :   };
+<span class="lineNum">     177 </span>            : 
+<span class="lineNum">     178 </span>            :   DYND_API type make_generic_funcproto(intptr_t nargs);
+<span class="lineNum">     179 </span>            : 
+<span class="lineNum">     180 </span>            : } // namespace dynd::ndt
+<span class="lineNum">     181 </span>            : } // namespace dynd
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.10</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

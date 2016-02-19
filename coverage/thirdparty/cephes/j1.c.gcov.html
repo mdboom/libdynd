@@ -1,0 +1,597 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - coverage.info - thirdparty/cephes/j1.c</title>
+  <link rel="stylesheet" type="text/css" href="../../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../../index.html">top level</a> - <a href="index.html">thirdparty/cephes</a> - j1.c<span style="font-size: 80%;"> (source / <a href="j1.c.func.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">coverage.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">31</td>
+            <td class="headerCovTableEntry">35</td>
+            <td class="headerCovTableEntryMed">88.6 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2016-02-19</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">2</td>
+            <td class="headerCovTableEntry">2</td>
+            <td class="headerCovTableEntryHi">100.0 %</td>
+          </tr>
+          <tr><td><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : /*                                                     j1.c</a>
+<span class="lineNum">       2 </span>            :  *
+<span class="lineNum">       3 </span>            :  *     Bessel function of order one
+<span class="lineNum">       4 </span>            :  *
+<span class="lineNum">       5 </span>            :  *
+<span class="lineNum">       6 </span>            :  *
+<span class="lineNum">       7 </span>            :  * SYNOPSIS:
+<span class="lineNum">       8 </span>            :  *
+<span class="lineNum">       9 </span>            :  * double x, y, j1();
+<span class="lineNum">      10 </span>            :  *
+<span class="lineNum">      11 </span>            :  * y = j1( x );
+<span class="lineNum">      12 </span>            :  *
+<span class="lineNum">      13 </span>            :  *
+<span class="lineNum">      14 </span>            :  *
+<span class="lineNum">      15 </span>            :  * DESCRIPTION:
+<span class="lineNum">      16 </span>            :  *
+<span class="lineNum">      17 </span>            :  * Returns Bessel function of order one of the argument.
+<span class="lineNum">      18 </span>            :  *
+<span class="lineNum">      19 </span>            :  * The domain is divided into the intervals [0, 8] and
+<span class="lineNum">      20 </span>            :  * (8, infinity). In the first interval a 24 term Chebyshev
+<span class="lineNum">      21 </span>            :  * expansion is used. In the second, the asymptotic
+<span class="lineNum">      22 </span>            :  * trigonometric representation is employed using two
+<span class="lineNum">      23 </span>            :  * rational functions of degree 5/5.
+<span class="lineNum">      24 </span>            :  *
+<span class="lineNum">      25 </span>            :  *
+<span class="lineNum">      26 </span>            :  *
+<span class="lineNum">      27 </span>            :  * ACCURACY:
+<span class="lineNum">      28 </span>            :  *
+<span class="lineNum">      29 </span>            :  *                      Absolute error:
+<span class="lineNum">      30 </span>            :  * arithmetic   domain      # trials      peak         rms
+<span class="lineNum">      31 </span>            :  *    DEC       0, 30       10000       4.0e-17     1.1e-17
+<span class="lineNum">      32 </span>            :  *    IEEE      0, 30       30000       2.6e-16     1.1e-16
+<span class="lineNum">      33 </span>            :  *
+<span class="lineNum">      34 </span>            :  *
+<span class="lineNum">      35 </span>            :  */
+<span class="lineNum">      36 </span>            : /*                                                     y1.c
+<span class="lineNum">      37 </span>            :  *
+<span class="lineNum">      38 </span>            :  *      Bessel function of second kind of order one
+<span class="lineNum">      39 </span>            :  *
+<span class="lineNum">      40 </span>            :  *
+<span class="lineNum">      41 </span>            :  *
+<span class="lineNum">      42 </span>            :  * SYNOPSIS:
+<span class="lineNum">      43 </span>            :  *
+<span class="lineNum">      44 </span>            :  * double x, y, y1();
+<span class="lineNum">      45 </span>            :  *
+<span class="lineNum">      46 </span>            :  * y = y1( x );
+<span class="lineNum">      47 </span>            :  *
+<span class="lineNum">      48 </span>            :  *
+<span class="lineNum">      49 </span>            :  *
+<span class="lineNum">      50 </span>            :  * DESCRIPTION:
+<span class="lineNum">      51 </span>            :  *
+<span class="lineNum">      52 </span>            :  * Returns Bessel function of the second kind of order one
+<span class="lineNum">      53 </span>            :  * of the argument.
+<span class="lineNum">      54 </span>            :  *
+<span class="lineNum">      55 </span>            :  * The domain is divided into the intervals [0, 8] and
+<span class="lineNum">      56 </span>            :  * (8, infinity). In the first interval a 25 term Chebyshev
+<span class="lineNum">      57 </span>            :  * expansion is used, and a call to j1() is required.
+<span class="lineNum">      58 </span>            :  * In the second, the asymptotic trigonometric representation
+<span class="lineNum">      59 </span>            :  * is employed using two rational functions of degree 5/5.
+<span class="lineNum">      60 </span>            :  *
+<span class="lineNum">      61 </span>            :  *
+<span class="lineNum">      62 </span>            :  *
+<span class="lineNum">      63 </span>            :  * ACCURACY:
+<span class="lineNum">      64 </span>            :  *
+<span class="lineNum">      65 </span>            :  *                      Absolute error:
+<span class="lineNum">      66 </span>            :  * arithmetic   domain      # trials      peak         rms
+<span class="lineNum">      67 </span>            :  *    DEC       0, 30       10000       8.6e-17     1.3e-17
+<span class="lineNum">      68 </span>            :  *    IEEE      0, 30       30000       1.0e-15     1.3e-16
+<span class="lineNum">      69 </span>            :  *
+<span class="lineNum">      70 </span>            :  * (error criterion relative when |y1| &gt; 1).
+<span class="lineNum">      71 </span>            :  *
+<span class="lineNum">      72 </span>            :  */
+<span class="lineNum">      73 </span>            : 
+<span class="lineNum">      74 </span>            : 
+<span class="lineNum">      75 </span>            : /*
+<span class="lineNum">      76 </span>            :  * Cephes Math Library Release 2.8:  June, 2000
+<span class="lineNum">      77 </span>            :  * Copyright 1984, 1987, 1989, 2000 by Stephen L. Moshier
+<span class="lineNum">      78 </span>            :  */
+<span class="lineNum">      79 </span>            : 
+<span class="lineNum">      80 </span>            : /*
+<span class="lineNum">      81 </span>            :  * #define PIO4 .78539816339744830962
+<span class="lineNum">      82 </span>            :  * #define THPIO4 2.35619449019234492885
+<span class="lineNum">      83 </span>            :  * #define SQ2OPI .79788456080286535588
+<span class="lineNum">      84 </span>            :  */
+<span class="lineNum">      85 </span>            : 
+<span class="lineNum">      86 </span>            : #include &quot;mconf.h&quot;
+<span class="lineNum">      87 </span>            : 
+<span class="lineNum">      88 </span>            : #ifdef UNK
+<span class="lineNum">      89 </span>            : static double RP[4] = {
+<span class="lineNum">      90 </span>            :     -8.99971225705559398224E8,
+<span class="lineNum">      91 </span>            :     4.52228297998194034323E11,
+<span class="lineNum">      92 </span>            :     -7.27494245221818276015E13,
+<span class="lineNum">      93 </span>            :     3.68295732863852883286E15,
+<span class="lineNum">      94 </span>            : };
+<span class="lineNum">      95 </span>            : 
+<span class="lineNum">      96 </span>            : static double RQ[8] = {
+<span class="lineNum">      97 </span>            :     /* 1.00000000000000000000E0, */
+<span class="lineNum">      98 </span>            :     6.20836478118054335476E2,
+<span class="lineNum">      99 </span>            :     2.56987256757748830383E5,
+<span class="lineNum">     100 </span>            :     8.35146791431949253037E7,
+<span class="lineNum">     101 </span>            :     2.21511595479792499675E10,
+<span class="lineNum">     102 </span>            :     4.74914122079991414898E12,
+<span class="lineNum">     103 </span>            :     7.84369607876235854894E14,
+<span class="lineNum">     104 </span>            :     8.95222336184627338078E16,
+<span class="lineNum">     105 </span>            :     5.32278620332680085395E18,
+<span class="lineNum">     106 </span>            : };
+<span class="lineNum">     107 </span>            : #endif
+<span class="lineNum">     108 </span>            : #ifdef DEC
+<span class="lineNum">     109 </span>            : static unsigned short RP[16] = {
+<span class="lineNum">     110 </span>            :     0147526, 0110742, 0063322, 0077052,
+<span class="lineNum">     111 </span>            :     0051722, 0112720, 0065034, 0061530,
+<span class="lineNum">     112 </span>            :     0153604, 0052227, 0033147, 0105650,
+<span class="lineNum">     113 </span>            :     0055121, 0055025, 0032276, 0022015,
+<span class="lineNum">     114 </span>            : };
+<span class="lineNum">     115 </span>            : 
+<span class="lineNum">     116 </span>            : static unsigned short RQ[32] = {
+<span class="lineNum">     117 </span>            :     /*0040200,0000000,0000000,0000000, */
+<span class="lineNum">     118 </span>            :     0042433, 0032610, 0155604, 0033473,
+<span class="lineNum">     119 </span>            :     0044572, 0173320, 0067270, 0006616,
+<span class="lineNum">     120 </span>            :     0046637, 0045246, 0162225, 0006606,
+<span class="lineNum">     121 </span>            :     0050645, 0004773, 0157577, 0053004,
+<span class="lineNum">     122 </span>            :     0052612, 0033734, 0001667, 0176501,
+<span class="lineNum">     123 </span>            :     0054462, 0054121, 0173147, 0121367,
+<span class="lineNum">     124 </span>            :     0056237, 0002777, 0121451, 0176007,
+<span class="lineNum">     125 </span>            :     0057623, 0136253, 0131601, 0044710,
+<span class="lineNum">     126 </span>            : };
+<span class="lineNum">     127 </span>            : #endif
+<span class="lineNum">     128 </span>            : #ifdef IBMPC
+<span class="lineNum">     129 </span>            : static unsigned short RP[16] = {
+<span class="lineNum">     130 </span>            :     0x4fc5, 0x4cda, 0xd23c, 0xc1ca,
+<span class="lineNum">     131 </span>            :     0x8c6b, 0x0d43, 0x52ba, 0x425a,
+<span class="lineNum">     132 </span>            :     0xf175, 0xe6cc, 0x8a92, 0xc2d0,
+<span class="lineNum">     133 </span>            :     0xc482, 0xa697, 0x2b42, 0x432a,
+<span class="lineNum">     134 </span>            : };
+<span class="lineNum">     135 </span>            : 
+<span class="lineNum">     136 </span>            : static unsigned short RQ[32] = {
+<span class="lineNum">     137 </span>            :     /*0x0000,0x0000,0x0000,0x3ff0, */
+<span class="lineNum">     138 </span>            :     0x86e7, 0x1b70, 0x66b1, 0x4083,
+<span class="lineNum">     139 </span>            :     0x01b2, 0x0dd7, 0x5eda, 0x410f,
+<span class="lineNum">     140 </span>            :     0xa1b1, 0xdc92, 0xe954, 0x4193,
+<span class="lineNum">     141 </span>            :     0xeac1, 0x7bef, 0xa13f, 0x4214,
+<span class="lineNum">     142 </span>            :     0xffa8, 0x8076, 0x46fb, 0x4291,
+<span class="lineNum">     143 </span>            :     0xf45f, 0x3ecc, 0x4b0a, 0x4306,
+<span class="lineNum">     144 </span>            :     0x3f81, 0xf465, 0xe0bf, 0x4373,
+<span class="lineNum">     145 </span>            :     0x2939, 0x7670, 0x7795, 0x43d2,
+<span class="lineNum">     146 </span>            : };
+<span class="lineNum">     147 </span>            : #endif
+<span class="lineNum">     148 </span>            : #ifdef MIEEE
+<span class="lineNum">     149 </span>            : static unsigned short RP[16] = {
+<span class="lineNum">     150 </span>            :     0xc1ca, 0xd23c, 0x4cda, 0x4fc5,
+<span class="lineNum">     151 </span>            :     0x425a, 0x52ba, 0x0d43, 0x8c6b,
+<span class="lineNum">     152 </span>            :     0xc2d0, 0x8a92, 0xe6cc, 0xf175,
+<span class="lineNum">     153 </span>            :     0x432a, 0x2b42, 0xa697, 0xc482,
+<span class="lineNum">     154 </span>            : };
+<span class="lineNum">     155 </span>            : 
+<span class="lineNum">     156 </span>            : static unsigned short RQ[32] = {
+<span class="lineNum">     157 </span>            :     /*0x3ff0,0x0000,0x0000,0x0000, */
+<span class="lineNum">     158 </span>            :     0x4083, 0x66b1, 0x1b70, 0x86e7,
+<span class="lineNum">     159 </span>            :     0x410f, 0x5eda, 0x0dd7, 0x01b2,
+<span class="lineNum">     160 </span>            :     0x4193, 0xe954, 0xdc92, 0xa1b1,
+<span class="lineNum">     161 </span>            :     0x4214, 0xa13f, 0x7bef, 0xeac1,
+<span class="lineNum">     162 </span>            :     0x4291, 0x46fb, 0x8076, 0xffa8,
+<span class="lineNum">     163 </span>            :     0x4306, 0x4b0a, 0x3ecc, 0xf45f,
+<span class="lineNum">     164 </span>            :     0x4373, 0xe0bf, 0xf465, 0x3f81,
+<span class="lineNum">     165 </span>            :     0x43d2, 0x7795, 0x7670, 0x2939,
+<span class="lineNum">     166 </span>            : };
+<span class="lineNum">     167 </span>            : #endif
+<span class="lineNum">     168 </span>            : 
+<span class="lineNum">     169 </span>            : #ifdef UNK
+<span class="lineNum">     170 </span>            : static double PP[7] = {
+<span class="lineNum">     171 </span>            :     7.62125616208173112003E-4,
+<span class="lineNum">     172 </span>            :     7.31397056940917570436E-2,
+<span class="lineNum">     173 </span>            :     1.12719608129684925192E0,
+<span class="lineNum">     174 </span>            :     5.11207951146807644818E0,
+<span class="lineNum">     175 </span>            :     8.42404590141772420927E0,
+<span class="lineNum">     176 </span>            :     5.21451598682361504063E0,
+<span class="lineNum">     177 </span>            :     1.00000000000000000254E0,
+<span class="lineNum">     178 </span>            : };
+<span class="lineNum">     179 </span>            : 
+<span class="lineNum">     180 </span>            : static double PQ[7] = {
+<span class="lineNum">     181 </span>            :     5.71323128072548699714E-4,
+<span class="lineNum">     182 </span>            :     6.88455908754495404082E-2,
+<span class="lineNum">     183 </span>            :     1.10514232634061696926E0,
+<span class="lineNum">     184 </span>            :     5.07386386128601488557E0,
+<span class="lineNum">     185 </span>            :     8.39985554327604159757E0,
+<span class="lineNum">     186 </span>            :     5.20982848682361821619E0,
+<span class="lineNum">     187 </span>            :     9.99999999999999997461E-1,
+<span class="lineNum">     188 </span>            : };
+<span class="lineNum">     189 </span>            : #endif
+<span class="lineNum">     190 </span>            : #ifdef DEC
+<span class="lineNum">     191 </span>            : static unsigned short PP[28] = {
+<span class="lineNum">     192 </span>            :     0035507, 0144542, 0061543, 0024326,
+<span class="lineNum">     193 </span>            :     0037225, 0145105, 0017766, 0022661,
+<span class="lineNum">     194 </span>            :     0040220, 0043766, 0010254, 0133255,
+<span class="lineNum">     195 </span>            :     0040643, 0113047, 0142611, 0151521,
+<span class="lineNum">     196 </span>            :     0041006, 0144344, 0055351, 0074261,
+<span class="lineNum">     197 </span>            :     0040646, 0156520, 0120574, 0006416,
+<span class="lineNum">     198 </span>            :     0040200, 0000000, 0000000, 0000000,
+<span class="lineNum">     199 </span>            : };
+<span class="lineNum">     200 </span>            : 
+<span class="lineNum">     201 </span>            : static unsigned short PQ[28] = {
+<span class="lineNum">     202 </span>            :     0035425, 0142330, 0115041, 0165514,
+<span class="lineNum">     203 </span>            :     0037214, 0177352, 0145105, 0052026,
+<span class="lineNum">     204 </span>            :     0040215, 0072515, 0141207, 0073255,
+<span class="lineNum">     205 </span>            :     0040642, 0056427, 0137222, 0106405,
+<span class="lineNum">     206 </span>            :     0041006, 0062716, 0166427, 0165450,
+<span class="lineNum">     207 </span>            :     0040646, 0133352, 0035425, 0123304,
+<span class="lineNum">     208 </span>            :     0040200, 0000000, 0000000, 0000000,
+<span class="lineNum">     209 </span>            : };
+<span class="lineNum">     210 </span>            : #endif
+<span class="lineNum">     211 </span>            : #ifdef IBMPC
+<span class="lineNum">     212 </span>            : static unsigned short PP[28] = {
+<span class="lineNum">     213 </span>            :     0x651b, 0x4c6c, 0xf92c, 0x3f48,
+<span class="lineNum">     214 </span>            :     0xc4b6, 0xa3fe, 0xb948, 0x3fb2,
+<span class="lineNum">     215 </span>            :     0x96d6, 0xc215, 0x08fe, 0x3ff2,
+<span class="lineNum">     216 </span>            :     0x3a6a, 0xf8b1, 0x72c4, 0x4014,
+<span class="lineNum">     217 </span>            :     0x2f16, 0x8b5d, 0xd91c, 0x4020,
+<span class="lineNum">     218 </span>            :     0x81a2, 0x142f, 0xdbaa, 0x4014,
+<span class="lineNum">     219 </span>            :     0x0000, 0x0000, 0x0000, 0x3ff0,
+<span class="lineNum">     220 </span>            : };
+<span class="lineNum">     221 </span>            : 
+<span class="lineNum">     222 </span>            : static unsigned short PQ[28] = {
+<span class="lineNum">     223 </span>            :     0x3d69, 0x1344, 0xb89b, 0x3f42,
+<span class="lineNum">     224 </span>            :     0xaa83, 0x5948, 0x9fdd, 0x3fb1,
+<span class="lineNum">     225 </span>            :     0xeed6, 0xb850, 0xaea9, 0x3ff1,
+<span class="lineNum">     226 </span>            :     0x51a1, 0xf7d2, 0x4ba2, 0x4014,
+<span class="lineNum">     227 </span>            :     0xfd65, 0xdda2, 0xccb9, 0x4020,
+<span class="lineNum">     228 </span>            :     0xb4d9, 0x4762, 0xd6dd, 0x4014,
+<span class="lineNum">     229 </span>            :     0x0000, 0x0000, 0x0000, 0x3ff0,
+<span class="lineNum">     230 </span>            : };
+<span class="lineNum">     231 </span>            : #endif
+<span class="lineNum">     232 </span>            : #ifdef MIEEE
+<span class="lineNum">     233 </span>            : static unsigned short PP[28] = {
+<span class="lineNum">     234 </span>            :     0x3f48, 0xf92c, 0x4c6c, 0x651b,
+<span class="lineNum">     235 </span>            :     0x3fb2, 0xb948, 0xa3fe, 0xc4b6,
+<span class="lineNum">     236 </span>            :     0x3ff2, 0x08fe, 0xc215, 0x96d6,
+<span class="lineNum">     237 </span>            :     0x4014, 0x72c4, 0xf8b1, 0x3a6a,
+<span class="lineNum">     238 </span>            :     0x4020, 0xd91c, 0x8b5d, 0x2f16,
+<span class="lineNum">     239 </span>            :     0x4014, 0xdbaa, 0x142f, 0x81a2,
+<span class="lineNum">     240 </span>            :     0x3ff0, 0x0000, 0x0000, 0x0000,
+<span class="lineNum">     241 </span>            : };
+<span class="lineNum">     242 </span>            : 
+<span class="lineNum">     243 </span>            : static unsigned short PQ[28] = {
+<span class="lineNum">     244 </span>            :     0x3f42, 0xb89b, 0x1344, 0x3d69,
+<span class="lineNum">     245 </span>            :     0x3fb1, 0x9fdd, 0x5948, 0xaa83,
+<span class="lineNum">     246 </span>            :     0x3ff1, 0xaea9, 0xb850, 0xeed6,
+<span class="lineNum">     247 </span>            :     0x4014, 0x4ba2, 0xf7d2, 0x51a1,
+<span class="lineNum">     248 </span>            :     0x4020, 0xccb9, 0xdda2, 0xfd65,
+<span class="lineNum">     249 </span>            :     0x4014, 0xd6dd, 0x4762, 0xb4d9,
+<span class="lineNum">     250 </span>            :     0x3ff0, 0x0000, 0x0000, 0x0000,
+<span class="lineNum">     251 </span>            : };
+<span class="lineNum">     252 </span>            : #endif
+<span class="lineNum">     253 </span>            : 
+<span class="lineNum">     254 </span>            : #ifdef UNK
+<span class="lineNum">     255 </span>            : static double QP[8] = {
+<span class="lineNum">     256 </span>            :     5.10862594750176621635E-2,
+<span class="lineNum">     257 </span>            :     4.98213872951233449420E0,
+<span class="lineNum">     258 </span>            :     7.58238284132545283818E1,
+<span class="lineNum">     259 </span>            :     3.66779609360150777800E2,
+<span class="lineNum">     260 </span>            :     7.10856304998926107277E2,
+<span class="lineNum">     261 </span>            :     5.97489612400613639965E2,
+<span class="lineNum">     262 </span>            :     2.11688757100572135698E2,
+<span class="lineNum">     263 </span>            :     2.52070205858023719784E1,
+<span class="lineNum">     264 </span>            : };
+<span class="lineNum">     265 </span>            : 
+<span class="lineNum">     266 </span>            : static double QQ[7] = {
+<span class="lineNum">     267 </span>            :     /* 1.00000000000000000000E0, */
+<span class="lineNum">     268 </span>            :     7.42373277035675149943E1,
+<span class="lineNum">     269 </span>            :     1.05644886038262816351E3,
+<span class="lineNum">     270 </span>            :     4.98641058337653607651E3,
+<span class="lineNum">     271 </span>            :     9.56231892404756170795E3,
+<span class="lineNum">     272 </span>            :     7.99704160447350683650E3,
+<span class="lineNum">     273 </span>            :     2.82619278517639096600E3,
+<span class="lineNum">     274 </span>            :     3.36093607810698293419E2,
+<span class="lineNum">     275 </span>            : };
+<span class="lineNum">     276 </span>            : #endif
+<span class="lineNum">     277 </span>            : #ifdef DEC
+<span class="lineNum">     278 </span>            : static unsigned short QP[32] = {
+<span class="lineNum">     279 </span>            :     0037121, 0037723, 0055605, 0151004,
+<span class="lineNum">     280 </span>            :     0040637, 0066656, 0031554, 0077264,
+<span class="lineNum">     281 </span>            :     0041627, 0122714, 0153170, 0161466,
+<span class="lineNum">     282 </span>            :     0042267, 0061712, 0036520, 0140145,
+<span class="lineNum">     283 </span>            :     0042461, 0133315, 0131573, 0071176,
+<span class="lineNum">     284 </span>            :     0042425, 0057525, 0147500, 0013201,
+<span class="lineNum">     285 </span>            :     0042123, 0130122, 0061245, 0154131,
+<span class="lineNum">     286 </span>            :     0041311, 0123772, 0064254, 0172650,
+<span class="lineNum">     287 </span>            : };
+<span class="lineNum">     288 </span>            : 
+<span class="lineNum">     289 </span>            : static unsigned short QQ[28] = {
+<span class="lineNum">     290 </span>            :     /*0040200,0000000,0000000,0000000, */
+<span class="lineNum">     291 </span>            :     0041624, 0074603, 0002112, 0101670,
+<span class="lineNum">     292 </span>            :     0042604, 0007135, 0010162, 0175565,
+<span class="lineNum">     293 </span>            :     0043233, 0151510, 0157757, 0172010,
+<span class="lineNum">     294 </span>            :     0043425, 0064506, 0112006, 0104276,
+<span class="lineNum">     295 </span>            :     0043371, 0164125, 0032271, 0164242,
+<span class="lineNum">     296 </span>            :     0043060, 0121425, 0122750, 0136013,
+<span class="lineNum">     297 </span>            :     0042250, 0005773, 0053472, 0146267,
+<span class="lineNum">     298 </span>            : };
+<span class="lineNum">     299 </span>            : #endif
+<span class="lineNum">     300 </span>            : #ifdef IBMPC
+<span class="lineNum">     301 </span>            : static unsigned short QP[32] = {
+<span class="lineNum">     302 </span>            :     0xba40, 0x6b70, 0x27fa, 0x3faa,
+<span class="lineNum">     303 </span>            :     0x8fd6, 0xc66d, 0xedb5, 0x4013,
+<span class="lineNum">     304 </span>            :     0x1c67, 0x9acf, 0xf4b9, 0x4052,
+<span class="lineNum">     305 </span>            :     0x180d, 0x47aa, 0xec79, 0x4076,
+<span class="lineNum">     306 </span>            :     0x6e50, 0xb66f, 0x36d9, 0x4086,
+<span class="lineNum">     307 </span>            :     0x02d0, 0xb9e8, 0xabea, 0x4082,
+<span class="lineNum">     308 </span>            :     0xbb0b, 0x4c54, 0x760a, 0x406a,
+<span class="lineNum">     309 </span>            :     0x9eb5, 0x4d15, 0x34ff, 0x4039,
+<span class="lineNum">     310 </span>            : };
+<span class="lineNum">     311 </span>            : 
+<span class="lineNum">     312 </span>            : static unsigned short QQ[28] = {
+<span class="lineNum">     313 </span>            :     /*0x0000,0x0000,0x0000,0x3ff0, */
+<span class="lineNum">     314 </span>            :     0x5077, 0x6089, 0x8f30, 0x4052,
+<span class="lineNum">     315 </span>            :     0x5f6f, 0xa20e, 0x81cb, 0x4090,
+<span class="lineNum">     316 </span>            :     0xfe81, 0x1bfd, 0x7a69, 0x40b3,
+<span class="lineNum">     317 </span>            :     0xd118, 0xd280, 0xad28, 0x40c2,
+<span class="lineNum">     318 </span>            :     0x3d14, 0xa697, 0x3d0a, 0x40bf,
+<span class="lineNum">     319 </span>            :     0x1781, 0xb4bd, 0x1462, 0x40a6,
+<span class="lineNum">     320 </span>            :     0x5997, 0x6ae7, 0x017f, 0x4075,
+<span class="lineNum">     321 </span>            : };
+<span class="lineNum">     322 </span>            : #endif
+<span class="lineNum">     323 </span>            : #ifdef MIEEE
+<span class="lineNum">     324 </span>            : static unsigned short QP[32] = {
+<span class="lineNum">     325 </span>            :     0x3faa, 0x27fa, 0x6b70, 0xba40,
+<span class="lineNum">     326 </span>            :     0x4013, 0xedb5, 0xc66d, 0x8fd6,
+<span class="lineNum">     327 </span>            :     0x4052, 0xf4b9, 0x9acf, 0x1c67,
+<span class="lineNum">     328 </span>            :     0x4076, 0xec79, 0x47aa, 0x180d,
+<span class="lineNum">     329 </span>            :     0x4086, 0x36d9, 0xb66f, 0x6e50,
+<span class="lineNum">     330 </span>            :     0x4082, 0xabea, 0xb9e8, 0x02d0,
+<span class="lineNum">     331 </span>            :     0x406a, 0x760a, 0x4c54, 0xbb0b,
+<span class="lineNum">     332 </span>            :     0x4039, 0x34ff, 0x4d15, 0x9eb5,
+<span class="lineNum">     333 </span>            : };
+<span class="lineNum">     334 </span>            : 
+<span class="lineNum">     335 </span>            : static unsigned short QQ[28] = {
+<span class="lineNum">     336 </span>            :     /*0x3ff0,0x0000,0x0000,0x0000, */
+<span class="lineNum">     337 </span>            :     0x4052, 0x8f30, 0x6089, 0x5077,
+<span class="lineNum">     338 </span>            :     0x4090, 0x81cb, 0xa20e, 0x5f6f,
+<span class="lineNum">     339 </span>            :     0x40b3, 0x7a69, 0x1bfd, 0xfe81,
+<span class="lineNum">     340 </span>            :     0x40c2, 0xad28, 0xd280, 0xd118,
+<span class="lineNum">     341 </span>            :     0x40bf, 0x3d0a, 0xa697, 0x3d14,
+<span class="lineNum">     342 </span>            :     0x40a6, 0x1462, 0xb4bd, 0x1781,
+<span class="lineNum">     343 </span>            :     0x4075, 0x017f, 0x6ae7, 0x5997,
+<span class="lineNum">     344 </span>            : };
+<span class="lineNum">     345 </span>            : #endif
+<span class="lineNum">     346 </span>            : 
+<span class="lineNum">     347 </span>            : #ifdef UNK
+<span class="lineNum">     348 </span>            : static double YP[6] = {
+<span class="lineNum">     349 </span>            :     1.26320474790178026440E9,
+<span class="lineNum">     350 </span>            :     -6.47355876379160291031E11,
+<span class="lineNum">     351 </span>            :     1.14509511541823727583E14,
+<span class="lineNum">     352 </span>            :     -8.12770255501325109621E15,
+<span class="lineNum">     353 </span>            :     2.02439475713594898196E17,
+<span class="lineNum">     354 </span>            :     -7.78877196265950026825E17,
+<span class="lineNum">     355 </span>            : };
+<span class="lineNum">     356 </span>            : 
+<span class="lineNum">     357 </span>            : static double YQ[8] = {
+<span class="lineNum">     358 </span>            :     /* 1.00000000000000000000E0, */
+<span class="lineNum">     359 </span>            :     5.94301592346128195359E2,
+<span class="lineNum">     360 </span>            :     2.35564092943068577943E5,
+<span class="lineNum">     361 </span>            :     7.34811944459721705660E7,
+<span class="lineNum">     362 </span>            :     1.87601316108706159478E10,
+<span class="lineNum">     363 </span>            :     3.88231277496238566008E12,
+<span class="lineNum">     364 </span>            :     6.20557727146953693363E14,
+<span class="lineNum">     365 </span>            :     6.87141087355300489866E16,
+<span class="lineNum">     366 </span>            :     3.97270608116560655612E18,
+<span class="lineNum">     367 </span>            : };
+<span class="lineNum">     368 </span>            : #endif
+<span class="lineNum">     369 </span>            : #ifdef DEC
+<span class="lineNum">     370 </span>            : static unsigned short YP[24] = {
+<span class="lineNum">     371 </span>            :     0047626, 0112763, 0013715, 0133045,
+<span class="lineNum">     372 </span>            :     0152026, 0134552, 0142033, 0024411,
+<span class="lineNum">     373 </span>            :     0053720, 0045245, 0102210, 0077565,
+<span class="lineNum">     374 </span>            :     0155347, 0000321, 0136415, 0102031,
+<span class="lineNum">     375 </span>            :     0056463, 0146550, 0055633, 0032605,
+<span class="lineNum">     376 </span>            :     0157054, 0171012, 0167361, 0054265,
+<span class="lineNum">     377 </span>            : };
+<span class="lineNum">     378 </span>            : 
+<span class="lineNum">     379 </span>            : static unsigned short YQ[32] = {
+<span class="lineNum">     380 </span>            :     /*0040200,0000000,0000000,0000000, */
+<span class="lineNum">     381 </span>            :     0042424, 0111515, 0044773, 0153014,
+<span class="lineNum">     382 </span>            :     0044546, 0005405, 0171307, 0075774,
+<span class="lineNum">     383 </span>            :     0046614, 0023575, 0047105, 0063556,
+<span class="lineNum">     384 </span>            :     0050613, 0143034, 0101533, 0156026,
+<span class="lineNum">     385 </span>            :     0052541, 0175367, 0166514, 0114257,
+<span class="lineNum">     386 </span>            :     0054415, 0014466, 0134350, 0171154,
+<span class="lineNum">     387 </span>            :     0056164, 0017436, 0025075, 0022101,
+<span class="lineNum">     388 </span>            :     0057534, 0103614, 0103663, 0121772,
+<span class="lineNum">     389 </span>            : };
+<span class="lineNum">     390 </span>            : #endif
+<span class="lineNum">     391 </span>            : #ifdef IBMPC
+<span class="lineNum">     392 </span>            : static unsigned short YP[24] = {
+<span class="lineNum">     393 </span>            :     0xb6c5, 0x62f9, 0xd2be, 0x41d2,
+<span class="lineNum">     394 </span>            :     0x6521, 0x5883, 0xd72d, 0xc262,
+<span class="lineNum">     395 </span>            :     0x0fef, 0xb091, 0x0954, 0x42da,
+<span class="lineNum">     396 </span>            :     0xb083, 0x37a1, 0xe01a, 0xc33c,
+<span class="lineNum">     397 </span>            :     0x66b1, 0x0b73, 0x79ad, 0x4386,
+<span class="lineNum">     398 </span>            :     0x2b17, 0x5dde, 0x9e41, 0xc3a5,
+<span class="lineNum">     399 </span>            : };
+<span class="lineNum">     400 </span>            : 
+<span class="lineNum">     401 </span>            : static unsigned short YQ[32] = {
+<span class="lineNum">     402 </span>            :     /*0x0000,0x0000,0x0000,0x3ff0, */
+<span class="lineNum">     403 </span>            :     0x7ac2, 0xa93f, 0x9269, 0x4082,
+<span class="lineNum">     404 </span>            :     0xef7f, 0xbe58, 0xc160, 0x410c,
+<span class="lineNum">     405 </span>            :     0xacee, 0xa9c8, 0x84ef, 0x4191,
+<span class="lineNum">     406 </span>            :     0x7b83, 0x906b, 0x78c3, 0x4211,
+<span class="lineNum">     407 </span>            :     0x9316, 0xfda9, 0x3f5e, 0x428c,
+<span class="lineNum">     408 </span>            :     0x1e4e, 0xd71d, 0xa326, 0x4301,
+<span class="lineNum">     409 </span>            :     0xa488, 0xc547, 0x83e3, 0x436e,
+<span class="lineNum">     410 </span>            :     0x747f, 0x90f6, 0x90f1, 0x43cb,
+<span class="lineNum">     411 </span>            : };
+<span class="lineNum">     412 </span>            : #endif
+<span class="lineNum">     413 </span>            : #ifdef MIEEE
+<span class="lineNum">     414 </span>            : static unsigned short YP[24] = {
+<span class="lineNum">     415 </span>            :     0x41d2, 0xd2be, 0x62f9, 0xb6c5,
+<span class="lineNum">     416 </span>            :     0xc262, 0xd72d, 0x5883, 0x6521,
+<span class="lineNum">     417 </span>            :     0x42da, 0x0954, 0xb091, 0x0fef,
+<span class="lineNum">     418 </span>            :     0xc33c, 0xe01a, 0x37a1, 0xb083,
+<span class="lineNum">     419 </span>            :     0x4386, 0x79ad, 0x0b73, 0x66b1,
+<span class="lineNum">     420 </span>            :     0xc3a5, 0x9e41, 0x5dde, 0x2b17,
+<span class="lineNum">     421 </span>            : };
+<span class="lineNum">     422 </span>            : 
+<span class="lineNum">     423 </span>            : static unsigned short YQ[32] = {
+<span class="lineNum">     424 </span>            :     /*0x3ff0,0x0000,0x0000,0x0000, */
+<span class="lineNum">     425 </span>            :     0x4082, 0x9269, 0xa93f, 0x7ac2,
+<span class="lineNum">     426 </span>            :     0x410c, 0xc160, 0xbe58, 0xef7f,
+<span class="lineNum">     427 </span>            :     0x4191, 0x84ef, 0xa9c8, 0xacee,
+<span class="lineNum">     428 </span>            :     0x4211, 0x78c3, 0x906b, 0x7b83,
+<span class="lineNum">     429 </span>            :     0x428c, 0x3f5e, 0xfda9, 0x9316,
+<span class="lineNum">     430 </span>            :     0x4301, 0xa326, 0xd71d, 0x1e4e,
+<span class="lineNum">     431 </span>            :     0x436e, 0x83e3, 0xc547, 0xa488,
+<span class="lineNum">     432 </span>            :     0x43cb, 0x90f1, 0x90f6, 0x747f,
+<span class="lineNum">     433 </span>            : };
+<span class="lineNum">     434 </span>            : #endif
+<span class="lineNum">     435 </span>            : 
+<span class="lineNum">     436 </span>            : 
+<span class="lineNum">     437 </span>            : #ifdef UNK
+<span class="lineNum">     438 </span>            : static double Z1 = 1.46819706421238932572E1;
+<span class="lineNum">     439 </span>            : static double Z2 = 4.92184563216946036703E1;
+<span class="lineNum">     440 </span>            : #endif
+<span class="lineNum">     441 </span>            : 
+<span class="lineNum">     442 </span>            : #ifdef DEC
+<span class="lineNum">     443 </span>            : static unsigned short DZ1[] = { 0041152, 0164532, 0006114, 0010540 };
+<span class="lineNum">     444 </span>            : static unsigned short DZ2[] = { 0041504, 0157663, 0001625, 0020621 };
+<span class="lineNum">     445 </span>            : 
+<span class="lineNum">     446 </span>            : #define Z1 (*(double *)DZ1)
+<span class="lineNum">     447 </span>            : #define Z2 (*(double *)DZ2)
+<span class="lineNum">     448 </span>            : #endif
+<span class="lineNum">     449 </span>            : 
+<span class="lineNum">     450 </span>            : #ifdef IBMPC
+<span class="lineNum">     451 </span>            : static unsigned short DZ1[] = { 0x822c, 0x4189, 0x5d2b, 0x402d };
+<span class="lineNum">     452 </span>            : static unsigned short DZ2[] = { 0xa432, 0x6072, 0x9bf6, 0x4048 };
+<span class="lineNum">     453 </span>            : 
+<span class="lineNum">     454 </span>            : #define Z1 (*(double *)DZ1)
+<span class="lineNum">     455 </span>            : #define Z2 (*(double *)DZ2)
+<span class="lineNum">     456 </span>            : #endif
+<span class="lineNum">     457 </span>            : 
+<span class="lineNum">     458 </span>            : #ifdef MIEEE
+<span class="lineNum">     459 </span>            : static unsigned short DZ1[] = { 0x402d, 0x5d2b, 0x4189, 0x822c };
+<span class="lineNum">     460 </span>            : static unsigned short DZ2[] = { 0x4048, 0x9bf6, 0x6072, 0xa432 };
+<span class="lineNum">     461 </span>            : 
+<span class="lineNum">     462 </span>            : #define Z1 (*(double *)DZ1)
+<span class="lineNum">     463 </span>            : #define Z2 (*(double *)DZ2)
+<span class="lineNum">     464 </span>            : #endif
+<span class="lineNum">     465 </span>            : 
+<a name="466"><span class="lineNum">     466 </span>            : extern double TWOOPI, THPIO4, SQ2OPI;</a>
+<span class="lineNum">     467 </span>            : 
+<span class="lineNum">     468 </span><span class="lineCov">        227 : double j1(x)</span>
+<span class="lineNum">     469 </span>            : double x;
+<span class="lineNum">     470 </span>            : {
+<span class="lineNum">     471 </span>            :     double w, z, p, q, xn;
+<span class="lineNum">     472 </span>            : 
+<span class="lineNum">     473 </span><span class="lineCov">        227 :     w = x;</span>
+<span class="lineNum">     474 </span><span class="lineCov">        227 :     if (x &lt; 0)</span>
+<span class="lineNum">     475 </span><span class="lineCov">          5 :         return -j1(-x);</span>
+<span class="lineNum">     476 </span>            : 
+<span class="lineNum">     477 </span><span class="lineCov">        222 :     if (w &lt;= 5.0) {</span>
+<span class="lineNum">     478 </span><span class="lineCov">        206 :         z = x * x;</span>
+<span class="lineNum">     479 </span><span class="lineCov">        206 :         w = polevl(z, RP, 3) / p1evl(z, RQ, 8);</span>
+<span class="lineNum">     480 </span><span class="lineCov">        206 :         w = w * x * (z - Z1) * (z - Z2);</span>
+<span class="lineNum">     481 </span><span class="lineCov">        206 :         return (w);</span>
+<span class="lineNum">     482 </span>            :     }
+<span class="lineNum">     483 </span>            : 
+<span class="lineNum">     484 </span><span class="lineCov">         16 :     w = 5.0 / x;</span>
+<span class="lineNum">     485 </span><span class="lineCov">         16 :     z = w * w;</span>
+<span class="lineNum">     486 </span><span class="lineCov">         16 :     p = polevl(z, PP, 6) / polevl(z, PQ, 6);</span>
+<span class="lineNum">     487 </span><span class="lineCov">         16 :     q = polevl(z, QP, 7) / p1evl(z, QQ, 7);</span>
+<span class="lineNum">     488 </span><span class="lineCov">         16 :     xn = x - THPIO4;</span>
+<span class="lineNum">     489 </span><span class="lineCov">         16 :     p = p * cos(xn) - w * q * sin(xn);</span>
+<span class="lineNum">     490 </span><span class="lineCov">         16 :     return (p * SQ2OPI / sqrt(x));</span>
+<span class="lineNum">     491 </span>            : }
+<a name="492"><span class="lineNum">     492 </span>            : </a>
+<span class="lineNum">     493 </span>            : 
+<span class="lineNum">     494 </span><span class="lineCov">        166 : double y1(x)</span>
+<span class="lineNum">     495 </span>            : double x;
+<span class="lineNum">     496 </span>            : {
+<span class="lineNum">     497 </span>            :     double w, z, p, q, xn;
+<span class="lineNum">     498 </span>            : 
+<span class="lineNum">     499 </span><span class="lineCov">        166 :     if (x &lt;= 5.0) {</span>
+<span class="lineNum">     500 </span><span class="lineCov">        120 :         if (x == 0.0) {</span>
+<span class="lineNum">     501 </span><span class="lineNoCov">          0 :             mtherr(&quot;y1&quot;, SING);</span>
+<span class="lineNum">     502 </span><span class="lineNoCov">          0 :             return -INFINITY;</span>
+<span class="lineNum">     503 </span>            :         }
+<span class="lineNum">     504 </span><span class="lineCov">        120 :         else if (x &lt;= 0.0) {</span>
+<span class="lineNum">     505 </span><span class="lineNoCov">          0 :             mtherr(&quot;y1&quot;, DOMAIN);</span>
+<span class="lineNum">     506 </span><span class="lineNoCov">          0 :             return NAN;</span>
+<span class="lineNum">     507 </span>            :         }
+<span class="lineNum">     508 </span><span class="lineCov">        120 :         z = x * x;</span>
+<span class="lineNum">     509 </span><span class="lineCov">        120 :         w = x * (polevl(z, YP, 5) / p1evl(z, YQ, 8));</span>
+<span class="lineNum">     510 </span><span class="lineCov">        120 :         w += TWOOPI * (j1(x) * log(x) - 1.0 / x);</span>
+<span class="lineNum">     511 </span><span class="lineCov">        120 :         return (w);</span>
+<span class="lineNum">     512 </span>            :     }
+<span class="lineNum">     513 </span>            : 
+<span class="lineNum">     514 </span><span class="lineCov">         46 :     w = 5.0 / x;</span>
+<span class="lineNum">     515 </span><span class="lineCov">         46 :     z = w * w;</span>
+<span class="lineNum">     516 </span><span class="lineCov">         46 :     p = polevl(z, PP, 6) / polevl(z, PQ, 6);</span>
+<span class="lineNum">     517 </span><span class="lineCov">         46 :     q = polevl(z, QP, 7) / p1evl(z, QQ, 7);</span>
+<span class="lineNum">     518 </span><span class="lineCov">         46 :     xn = x - THPIO4;</span>
+<span class="lineNum">     519 </span><span class="lineCov">         46 :     p = p * sin(xn) + w * q * cos(xn);</span>
+<span class="lineNum">     520 </span><span class="lineCov">         46 :     return (p * SQ2OPI / sqrt(x));</span>
+<span class="lineNum">     521 </span>            : }
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.10</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

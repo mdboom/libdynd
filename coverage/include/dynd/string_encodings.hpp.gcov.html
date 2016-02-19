@@ -1,0 +1,216 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - coverage.info.cleaned - include/dynd/string_encodings.hpp</title>
+  <link rel="stylesheet" type="text/css" href="../../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../../index.html">top level</a> - <a href="index.html">include/dynd</a> - string_encodings.hpp<span style="font-size: 80%;"> (source / <a href="string_encodings.hpp.func.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">coverage.info.cleaned</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">14</td>
+            <td class="headerCovTableEntry">20</td>
+            <td class="headerCovTableEntryLo">70.0 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2016-02-19</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">2</td>
+            <td class="headerCovTableEntry">2</td>
+            <td class="headerCovTableEntryHi">100.0 %</td>
+          </tr>
+          <tr><td><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : //</a>
+<span class="lineNum">       2 </span>            : // Copyright (C) 2011-15 DyND Developers
+<span class="lineNum">       3 </span>            : // BSD 2-Clause License, see LICENSE.txt
+<span class="lineNum">       4 </span>            : //
+<span class="lineNum">       5 </span>            : 
+<span class="lineNum">       6 </span>            : #pragma once
+<span class="lineNum">       7 </span>            : 
+<span class="lineNum">       8 </span>            : #include &lt;iostream&gt;
+<span class="lineNum">       9 </span>            : #include &lt;string&gt;
+<span class="lineNum">      10 </span>            : 
+<span class="lineNum">      11 </span>            : #include &lt;dynd/config.hpp&gt;
+<span class="lineNum">      12 </span>            : 
+<span class="lineNum">      13 </span>            : namespace dynd {
+<span class="lineNum">      14 </span>            : namespace ndt {
+<span class="lineNum">      15 </span>            : 
+<span class="lineNum">      16 </span>            :   class type;
+<span class="lineNum">      17 </span>            : 
+<span class="lineNum">      18 </span>            : } // namespace dynd::ndt
+<span class="lineNum">      19 </span>            : 
+<span class="lineNum">      20 </span>            : enum string_encoding_t {
+<span class="lineNum">      21 </span>            :   string_encoding_ascii,
+<span class="lineNum">      22 </span>            :   string_encoding_ucs_2,
+<span class="lineNum">      23 </span>            :   string_encoding_utf_8,
+<span class="lineNum">      24 </span>            :   string_encoding_utf_16,
+<span class="lineNum">      25 </span>            :   string_encoding_utf_32,
+<span class="lineNum">      26 </span>            : 
+<span class="lineNum">      27 </span>            :   string_encoding_latin1,
+<span class="lineNum">      28 </span>            :   // TODO: more codepages here
+<span class="lineNum">      29 </span>            : 
+<span class="lineNum">      30 </span>            :   string_encoding_invalid
+<span class="lineNum">      31 </span>            : };
+<span class="lineNum">      32 </span>            : 
+<span class="lineNum">      33 </span>            : /**
+<span class="lineNum">      34 </span>            :  * A table of the individual character sizes for
+<span class="lineNum">      35 </span>            :  * the various encodings.
+<span class="lineNum">      36 </span>            :  */
+<span class="lineNum">      37 </span>            : extern DYND_API int string_encoding_char_size_table[6];
+<span class="lineNum">      38 </span>            : 
+<span class="lineNum">      39 </span>            : /**
+<span class="lineNum">      40 </span>            :  * Returns true if the provided encoding uses a variable-length encoding
+<span class="lineNum">      41 </span>            :  * for each character, for example UTF-8.
+<span class="lineNum">      42 </span>            :  */
+<span class="lineNum">      43 </span>            : inline bool is_variable_length_string_encoding(string_encoding_t encoding)
+<span class="lineNum">      44 </span>            : {
+<span class="lineNum">      45 </span>            :   return encoding == string_encoding_utf_8 || encoding == string_encoding_utf_16;
+<a name="46"><span class="lineNum">      46 </span>            : }</a>
+<span class="lineNum">      47 </span>            : 
+<span class="lineNum">      48 </span><span class="lineCov">          7 : inline std::ostream &amp;operator&lt;&lt;(std::ostream &amp;o, string_encoding_t encoding)</span>
+<span class="lineNum">      49 </span>            : {
+<span class="lineNum">      50 </span><span class="lineCov">          7 :   switch (encoding) {</span>
+<span class="lineNum">      51 </span>            :   case string_encoding_ascii:
+<span class="lineNum">      52 </span><span class="lineCov">          3 :     o &lt;&lt; &quot;ascii&quot;;</span>
+<span class="lineNum">      53 </span><span class="lineCov">          3 :     break;</span>
+<span class="lineNum">      54 </span>            :   case string_encoding_ucs_2:
+<span class="lineNum">      55 </span><span class="lineCov">          2 :     o &lt;&lt; &quot;ucs2&quot;;</span>
+<span class="lineNum">      56 </span><span class="lineCov">          2 :     break;</span>
+<span class="lineNum">      57 </span>            :   case string_encoding_utf_8:
+<span class="lineNum">      58 </span><span class="lineNoCov">          0 :     o &lt;&lt; &quot;utf8&quot;;</span>
+<span class="lineNum">      59 </span><span class="lineNoCov">          0 :     break;</span>
+<span class="lineNum">      60 </span>            :   case string_encoding_utf_16:
+<span class="lineNum">      61 </span><span class="lineCov">          1 :     o &lt;&lt; &quot;utf16&quot;;</span>
+<span class="lineNum">      62 </span><span class="lineCov">          1 :     break;</span>
+<span class="lineNum">      63 </span>            :   case string_encoding_utf_32:
+<span class="lineNum">      64 </span><span class="lineCov">          1 :     o &lt;&lt; &quot;utf32&quot;;</span>
+<span class="lineNum">      65 </span><span class="lineCov">          1 :     break;</span>
+<span class="lineNum">      66 </span>            :   case string_encoding_latin1:
+<span class="lineNum">      67 </span><span class="lineNoCov">          0 :     o &lt;&lt; &quot;latin1&quot;;</span>
+<span class="lineNum">      68 </span><span class="lineNoCov">          0 :     break;</span>
+<span class="lineNum">      69 </span>            :   default:
+<span class="lineNum">      70 </span><span class="lineNoCov">          0 :     o &lt;&lt; &quot;unknown string encoding&quot;;</span>
+<span class="lineNum">      71 </span><span class="lineNoCov">          0 :     break;</span>
+<span class="lineNum">      72 </span>            :   }
+<span class="lineNum">      73 </span>            : 
+<span class="lineNum">      74 </span><span class="lineCov">          7 :   return o;</span>
+<span class="lineNum">      75 </span>            : }
+<span class="lineNum">      76 </span>            : 
+<span class="lineNum">      77 </span>            : /**
+<span class="lineNum">      78 </span>            :  * Typedef for getting the next unicode codepoint from a string of a particular
+<span class="lineNum">      79 </span>            :  * encoding.
+<span class="lineNum">      80 </span>            :  *
+<span class="lineNum">      81 </span>            :  * On entry, this function assumes that 'it' and 'end' are appropriately aligned
+<span class="lineNum">      82 </span>            :  * and that (it &lt; end). The variable 'it' is updated in-place to be after the
+<span class="lineNum">      83 </span>            :  * character data representing the returned code point.
+<span class="lineNum">      84 </span>            :  *
+<span class="lineNum">      85 </span>            :  * This function may raise an exception if there is an error.
+<span class="lineNum">      86 </span>            :  */
+<span class="lineNum">      87 </span>            : typedef uint32_t (*next_unicode_codepoint_t)(const char *&amp;it, const char *end);
+<span class="lineNum">      88 </span>            : 
+<span class="lineNum">      89 </span>            : /**
+<span class="lineNum">      90 </span>            :  * Typedef for appending a unicode codepoint to a string of a particular
+<span class="lineNum">      91 </span>            :  * encoding.
+<span class="lineNum">      92 </span>            :  *
+<span class="lineNum">      93 </span>            :  * On entry, this function assumes that 'it' and 'end' are appropriately aligned
+<span class="lineNum">      94 </span>            :  * and that (it &lt; end). The variable 'it' is updated in-place to be after the
+<span class="lineNum">      95 </span>            :  * character data representing the appended code point.
+<span class="lineNum">      96 </span>            :  *
+<span class="lineNum">      97 </span>            :  * This function may raise an exception if there is an error.
+<span class="lineNum">      98 </span>            :  */
+<span class="lineNum">      99 </span>            : typedef void (*append_unicode_codepoint_t)(uint32_t cp, char *&amp;it, char *end);
+<span class="lineNum">     100 </span>            : 
+<span class="lineNum">     101 </span>            : DYND_API next_unicode_codepoint_t get_next_unicode_codepoint_function(string_encoding_t encoding,
+<span class="lineNum">     102 </span>            :                                                                       assign_error_mode errmode);
+<span class="lineNum">     103 </span>            : DYND_API append_unicode_codepoint_t get_append_unicode_codepoint_function(string_encoding_t encoding,
+<span class="lineNum">     104 </span>            :                                                                           assign_error_mode errmode);
+<span class="lineNum">     105 </span>            : 
+<span class="lineNum">     106 </span>            : /**
+<span class="lineNum">     107 </span>            :  * Converts a string buffer provided as a range of bytes into a std::string as UTF8.
+<span class="lineNum">     108 </span>            :  */
+<span class="lineNum">     109 </span>            : DYND_API std::string string_range_as_utf8_string(string_encoding_t encoding, const char *begin, const char *end,
+<span class="lineNum">     110 </span>            :                                                  assign_error_mode errmode);
+<span class="lineNum">     111 </span>            : 
+<span class="lineNum">     112 </span>            : /**
+<span class="lineNum">     113 </span>            :  * Prints the given code point to the output stream, escaping it as necessary.
+<span class="lineNum">     114 </span>            :  */
+<span class="lineNum">     115 </span>            : DYND_API void print_escaped_unicode_codepoint(std::ostream &amp;o, uint32_t cp, bool single_quote);
+<span class="lineNum">     116 </span>            : 
+<span class="lineNum">     117 </span>            : /**
+<span class="lineNum">     118 </span>            :  * Prints the utf8 string, escaping as necessary.
+<span class="lineNum">     119 </span>            :  */
+<span class="lineNum">     120 </span>            : DYND_API void print_escaped_utf8_string(std::ostream &amp;o, const char *str_begin, const char *str_end,
+<span class="lineNum">     121 </span>            :                                         bool single_quote = false);
+<span class="lineNum">     122 </span>            : 
+<span class="lineNum">     123 </span>            : /**
+<a name="124"><span class="lineNum">     124 </span>            :  * Prints the utf8 string, escaping as necessary.</a>
+<span class="lineNum">     125 </span>            :  */
+<span class="lineNum">     126 </span><span class="lineCov">         49 : inline void print_escaped_utf8_string(std::ostream &amp;o, const std::string &amp;str, bool single_quote = false)</span>
+<span class="lineNum">     127 </span>            : {
+<span class="lineNum">     128 </span><span class="lineCov">         49 :   print_escaped_utf8_string(o, str.data(), str.data() + str.size(), single_quote);</span>
+<span class="lineNum">     129 </span><span class="lineCov">         49 : }</span>
+<span class="lineNum">     130 </span>            : 
+<span class="lineNum">     131 </span>            : DYND_API void append_utf8_codepoint(uint32_t cp, std::string &amp;out_str);
+<span class="lineNum">     132 </span>            : 
+<span class="lineNum">     133 </span>            : /**
+<span class="lineNum">     134 </span>            :  * Returns the char type corresponding to the encoding. For fixed-sized
+<span class="lineNum">     135 </span>            :  * encodings, this is &quot;char_type[encoding]&quot;, and for variable-sized
+<span class="lineNum">     136 </span>            :  * encodings, this is &quot;bytes[1]&quot; or &quot;bytes[2,2]&quot;.
+<span class="lineNum">     137 </span>            :  */
+<span class="lineNum">     138 </span>            : DYND_API ndt::type char_type_of_encoding(string_encoding_t encoding);
+<span class="lineNum">     139 </span>            : 
+<span class="lineNum">     140 </span>            : } // namespace dynd
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.10</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

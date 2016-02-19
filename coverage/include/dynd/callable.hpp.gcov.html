@@ -1,0 +1,563 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - coverage.info.cleaned - include/dynd/callable.hpp</title>
+  <link rel="stylesheet" type="text/css" href="../../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../../index.html">top level</a> - <a href="index.html">include/dynd</a> - callable.hpp<span style="font-size: 80%;"> (source / <a href="callable.hpp.func.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">coverage.info.cleaned</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">111</td>
+            <td class="headerCovTableEntry">119</td>
+            <td class="headerCovTableEntryHi">93.3 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2016-02-19</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">8086</td>
+            <td class="headerCovTableEntry">10469</td>
+            <td class="headerCovTableEntryMed">77.2 %</td>
+          </tr>
+          <tr><td><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : //</a>
+<span class="lineNum">       2 </span>            : // Copyright (C) 2011-15 DyND Developers
+<span class="lineNum">       3 </span>            : // BSD 2-Clause License, see LICENSE.txt
+<span class="lineNum">       4 </span>            : //
+<span class="lineNum">       5 </span>            : 
+<span class="lineNum">       6 </span>            : #pragma once
+<span class="lineNum">       7 </span>            : 
+<span class="lineNum">       8 </span>            : #include &lt;memory&gt;
+<span class="lineNum">       9 </span>            : 
+<span class="lineNum">      10 </span>            : #include &lt;dynd/config.hpp&gt;
+<span class="lineNum">      11 </span>            : #include &lt;dynd/kernels/apply_function_kernel.hpp&gt;
+<span class="lineNum">      12 </span>            : #include &lt;dynd/kernels/apply_callable_kernel.hpp&gt;
+<span class="lineNum">      13 </span>            : #include &lt;dynd/kernels/apply_member_function_kernel.hpp&gt;
+<span class="lineNum">      14 </span>            : #include &lt;dynd/kernels/construct_then_apply_callable_kernel.hpp&gt;
+<span class="lineNum">      15 </span>            : #include &lt;dynd/types/callable_type.hpp&gt;
+<span class="lineNum">      16 </span>            : #include &lt;dynd/types/substitute_typevars.hpp&gt;
+<span class="lineNum">      17 </span>            : #include &lt;dynd/types/option_type.hpp&gt;
+<span class="lineNum">      18 </span>            : #include &lt;dynd/callables/static_data_callable.hpp&gt;
+<span class="lineNum">      19 </span>            : 
+<span class="lineNum">      20 </span>            : namespace dynd {
+<span class="lineNum">      21 </span>            : namespace nd {
+<span class="lineNum">      22 </span>            :   namespace detail {
+<span class="lineNum">      23 </span>            : 
+<span class="lineNum">      24 </span>            :     /**
+<span class="lineNum">      25 </span>            :      * Presently, there are some specially treated keyword arguments in
+<span class="lineNum">      26 </span>            :      * arrfuncs. The &quot;dst_tp&quot; keyword argument always tells the desired
+<span class="lineNum">      27 </span>            :      * output type, and the &quot;dst&quot; keyword argument always provides an
+<a name="28"><span class="lineNum">      28 </span>            :      * output array.</a>
+<span class="lineNum">      29 </span>            :      */
+<span class="lineNum">      30 </span><span class="lineCov">       1003 :     inline bool is_special_kwd(const ndt::callable_type *DYND_UNUSED(self_tp), array &amp;dst, const std::string &amp;name,</span>
+<span class="lineNum">      31 </span>            :                                const nd::array &amp;value)
+<span class="lineNum">      32 </span>            :     {
+<span class="lineNum">      33 </span><span class="lineCov">       1003 :       if (name == &quot;dst_tp&quot;) {</span>
+<span class="lineNum">      34 </span><span class="lineCov">         19 :         dst = nd::empty(value.as&lt;ndt::type&gt;());</span>
+<span class="lineNum">      35 </span><span class="lineCov">         19 :         return true;</span>
+<span class="lineNum">      36 </span>            :       }
+<span class="lineNum">      37 </span><span class="lineCov">        984 :       else if (name == &quot;dst&quot;) {</span>
+<span class="lineNum">      38 </span><span class="lineCov">        977 :         dst = value;</span>
+<span class="lineNum">      39 </span><span class="lineCov">        977 :         return true;</span>
+<span class="lineNum">      40 </span>            :       }
+<span class="lineNum">      41 </span>            : 
+<span class="lineNum">      42 </span><span class="lineCov">          7 :       return false;</span>
+<span class="lineNum">      43 </span>            :     }
+<span class="lineNum">      44 </span>            : 
+<span class="lineNum">      45 </span>            :     DYND_API void check_narg(const ndt::callable_type *af_tp, intptr_t narg);
+<span class="lineNum">      46 </span>            : 
+<span class="lineNum">      47 </span>            :     DYND_API void check_arg(const ndt::callable_type *af_tp, intptr_t i, const ndt::type &amp;actual_tp,
+<span class="lineNum">      48 </span>            :                             const char *actual_arrmeta, std::map&lt;std::string, ndt::type&gt; &amp;tp_vars);
+<a name="49"><span class="lineNum">      49 </span>            : </a>
+<span class="lineNum">      50 </span>            :     template &lt;typename KernelType&gt;
+<span class="lineNum">      51 </span><span class="lineCov">       5566 :     kernel_targets_t get_targets()</span>
+<span class="lineNum">      52 </span>            :     {
+<span class="lineNum">      53 </span>            :       return kernel_targets_t{reinterpret_cast&lt;void *&gt;(static_cast&lt;void (*)(kernel_prefix *, char *, char *const *)&gt;(
+<span class="lineNum">      54 </span>            :                                   KernelType::single_wrapper)),
+<span class="lineNum">      55 </span><span class="lineCov">       5566 :                               NULL, reinterpret_cast&lt;void *&gt;(KernelType::strided_wrapper)};</span>
+<span class="lineNum">      56 </span>            :     }
+<a name="57"><span class="lineNum">      57 </span>            : </a>
+<span class="lineNum">      58 </span>            :     template &lt;typename KernelType&gt;
+<span class="lineNum">      59 </span><span class="lineCov">       5566 :     const volatile char *get_ir()</span>
+<span class="lineNum">      60 </span>            :     {
+<span class="lineNum">      61 </span><span class="lineCov">       5566 :       return KernelType::ir;</span>
+<span class="lineNum">      62 </span>            :     }
+<span class="lineNum">      63 </span>            : 
+<span class="lineNum">      64 </span>            :     template &lt;template &lt;type_id_t...&gt; class KernelType&gt;
+<span class="lineNum">      65 </span>            :     struct make_all;
+<span class="lineNum">      66 </span>            : 
+<span class="lineNum">      67 </span>            :   } // namespace dynd::nd::detail
+<span class="lineNum">      68 </span>            : 
+<span class="lineNum">      69 </span>            :   typedef array callable_arg_t;
+<span class="lineNum">      70 </span>            :   typedef std::pair&lt;const char *, array&gt; callable_kwd_t;
+<span class="lineNum">      71 </span>            : 
+<span class="lineNum">      72 </span>            :   /**
+<span class="lineNum">      73 </span>            :    * Holds a single instance of an callable in an nd::array,
+<a name="74"><span class="lineNum">      74 </span>            :    * providing some more direct convenient interface.</a>
+<span class="lineNum">      75 </span>            :    */
+<a name="76"><span class="lineNum">      76 </span><span class="lineCov">      31141 :   class DYND_API callable : public intrusive_ptr&lt;base_callable&gt; {</span></a>
+<span class="lineNum">      77 </span>            :   public:
+<a name="78"><span class="lineNum">      78 </span><span class="lineCov">         31 :     using intrusive_ptr&lt;base_callable&gt;::intrusive_ptr;</span></a>
+<span class="lineNum">      79 </span>            : 
+<span class="lineNum">      80 </span><span class="lineCov">       5231 :     callable() = default;</span>
+<span class="lineNum">      81 </span>            : 
+<span class="lineNum">      82 </span>            :     callable(const ndt::type &amp;self_tp, kernel_single_t single, kernel_strided_t strided)
+<span class="lineNum">      83 </span>            :         : intrusive_ptr&lt;base_callable&gt;(
+<span class="lineNum">      84 </span>            :               new (sizeof(kernel_targets_t)) base_callable(
+<span class="lineNum">      85 </span>            :                   self_tp, kernel_targets_t{reinterpret_cast&lt;void *&gt;(single), NULL, reinterpret_cast&lt;void *&gt;(strided)}),
+<span class="lineNum">      86 </span>            :               true)
+<span class="lineNum">      87 </span>            :     {
+<a name="88"><span class="lineNum">      88 </span>            :     }</a>
+<span class="lineNum">      89 </span>            : 
+<span class="lineNum">      90 </span><span class="lineCov">       1968 :     callable(const ndt::type &amp;self_tp, kernel_targets_t targets, const volatile char *ir,</span>
+<span class="lineNum">      91 </span>            :              callable_data_init_t data_init, callable_resolve_dst_type_t resolve_dst_type,
+<span class="lineNum">      92 </span>            :              callable_instantiate_t instantiate)
+<span class="lineNum">      93 </span>            :         : intrusive_ptr&lt;base_callable&gt;(
+<span class="lineNum">      94 </span><span class="lineCov">       1968 :               new base_callable(self_tp, targets, ir, data_init, resolve_dst_type, instantiate), true)</span>
+<span class="lineNum">      95 </span>            :     {
+<span class="lineNum">      96 </span><span class="lineCov">       1968 :     }</span>
+<a name="97"><span class="lineNum">      97 </span>            : </a>
+<span class="lineNum">      98 </span>            :     template &lt;typename T&gt;
+<span class="lineNum">      99 </span><span class="lineCov">       3567 :     callable(const ndt::type &amp;self_tp, kernel_targets_t targets, const volatile char *ir, T &amp;&amp;static_data,</span>
+<span class="lineNum">     100 </span>            :              callable_data_init_t data_init, callable_resolve_dst_type_t resolve_dst_type,
+<span class="lineNum">     101 </span>            :              callable_instantiate_t instantiate)
+<span class="lineNum">     102 </span>            :         : intrusive_ptr&lt;base_callable&gt;(
+<span class="lineNum">     103 </span>            :               new static_data_callable&lt;typename std::remove_reference&lt;T&gt;::type&gt;(
+<span class="lineNum">     104 </span>            :                   self_tp, targets, ir, data_init, resolve_dst_type, instantiate, std::forward&lt;T&gt;(static_data)),
+<span class="lineNum">     105 </span><span class="lineCov">       3567 :               true)</span>
+<span class="lineNum">     106 </span>            :     {
+<span class="lineNum">     107 </span><span class="lineCov">       3567 :     }</span>
+<span class="lineNum">     108 </span>            : 
+<span class="lineNum">     109 </span>            :     template &lt;typename CallableType, typename... T, typename = std::enable_if_t&lt;all_char_string_params&lt;T...&gt;::value&gt;&gt;
+<a name="110"><span class="lineNum">     110 </span>            :     explicit callable(CallableType f, T &amp;&amp;... names);</a>
+<span class="lineNum">     111 </span>            : 
+<a name="112"><span class="lineNum">     112 </span><span class="lineCov">      13512 :     bool is_null() const { return get() == NULL; }</span></a>
+<span class="lineNum">     113 </span>            : 
+<a name="114"><span class="lineNum">     114 </span><span class="lineCov">         13 :     callable_property get_flags() const { return right_associative; }</span></a>
+<span class="lineNum">     115 </span>            : 
+<span class="lineNum">     116 </span><span class="lineCov">      12646 :     const ndt::callable_type *get_type() const</span>
+<span class="lineNum">     117 </span>            :     {
+<span class="lineNum">     118 </span><span class="lineCov">      12646 :       if (get() == NULL) {</span>
+<span class="lineNum">     119 </span><span class="lineNoCov">          0 :         return NULL;</span>
+<span class="lineNum">     120 </span>            :       }
+<span class="lineNum">     121 </span>            : 
+<span class="lineNum">     122 </span><span class="lineCov">      12646 :       return get()-&gt;tp.extended&lt;ndt::callable_type&gt;();</span>
+<a name="123"><span class="lineNum">     123 </span>            :     }</a>
+<span class="lineNum">     124 </span>            : 
+<a name="125"><span class="lineNum">     125 </span><span class="lineCov">         32 :     const ndt::type &amp;get_array_type() const { return get()-&gt;tp; }</span></a>
+<span class="lineNum">     126 </span>            : 
+<a name="127"><span class="lineNum">     127 </span><span class="lineCov">        219 :     const ndt::type &amp;get_ret_type() const { return get_type()-&gt;get_return_type(); }</span></a>
+<span class="lineNum">     128 </span>            : 
+<a name="129"><span class="lineNum">     129 </span><span class="lineCov">         33 :     std::intptr_t get_narg() const { return get_type()-&gt;get_npos(); }</span></a>
+<span class="lineNum">     130 </span>            : 
+<a name="131"><span class="lineNum">     131 </span><span class="lineCov">         17 :     const ndt::type &amp;get_arg_type(std::intptr_t i) const { return get_type()-&gt;get_pos_type(i); }</span></a>
+<span class="lineNum">     132 </span>            : 
+<a name="133"><span class="lineNum">     133 </span><span class="lineCov">         26 :     const std::vector&lt;ndt::type&gt; &amp;get_arg_types() const { return get_type()-&gt;get_pos_types(); }</span></a>
+<span class="lineNum">     134 </span>            : 
+<span class="lineNum">     135 </span><span class="lineCov">          8 :     const callable &amp;get_overload(const ndt::type &amp;ret_tp, intptr_t narg, const ndt::type *arg_tp) const</span>
+<span class="lineNum">     136 </span>            :     {
+<span class="lineNum">     137 </span><span class="lineCov">          8 :       return get()-&gt;overload(ret_tp, narg, arg_tp);</span>
+<a name="138"><span class="lineNum">     138 </span>            :     }</a>
+<span class="lineNum">     139 </span>            : 
+<span class="lineNum">     140 </span><span class="lineCov">          8 :     const callable &amp;get_overload(const ndt::type &amp;ret_tp, const std::initializer_list&lt;ndt::type&gt; &amp;arg_tp) const</span>
+<span class="lineNum">     141 </span>            :     {
+<span class="lineNum">     142 </span><span class="lineCov">          8 :       return get_overload(ret_tp, arg_tp.size(), arg_tp.begin());</span>
+<span class="lineNum">     143 </span>            :     }
+<span class="lineNum">     144 </span>            : 
+<span class="lineNum">     145 </span>            :     void set_overload(const ndt::type &amp;ret_tp, intptr_t narg, const ndt::type *arg_tp, const callable &amp;value)
+<span class="lineNum">     146 </span>            :     {
+<span class="lineNum">     147 </span>            :       get()-&gt;overload(ret_tp, narg, arg_tp) = value;
+<span class="lineNum">     148 </span>            :     }
+<span class="lineNum">     149 </span>            : 
+<span class="lineNum">     150 </span>            :     void set_overload(const ndt::type &amp;ret_tp, const std::initializer_list&lt;ndt::type&gt; &amp;arg_tp, const callable &amp;value)
+<span class="lineNum">     151 </span>            :     {
+<span class="lineNum">     152 </span>            :       set_overload(ret_tp, arg_tp.size(), arg_tp.begin(), value);
+<span class="lineNum">     153 </span>            :     }
+<span class="lineNum">     154 </span>            : 
+<span class="lineNum">     155 </span>            :     array call(size_t args_size, const array *args_values, size_t kwds_size,
+<span class="lineNum">     156 </span>            :                const std::pair&lt;const char *, array&gt; *kwds_values);
+<a name="157"><span class="lineNum">     157 </span>            : </a>
+<span class="lineNum">     158 </span>            :     template &lt;typename... ArgTypes&gt;
+<span class="lineNum">     159 </span><span class="lineCov">       1847 :     array operator()(ArgTypes &amp;&amp;... args)</span>
+<span class="lineNum">     160 </span>            :     {
+<span class="lineNum">     161 </span><span class="lineCov">       3680 :       array tmp[sizeof...(ArgTypes)] = {std::forward&lt;ArgTypes&gt;(args)...};</span>
+<span class="lineNum">     162 </span><span class="lineCov">       3680 :       return call(sizeof...(ArgTypes), tmp, 0, nullptr);</span>
+<a name="163"><span class="lineNum">     163 </span>            :     }</a>
+<span class="lineNum">     164 </span>            : 
+<a name="165"><span class="lineNum">     165 </span><span class="lineCov">          5 :     array operator()() { return call(0, nullptr, 0, nullptr); }</span></a>
+<span class="lineNum">     166 </span>            : 
+<span class="lineNum">     167 </span><span class="lineCov">       1053 :     array operator()(const std::initializer_list&lt;array&gt; &amp;args,</span>
+<span class="lineNum">     168 </span>            :                      const std::initializer_list&lt;std::pair&lt;const char *, array&gt;&gt; &amp;kwds)
+<span class="lineNum">     169 </span>            :     {
+<span class="lineNum">     170 </span><span class="lineCov">       1053 :       return call(args.size(), args.begin(), kwds.size(), kwds.begin());</span>
+<span class="lineNum">     171 </span>            :     }
+<span class="lineNum">     172 </span>            : 
+<span class="lineNum">     173 </span>            :     template &lt;typename DstType, typename... ArgTypes&gt;
+<span class="lineNum">     174 </span>            :     array operator()(ArgTypes &amp;&amp;... args)
+<span class="lineNum">     175 </span>            :     {
+<span class="lineNum">     176 </span>            :       array tmp[sizeof...(ArgTypes)] = {std::forward&lt;ArgTypes&gt;(args)...};
+<span class="lineNum">     177 </span>            :       std::pair&lt;const char *, array&gt; kwds = {&quot;dst_tp&quot;, ndt::make_type&lt;DstType&gt;()};
+<span class="lineNum">     178 </span>            :       return call(sizeof...(ArgTypes), tmp, 1, &amp;kwds);
+<span class="lineNum">     179 </span>            :     }
+<a name="180"><span class="lineNum">     180 </span>            : </a>
+<span class="lineNum">     181 </span>            :     template &lt;typename KernelType&gt;
+<span class="lineNum">     182 </span><span class="lineCov">       1806 :     static typename std::enable_if&lt;ndt::has_traits&lt;KernelType&gt;::value, callable&gt;::type make()</span>
+<span class="lineNum">     183 </span>            :     {
+<span class="lineNum">     184 </span>            :       return callable(ndt::traits&lt;KernelType&gt;::equivalent(), detail::get_targets&lt;KernelType&gt;(),
+<span class="lineNum">     185 </span>            :                       detail::get_ir&lt;KernelType&gt;(), &amp;KernelType::data_init, &amp;KernelType::resolve_dst_type,
+<span class="lineNum">     186 </span><span class="lineCov">       1806 :                       &amp;KernelType::instantiate);</span>
+<span class="lineNum">     187 </span>            :     }
+<a name="188"><span class="lineNum">     188 </span>            : </a>
+<span class="lineNum">     189 </span>            :     template &lt;typename KernelType&gt;
+<span class="lineNum">     190 </span><span class="lineCov">        162 :     static typename std::enable_if&lt;!ndt::has_traits&lt;KernelType&gt;::value, callable&gt;::type make(const ndt::type &amp;tp)</span>
+<span class="lineNum">     191 </span>            :     {
+<span class="lineNum">     192 </span>            :       return callable(tp, detail::get_targets&lt;KernelType&gt;(), detail::get_ir&lt;KernelType&gt;(), &amp;KernelType::data_init,
+<span class="lineNum">     193 </span><span class="lineCov">        162 :                       &amp;KernelType::resolve_dst_type, &amp;KernelType::instantiate);</span>
+<span class="lineNum">     194 </span>            :     }
+<span class="lineNum">     195 </span>            : 
+<a name="196"><span class="lineNum">     196 </span>            :     template &lt;typename KernelType, typename StaticDataType&gt;</a>
+<span class="lineNum">     197 </span>            :     static typename std::enable_if&lt;ndt::has_traits&lt;KernelType&gt;::value, callable&gt;::type
+<span class="lineNum">     198 </span><span class="lineCov">         18 :     make(StaticDataType &amp;&amp;static_data)</span>
+<span class="lineNum">     199 </span>            :     {
+<span class="lineNum">     200 </span>            :       return callable(ndt::traits&lt;KernelType&gt;::equivalent(), detail::get_targets&lt;KernelType&gt;(),
+<span class="lineNum">     201 </span><span class="lineCov">         18 :                       detail::get_ir&lt;KernelType&gt;(), std::forward&lt;StaticDataType&gt;(static_data), &amp;KernelType::data_init,</span>
+<span class="lineNum">     202 </span><span class="lineCov">         18 :                       &amp;KernelType::resolve_dst_type, &amp;KernelType::instantiate);</span>
+<span class="lineNum">     203 </span>            :     }
+<span class="lineNum">     204 </span>            : 
+<a name="205"><span class="lineNum">     205 </span>            :     template &lt;typename KernelType, typename StaticDataType&gt;</a>
+<span class="lineNum">     206 </span>            :     static typename std::enable_if&lt;!ndt::has_traits&lt;KernelType&gt;::value, callable&gt;::type
+<span class="lineNum">     207 </span><span class="lineCov">       3549 :     make(const ndt::type &amp;tp, StaticDataType &amp;&amp;static_data)</span>
+<span class="lineNum">     208 </span>            :     {
+<span class="lineNum">     209 </span>            :       return callable(tp, detail::get_targets&lt;KernelType&gt;(), detail::get_ir&lt;KernelType&gt;(),
+<span class="lineNum">     210 </span><span class="lineCov">       3549 :                       std::forward&lt;StaticDataType&gt;(static_data), &amp;KernelType::data_init, &amp;KernelType::resolve_dst_type,</span>
+<span class="lineNum">     211 </span><span class="lineCov">       3549 :                       &amp;KernelType::instantiate);</span>
+<span class="lineNum">     212 </span>            :     }
+<a name="213"><span class="lineNum">     213 </span>            : </a>
+<span class="lineNum">     214 </span>            :     template &lt;template &lt;int&gt; class CKT, typename T&gt;
+<span class="lineNum">     215 </span><span class="lineCov">        626 :     static callable make(const ndt::type &amp;self_tp, T &amp;&amp;data)</span>
+<span class="lineNum">     216 </span>            :     {
+<span class="lineNum">     217 </span><span class="lineCov">        626 :       switch (self_tp.extended&lt;ndt::callable_type&gt;()-&gt;get_npos()) {</span>
+<span class="lineNum">     218 </span>            :       case 0:
+<span class="lineNum">     219 </span><span class="lineCov">          3 :         return make&lt;CKT&lt;0&gt;&gt;(self_tp, std::forward&lt;T&gt;(data));</span>
+<span class="lineNum">     220 </span>            :       case 1:
+<span class="lineNum">     221 </span><span class="lineCov">         89 :         return make&lt;CKT&lt;1&gt;&gt;(self_tp, std::forward&lt;T&gt;(data));</span>
+<span class="lineNum">     222 </span>            :       case 2:
+<span class="lineNum">     223 </span><span class="lineCov">        532 :         return make&lt;CKT&lt;2&gt;&gt;(self_tp, std::forward&lt;T&gt;(data));</span>
+<span class="lineNum">     224 </span>            :       case 3:
+<span class="lineNum">     225 </span><span class="lineCov">          2 :         return make&lt;CKT&lt;3&gt;&gt;(self_tp, std::forward&lt;T&gt;(data));</span>
+<span class="lineNum">     226 </span>            :       case 4:
+<span class="lineNum">     227 </span><span class="lineNoCov">          0 :         return make&lt;CKT&lt;4&gt;&gt;(self_tp, std::forward&lt;T&gt;(data));</span>
+<span class="lineNum">     228 </span>            :       case 5:
+<span class="lineNum">     229 </span><span class="lineNoCov">          0 :         return make&lt;CKT&lt;5&gt;&gt;(self_tp, std::forward&lt;T&gt;(data));</span>
+<span class="lineNum">     230 </span>            :       case 6:
+<span class="lineNum">     231 </span><span class="lineNoCov">          0 :         return make&lt;CKT&lt;6&gt;&gt;(self_tp, std::forward&lt;T&gt;(data));</span>
+<span class="lineNum">     232 </span>            :       case 7:
+<span class="lineNum">     233 </span><span class="lineNoCov">          0 :         return make&lt;CKT&lt;7&gt;&gt;(self_tp, std::forward&lt;T&gt;(data));</span>
+<span class="lineNum">     234 </span>            :       default:
+<span class="lineNum">     235 </span><span class="lineNoCov">          0 :         throw std::runtime_error(&quot;callable with nsrc &gt; 7 not implemented yet&quot;);</span>
+<span class="lineNum">     236 </span>            :       }
+<span class="lineNum">     237 </span>            :     }
+<a name="238"><span class="lineNum">     238 </span>            : </a>
+<span class="lineNum">     239 </span>            :     template &lt;template &lt;type_id_t&gt; class KernelType, typename I0, typename... A&gt;
+<span class="lineNum">     240 </span><span class="lineCov">         11 :     static std::map&lt;type_id_t, callable&gt; make_all(A &amp;&amp;... a)</span>
+<span class="lineNum">     241 </span>            :     {
+<span class="lineNum">     242 </span><span class="lineCov">         11 :       std::map&lt;type_id_t, callable&gt; callables;</span>
+<span class="lineNum">     243 </span><span class="lineCov">         11 :       for_each&lt;I0&gt;(detail::make_all&lt;KernelType&gt;(), callables, std::forward&lt;A&gt;(a)...);</span>
+<span class="lineNum">     244 </span>            : 
+<span class="lineNum">     245 </span><span class="lineCov">         11 :       return callables;</span>
+<span class="lineNum">     246 </span>            :     }
+<span class="lineNum">     247 </span>            : 
+<a name="248"><span class="lineNum">     248 </span>            :     template &lt;template &lt;type_id_t, type_id_t, type_id_t...&gt; class KernelType, typename I0, typename I1, typename... I,</a>
+<span class="lineNum">     249 </span>            :               typename... A&gt;
+<span class="lineNum">     250 </span><span class="lineCov">         11 :     static std::map&lt;std::array&lt;type_id_t, 2 + sizeof...(I)&gt;, callable&gt; make_all(A &amp;&amp;... a)</span>
+<span class="lineNum">     251 </span>            :     {
+<span class="lineNum">     252 </span><span class="lineCov">         11 :       std::map&lt;std::array&lt;type_id_t, 2 + sizeof...(I)&gt;, callable&gt; callables;</span>
+<span class="lineNum">     253 </span><span class="lineCov">         11 :       for_each&lt;typename outer&lt;I0, I1, I...&gt;::type&gt;(detail::make_all&lt;KernelType&gt;(), callables, std::forward&lt;A&gt;(a)...);</span>
+<span class="lineNum">     254 </span>            : 
+<span class="lineNum">     255 </span><span class="lineCov">         11 :       return callables;</span>
+<span class="lineNum">     256 </span>            :     }
+<span class="lineNum">     257 </span>            :   };
+<span class="lineNum">     258 </span>            : 
+<span class="lineNum">     259 </span>            :   template &lt;typename CallableType, typename... ArgTypes&gt;
+<span class="lineNum">     260 </span>            :   callable make_callable(ArgTypes &amp;&amp;... args)
+<span class="lineNum">     261 </span>            :   {
+<span class="lineNum">     262 </span>            :     return callable(new CallableType(std::forward&lt;ArgTypes&gt;(args)...), true);
+<span class="lineNum">     263 </span>            :   }
+<span class="lineNum">     264 </span>            : 
+<span class="lineNum">     265 </span>            :   template &lt;typename CallableType, typename KernelType, typename... ArgTypes&gt;
+<span class="lineNum">     266 </span>            :   std::enable_if_t&lt;ndt::has_traits&lt;KernelType&gt;::value, callable&gt; make_callable(ArgTypes &amp;&amp;... args)
+<span class="lineNum">     267 </span>            :   {
+<span class="lineNum">     268 </span>            :     return callable(new CallableType(ndt::traits&lt;KernelType&gt;::equivalent(), detail::get_targets&lt;KernelType&gt;(),
+<span class="lineNum">     269 </span>            :                                      detail::get_ir&lt;KernelType&gt;(), &amp;KernelType::data_init,
+<span class="lineNum">     270 </span>            :                                      &amp;KernelType::resolve_dst_type, &amp;KernelType::instantiate,
+<span class="lineNum">     271 </span>            :                                      std::forward&lt;ArgTypes&gt;(args)...),
+<span class="lineNum">     272 </span>            :                     true);
+<span class="lineNum">     273 </span>            :   }
+<a name="274"><span class="lineNum">     274 </span>            : </a>
+<span class="lineNum">     275 </span>            :   template &lt;typename CallableType, typename KernelType, typename... ArgTypes&gt;
+<span class="lineNum">     276 </span><span class="lineCov">         31 :   std::enable_if_t&lt;!ndt::has_traits&lt;KernelType&gt;::value, callable&gt; make_callable(const ndt::type &amp;tp,</span>
+<span class="lineNum">     277 </span>            :                                                                                 ArgTypes &amp;&amp;... args)
+<span class="lineNum">     278 </span>            :   {
+<span class="lineNum">     279 </span>            :     return callable(new CallableType(tp, detail::get_targets&lt;KernelType&gt;(), detail::get_ir&lt;KernelType&gt;(),
+<span class="lineNum">     280 </span>            :                                      &amp;KernelType::data_init, &amp;KernelType::resolve_dst_type, &amp;KernelType::instantiate,
+<span class="lineNum">     281 </span>            :                                      std::forward&lt;ArgTypes&gt;(args)...),
+<span class="lineNum">     282 </span><span class="lineCov">         31 :                     true);</span>
+<a name="283"><span class="lineNum">     283 </span>            :   }</a>
+<span class="lineNum">     284 </span>            : 
+<span class="lineNum">     285 </span><span class="lineNoCov">          0 :   inline std::ostream &amp;operator&lt;&lt;(std::ostream &amp;o, const callable &amp;rhs)</span>
+<span class="lineNum">     286 </span>            :   {
+<span class="lineNum">     287 </span><span class="lineNoCov">          0 :     return o &lt;&lt; &quot;&lt;callable &lt;&quot; &lt;&lt; rhs.get()-&gt;tp &lt;&lt; &quot;&gt; at &quot; &lt;&lt; reinterpret_cast&lt;const void *&gt;(rhs.get()) &lt;&lt; &quot;&gt;&quot;;</span>
+<span class="lineNum">     288 </span>            :   }
+<span class="lineNum">     289 </span>            : 
+<span class="lineNum">     290 </span>            :   namespace detail {
+<span class="lineNum">     291 </span>            : 
+<span class="lineNum">     292 </span>            :     template &lt;template &lt;type_id_t...&gt; class KernelType, typename S&gt;
+<span class="lineNum">     293 </span>            :     struct apply;
+<span class="lineNum">     294 </span>            : 
+<span class="lineNum">     295 </span>            :     template &lt;template &lt;type_id_t...&gt; class KernelType, type_id_t... I&gt;
+<span class="lineNum">     296 </span>            :     struct apply&lt;KernelType, type_id_sequence&lt;I...&gt;&gt; {
+<span class="lineNum">     297 </span>            :       typedef KernelType&lt;I...&gt; type;
+<span class="lineNum">     298 </span>            :     };
+<span class="lineNum">     299 </span>            : 
+<span class="lineNum">     300 </span>            :     template &lt;template &lt;type_id_t...&gt; class KernelType&gt;
+<a name="301"><span class="lineNum">     301 </span>            :     struct make_all {</a>
+<span class="lineNum">     302 </span>            :       template &lt;type_id_t TypeID, typename... A&gt;
+<span class="lineNum">     303 </span><span class="lineCov">        107 :       void on_each(std::map&lt;type_id_t, callable&gt; &amp;callables, A &amp;&amp;... a) const</span>
+<span class="lineNum">     304 </span>            :       {
+<span class="lineNum">     305 </span><span class="lineCov">        107 :         callables[TypeID] = callable::make&lt;KernelType&lt;TypeID&gt;&gt;(std::forward&lt;A&gt;(a)...);</span>
+<span class="lineNum">     306 </span><span class="lineCov">        107 :       }</span>
+<a name="307"><span class="lineNum">     307 </span>            : </a>
+<span class="lineNum">     308 </span>            :       template &lt;typename TypeIDSequence, typename... A&gt;
+<span class="lineNum">     309 </span><span class="lineCov">       1527 :       void on_each(std::map&lt;std::array&lt;type_id_t, TypeIDSequence::size2()&gt;, callable&gt; &amp;callables, A &amp;&amp;... a) const</span>
+<span class="lineNum">     310 </span>            :       {
+<span class="lineNum">     311 </span><span class="lineCov">       1527 :         callables[i2a&lt;TypeIDSequence&gt;()] =</span>
+<span class="lineNum">     312 </span>            :             callable::make&lt;typename apply&lt;KernelType, TypeIDSequence&gt;::type&gt;(std::forward&lt;A&gt;(a)...);
+<span class="lineNum">     313 </span><span class="lineCov">       1527 :       }</span>
+<span class="lineNum">     314 </span>            :     };
+<span class="lineNum">     315 </span>            : 
+<span class="lineNum">     316 </span>            :   } // namespace dynd::nd::detail
+<span class="lineNum">     317 </span>            : 
+<span class="lineNum">     318 </span>            :   template &lt;typename FuncType&gt;
+<span class="lineNum">     319 </span>            :   struct declfunc {
+<span class="lineNum">     320 </span>            :     template &lt;typename DstType, typename... ArgTypes&gt;
+<span class="lineNum">     321 </span>            :     array operator()(ArgTypes &amp;&amp;... args)
+<span class="lineNum">     322 </span>            :     {
+<span class="lineNum">     323 </span>            :       return get().operator()&lt;DstType&gt;(std::forward&lt;ArgTypes&gt;(args)...);
+<span class="lineNum">     324 </span>            :     }
+<a name="325"><span class="lineNum">     325 </span>            : </a>
+<span class="lineNum">     326 </span>            :     template &lt;typename... ArgTypes&gt;
+<span class="lineNum">     327 </span><span class="lineCov">        830 :     array operator()(ArgTypes &amp;&amp;... args)</span>
+<span class="lineNum">     328 </span>            :     {
+<span class="lineNum">     329 </span><span class="lineCov">        830 :       return get()(std::forward&lt;ArgTypes&gt;(args)...);</span>
+<a name="330"><span class="lineNum">     330 </span>            :     }</a>
+<span class="lineNum">     331 </span>            : 
+<span class="lineNum">     332 </span><span class="lineCov">        990 :     array operator()(const std::initializer_list&lt;array&gt; &amp;args,</span>
+<span class="lineNum">     333 </span>            :                      const std::initializer_list&lt;std::pair&lt;const char *, array&gt;&gt; &amp;kwds)
+<span class="lineNum">     334 </span>            :     {
+<span class="lineNum">     335 </span><span class="lineCov">        990 :       return get()(args, kwds);</span>
+<a name="336"><span class="lineNum">     336 </span>            :     }</a>
+<span class="lineNum">     337 </span>            : 
+<span class="lineNum">     338 </span><span class="lineCov">       6126 :     static callable &amp;get()</span>
+<span class="lineNum">     339 </span>            :     {
+<span class="lineNum">     340 </span><span class="lineCov">       6126 :       static callable self = FuncType::make();</span>
+<span class="lineNum">     341 </span><span class="lineCov">       6126 :       return self;</span>
+<span class="lineNum">     342 </span>            :     }
+<span class="lineNum">     343 </span>            :   };
+<span class="lineNum">     344 </span>            : 
+<span class="lineNum">     345 </span>            :   template &lt;typename FuncType&gt;
+<span class="lineNum">     346 </span>            :   std::ostream &amp;operator&lt;&lt;(std::ostream &amp;o, const declfunc&lt;FuncType&gt; &amp;DYND_UNUSED(rhs))
+<span class="lineNum">     347 </span>            :   {
+<span class="lineNum">     348 </span>            :     return o &lt;&lt; FuncType::get();
+<span class="lineNum">     349 </span>            :   }
+<a name="350"><span class="lineNum">     350 </span>            : </a>
+<span class="lineNum">     351 </span>            :   template &lt;typename... ArgTypes&gt;
+<span class="lineNum">     352 </span><span class="lineCov">          1 :   array array::f(const char *name, ArgTypes &amp;&amp;... args)</span>
+<span class="lineNum">     353 </span>            :   {
+<span class="lineNum">     354 </span><span class="lineCov">          2 :     callable f = find_dynamic_function(name);</span>
+<span class="lineNum">     355 </span><span class="lineCov">          2 :     return f(*this, std::forward&lt;ArgTypes&gt;(args)...);</span>
+<span class="lineNum">     356 </span>            :   }
+<span class="lineNum">     357 </span>            : 
+<span class="lineNum">     358 </span>            :   template &lt;typename... ArgTypes&gt;
+<span class="lineNum">     359 </span>            :   array array::f(const char *name, ArgTypes &amp;&amp;... args) const
+<span class="lineNum">     360 </span>            :   {
+<span class="lineNum">     361 </span>            :     callable f = find_dynamic_function(name);
+<span class="lineNum">     362 </span>            :     return f(*this, std::forward&lt;ArgTypes&gt;(args)...);
+<span class="lineNum">     363 </span>            :   }
+<span class="lineNum">     364 </span>            : 
+<span class="lineNum">     365 </span>            :   namespace functional {
+<span class="lineNum">     366 </span>            : 
+<span class="lineNum">     367 </span>            :     /**
+<span class="lineNum">     368 </span>            :      * Makes an callable out of function ``func``, using the provided keyword
+<span class="lineNum">     369 </span>            :      * parameter names. This function takes ``func`` as a template
+<span class="lineNum">     370 </span>            :      * parameter, so can call it efficiently.
+<a name="371"><span class="lineNum">     371 </span>            :      */</a>
+<span class="lineNum">     372 </span>            :     template &lt;kernel_request_t kernreq, typename func_type, func_type func, typename... T&gt;
+<span class="lineNum">     373 </span><span class="lineCov">         15 :     callable apply(T &amp;&amp;... names)</span>
+<span class="lineNum">     374 </span>            :     {
+<span class="lineNum">     375 </span>            :       typedef apply_function_kernel&lt;func_type, func, arity_of&lt;func_type&gt;::value - sizeof...(T)&gt; CKT;
+<span class="lineNum">     376 </span>            : 
+<span class="lineNum">     377 </span><span class="lineCov">         30 :       ndt::type self_tp = ndt::make_type&lt;typename funcproto_of&lt;func_type&gt;::type&gt;(std::forward&lt;T&gt;(names)...);</span>
+<span class="lineNum">     378 </span>            : 
+<span class="lineNum">     379 </span><span class="lineCov">         30 :       return callable::make&lt;CKT&gt;(self_tp);</span>
+<span class="lineNum">     380 </span>            :     }
+<a name="381"><span class="lineNum">     381 </span>            : </a>
+<span class="lineNum">     382 </span>            :     template &lt;typename func_type, func_type func, typename... T&gt;
+<span class="lineNum">     383 </span><span class="lineCov">         10 :     callable apply(T &amp;&amp;... names)</span>
+<span class="lineNum">     384 </span>            :     {
+<span class="lineNum">     385 </span><span class="lineCov">         10 :       return apply&lt;kernel_request_host, func_type, func&gt;(std::forward&lt;T&gt;(names)...);</span>
+<span class="lineNum">     386 </span>            :     }
+<span class="lineNum">     387 </span>            : 
+<span class="lineNum">     388 </span>            :     /**
+<span class="lineNum">     389 </span>            :      * Makes an callable out of the function object ``func``, using the provided
+<span class="lineNum">     390 </span>            :      * keyword parameter names. This version makes a copy of provided ``func``
+<span class="lineNum">     391 </span>            :      * object.
+<a name="392"><span class="lineNum">     392 </span>            :      */</a>
+<span class="lineNum">     393 </span>            :     template &lt;kernel_request_t kernreq, typename func_type, typename... T&gt;
+<span class="lineNum">     394 </span><span class="lineCov">        114 :     typename std::enable_if&lt;!is_function_pointer&lt;func_type&gt;::value, callable&gt;::type apply(func_type func, T &amp;&amp;... names)</span>
+<span class="lineNum">     395 </span>            :     {
+<span class="lineNum">     396 </span>            :       typedef apply_callable_kernel&lt;func_type, arity_of&lt;func_type&gt;::value - sizeof...(T)&gt; ck_type;
+<span class="lineNum">     397 </span>            : 
+<span class="lineNum">     398 </span><span class="lineCov">        228 :       ndt::type self_tp = ndt::make_type&lt;typename funcproto_of&lt;func_type&gt;::type&gt;(std::forward&lt;T&gt;(names)...);</span>
+<span class="lineNum">     399 </span>            : 
+<span class="lineNum">     400 </span><span class="lineCov">        228 :       return callable::make&lt;ck_type&gt;(self_tp, func);</span>
+<span class="lineNum">     401 </span>            :     }
+<a name="402"><span class="lineNum">     402 </span>            : </a>
+<span class="lineNum">     403 </span>            :     template &lt;typename func_type, typename... T&gt;
+<span class="lineNum">     404 </span><span class="lineCov">         97 :     typename std::enable_if&lt;!is_function_pointer&lt;func_type&gt;::value, callable&gt;::type apply(func_type func, T &amp;&amp;... names)</span>
+<span class="lineNum">     405 </span>            :     {
+<span class="lineNum">     406 </span>            :       static_assert(all_char_string_params&lt;T...&gt;::value, &quot;All the names must be strings&quot;);
+<span class="lineNum">     407 </span><span class="lineCov">         97 :       return apply&lt;kernel_request_host&gt;(func, std::forward&lt;T&gt;(names)...);</span>
+<span class="lineNum">     408 </span>            :     }
+<a name="409"><span class="lineNum">     409 </span>            : </a>
+<span class="lineNum">     410 </span>            :     template &lt;kernel_request_t kernreq, typename func_type, typename... T&gt;
+<span class="lineNum">     411 </span><span class="lineCov">        855 :     callable apply(func_type *func, T &amp;&amp;... names)</span>
+<span class="lineNum">     412 </span>            :     {
+<span class="lineNum">     413 </span>            :       typedef apply_callable_kernel&lt;func_type *, arity_of&lt;func_type&gt;::value - sizeof...(T)&gt; ck_type;
+<span class="lineNum">     414 </span>            : 
+<span class="lineNum">     415 </span><span class="lineCov">       1710 :       ndt::type self_tp = ndt::make_type&lt;typename funcproto_of&lt;func_type&gt;::type&gt;(std::forward&lt;T&gt;(names)...);</span>
+<span class="lineNum">     416 </span>            : 
+<span class="lineNum">     417 </span><span class="lineCov">       1710 :       return callable::make&lt;ck_type&gt;(self_tp, func);</span>
+<span class="lineNum">     418 </span>            :     }
+<a name="419"><span class="lineNum">     419 </span>            : </a>
+<span class="lineNum">     420 </span>            :     template &lt;typename func_type, typename... T&gt;
+<span class="lineNum">     421 </span><span class="lineCov">        841 :     callable apply(func_type *func, T &amp;&amp;... names)</span>
+<span class="lineNum">     422 </span>            :     {
+<span class="lineNum">     423 </span><span class="lineCov">        841 :       return apply&lt;kernel_request_host&gt;(func, std::forward&lt;T&gt;(names)...);</span>
+<span class="lineNum">     424 </span>            :     }
+<a name="425"><span class="lineNum">     425 </span>            : </a>
+<span class="lineNum">     426 </span>            :     template &lt;kernel_request_t kernreq, typename T, typename R, typename... A, typename... S&gt;
+<span class="lineNum">     427 </span><span class="lineCov">          1 :     callable apply(T *obj, R (T::*mem_func)(A...), S &amp;&amp;... names)</span>
+<span class="lineNum">     428 </span>            :     {
+<span class="lineNum">     429 </span>            :       typedef apply_member_function_kernel&lt;T *, R (T::*)(A...), sizeof...(A) - sizeof...(S)&gt; ck_type;
+<span class="lineNum">     430 </span>            : 
+<span class="lineNum">     431 </span><span class="lineCov">          2 :       ndt::type self_tp = ndt::make_type&lt;typename funcproto_of&lt;R (T::*)(A...)&gt;::type&gt;(std::forward&lt;S&gt;(names)...);</span>
+<span class="lineNum">     432 </span>            : 
+<span class="lineNum">     433 </span><span class="lineCov">          2 :       return callable::make&lt;ck_type&gt;(self_tp, typename ck_type::data_type(obj, mem_func));</span>
+<span class="lineNum">     434 </span>            :     }
+<a name="435"><span class="lineNum">     435 </span>            : </a>
+<span class="lineNum">     436 </span>            :     template &lt;typename O, typename R, typename... A, typename... T&gt;
+<span class="lineNum">     437 </span><span class="lineCov">          1 :     callable apply(O *obj, R (O::*mem_func)(A...), T &amp;&amp;... names)</span>
+<span class="lineNum">     438 </span>            :     {
+<span class="lineNum">     439 </span><span class="lineCov">          1 :       return apply&lt;kernel_request_host&gt;(obj, mem_func, std::forward&lt;T&gt;(names)...);</span>
+<span class="lineNum">     440 </span>            :     }
+<span class="lineNum">     441 </span>            : 
+<span class="lineNum">     442 </span>            :     /**
+<span class="lineNum">     443 </span>            :      * Makes an callable out of the provided function object type, specialized
+<span class="lineNum">     444 </span>            :      * for a memory_type such as cuda_device based on the ``kernreq``.
+<a name="445"><span class="lineNum">     445 </span>            :      */</a>
+<span class="lineNum">     446 </span>            :     template &lt;kernel_request_t kernreq, typename func_type, typename... K, typename... T&gt;
+<span class="lineNum">     447 </span><span class="lineCov">         11 :     callable apply(T &amp;&amp;... names)</span>
+<span class="lineNum">     448 </span>            :     {
+<span class="lineNum">     449 </span>            :       typedef construct_then_apply_callable_kernel&lt;func_type, K...&gt; ck_type;
+<span class="lineNum">     450 </span>            : 
+<span class="lineNum">     451 </span><span class="lineCov">         22 :       ndt::type self_tp = ndt::make_type&lt;typename funcproto_of&lt;func_type, K...&gt;::type&gt;(std::forward&lt;T&gt;(names)...);</span>
+<span class="lineNum">     452 </span>            : 
+<span class="lineNum">     453 </span><span class="lineCov">         22 :       return callable::make&lt;ck_type&gt;(self_tp);</span>
+<span class="lineNum">     454 </span>            :     }
+<span class="lineNum">     455 </span>            : 
+<span class="lineNum">     456 </span>            :     /**
+<span class="lineNum">     457 </span>            :      * Makes an callable out of the provided function object type, which
+<span class="lineNum">     458 </span>            :      * constructs and calls the function object on demand.
+<a name="459"><span class="lineNum">     459 </span>            :      */</a>
+<span class="lineNum">     460 </span>            :     template &lt;typename func_type, typename... K, typename... T&gt;
+<span class="lineNum">     461 </span><span class="lineCov">          1 :     callable apply(T &amp;&amp;... names)</span>
+<span class="lineNum">     462 </span>            :     {
+<span class="lineNum">     463 </span><span class="lineCov">          1 :       return apply&lt;kernel_request_host, func_type, K...&gt;(std::forward&lt;T&gt;(names)...);</span>
+<span class="lineNum">     464 </span>            :     }
+<span class="lineNum">     465 </span>            : 
+<span class="lineNum">     466 </span>            :   } // namespace dynd::nd::functional
+<a name="467"><span class="lineNum">     467 </span>            : </a>
+<span class="lineNum">     468 </span>            :   template &lt;typename CallableType, typename... T, typename&gt;
+<span class="lineNum">     469 </span><span class="lineCov">         20 :   callable::callable(CallableType f, T &amp;&amp;... names)</span>
+<span class="lineNum">     470 </span><span class="lineCov">         20 :       : callable(nd::functional::apply(f, std::forward&lt;T&gt;(names)...))</span>
+<span class="lineNum">     471 </span>            :   {
+<span class="lineNum">     472 </span><span class="lineCov">         20 :   }</span>
+<span class="lineNum">     473 </span>            : 
+<span class="lineNum">     474 </span>            : } // namespace dynd::nd
+<span class="lineNum">     475 </span>            : 
+<span class="lineNum">     476 </span>            : /**
+<span class="lineNum">     477 </span>            :  * Creates an callable which does the assignment from
+<span class="lineNum">     478 </span>            :  * data of src_tp to dst_tp.
+<span class="lineNum">     479 </span>            :  *
+<span class="lineNum">     480 </span>            :  * \param dst_tp  The type of the destination.
+<span class="lineNum">     481 </span>            :  * \param src_tp  The type of the source.
+<span class="lineNum">     482 </span>            :  * \param errmode  The error mode to use for the assignment.
+<span class="lineNum">     483 </span>            :  */
+<span class="lineNum">     484 </span>            : DYND_API nd::callable make_callable_from_assignment(const ndt::type &amp;dst_tp, const ndt::type &amp;src_tp,
+<span class="lineNum">     485 </span>            :                                                     assign_error_mode errmode);
+<span class="lineNum">     486 </span>            : 
+<span class="lineNum">     487 </span>            : } // namespace dynd
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.10</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

@@ -1,0 +1,344 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - coverage.info.cleaned - src/dynd/array_range.cpp</title>
+  <link rel="stylesheet" type="text/css" href="../../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../../index.html">top level</a> - <a href="index.html">src/dynd</a> - array_range.cpp<span style="font-size: 80%;"> (source / <a href="array_range.cpp.func.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">coverage.info.cleaned</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">85</td>
+            <td class="headerCovTableEntry">134</td>
+            <td class="headerCovTableEntryLo">63.4 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2016-02-19</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">18</td>
+            <td class="headerCovTableEntry">32</td>
+            <td class="headerCovTableEntryLo">56.2 %</td>
+          </tr>
+          <tr><td><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : //</a>
+<span class="lineNum">       2 </span>            : // Copyright (C) 2011-15 DyND Developers
+<span class="lineNum">       3 </span>            : // BSD 2-Clause License, see LICENSE.txt
+<span class="lineNum">       4 </span>            : //
+<span class="lineNum">       5 </span>            : 
+<span class="lineNum">       6 </span>            : #include &lt;stdexcept&gt;
+<span class="lineNum">       7 </span>            : #include &lt;sstream&gt;
+<span class="lineNum">       8 </span>            : 
+<span class="lineNum">       9 </span>            : #include &lt;dynd/array.hpp&gt;
+<span class="lineNum">      10 </span>            : #include &lt;dynd/array_range.hpp&gt;
+<span class="lineNum">      11 </span>            : #include &lt;dynd/type_promotion.hpp&gt;
+<span class="lineNum">      12 </span>            : 
+<span class="lineNum">      13 </span>            : using namespace std;
+<span class="lineNum">      14 </span>            : using namespace dynd;
+<span class="lineNum">      15 </span>            : 
+<span class="lineNum">      16 </span>            : namespace {
+<a name="17"><span class="lineNum">      17 </span>            : template &lt;class T&gt;</a>
+<span class="lineNum">      18 </span>            : struct range_specialization {
+<span class="lineNum">      19 </span><span class="lineCov">         18 :   static void range(const void *beginval, const void *stepval, nd::array &amp;result)</span>
+<span class="lineNum">      20 </span>            :   {
+<span class="lineNum">      21 </span><span class="lineCov">         18 :     T begin = *reinterpret_cast&lt;const T *&gt;(beginval);</span>
+<span class="lineNum">      22 </span><span class="lineCov">         18 :     T step = *reinterpret_cast&lt;const T *&gt;(stepval);</span>
+<span class="lineNum">      23 </span><span class="lineCov">         18 :     intptr_t count = result.get_shape()[0], stride = result.get_strides()[0];</span>
+<span class="lineNum">      24 </span>            :     // cout &lt;&lt; &quot;range with count &quot; &lt;&lt; count &lt;&lt; endl;
+<span class="lineNum">      25 </span><span class="lineCov">         18 :     char *dst = result.data();</span>
+<span class="lineNum">      26 </span><span class="lineCov">        337 :     for (intptr_t i = 0; i &lt; count; ++i, dst += stride) {</span>
+<span class="lineNum">      27 </span><span class="lineCov">        319 :       *reinterpret_cast&lt;T *&gt;(dst) = static_cast&lt;T&gt;(begin + i * step);</span>
+<span class="lineNum">      28 </span>            :     }
+<span class="lineNum">      29 </span><span class="lineCov">         18 :   }</span>
+<span class="lineNum">      30 </span>            : };
+<span class="lineNum">      31 </span>            : 
+<a name="32"><span class="lineNum">      32 </span>            : template &lt;&gt;</a>
+<span class="lineNum">      33 </span>            : struct range_specialization&lt;int128&gt; {
+<span class="lineNum">      34 </span><span class="lineNoCov">          0 :   static void range(const void *beginval, const void *stepval, nd::array &amp;result)</span>
+<span class="lineNum">      35 </span>            :   {
+<span class="lineNum">      36 </span><span class="lineNoCov">          0 :     int128 begin = *reinterpret_cast&lt;const int128 *&gt;(beginval);</span>
+<span class="lineNum">      37 </span><span class="lineNoCov">          0 :     int128 step = *reinterpret_cast&lt;const int128 *&gt;(stepval);</span>
+<span class="lineNum">      38 </span><span class="lineNoCov">          0 :     intptr_t count = result.get_shape()[0], stride = result.get_strides()[0];</span>
+<span class="lineNum">      39 </span>            :     // cout &lt;&lt; &quot;range with count &quot; &lt;&lt; count &lt;&lt; endl;
+<span class="lineNum">      40 </span><span class="lineNoCov">          0 :     char *dst = result.data();</span>
+<span class="lineNum">      41 </span><span class="lineNoCov">          0 :     for (intptr_t i = 0; i &lt; count; ++i, dst += stride) {</span>
+<span class="lineNum">      42 </span><span class="lineNoCov">          0 :       *reinterpret_cast&lt;int128 *&gt;(dst) = begin;</span>
+<span class="lineNum">      43 </span><span class="lineNoCov">          0 :       begin = begin + step;</span>
+<span class="lineNum">      44 </span>            :     }
+<span class="lineNum">      45 </span><span class="lineNoCov">          0 :   }</span>
+<span class="lineNum">      46 </span>            : };
+<span class="lineNum">      47 </span>            : 
+<a name="48"><span class="lineNum">      48 </span>            : template &lt;class T, type_kind_t kind&gt;</a>
+<span class="lineNum">      49 </span>            : struct range_counter {
+<span class="lineNum">      50 </span><span class="lineCov">         15 :   static intptr_t count(const void *beginval, const void *endval, const void *stepval)</span>
+<span class="lineNum">      51 </span>            :   {
+<span class="lineNum">      52 </span><span class="lineCov">         15 :     T begin = *reinterpret_cast&lt;const T *&gt;(beginval);</span>
+<span class="lineNum">      53 </span><span class="lineCov">         15 :     T end = *reinterpret_cast&lt;const T *&gt;(endval);</span>
+<span class="lineNum">      54 </span><span class="lineCov">         15 :     T step = *reinterpret_cast&lt;const T *&gt;(stepval);</span>
+<span class="lineNum">      55 </span>            :     // cout &lt;&lt; &quot;range params &quot; &lt;&lt; begin &lt;&lt; &quot;  &quot; &lt;&lt; end &lt;&lt; &quot;  &quot; &lt;&lt; step &lt;&lt; &quot;\n&quot;;
+<span class="lineNum">      56 </span><span class="lineCov">         15 :     if (step &gt; 0) {</span>
+<span class="lineNum">      57 </span><span class="lineCov">         15 :       if (end &lt;= begin) {</span>
+<span class="lineNum">      58 </span><span class="lineNoCov">          0 :         return 0;</span>
+<span class="lineNum">      59 </span>            :       }
+<span class="lineNum">      60 </span><span class="lineCov">         15 :       return ((intptr_t)end - (intptr_t)begin + (intptr_t)step - 1) / (intptr_t)step;</span>
+<span class="lineNum">      61 </span>            :     }
+<span class="lineNum">      62 </span><span class="lineNoCov">          0 :     else if (step &lt; 0) {</span>
+<span class="lineNum">      63 </span><span class="lineNoCov">          0 :       if (end &gt;= begin) {</span>
+<span class="lineNum">      64 </span><span class="lineNoCov">          0 :         return 0;</span>
+<span class="lineNum">      65 </span>            :       }
+<span class="lineNum">      66 </span><span class="lineNoCov">          0 :       step = -step;</span>
+<span class="lineNum">      67 </span><span class="lineNoCov">          0 :       return ((intptr_t)begin - (intptr_t)end + (intptr_t)step - 1) / (intptr_t)step;</span>
+<span class="lineNum">      68 </span>            :     }
+<span class="lineNum">      69 </span>            :     else {
+<span class="lineNum">      70 </span><span class="lineNoCov">          0 :       throw std::runtime_error(&quot;nd::range cannot have a zero-sized step&quot;);</span>
+<span class="lineNum">      71 </span>            :     }
+<span class="lineNum">      72 </span>            :   }
+<span class="lineNum">      73 </span>            : };
+<span class="lineNum">      74 </span>            : 
+<a name="75"><span class="lineNum">      75 </span>            : template &lt;class T&gt;</a>
+<span class="lineNum">      76 </span>            : struct range_counter&lt;T, uint_kind&gt; {
+<span class="lineNum">      77 </span><span class="lineNoCov">          0 :   static intptr_t count(const void *beginval, const void *endval, const void *stepval)</span>
+<span class="lineNum">      78 </span>            :   {
+<span class="lineNum">      79 </span><span class="lineNoCov">          0 :     T begin = *reinterpret_cast&lt;const T *&gt;(beginval);</span>
+<span class="lineNum">      80 </span><span class="lineNoCov">          0 :     T end = *reinterpret_cast&lt;const T *&gt;(endval);</span>
+<span class="lineNum">      81 </span><span class="lineNoCov">          0 :     T step = *reinterpret_cast&lt;const T *&gt;(stepval);</span>
+<span class="lineNum">      82 </span>            :     // cout &lt;&lt; &quot;range params &quot; &lt;&lt; begin &lt;&lt; &quot;  &quot; &lt;&lt; end &lt;&lt; &quot;  &quot; &lt;&lt; step &lt;&lt; &quot;\n&quot;;
+<span class="lineNum">      83 </span><span class="lineNoCov">          0 :     if (step &gt; 0) {</span>
+<span class="lineNum">      84 </span><span class="lineNoCov">          0 :       if (end &lt;= begin) {</span>
+<span class="lineNum">      85 </span><span class="lineNoCov">          0 :         return 0;</span>
+<span class="lineNum">      86 </span>            :       }
+<span class="lineNum">      87 </span><span class="lineNoCov">          0 :       return ((intptr_t)end - (intptr_t)begin + (intptr_t)step - 1) / (intptr_t)step;</span>
+<span class="lineNum">      88 </span>            :     }
+<span class="lineNum">      89 </span>            :     else {
+<span class="lineNum">      90 </span><span class="lineNoCov">          0 :       throw std::runtime_error(&quot;nd::range cannot have a zero-sized step&quot;);</span>
+<span class="lineNum">      91 </span>            :     }
+<span class="lineNum">      92 </span>            :   }
+<span class="lineNum">      93 </span>            : };
+<span class="lineNum">      94 </span>            : 
+<a name="95"><span class="lineNum">      95 </span>            : template &lt;class T&gt;</a>
+<span class="lineNum">      96 </span>            : struct range_counter&lt;T, real_kind&gt; {
+<span class="lineNum">      97 </span><span class="lineCov">          3 :   static intptr_t count(const void *beginval, const void *endval, const void *stepval)</span>
+<span class="lineNum">      98 </span>            :   {
+<span class="lineNum">      99 </span><span class="lineCov">          3 :     T begin = *reinterpret_cast&lt;const T *&gt;(beginval);</span>
+<span class="lineNum">     100 </span><span class="lineCov">          3 :     T end = *reinterpret_cast&lt;const T *&gt;(endval);</span>
+<span class="lineNum">     101 </span><span class="lineCov">          3 :     T step = *reinterpret_cast&lt;const T *&gt;(stepval);</span>
+<span class="lineNum">     102 </span>            :     // cout &lt;&lt; &quot;nd::range params &quot; &lt;&lt; begin &lt;&lt; &quot;  &quot; &lt;&lt; end &lt;&lt; &quot;  &quot; &lt;&lt; step &lt;&lt;
+<span class="lineNum">     103 </span>            :     // &quot;\n&quot;;
+<span class="lineNum">     104 </span><span class="lineCov">          3 :     if (step &gt; 0) {</span>
+<span class="lineNum">     105 </span><span class="lineCov">          3 :       if (end &lt;= begin) {</span>
+<span class="lineNum">     106 </span><span class="lineNoCov">          0 :         return 0;</span>
+<span class="lineNum">     107 </span>            :       }
+<span class="lineNum">     108 </span>            :       // Add half a step to make the count robust. This requires
+<span class="lineNum">     109 </span>            :       // that the range given is approximately a multiple of step
+<span class="lineNum">     110 </span><span class="lineCov">          3 :       return (intptr_t)floor((end - begin + 0.5 * step) / step);</span>
+<span class="lineNum">     111 </span>            :     }
+<span class="lineNum">     112 </span><span class="lineNoCov">          0 :     else if (step &lt; 0) {</span>
+<span class="lineNum">     113 </span><span class="lineNoCov">          0 :       if (end &gt;= begin) {</span>
+<span class="lineNum">     114 </span><span class="lineNoCov">          0 :         return 0;</span>
+<span class="lineNum">     115 </span>            :       }
+<span class="lineNum">     116 </span>            :       // Add half a step to make the count robust. This requires
+<span class="lineNum">     117 </span>            :       // that the range given is approximately a multiple of step
+<span class="lineNum">     118 </span><span class="lineNoCov">          0 :       return (intptr_t)floor((end - begin + 0.5 * step) / step);</span>
+<span class="lineNum">     119 </span>            :     }
+<span class="lineNum">     120 </span>            :     else {
+<span class="lineNum">     121 </span><span class="lineNoCov">          0 :       throw std::runtime_error(&quot;nd::range cannot have a zero-sized step&quot;);</span>
+<span class="lineNum">     122 </span>            :     }
+<span class="lineNum">     123 </span>            :   }
+<span class="lineNum">     124 </span>            : };
+<a name="125"><span class="lineNum">     125 </span>            : } // anonymous namespace</a>
+<span class="lineNum">     126 </span>            : 
+<span class="lineNum">     127 </span><span class="lineCov">         18 : nd::array dynd::nd::range(const ndt::type &amp;scalar_tp, const void *beginval, const void *endval, const void *stepval)</span>
+<span class="lineNum">     128 </span>            : {
+<span class="lineNum">     129 </span>            : #define ONE_ARANGE_SPECIALIZATION(type)                                                                                \
+<span class="lineNum">     130 </span>            :   case type_id_of&lt;type&gt;::value: {                                                                                      \
+<span class="lineNum">     131 </span>            :     intptr_t dim_size =                                                                                                \
+<span class="lineNum">     132 </span>            :         range_counter&lt;type, type_kind_of&lt;type_id_of&lt;type&gt;::value&gt;::value&gt;::count(beginval, endval, stepval);           \
+<span class="lineNum">     133 </span>            :     nd::array result = nd::empty(dim_size, scalar_tp);                                                                 \
+<span class="lineNum">     134 </span>            :     range_specialization&lt;type&gt;::range(beginval, stepval, result);                                                      \
+<span class="lineNum">     135 </span>            :     return result;                                                                                                     \
+<span class="lineNum">     136 </span>            :   }
+<span class="lineNum">     137 </span>            : 
+<span class="lineNum">     138 </span><span class="lineCov">         18 :   switch (scalar_tp.get_id()) {</span>
+<span class="lineNum">     139 </span><span class="lineNoCov">          0 :     ONE_ARANGE_SPECIALIZATION(int8_t);</span>
+<span class="lineNum">     140 </span><span class="lineNoCov">          0 :     ONE_ARANGE_SPECIALIZATION(int16_t);</span>
+<span class="lineNum">     141 </span><span class="lineCov">         14 :     ONE_ARANGE_SPECIALIZATION(int32_t);</span>
+<span class="lineNum">     142 </span><span class="lineCov">          1 :     ONE_ARANGE_SPECIALIZATION(int64_t);</span>
+<span class="lineNum">     143 </span><span class="lineNoCov">          0 :     ONE_ARANGE_SPECIALIZATION(int128);</span>
+<span class="lineNum">     144 </span><span class="lineNoCov">          0 :     ONE_ARANGE_SPECIALIZATION(uint8_t);</span>
+<span class="lineNum">     145 </span><span class="lineNoCov">          0 :     ONE_ARANGE_SPECIALIZATION(uint16_t);</span>
+<span class="lineNum">     146 </span><span class="lineNoCov">          0 :     ONE_ARANGE_SPECIALIZATION(uint32_t);</span>
+<span class="lineNum">     147 </span><span class="lineNoCov">          0 :     ONE_ARANGE_SPECIALIZATION(uint64_t);</span>
+<span class="lineNum">     148 </span><span class="lineCov">          1 :     ONE_ARANGE_SPECIALIZATION(float);</span>
+<span class="lineNum">     149 </span><span class="lineCov">          2 :     ONE_ARANGE_SPECIALIZATION(double);</span>
+<span class="lineNum">     150 </span>            :   default:
+<span class="lineNum">     151 </span><span class="lineNoCov">          0 :     break;</span>
+<span class="lineNum">     152 </span>            :   }
+<span class="lineNum">     153 </span>            : 
+<span class="lineNum">     154 </span>            : #undef ONE_ARANGE_SPECIALIZATION
+<span class="lineNum">     155 </span>            : 
+<span class="lineNum">     156 </span><span class="lineNoCov">          0 :   stringstream ss;</span>
+<span class="lineNum">     157 </span><span class="lineNoCov">          0 :   ss &lt;&lt; &quot;dynd nd::range doesn't support type &quot; &lt;&lt; scalar_tp;</span>
+<span class="lineNum">     158 </span><span class="lineNoCov">          0 :   throw type_error(ss.str());</span>
+<a name="159"><span class="lineNum">     159 </span>            : }</a>
+<span class="lineNum">     160 </span>            : 
+<span class="lineNum">     161 </span><span class="lineCov">          1 : static void linspace_specialization(float start, float stop, intptr_t count, nd::array &amp;result)</span>
+<span class="lineNum">     162 </span>            : {
+<span class="lineNum">     163 </span><span class="lineCov">          1 :   intptr_t stride = result.get_strides()[0];</span>
+<span class="lineNum">     164 </span><span class="lineCov">          1 :   char *dst = result.data();</span>
+<span class="lineNum">     165 </span><span class="lineCov">          4 :   for (intptr_t i = 0; i &lt; count; ++i, dst += stride) {</span>
+<span class="lineNum">     166 </span><span class="lineCov">          3 :     double val = ((count - i - 1) * double(start) + i * double(stop)) / double(count - 1);</span>
+<span class="lineNum">     167 </span><span class="lineCov">          3 :     *reinterpret_cast&lt;float *&gt;(dst) = static_cast&lt;float&gt;(val);</span>
+<span class="lineNum">     168 </span>            :   }
+<a name="169"><span class="lineNum">     169 </span><span class="lineCov">          1 : }</span></a>
+<span class="lineNum">     170 </span>            : 
+<span class="lineNum">     171 </span><span class="lineCov">          2 : static void linspace_specialization(double start, double stop, intptr_t count, nd::array &amp;result)</span>
+<span class="lineNum">     172 </span>            : {
+<span class="lineNum">     173 </span><span class="lineCov">          2 :   intptr_t stride = result.get_strides()[0];</span>
+<span class="lineNum">     174 </span><span class="lineCov">          2 :   char *dst = result.data();</span>
+<span class="lineNum">     175 </span><span class="lineCov">         11 :   for (intptr_t i = 0; i &lt; count; ++i, dst += stride) {</span>
+<span class="lineNum">     176 </span><span class="lineCov">          9 :     double val = ((count - i - 1) * start + i * stop) / double(count - 1);</span>
+<span class="lineNum">     177 </span><span class="lineCov">          9 :     *reinterpret_cast&lt;double *&gt;(dst) = val;</span>
+<span class="lineNum">     178 </span>            :   }
+<a name="179"><span class="lineNum">     179 </span><span class="lineCov">          2 : }</span></a>
+<span class="lineNum">     180 </span>            : 
+<span class="lineNum">     181 </span><span class="lineCov">          1 : static void linspace_specialization(dynd::complex&lt;float&gt; start, dynd::complex&lt;float&gt; stop, intptr_t count,</span>
+<span class="lineNum">     182 </span>            :                                     nd::array &amp;result)
+<span class="lineNum">     183 </span>            : {
+<span class="lineNum">     184 </span><span class="lineCov">          1 :   intptr_t stride = result.get_strides()[0];</span>
+<span class="lineNum">     185 </span><span class="lineCov">          1 :   char *dst = result.data();</span>
+<span class="lineNum">     186 </span><span class="lineCov">          4 :   for (intptr_t i = 0; i &lt; count; ++i, dst += stride) {</span>
+<span class="lineNum">     187 </span>            :     dynd::complex&lt;double&gt; val =
+<span class="lineNum">     188 </span><span class="lineCov">          3 :         (double(count - i - 1) * dynd::complex&lt;double&gt;(start) + double(i) * dynd::complex&lt;double&gt;(stop)) /</span>
+<span class="lineNum">     189 </span><span class="lineCov">          6 :         double(count - 1);</span>
+<span class="lineNum">     190 </span><span class="lineCov">          3 :     *reinterpret_cast&lt;dynd::complex&lt;float&gt; *&gt;(dst) = dynd::complex&lt;float&gt;(val);</span>
+<span class="lineNum">     191 </span>            :   }
+<a name="192"><span class="lineNum">     192 </span><span class="lineCov">          1 : }</span></a>
+<span class="lineNum">     193 </span>            : 
+<span class="lineNum">     194 </span><span class="lineCov">          1 : static void linspace_specialization(dynd::complex&lt;double&gt; start, dynd::complex&lt;double&gt; stop, intptr_t count,</span>
+<span class="lineNum">     195 </span>            :                                     nd::array &amp;result)
+<span class="lineNum">     196 </span>            : {
+<span class="lineNum">     197 </span><span class="lineCov">          1 :   intptr_t stride = result.get_strides()[0];</span>
+<span class="lineNum">     198 </span><span class="lineCov">          1 :   char *dst = result.data();</span>
+<span class="lineNum">     199 </span><span class="lineCov">          4 :   for (intptr_t i = 0; i &lt; count; ++i, dst += stride) {</span>
+<span class="lineNum">     200 </span>            :     dynd::complex&lt;double&gt; val =
+<span class="lineNum">     201 </span><span class="lineCov">          3 :         (double(count - i - 1) * dynd::complex&lt;double&gt;(start) + double(i) * dynd::complex&lt;double&gt;(stop)) /</span>
+<span class="lineNum">     202 </span><span class="lineCov">          6 :         double(count - 1);</span>
+<span class="lineNum">     203 </span><span class="lineCov">          3 :     *reinterpret_cast&lt;dynd::complex&lt;double&gt; *&gt;(dst) = val;</span>
+<span class="lineNum">     204 </span>            :   }
+<a name="205"><span class="lineNum">     205 </span><span class="lineCov">          1 : }</span></a>
+<span class="lineNum">     206 </span>            : 
+<span class="lineNum">     207 </span><span class="lineCov">          2 : nd::array dynd::nd::linspace(const nd::array &amp;start, const nd::array &amp;stop, intptr_t count, const ndt::type &amp;dt)</span>
+<span class="lineNum">     208 </span>            : {
+<span class="lineNum">     209 </span><span class="lineCov">          4 :   nd::array start_cleaned = nd::empty(dt).assign(start);</span>
+<span class="lineNum">     210 </span><span class="lineCov">          4 :   nd::array stop_cleaned = nd::empty(dt).assign(stop);</span>
+<span class="lineNum">     211 </span>            : 
+<span class="lineNum">     212 </span><span class="lineCov">          2 :   if (start_cleaned.is_scalar() &amp;&amp; stop_cleaned.is_scalar()) {</span>
+<span class="lineNum">     213 </span><span class="lineCov">          4 :     return linspace(dt, start_cleaned.cdata(), stop_cleaned.cdata(), count);</span>
+<span class="lineNum">     214 </span>            :   }
+<span class="lineNum">     215 </span>            :   else {
+<span class="lineNum">     216 </span><span class="lineNoCov">          0 :     throw runtime_error(&quot;dynd::linspace presently only supports scalar parameters&quot;);</span>
+<span class="lineNum">     217 </span>            :   }
+<a name="218"><span class="lineNum">     218 </span>            : }</a>
+<span class="lineNum">     219 </span>            : 
+<span class="lineNum">     220 </span><span class="lineCov">          2 : nd::array dynd::nd::linspace(const nd::array &amp;start, const nd::array &amp;stop, intptr_t count)</span>
+<span class="lineNum">     221 </span>            : {
+<span class="lineNum">     222 </span><span class="lineCov">          4 :   ndt::type dt = promote_types_arithmetic(start.get_dtype(), stop.get_dtype());</span>
+<span class="lineNum">     223 </span>            :   // Make sure it's at least floating point
+<span class="lineNum">     224 </span><span class="lineCov">          2 :   if (dt.get_base_id() == bool_kind_id || dt.get_base_id() == int_kind_id || dt.get_base_id() == uint_kind_id) {</span>
+<span class="lineNum">     225 </span><span class="lineNoCov">          0 :     dt = ndt::make_type&lt;double&gt;();</span>
+<span class="lineNum">     226 </span>            :   }
+<span class="lineNum">     227 </span><span class="lineCov">          4 :   return linspace(start, stop, count, dt);</span>
+<a name="228"><span class="lineNum">     228 </span>            : }</a>
+<span class="lineNum">     229 </span>            : 
+<span class="lineNum">     230 </span><span class="lineCov">          5 : nd::array dynd::nd::linspace(const ndt::type &amp;dt, const void *startval, const void *stopval, intptr_t count)</span>
+<span class="lineNum">     231 </span>            : {
+<span class="lineNum">     232 </span><span class="lineCov">          5 :   if (count &lt; 2) {</span>
+<span class="lineNum">     233 </span><span class="lineNoCov">          0 :     throw runtime_error(&quot;linspace needs a count of at least 2&quot;);</span>
+<span class="lineNum">     234 </span>            :   }
+<span class="lineNum">     235 </span>            : 
+<span class="lineNum">     236 </span><span class="lineCov">          5 :   switch (dt.get_id()) {</span>
+<span class="lineNum">     237 </span>            :   case float32_id: {
+<span class="lineNum">     238 </span><span class="lineCov">          2 :     nd::array result = nd::empty(count, dt);</span>
+<span class="lineNum">     239 </span><span class="lineCov">          1 :     linspace_specialization(*reinterpret_cast&lt;const float *&gt;(startval), *reinterpret_cast&lt;const float *&gt;(stopval),</span>
+<span class="lineNum">     240 </span><span class="lineCov">          1 :                             count, result);</span>
+<span class="lineNum">     241 </span><span class="lineCov">          1 :     return result;</span>
+<span class="lineNum">     242 </span>            :   }
+<span class="lineNum">     243 </span>            :   case float64_id: {
+<span class="lineNum">     244 </span><span class="lineCov">          4 :     nd::array result = nd::empty(count, dt);</span>
+<span class="lineNum">     245 </span><span class="lineCov">          2 :     linspace_specialization(*reinterpret_cast&lt;const double *&gt;(startval), *reinterpret_cast&lt;const double *&gt;(stopval),</span>
+<span class="lineNum">     246 </span><span class="lineCov">          2 :                             count, result);</span>
+<span class="lineNum">     247 </span><span class="lineCov">          2 :     return result;</span>
+<span class="lineNum">     248 </span>            :   }
+<span class="lineNum">     249 </span>            :   case complex_float32_id: {
+<span class="lineNum">     250 </span><span class="lineCov">          2 :     nd::array result = nd::empty(count, dt);</span>
+<span class="lineNum">     251 </span>            :     linspace_specialization(*reinterpret_cast&lt;const dynd::complex&lt;float&gt; *&gt;(startval),
+<span class="lineNum">     252 </span><span class="lineCov">          1 :                             *reinterpret_cast&lt;const dynd::complex&lt;float&gt; *&gt;(stopval), count, result);</span>
+<span class="lineNum">     253 </span><span class="lineCov">          1 :     return result;</span>
+<span class="lineNum">     254 </span>            :   }
+<span class="lineNum">     255 </span>            :   case complex_float64_id: {
+<span class="lineNum">     256 </span><span class="lineCov">          2 :     nd::array result = nd::empty(count, dt);</span>
+<span class="lineNum">     257 </span>            :     linspace_specialization(*reinterpret_cast&lt;const dynd::complex&lt;double&gt; *&gt;(startval),
+<span class="lineNum">     258 </span><span class="lineCov">          1 :                             *reinterpret_cast&lt;const dynd::complex&lt;double&gt; *&gt;(stopval), count, result);</span>
+<span class="lineNum">     259 </span><span class="lineCov">          1 :     return result;</span>
+<span class="lineNum">     260 </span>            :   }
+<span class="lineNum">     261 </span>            :   default:
+<span class="lineNum">     262 </span><span class="lineNoCov">          0 :     break;</span>
+<span class="lineNum">     263 </span>            :   }
+<span class="lineNum">     264 </span>            : 
+<span class="lineNum">     265 </span><span class="lineNoCov">          0 :   stringstream ss;</span>
+<a name="266"><span class="lineNum">     266 </span><span class="lineNoCov">          0 :   ss &lt;&lt; &quot;dynd linspace doesn't support type &quot; &lt;&lt; dt;</span></a>
+<span class="lineNum">     267 </span><span class="lineNoCov">          0 :   throw runtime_error(ss.str());</span>
+<span class="lineNum">     268 </span><span class="lineCov">          3 : }</span>
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.10</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

@@ -1,0 +1,170 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - coverage.info.cleaned - include/dynd/kernels/mean_kernel.hpp</title>
+  <link rel="stylesheet" type="text/css" href="../../../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../../../index.html">top level</a> - <a href="index.html">include/dynd/kernels</a> - mean_kernel.hpp<span style="font-size: 80%;"> (source / <a href="mean_kernel.hpp.func.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">coverage.info.cleaned</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntry">34</td>
+            <td class="headerCovTableEntryLo">0.0 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2016-02-19</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntry">6</td>
+            <td class="headerCovTableEntryLo">0.0 %</td>
+          </tr>
+          <tr><td><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : //</a>
+<span class="lineNum">       2 </span>            : // Copyright (C) 2011-15 DyND Developers
+<span class="lineNum">       3 </span>            : // BSD 2-Clause License, see LICENSE.txt
+<span class="lineNum">       4 </span>            : //
+<span class="lineNum">       5 </span>            : 
+<span class="lineNum">       6 </span>            : #pragma once
+<span class="lineNum">       7 </span>            : 
+<span class="lineNum">       8 </span>            : #include &lt;dynd/func/arithmetic.hpp&gt;
+<span class="lineNum">       9 </span>            : #include &lt;dynd/func/sum.hpp&gt;
+<span class="lineNum">      10 </span>            : #include &lt;dynd/kernels/base_kernel.hpp&gt;
+<span class="lineNum">      11 </span>            : #include &lt;dynd/types/any_kind_type.hpp&gt;
+<span class="lineNum">      12 </span>            : 
+<span class="lineNum">      13 </span>            : namespace dynd {
+<span class="lineNum">      14 </span>            : namespace nd {
+<span class="lineNum">      15 </span>            : 
+<span class="lineNum">      16 </span>            :   // All methods are inlined, so this does not need to be declared DYND_API.
+<span class="lineNum">      17 </span>            :   struct mean_kernel : base_kernel&lt;mean_kernel, 1&gt; {
+<span class="lineNum">      18 </span>            :     std::intptr_t compound_div_offset;
+<span class="lineNum">      19 </span>            :     int64 count;
+<span class="lineNum">      20 </span>            : 
+<span class="lineNum">      21 </span>            :     struct data_type {
+<span class="lineNum">      22 </span>            :       char *sum_data;
+<span class="lineNum">      23 </span>            :       char *compound_div_data;
+<a name="24"><span class="lineNum">      24 </span>            :     };</a>
+<span class="lineNum">      25 </span>            : 
+<a name="26"><span class="lineNum">      26 </span><span class="lineNoCov">          0 :     mean_kernel(int64 count) : count(count) {}</span></a>
+<span class="lineNum">      27 </span>            : 
+<span class="lineNum">      28 </span><span class="lineNoCov">          0 :     void single(char *dst, char *const *src)</span>
+<span class="lineNum">      29 </span>            :     {
+<span class="lineNum">      30 </span><span class="lineNoCov">          0 :       kernel_prefix *sum_kernel = get_child();</span>
+<span class="lineNum">      31 </span><span class="lineNoCov">          0 :       kernel_single_t sum = sum_kernel-&gt;get_function&lt;kernel_single_t&gt;();</span>
+<span class="lineNum">      32 </span><span class="lineNoCov">          0 :       sum(sum_kernel, dst, src);</span>
+<span class="lineNum">      33 </span>            : 
+<span class="lineNum">      34 </span><span class="lineNoCov">          0 :       kernel_prefix *compound_div_kernel = get_child(compound_div_offset);</span>
+<span class="lineNum">      35 </span><span class="lineNoCov">          0 :       kernel_single_t compound_div = compound_div_kernel-&gt;get_function&lt;kernel_single_t&gt;();</span>
+<span class="lineNum">      36 </span><span class="lineNoCov">          0 :       char *child_src[1] = {reinterpret_cast&lt;char *&gt;(&amp;count)};</span>
+<span class="lineNum">      37 </span><span class="lineNoCov">          0 :       compound_div(compound_div_kernel, dst, child_src);</span>
+<a name="38"><span class="lineNum">      38 </span><span class="lineNoCov">          0 :     }</span></a>
+<span class="lineNum">      39 </span>            : 
+<span class="lineNum">      40 </span><span class="lineNoCov">          0 :     static char *data_init(char *static_data, const ndt::type &amp;dst_tp, intptr_t nsrc, const ndt::type *src_tp,</span>
+<span class="lineNum">      41 </span>            :                            intptr_t nkwd, const nd::array *kwds, const std::map&lt;std::string, ndt::type&gt; &amp;tp_vars)
+<span class="lineNum">      42 </span>            :     {
+<span class="lineNum">      43 </span><span class="lineNoCov">          0 :       char *data = reinterpret_cast&lt;char *&gt;(new data_type());</span>
+<span class="lineNum">      44 </span><span class="lineNoCov">          0 :       reinterpret_cast&lt;data_type *&gt;(data)-&gt;sum_data = nd::sum::get().get()-&gt;data_init(</span>
+<span class="lineNum">      45 </span><span class="lineNoCov">          0 :           nd::sum::get().get()-&gt;static_data(), dst_tp, nsrc, src_tp, nkwd, kwds, tp_vars);</span>
+<span class="lineNum">      46 </span>            :       reinterpret_cast&lt;data_type *&gt;(data)-&gt;compound_div_data =
+<span class="lineNum">      47 </span><span class="lineNoCov">          0 :           nd::compound_div::get().get()-&gt;data_init(nd::compound_div::get().get()-&gt;static_data(), dst_tp, 1,</span>
+<span class="lineNum">      48 </span><span class="lineNoCov">          0 :                                                    reinterpret_cast&lt;ndt::type *&gt;(static_data), 0, NULL, tp_vars);</span>
+<span class="lineNum">      49 </span>            : 
+<span class="lineNum">      50 </span><span class="lineNoCov">          0 :       return data;</span>
+<a name="51"><span class="lineNum">      51 </span>            :     }</a>
+<span class="lineNum">      52 </span>            : 
+<span class="lineNum">      53 </span><span class="lineNoCov">          0 :     static void resolve_dst_type(char *DYND_UNUSED(static_data), char *data, ndt::type &amp;dst_tp, intptr_t nsrc,</span>
+<span class="lineNum">      54 </span>            :                                  const ndt::type *src_tp, intptr_t nkwd, const array *kwds,
+<span class="lineNum">      55 </span>            :                                  const std::map&lt;std::string, ndt::type&gt; &amp;tp_vars)
+<span class="lineNum">      56 </span>            :     {
+<span class="lineNum">      57 </span><span class="lineNoCov">          0 :       nd::sum::get().get()-&gt;resolve_dst_type(nd::sum::get().get()-&gt;static_data(),</span>
+<span class="lineNum">      58 </span>            :                                              reinterpret_cast&lt;data_type *&gt;(data)-&gt;sum_data, dst_tp, nsrc, src_tp, nkwd,
+<span class="lineNum">      59 </span><span class="lineNoCov">          0 :                                              kwds, tp_vars);</span>
+<a name="60"><span class="lineNum">      60 </span><span class="lineNoCov">          0 :     }</span></a>
+<span class="lineNum">      61 </span>            : 
+<span class="lineNum">      62 </span><span class="lineNoCov">          0 :     static void instantiate(char *static_data, char *data, kernel_builder *ckb, const ndt::type &amp;dst_tp,</span>
+<span class="lineNum">      63 </span>            :                             const char *dst_arrmeta, intptr_t nsrc, const ndt::type *src_tp,
+<span class="lineNum">      64 </span>            :                             const char *const *src_arrmeta, kernel_request_t kernreq, intptr_t nkwd, const array *kwds,
+<span class="lineNum">      65 </span>            :                             const std::map&lt;std::string, ndt::type&gt; &amp;tp_vars)
+<span class="lineNum">      66 </span>            :     {
+<span class="lineNum">      67 </span><span class="lineNoCov">          0 :       intptr_t mean_offset = ckb-&gt;size();</span>
+<span class="lineNum">      68 </span><span class="lineNoCov">          0 :       ckb-&gt;emplace_back&lt;mean_kernel&gt;(kernreq, src_tp[0].get_size(src_arrmeta[0]));</span>
+<span class="lineNum">      69 </span>            : 
+<span class="lineNum">      70 </span><span class="lineNoCov">          0 :       nd::sum::get().get()-&gt;instantiate(nd::sum::get().get()-&gt;static_data(),</span>
+<span class="lineNum">      71 </span>            :                                         reinterpret_cast&lt;data_type *&gt;(data)-&gt;sum_data, ckb, dst_tp, dst_arrmeta, nsrc,
+<span class="lineNum">      72 </span><span class="lineNoCov">          0 :                                         src_tp, src_arrmeta, kernreq, nkwd, kwds, tp_vars);</span>
+<span class="lineNum">      73 </span>            : 
+<span class="lineNum">      74 </span><span class="lineNoCov">          0 :       mean_kernel *self = ckb-&gt;get_at&lt;mean_kernel&gt;(mean_offset);</span>
+<span class="lineNum">      75 </span><span class="lineNoCov">          0 :       self-&gt;compound_div_offset = ckb-&gt;size();</span>
+<span class="lineNum">      76 </span><span class="lineNoCov">          0 :       nd::compound_div::get().get()-&gt;instantiate(</span>
+<span class="lineNum">      77 </span><span class="lineNoCov">          0 :           nd::compound_div::get().get()-&gt;static_data(), reinterpret_cast&lt;data_type *&gt;(data)-&gt;compound_div_data, ckb,</span>
+<span class="lineNum">      78 </span><span class="lineNoCov">          0 :           dst_tp, dst_arrmeta, 1, reinterpret_cast&lt;ndt::type *&gt;(static_data), NULL, kernreq, nkwd, kwds, tp_vars);</span>
+<span class="lineNum">      79 </span>            : 
+<span class="lineNum">      80 </span><span class="lineNoCov">          0 :       delete reinterpret_cast&lt;data_type *&gt;(data);</span>
+<span class="lineNum">      81 </span><span class="lineNoCov">          0 :     }</span>
+<span class="lineNum">      82 </span>            :   };
+<span class="lineNum">      83 </span>            : 
+<span class="lineNum">      84 </span>            : } // namespace dynd::nd
+<span class="lineNum">      85 </span>            : 
+<span class="lineNum">      86 </span>            : namespace ndt {
+<span class="lineNum">      87 </span>            : 
+<a name="88"><span class="lineNum">      88 </span>            :   template &lt;&gt;</a>
+<span class="lineNum">      89 </span>            :   struct traits&lt;nd::mean_kernel&gt; {
+<span class="lineNum">      90 </span><span class="lineNoCov">          0 :     static type equivalent() { return nd::sum::get().get_array_type(); }</span>
+<span class="lineNum">      91 </span>            :   };
+<span class="lineNum">      92 </span>            : 
+<span class="lineNum">      93 </span>            : } // namespace dynd::ndt
+<span class="lineNum">      94 </span>            : } // namespace dynd
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.10</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

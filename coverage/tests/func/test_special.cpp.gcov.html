@@ -1,0 +1,365 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - coverage.info.cleaned - tests/func/test_special.cpp</title>
+  <link rel="stylesheet" type="text/css" href="../../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../../index.html">top level</a> - <a href="index.html">tests/func</a> - test_special.cpp<span style="font-size: 80%;"> (source / <a href="test_special.cpp.func.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">coverage.info.cleaned</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">120</td>
+            <td class="headerCovTableEntry">120</td>
+            <td class="headerCovTableEntryHi">100.0 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2016-02-19</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">94</td>
+            <td class="headerCovTableEntry">94</td>
+            <td class="headerCovTableEntryHi">100.0 %</td>
+          </tr>
+          <tr><td><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : //</a>
+<span class="lineNum">       2 </span>            : // Copyright (C) 2011-15 DyND Developers
+<span class="lineNum">       3 </span>            : // BSD 2-Clause License, see LICENSE.txt
+<span class="lineNum">       4 </span>            : //
+<span class="lineNum">       5 </span>            : 
+<span class="lineNum">       6 </span>            : #include &lt;iostream&gt;
+<span class="lineNum">       7 </span>            : #include &lt;stdexcept&gt;
+<span class="lineNum">       8 </span>            : #include &lt;cmath&gt;
+<span class="lineNum">       9 </span>            : #include &lt;inc_gtest.hpp&gt;
+<span class="lineNum">      10 </span>            : 
+<span class="lineNum">      11 </span>            : #include &quot;dynd_assertions.hpp&quot;
+<span class="lineNum">      12 </span>            : #include &quot;special_vals.hpp&quot;
+<span class="lineNum">      13 </span>            : 
+<span class="lineNum">      14 </span>            : #include &lt;dynd/special.hpp&gt;
+<span class="lineNum">      15 </span>            : 
+<span class="lineNum">      16 </span>            : using namespace std;
+<span class="lineNum">      17 </span>            : using namespace dynd;
+<span class="lineNum">      18 </span>            : 
+<a name="19"><span class="lineNum">      19 </span>            : #define REL_ERROR_MAX 1E-11</a>
+<span class="lineNum">      20 </span>            : 
+<span class="lineNum">      21 </span><span class="lineCov">          5 : TEST(Special, Factorial) {</span>
+<span class="lineNum">      22 </span><span class="lineCov">          2 :     nd::array vals = factorial_vals();</span>
+<span class="lineNum">      23 </span><span class="lineCov">          1 :     intptr_t size = vals.get_dim_size();</span>
+<span class="lineNum">      24 </span>            : 
+<span class="lineNum">      25 </span><span class="lineCov">        151 :     for (int i = 0; i &lt; size; ++i) {</span>
+<span class="lineNum">      26 </span><span class="lineCov">        150 :         EXPECT_EQ_RELERR(vals(i, 1).as&lt;double&gt;(),</span>
+<span class="lineNum">      27 </span>            :                          factorial(vals(i, 0).as&lt;int&gt;()), REL_ERROR_MAX);
+<span class="lineNum">      28 </span>            :     }
+<a name="29"><span class="lineNum">      29 </span>            : }</a>
+<span class="lineNum">      30 </span>            : 
+<span class="lineNum">      31 </span><span class="lineCov">          5 : TEST(Special, Factorial2) {</span>
+<span class="lineNum">      32 </span><span class="lineCov">          2 :     nd::array vals = factorial2_vals();</span>
+<span class="lineNum">      33 </span><span class="lineCov">          1 :     intptr_t size = vals.get_dim_size();</span>
+<span class="lineNum">      34 </span>            : 
+<span class="lineNum">      35 </span><span class="lineCov">        151 :     for (int i = 0; i &lt; size; ++i) {</span>
+<span class="lineNum">      36 </span><span class="lineCov">        150 :         EXPECT_EQ_RELERR(vals(i, 1).as&lt;double&gt;(),</span>
+<span class="lineNum">      37 </span>            :                          factorial2(vals(i, 0).as&lt;int&gt;()), REL_ERROR_MAX);
+<span class="lineNum">      38 </span>            :     }
+<a name="39"><span class="lineNum">      39 </span>            : }</a>
+<span class="lineNum">      40 </span>            : 
+<span class="lineNum">      41 </span><span class="lineCov">          5 : TEST(Special, FactorialRatio) {</span>
+<span class="lineNum">      42 </span><span class="lineCov">          2 :     nd::array vals = factorial_ratio_vals();</span>
+<span class="lineNum">      43 </span><span class="lineCov">          1 :     intptr_t size = vals.get_dim_size();</span>
+<span class="lineNum">      44 </span>            : 
+<span class="lineNum">      45 </span><span class="lineCov">      22501 :     for (int i = 0; i &lt; size; ++i) {</span>
+<span class="lineNum">      46 </span><span class="lineCov">      22500 :         EXPECT_EQ_RELERR(</span>
+<span class="lineNum">      47 </span>            :             vals(i, 2).as&lt;double&gt;(),
+<span class="lineNum">      48 </span>            :             factorial_ratio(vals(i, 0).as&lt;int&gt;(), vals(i, 1).as&lt;int&gt;()),
+<span class="lineNum">      49 </span>            :             REL_ERROR_MAX);
+<span class="lineNum">      50 </span>            :     }
+<a name="51"><span class="lineNum">      51 </span>            : }</a>
+<span class="lineNum">      52 </span>            : 
+<span class="lineNum">      53 </span><span class="lineCov">          5 : TEST(Special, Gamma) {</span>
+<span class="lineNum">      54 </span>            :     using dynd::gamma;
+<span class="lineNum">      55 </span>            : 
+<span class="lineNum">      56 </span><span class="lineCov">          2 :     nd::array vals = gamma_vals();</span>
+<span class="lineNum">      57 </span><span class="lineCov">          1 :     intptr_t size = vals.get_dim_size();</span>
+<span class="lineNum">      58 </span>            : 
+<span class="lineNum">      59 </span><span class="lineCov">        106 :     for (int i = 0; i &lt; size; ++i) {</span>
+<span class="lineNum">      60 </span><span class="lineCov">        105 :         EXPECT_EQ_RELERR(vals(i, 1).as&lt;double&gt;(),</span>
+<span class="lineNum">      61 </span>            :                          gamma(vals(i, 0).as&lt;double&gt;()), REL_ERROR_MAX);
+<span class="lineNum">      62 </span>            :     }
+<a name="63"><span class="lineNum">      63 </span>            : }</a>
+<span class="lineNum">      64 </span>            : 
+<span class="lineNum">      65 </span><span class="lineCov">          5 : TEST(Special, LogGamma) {</span>
+<span class="lineNum">      66 </span>            :     using dynd::lgamma;
+<span class="lineNum">      67 </span>            : 
+<span class="lineNum">      68 </span><span class="lineCov">          2 :     nd::array vals = lgamma_vals();</span>
+<span class="lineNum">      69 </span><span class="lineCov">          1 :     intptr_t size = vals.get_dim_size();</span>
+<span class="lineNum">      70 </span>            : 
+<span class="lineNum">      71 </span><span class="lineCov">        104 :     for (int i = 0; i &lt; size; ++i) {</span>
+<span class="lineNum">      72 </span><span class="lineCov">        103 :         EXPECT_EQ_RELERR(vals(i, 1).as&lt;double&gt;(),</span>
+<span class="lineNum">      73 </span>            :                          lgamma(vals(i, 0).as&lt;double&gt;()), REL_ERROR_MAX);
+<span class="lineNum">      74 </span>            :     }
+<a name="75"><span class="lineNum">      75 </span>            : }</a>
+<span class="lineNum">      76 </span>            : 
+<span class="lineNum">      77 </span><span class="lineCov">          5 : TEST(Special, Airy) {</span>
+<span class="lineNum">      78 </span><span class="lineCov">          2 :     nd::array vals = airy_vals();</span>
+<span class="lineNum">      79 </span><span class="lineCov">          1 :     intptr_t size = vals.get_dim_size();</span>
+<span class="lineNum">      80 </span>            : 
+<span class="lineNum">      81 </span><span class="lineCov">         22 :     for (int i = 0; i &lt; size; ++i) {</span>
+<span class="lineNum">      82 </span>            :         double res[2][2];
+<span class="lineNum">      83 </span><span class="lineCov">         21 :         airy(res, vals(i, 0).as&lt;double&gt;());</span>
+<span class="lineNum">      84 </span>            : 
+<span class="lineNum">      85 </span><span class="lineCov">         21 :         EXPECT_EQ_RELERR(vals(i, 1, 0, 0).as&lt;double&gt;(), res[0][0],</span>
+<span class="lineNum">      86 </span>            :                          REL_ERROR_MAX);
+<span class="lineNum">      87 </span><span class="lineCov">         21 :         EXPECT_EQ_RELERR(vals(i, 1, 0, 1).as&lt;double&gt;(), res[0][1],</span>
+<span class="lineNum">      88 </span>            :                          REL_ERROR_MAX);
+<span class="lineNum">      89 </span><span class="lineCov">         21 :         EXPECT_EQ_RELERR(vals(i, 1, 1, 0).as&lt;double&gt;(), res[1][0],</span>
+<span class="lineNum">      90 </span>            :                          REL_ERROR_MAX);
+<span class="lineNum">      91 </span><span class="lineCov">         21 :         EXPECT_EQ_RELERR(vals(i, 1, 1, 1).as&lt;double&gt;(), res[1][1],</span>
+<span class="lineNum">      92 </span>            :                          REL_ERROR_MAX);
+<span class="lineNum">      93 </span>            :     }
+<a name="94"><span class="lineNum">      94 </span>            : }</a>
+<span class="lineNum">      95 </span>            : 
+<span class="lineNum">      96 </span><span class="lineCov">          5 : TEST(Special, BesselJ0) {</span>
+<span class="lineNum">      97 </span><span class="lineCov">          2 :     nd::array vals = bessel_j0_vals();</span>
+<span class="lineNum">      98 </span><span class="lineCov">          1 :     intptr_t size = vals.get_dim_size();</span>
+<span class="lineNum">      99 </span>            : 
+<span class="lineNum">     100 </span><span class="lineCov">         22 :     for (int i = 0; i &lt; size; ++i) {</span>
+<span class="lineNum">     101 </span><span class="lineCov">         21 :         EXPECT_EQ_RELERR(vals(i, 1).as&lt;double&gt;(),</span>
+<span class="lineNum">     102 </span>            :                          bessel_j0(vals(i, 0).as&lt;double&gt;()), REL_ERROR_MAX);
+<span class="lineNum">     103 </span>            :     }
+<a name="104"><span class="lineNum">     104 </span>            : }</a>
+<span class="lineNum">     105 </span>            : 
+<span class="lineNum">     106 </span><span class="lineCov">          5 : TEST(Special, BesselJ1) {</span>
+<span class="lineNum">     107 </span><span class="lineCov">          2 :     nd::array vals = bessel_j1_vals();</span>
+<span class="lineNum">     108 </span><span class="lineCov">          1 :     intptr_t size = vals.get_dim_size();</span>
+<span class="lineNum">     109 </span>            : 
+<span class="lineNum">     110 </span><span class="lineCov">         22 :     for (int i = 0; i &lt; size; ++i) {</span>
+<span class="lineNum">     111 </span><span class="lineCov">         21 :         EXPECT_EQ_RELERR(vals(i, 1).as&lt;double&gt;(),</span>
+<span class="lineNum">     112 </span>            :                          bessel_j1(vals(i, 0).as&lt;double&gt;()), REL_ERROR_MAX);
+<span class="lineNum">     113 </span>            :     }
+<a name="114"><span class="lineNum">     114 </span>            : }</a>
+<span class="lineNum">     115 </span>            : 
+<span class="lineNum">     116 </span><span class="lineCov">          5 : TEST(Special, BesselJ) {</span>
+<span class="lineNum">     117 </span><span class="lineCov">          2 :     nd::array vals = bessel_j_vals();</span>
+<span class="lineNum">     118 </span><span class="lineCov">          1 :     intptr_t size = vals.get_dim_size();</span>
+<span class="lineNum">     119 </span>            : 
+<span class="lineNum">     120 </span><span class="lineCov">         73 :     for (int i = 0; i &lt; size; ++i) {</span>
+<span class="lineNum">     121 </span><span class="lineCov">         72 :         EXPECT_EQ_RELERR(</span>
+<span class="lineNum">     122 </span>            :             vals(i, 2).as&lt;double&gt;(),
+<span class="lineNum">     123 </span>            :             bessel_j(vals(i, 0).as&lt;double&gt;(), vals(i, 1).as&lt;double&gt;()),
+<span class="lineNum">     124 </span>            :             REL_ERROR_MAX);
+<span class="lineNum">     125 </span>            :     }
+<a name="126"><span class="lineNum">     126 </span>            : }</a>
+<span class="lineNum">     127 </span>            : 
+<span class="lineNum">     128 </span><span class="lineCov">          5 : TEST(Special, SphericalBesselJ0) {</span>
+<span class="lineNum">     129 </span><span class="lineCov">          2 :     nd::array vals = sph_bessel_j0_vals();</span>
+<span class="lineNum">     130 </span><span class="lineCov">          1 :     intptr_t size = vals.get_dim_size();</span>
+<span class="lineNum">     131 </span>            : 
+<span class="lineNum">     132 </span><span class="lineCov">         17 :     for (int i = 0; i &lt; size; ++i) {</span>
+<span class="lineNum">     133 </span><span class="lineCov">         16 :         EXPECT_EQ_RELERR(vals(i, 1).as&lt;double&gt;(),</span>
+<span class="lineNum">     134 </span>            :                          sph_bessel_j0(vals(i, 0).as&lt;double&gt;()), REL_ERROR_MAX);
+<span class="lineNum">     135 </span>            :     }
+<a name="136"><span class="lineNum">     136 </span>            : }</a>
+<span class="lineNum">     137 </span>            : 
+<span class="lineNum">     138 </span><span class="lineCov">          5 : TEST(Special, SphericalBesselJ) {</span>
+<span class="lineNum">     139 </span><span class="lineCov">          2 :     nd::array vals = sph_bessel_j_vals();</span>
+<span class="lineNum">     140 </span><span class="lineCov">          1 :     intptr_t size = vals.get_dim_size();</span>
+<span class="lineNum">     141 </span>            : 
+<span class="lineNum">     142 </span><span class="lineCov">        101 :     for (int i = 0; i &lt; size; ++i) {</span>
+<span class="lineNum">     143 </span><span class="lineCov">        100 :         EXPECT_EQ_RELERR(</span>
+<span class="lineNum">     144 </span>            :             vals(i, 2).as&lt;double&gt;(),
+<span class="lineNum">     145 </span>            :             sph_bessel_j(vals(i, 0).as&lt;double&gt;(), vals(i, 1).as&lt;double&gt;()),
+<span class="lineNum">     146 </span>            :             REL_ERROR_MAX);
+<span class="lineNum">     147 </span>            :     }
+<a name="148"><span class="lineNum">     148 </span>            : }</a>
+<span class="lineNum">     149 </span>            : 
+<span class="lineNum">     150 </span><span class="lineCov">          5 : TEST(Special, BesselY0) {</span>
+<span class="lineNum">     151 </span><span class="lineCov">          2 :     nd::array vals = bessel_y0_vals();</span>
+<span class="lineNum">     152 </span><span class="lineCov">          1 :     intptr_t size = vals.get_dim_size();</span>
+<span class="lineNum">     153 </span>            : 
+<span class="lineNum">     154 </span><span class="lineCov">         17 :     for (int i = 0; i &lt; size; ++i) {</span>
+<span class="lineNum">     155 </span><span class="lineCov">         16 :         EXPECT_EQ_RELERR(vals(i, 1).as&lt;double&gt;(),</span>
+<span class="lineNum">     156 </span>            :                          bessel_y0(vals(i, 0).as&lt;double&gt;()), REL_ERROR_MAX);
+<span class="lineNum">     157 </span>            :     }
+<a name="158"><span class="lineNum">     158 </span>            : }</a>
+<span class="lineNum">     159 </span>            : 
+<span class="lineNum">     160 </span><span class="lineCov">          5 : TEST(Special, BesselY1) {</span>
+<span class="lineNum">     161 </span><span class="lineCov">          2 :     nd::array vals = bessel_y1_vals();</span>
+<span class="lineNum">     162 </span><span class="lineCov">          1 :     intptr_t size = vals.get_dim_size();</span>
+<span class="lineNum">     163 </span>            : 
+<span class="lineNum">     164 </span><span class="lineCov">         17 :     for (int i = 0; i &lt; size; ++i) {</span>
+<span class="lineNum">     165 </span><span class="lineCov">         16 :         EXPECT_EQ_RELERR(vals(i, 1).as&lt;double&gt;(),</span>
+<span class="lineNum">     166 </span>            :                          bessel_y1(vals(i, 0).as&lt;double&gt;()), REL_ERROR_MAX);
+<span class="lineNum">     167 </span>            :     }
+<a name="168"><span class="lineNum">     168 </span>            : }</a>
+<span class="lineNum">     169 </span>            : 
+<span class="lineNum">     170 </span><span class="lineCov">          5 : TEST(Special, BesselY) {</span>
+<span class="lineNum">     171 </span><span class="lineCov">          2 :     nd::array vals = bessel_y_vals();</span>
+<span class="lineNum">     172 </span><span class="lineCov">          1 :     intptr_t size = vals.get_dim_size();</span>
+<span class="lineNum">     173 </span>            : 
+<span class="lineNum">     174 </span><span class="lineCov">         73 :     for (int i = 0; i &lt; size; ++i) {</span>
+<span class="lineNum">     175 </span><span class="lineCov">         72 :         EXPECT_EQ_RELERR(</span>
+<span class="lineNum">     176 </span>            :             vals(i, 2).as&lt;double&gt;(),
+<span class="lineNum">     177 </span>            :             bessel_y(vals(i, 0).as&lt;double&gt;(), vals(i, 1).as&lt;double&gt;()),
+<span class="lineNum">     178 </span>            :             REL_ERROR_MAX);
+<span class="lineNum">     179 </span>            :     }
+<a name="180"><span class="lineNum">     180 </span>            : }</a>
+<span class="lineNum">     181 </span>            : 
+<span class="lineNum">     182 </span><span class="lineCov">          5 : TEST(Special, SphericalBesselY0) {</span>
+<span class="lineNum">     183 </span><span class="lineCov">          2 :     nd::array vals = sph_bessel_y0_vals();</span>
+<span class="lineNum">     184 </span><span class="lineCov">          1 :     intptr_t size = vals.get_dim_size();</span>
+<span class="lineNum">     185 </span>            : 
+<span class="lineNum">     186 </span><span class="lineCov">         16 :     for (int i = 0; i &lt; size; ++i) {</span>
+<span class="lineNum">     187 </span><span class="lineCov">         15 :         EXPECT_EQ_RELERR(vals(i, 1).as&lt;double&gt;(),</span>
+<span class="lineNum">     188 </span>            :                          sph_bessel_y0(vals(i, 0).as&lt;double&gt;()), REL_ERROR_MAX);
+<span class="lineNum">     189 </span>            :     }
+<a name="190"><span class="lineNum">     190 </span>            : }</a>
+<span class="lineNum">     191 </span>            : 
+<span class="lineNum">     192 </span><span class="lineCov">          5 : TEST(Special, SphericalBesselY) {</span>
+<span class="lineNum">     193 </span><span class="lineCov">          2 :     nd::array vals = sph_bessel_y_vals();</span>
+<span class="lineNum">     194 </span><span class="lineCov">          1 :     intptr_t size = vals.get_dim_size();</span>
+<span class="lineNum">     195 </span>            : 
+<span class="lineNum">     196 </span><span class="lineCov">         91 :     for (int i = 0; i &lt; size; ++i) {</span>
+<span class="lineNum">     197 </span><span class="lineCov">         90 :         EXPECT_EQ_RELERR(</span>
+<span class="lineNum">     198 </span>            :             vals(i, 2).as&lt;double&gt;(),
+<span class="lineNum">     199 </span>            :             sph_bessel_y(vals(i, 0).as&lt;double&gt;(), vals(i, 1).as&lt;double&gt;()),
+<span class="lineNum">     200 </span>            :             REL_ERROR_MAX);
+<span class="lineNum">     201 </span>            :     }
+<a name="202"><span class="lineNum">     202 </span>            : }</a>
+<span class="lineNum">     203 </span>            : 
+<span class="lineNum">     204 </span><span class="lineCov">          5 : TEST(Special, HankelH1) {</span>
+<span class="lineNum">     205 </span><span class="lineCov">          2 :     nd::array vals = hankel_h1_vals();</span>
+<span class="lineNum">     206 </span><span class="lineCov">          1 :     intptr_t size = vals.get_dim_size();</span>
+<span class="lineNum">     207 </span>            : 
+<span class="lineNum">     208 </span><span class="lineCov">         73 :     for (int i = 0; i &lt; size; ++i) {</span>
+<span class="lineNum">     209 </span><span class="lineCov">         72 :         EXPECT_EQ_RELERR(</span>
+<span class="lineNum">     210 </span>            :             vals(i, 2).as&lt;dynd::complex&lt;double&gt; &gt;(),
+<span class="lineNum">     211 </span>            :             hankel_h1(vals(i, 0).as&lt;double&gt;(), vals(i, 1).as&lt;double&gt;()),
+<span class="lineNum">     212 </span>            :             REL_ERROR_MAX);
+<span class="lineNum">     213 </span>            :     }
+<a name="214"><span class="lineNum">     214 </span>            : }</a>
+<span class="lineNum">     215 </span>            : 
+<span class="lineNum">     216 </span><span class="lineCov">          5 : TEST(Special, SphericalHankelH1) {</span>
+<span class="lineNum">     217 </span><span class="lineCov">          2 :     nd::array vals = sph_hankel_h1_vals();</span>
+<span class="lineNum">     218 </span><span class="lineCov">          1 :     intptr_t size = vals.get_dim_size();</span>
+<span class="lineNum">     219 </span>            : 
+<span class="lineNum">     220 </span><span class="lineCov">         91 :     for (int i = 0; i &lt; size; ++i) {</span>
+<span class="lineNum">     221 </span><span class="lineCov">         90 :         EXPECT_EQ_RELERR(</span>
+<span class="lineNum">     222 </span>            :             vals(i, 2).as&lt;dynd::complex&lt;double&gt; &gt;(),
+<span class="lineNum">     223 </span>            :             sph_hankel_h1(vals(i, 0).as&lt;double&gt;(), vals(i, 1).as&lt;double&gt;()),
+<span class="lineNum">     224 </span>            :             REL_ERROR_MAX);
+<span class="lineNum">     225 </span>            :     }
+<a name="226"><span class="lineNum">     226 </span>            : }</a>
+<span class="lineNum">     227 </span>            : 
+<span class="lineNum">     228 </span><span class="lineCov">          5 : TEST(Special, HankelH2) {</span>
+<span class="lineNum">     229 </span><span class="lineCov">          2 :     nd::array vals = hankel_h2_vals();</span>
+<span class="lineNum">     230 </span><span class="lineCov">          1 :     intptr_t size = vals.get_dim_size();</span>
+<span class="lineNum">     231 </span>            : 
+<span class="lineNum">     232 </span><span class="lineCov">         73 :     for (int i = 0; i &lt; size; ++i) {</span>
+<span class="lineNum">     233 </span><span class="lineCov">         72 :         EXPECT_EQ_RELERR(</span>
+<span class="lineNum">     234 </span>            :             vals(i, 2).as&lt;dynd::complex&lt;double&gt; &gt;(),
+<span class="lineNum">     235 </span>            :             hankel_h2(vals(i, 0).as&lt;double&gt;(), vals(i, 1).as&lt;double&gt;()),
+<span class="lineNum">     236 </span>            :             REL_ERROR_MAX);
+<span class="lineNum">     237 </span>            :     }
+<a name="238"><span class="lineNum">     238 </span>            : }</a>
+<span class="lineNum">     239 </span>            : 
+<span class="lineNum">     240 </span><span class="lineCov">          5 : TEST(Special, SphericalHankelH2) {</span>
+<span class="lineNum">     241 </span><span class="lineCov">          2 :     nd::array vals = sph_hankel_h2_vals();</span>
+<span class="lineNum">     242 </span><span class="lineCov">          1 :     intptr_t size = vals.get_dim_size();</span>
+<span class="lineNum">     243 </span>            : 
+<span class="lineNum">     244 </span><span class="lineCov">         91 :     for (int i = 0; i &lt; size; ++i) {</span>
+<span class="lineNum">     245 </span><span class="lineCov">         90 :         EXPECT_EQ_RELERR(</span>
+<span class="lineNum">     246 </span>            :             vals(i, 2).as&lt;dynd::complex&lt;double&gt; &gt;(),
+<span class="lineNum">     247 </span>            :             sph_hankel_h2(vals(i, 0).as&lt;double&gt;(), vals(i, 1).as&lt;double&gt;()),
+<span class="lineNum">     248 </span>            :             REL_ERROR_MAX);
+<span class="lineNum">     249 </span>            :     }
+<a name="250"><span class="lineNum">     250 </span>            : }</a>
+<span class="lineNum">     251 </span>            : 
+<span class="lineNum">     252 </span><span class="lineCov">          5 : TEST(Special, StruveH) {</span>
+<span class="lineNum">     253 </span><span class="lineCov">          2 :     nd::array vals = struve_h_vals();</span>
+<span class="lineNum">     254 </span><span class="lineCov">          1 :     intptr_t size = vals.get_dim_size();</span>
+<span class="lineNum">     255 </span>            : 
+<span class="lineNum">     256 </span><span class="lineCov">         43 :     for (int i = 0; i &lt; size; ++i) {</span>
+<span class="lineNum">     257 </span><span class="lineCov">         42 :         EXPECT_EQ_RELERR(</span>
+<span class="lineNum">     258 </span>            :             vals(i, 2).as&lt;double&gt;(),
+<span class="lineNum">     259 </span>            :             struve_h(vals(i, 0).as&lt;double&gt;(), vals(i, 1).as&lt;double&gt;()),
+<span class="lineNum">     260 </span>            :             REL_ERROR_MAX);
+<span class="lineNum">     261 </span>            :     }
+<a name="262"><span class="lineNum">     262 </span>            : }</a>
+<span class="lineNum">     263 </span>            : 
+<span class="lineNum">     264 </span><span class="lineCov">          5 : TEST(Special, LegendreP) {</span>
+<span class="lineNum">     265 </span><span class="lineCov">          2 :     nd::array vals = legendre_p_vals();</span>
+<span class="lineNum">     266 </span><span class="lineCov">          1 :     intptr_t size = vals.get_dim_size();</span>
+<span class="lineNum">     267 </span>            : 
+<span class="lineNum">     268 </span><span class="lineCov">        336 :     for (int i = 0; i &lt; size; ++i) {</span>
+<span class="lineNum">     269 </span><span class="lineCov">        335 :         EXPECT_EQ_RELERR(</span>
+<span class="lineNum">     270 </span>            :             vals(i, 2).as&lt;double&gt;(),
+<span class="lineNum">     271 </span>            :             legendre_p(vals(i, 0).as&lt;int&gt;(), vals(i, 1).as&lt;double&gt;()),
+<span class="lineNum">     272 </span>            :             REL_ERROR_MAX);
+<span class="lineNum">     273 </span>            :     }
+<a name="274"><span class="lineNum">     274 </span>            : }</a>
+<span class="lineNum">     275 </span>            : 
+<span class="lineNum">     276 </span><span class="lineCov">          5 : TEST(Special, AssociatedLegendreP) {</span>
+<span class="lineNum">     277 </span><span class="lineCov">          2 :     nd::array vals = assoc_legendre_p_vals();</span>
+<span class="lineNum">     278 </span><span class="lineCov">          1 :     intptr_t size = vals.get_dim_size();</span>
+<span class="lineNum">     279 </span>            : 
+<span class="lineNum">     280 </span><span class="lineCov">       1676 :     for (int i = 0; i &lt; size; ++i) {</span>
+<span class="lineNum">     281 </span><span class="lineCov">       1675 :         EXPECT_EQ_RELERR(vals(i, 3).as&lt;double&gt;(),</span>
+<span class="lineNum">     282 </span>            :                          assoc_legendre_p(vals(i, 0).as&lt;int&gt;(),
+<span class="lineNum">     283 </span>            :                                           vals(i, 1).as&lt;int&gt;(),
+<span class="lineNum">     284 </span>            :                                           vals(i, 2).as&lt;double&gt;()),
+<a name="285"><span class="lineNum">     285 </span>            :                          REL_ERROR_MAX);</a>
+<span class="lineNum">     286 </span>            :     }
+<span class="lineNum">     287 </span><span class="lineCov">          3 : }</span>
+<span class="lineNum">     288 </span>            : 
+<span class="lineNum">     289 </span>            : #undef REL_ERROR_MAX
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.10</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

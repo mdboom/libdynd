@@ -1,0 +1,1411 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - coverage.info.cleaned - include/dynd/type.hpp</title>
+  <link rel="stylesheet" type="text/css" href="../../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../../index.html">top level</a> - <a href="index.html">include/dynd</a> - type.hpp<span style="font-size: 80%;"> (source / <a href="type.hpp.func.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">coverage.info.cleaned</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">191</td>
+            <td class="headerCovTableEntry">206</td>
+            <td class="headerCovTableEntryHi">92.7 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2016-02-19</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">1155</td>
+            <td class="headerCovTableEntry">1408</td>
+            <td class="headerCovTableEntryMed">82.0 %</td>
+          </tr>
+          <tr><td><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : //</a>
+<span class="lineNum">       2 </span>            : // Copyright (C) 2011-15 DyND Developers
+<span class="lineNum">       3 </span>            : // BSD 2-Clause License, see LICENSE.txt
+<span class="lineNum">       4 </span>            : //
+<span class="lineNum">       5 </span>            : 
+<span class="lineNum">       6 </span>            : #pragma once
+<span class="lineNum">       7 </span>            : 
+<span class="lineNum">       8 </span>            : #include &lt;iostream&gt;
+<span class="lineNum">       9 </span>            : #include &lt;stdexcept&gt;
+<span class="lineNum">      10 </span>            : 
+<span class="lineNum">      11 </span>            : #include &lt;dynd/types/base_type.hpp&gt;
+<span class="lineNum">      12 </span>            : #include &lt;dynd/types/base_expr_type.hpp&gt;
+<span class="lineNum">      13 </span>            : #include &lt;dynd/types/base_string_type.hpp&gt;
+<span class="lineNum">      14 </span>            : #include &lt;dynd/eval/eval_context.hpp&gt;
+<span class="lineNum">      15 </span>            : #include &lt;dynd/exceptions.hpp&gt;
+<span class="lineNum">      16 </span>            : 
+<span class="lineNum">      17 </span>            : namespace dynd {
+<span class="lineNum">      18 </span>            : namespace detail {
+<span class="lineNum">      19 </span>            : 
+<span class="lineNum">      20 </span>            :   template &lt;typename ValueType, int NDim&gt;
+<span class="lineNum">      21 </span>            :   class scalar_wrapper_iterator;
+<span class="lineNum">      22 </span>            : 
+<span class="lineNum">      23 </span>            :   template &lt;typename ValueType&gt;
+<span class="lineNum">      24 </span>            :   class scalar_wrapper {
+<span class="lineNum">      25 </span>            :   protected:
+<span class="lineNum">      26 </span>            :     const char *m_metadata;
+<span class="lineNum">      27 </span>            :     char *m_data;
+<span class="lineNum">      28 </span>            : 
+<span class="lineNum">      29 </span>            :   public:
+<span class="lineNum">      30 </span>            :     typedef ValueType data_type;
+<span class="lineNum">      31 </span>            :     static const intptr_t ndim = 0;
+<span class="lineNum">      32 </span>            : 
+<span class="lineNum">      33 </span>            :     template &lt;int NDim&gt;
+<a name="34"><span class="lineNum">      34 </span>            :     class iterator_type : public scalar_wrapper_iterator&lt;ValueType, NDim&gt; {</a>
+<span class="lineNum">      35 </span>            :     public:
+<span class="lineNum">      36 </span><span class="lineCov">          2 :       iterator_type(const char *metadata, char *data) : scalar_wrapper_iterator&lt;ValueType, NDim&gt;(metadata, data) {}</span>
+<a name="37"><span class="lineNum">      37 </span>            :     };</a>
+<span class="lineNum">      38 </span>            : 
+<a name="39"><span class="lineNum">      39 </span><span class="lineCov">         39 :     scalar_wrapper(const char *metadata, char *data) : m_metadata(metadata), m_data(data) {}</span></a>
+<span class="lineNum">      40 </span>            : 
+<span class="lineNum">      41 </span><span class="lineCov">         66 :     data_type &amp;operator()(const char *DYND_UNUSED(metadata), char *data)</span>
+<span class="lineNum">      42 </span>            :     {
+<span class="lineNum">      43 </span><span class="lineCov">         66 :       return *reinterpret_cast&lt;data_type *&gt;(data);</span>
+<span class="lineNum">      44 </span>            :     }
+<span class="lineNum">      45 </span>            :   };
+<span class="lineNum">      46 </span>            : 
+<span class="lineNum">      47 </span>            :   template &lt;typename ValueType&gt;
+<span class="lineNum">      48 </span>            :   class scalar_wrapper_iterator&lt;ValueType, 0&gt; {
+<span class="lineNum">      49 </span>            :   protected:
+<span class="lineNum">      50 </span>            :     char *m_data;
+<a name="51"><span class="lineNum">      51 </span>            : </a>
+<span class="lineNum">      52 </span>            :   public:
+<a name="53"><span class="lineNum">      53 </span><span class="lineCov">          2 :     scalar_wrapper_iterator(const char *DYND_UNUSED(metadata), char *data) : m_data(data) {}</span></a>
+<span class="lineNum">      54 </span>            : 
+<span class="lineNum">      55 </span><span class="lineCov">          5 :     ValueType &amp;operator*() { return *reinterpret_cast&lt;ValueType *&gt;(m_data); }</span>
+<span class="lineNum">      56 </span>            : 
+<a name="57"><span class="lineNum">      57 </span>            :     bool operator==(const scalar_wrapper_iterator &amp;rhs) const { return m_data == rhs.m_data; }</a>
+<span class="lineNum">      58 </span>            : 
+<span class="lineNum">      59 </span><span class="lineCov">          6 :     bool operator!=(const scalar_wrapper_iterator &amp;rhs) const { return m_data != rhs.m_data; }</span>
+<span class="lineNum">      60 </span>            :   };
+<span class="lineNum">      61 </span>            : 
+<span class="lineNum">      62 </span>            : } // namespace dynd::detail
+<span class="lineNum">      63 </span>            : 
+<span class="lineNum">      64 </span>            : template &lt;typename T&gt;
+<span class="lineNum">      65 </span>            : using identity_t = T;
+<span class="lineNum">      66 </span>            : 
+<span class="lineNum">      67 </span>            : template &lt;typename T&gt;
+<span class="lineNum">      68 </span>            : using as_t = typename conditional_make&lt;!std::is_fundamental&lt;typename std::remove_cv&lt;T&gt;::type&gt;::value &amp;&amp;
+<span class="lineNum">      69 </span>            :                                            !std::is_same&lt;typename std::remove_cv&lt;T&gt;::type, ndt::type&gt;::value,
+<span class="lineNum">      70 </span>            :                                        identity_t, detail::scalar_wrapper, T&gt;::type;
+<span class="lineNum">      71 </span>            : 
+<span class="lineNum">      72 </span>            : /**
+<span class="lineNum">      73 </span>            :  * Increments the offset value so that it is aligned to the requested alignment
+<a name="74"><span class="lineNum">      74 </span>            :  * NOTE: The alignment must be a power of two.</a>
+<span class="lineNum">      75 </span>            :  */
+<span class="lineNum">      76 </span><span class="lineCov">       7733 : inline size_t inc_to_alignment(size_t offset, size_t alignment)</span>
+<span class="lineNum">      77 </span>            : {
+<span class="lineNum">      78 </span><span class="lineCov">       7733 :   return (offset + alignment - 1) &amp; (std::size_t)(-(std::ptrdiff_t)alignment);</span>
+<span class="lineNum">      79 </span>            : }
+<span class="lineNum">      80 </span>            : 
+<span class="lineNum">      81 </span>            : /**
+<span class="lineNum">      82 </span>            :  * Increments the pointer value so that it is aligned to the requested alignment
+<span class="lineNum">      83 </span>            :  * NOTE: The alignment must be a power of two.
+<span class="lineNum">      84 </span>            :  */
+<span class="lineNum">      85 </span>            : inline char *inc_to_alignment(char *ptr, size_t alignment)
+<span class="lineNum">      86 </span>            : {
+<span class="lineNum">      87 </span>            :   return reinterpret_cast&lt;char *&gt;((reinterpret_cast&lt;std::size_t&gt;(ptr) + alignment - 1) &amp;
+<span class="lineNum">      88 </span>            :                                   (std::size_t)(-(std::ptrdiff_t)alignment));
+<span class="lineNum">      89 </span>            : }
+<span class="lineNum">      90 </span>            : 
+<span class="lineNum">      91 </span>            : /**
+<span class="lineNum">      92 </span>            :  * Increments the pointer value so that it is aligned to the requested alignment
+<span class="lineNum">      93 </span>            :  * NOTE: The alignment must be a power of two.
+<span class="lineNum">      94 </span>            :  */
+<span class="lineNum">      95 </span>            : inline void *inc_to_alignment(void *ptr, size_t alignment)
+<span class="lineNum">      96 </span>            : {
+<span class="lineNum">      97 </span>            :   return reinterpret_cast&lt;char *&gt;((reinterpret_cast&lt;std::size_t&gt;(ptr) + alignment - 1) &amp;
+<span class="lineNum">      98 </span>            :                                   (size_t)(-(std::ptrdiff_t)alignment));
+<span class="lineNum">      99 </span>            : }
+<span class="lineNum">     100 </span>            : 
+<span class="lineNum">     101 </span>            : /**
+<span class="lineNum">     102 </span>            :  * \brief Tests whether the offset has the requested alignment.
+<span class="lineNum">     103 </span>            :  *
+<span class="lineNum">     104 </span>            :  * NOTE: The alignment must be a power of two.
+<span class="lineNum">     105 </span>            :  *
+<span class="lineNum">     106 </span>            :  * \param offset  The offset whose alignment is tested.
+<span class="lineNum">     107 </span>            :  * \param alignment  The required alignment, must be a power of two.
+<span class="lineNum">     108 </span>            :  *
+<span class="lineNum">     109 </span>            :  * \returns  True if the offset is divisible by the power of two alignment,
+<span class="lineNum">     110 </span>            :  *           False otherwise.
+<span class="lineNum">     111 </span>            :  */
+<span class="lineNum">     112 </span>            : inline bool offset_is_aligned(size_t offset, size_t alignment) { return (offset &amp; (alignment - 1)) == 0; }
+<span class="lineNum">     113 </span>            : 
+<span class="lineNum">     114 </span>            : /** Prints a single scalar of a builtin type to the stream */
+<span class="lineNum">     115 </span>            : void DYND_API print_builtin_scalar(type_id_t type_id, std::ostream &amp;o, const char *data);
+<span class="lineNum">     116 </span>            : 
+<span class="lineNum">     117 </span>            : /** Special iterdata which broadcasts to any number of additional dimensions */
+<span class="lineNum">     118 </span>            : struct DYND_API iterdata_broadcasting_terminator {
+<span class="lineNum">     119 </span>            :   iterdata_common common;
+<span class="lineNum">     120 </span>            :   char *data;
+<span class="lineNum">     121 </span>            : };
+<span class="lineNum">     122 </span>            : DYND_API char *iterdata_broadcasting_terminator_incr(iterdata_common *iterdata, intptr_t level);
+<span class="lineNum">     123 </span>            : DYND_API char *iterdata_broadcasting_terminator_adv(iterdata_common *iterdata, intptr_t level, intptr_t i);
+<span class="lineNum">     124 </span>            : DYND_API char *iterdata_broadcasting_terminator_reset(iterdata_common *iterdata, char *data, intptr_t level);
+<span class="lineNum">     125 </span>            : 
+<span class="lineNum">     126 </span>            : // Forward declaration of nd::array and nd::strided_vals
+<span class="lineNum">     127 </span>            : namespace nd {
+<span class="lineNum">     128 </span>            :   class DYND_API array;
+<span class="lineNum">     129 </span>            : } // namespace dynd::nd
+<span class="lineNum">     130 </span>            : 
+<span class="lineNum">     131 </span>            : namespace ndt {
+<span class="lineNum">     132 </span>            :   typedef type (*type_make_t)(type_id_t tp_id, const nd::array &amp;args);
+<span class="lineNum">     133 </span>            : 
+<span class="lineNum">     134 </span>            :   DYND_API type make_fixed_dim(size_t dim_size, const type &amp;element_tp);
+<span class="lineNum">     135 </span>            :   inline type make_var_dim(const type &amp;element_tp);
+<span class="lineNum">     136 </span>            : 
+<span class="lineNum">     137 </span>            :   template &lt;typename T&gt;
+<span class="lineNum">     138 </span>            :   struct traits {
+<span class="lineNum">     139 </span>            :     ~traits() = delete;
+<span class="lineNum">     140 </span>            :   };
+<span class="lineNum">     141 </span>            : 
+<span class="lineNum">     142 </span>            :   template &lt;typename T&gt;
+<span class="lineNum">     143 </span>            :   struct has_traits {
+<span class="lineNum">     144 </span>            :     static const bool value = std::is_destructible&lt;traits&lt;T&gt;&gt;::value;
+<span class="lineNum">     145 </span>            :   };
+<span class="lineNum">     146 </span>            : 
+<span class="lineNum">     147 </span>            :   /**
+<span class="lineNum">     148 </span>            :    * This class represents a data type.
+<span class="lineNum">     149 </span>            :    *
+<span class="lineNum">     150 </span>            :    * The purpose of this data type is to describe the data layout
+<span class="lineNum">     151 </span>            :    * of elements in ndarrays. The class stores a number of common
+<span class="lineNum">     152 </span>            :    * properties, like a type id, a kind, an alignment, a byte-swapped
+<span class="lineNum">     153 </span>            :    * flag, and an element_size. Some data types have additional data
+<span class="lineNum">     154 </span>            :    * which is stored as a dynamically allocated base_type object.
+<span class="lineNum">     155 </span>            :    *
+<span class="lineNum">     156 </span>            :    * For the simple built-in types, no extended data is needed, in
+<span class="lineNum">     157 </span>            :    * which case this is entirely a value type with no allocated memory.
+<a name="158"><span class="lineNum">     158 </span>            :    *</a>
+<span class="lineNum">     159 </span>            :    */
+<a name="160"><span class="lineNum">     160 </span><span class="lineCov">    1886790 :   class DYND_API type : public intrusive_ptr&lt;const base_type&gt; {</span></a>
+<span class="lineNum">     161 </span>            :   public:
+<span class="lineNum">     162 </span><span class="lineCov">      38582 :     using intrusive_ptr&lt;const base_type&gt;::intrusive_ptr;</span>
+<span class="lineNum">     163 </span>            : 
+<span class="lineNum">     164 </span>            :     /**
+<a name="165"><span class="lineNum">     165 </span>            :       * Default constructor.</a>
+<span class="lineNum">     166 </span>            :       */
+<span class="lineNum">     167 </span><span class="lineCov">      33757 :     type() = default;</span>
+<span class="lineNum">     168 </span>            : 
+<span class="lineNum">     169 </span>            :     /** Construct from a type ID */
+<span class="lineNum">     170 </span>            :     type(type_id_t tp_id);
+<span class="lineNum">     171 </span>            : 
+<span class="lineNum">     172 </span>            :     /** Construct from a string representation */
+<span class="lineNum">     173 </span>            :     explicit type(const std::string &amp;rep);
+<span class="lineNum">     174 </span>            : 
+<span class="lineNum">     175 </span>            :     /** Construct from a string representation */
+<a name="176"><span class="lineNum">     176 </span>            :     type(const char *rep_begin, const char *rep_end);</a>
+<span class="lineNum">     177 </span>            : 
+<span class="lineNum">     178 </span><span class="lineCov">     202441 :     bool operator==(const type &amp;rhs) const</span>
+<span class="lineNum">     179 </span>            :     {
+<span class="lineNum">     180 </span><span class="lineCov">     202441 :       return m_ptr == rhs.m_ptr || (!is_builtin() &amp;&amp; !rhs.is_builtin() &amp;&amp; *m_ptr == *rhs.m_ptr);</span>
+<a name="181"><span class="lineNum">     181 </span>            :     }</a>
+<span class="lineNum">     182 </span>            : 
+<a name="183"><span class="lineNum">     183 </span><span class="lineCov">        412 :     bool operator!=(const type &amp;rhs) const { return !(operator==(rhs)); }</span></a>
+<span class="lineNum">     184 </span>            : 
+<span class="lineNum">     185 </span><span class="lineCov">      37333 :     bool is_null() const { return m_ptr == NULL; }</span>
+<span class="lineNum">     186 </span>            : 
+<span class="lineNum">     187 </span>            :     /**
+<span class="lineNum">     188 </span>            :      * Returns true if this type is built in, which
+<span class="lineNum">     189 </span>            :      * means the type id is encoded directly in the m_ptr
+<a name="190"><span class="lineNum">     190 </span>            :      * pointer.</a>
+<span class="lineNum">     191 </span>            :      */
+<span class="lineNum">     192 </span><span class="lineCov">    1631312 :     bool is_builtin() const { return is_builtin_type(m_ptr); }</span>
+<span class="lineNum">     193 </span>            : 
+<span class="lineNum">     194 </span>            :     /**
+<span class="lineNum">     195 </span>            :      * Indexes into the type. This function returns the type which results
+<span class="lineNum">     196 </span>            :      * from applying the same index to an ndarray of this type.
+<span class="lineNum">     197 </span>            :      *
+<span class="lineNum">     198 </span>            :      * \param nindices     The number of elements in the 'indices' array
+<span class="lineNum">     199 </span>            :      * \param indices      The indices to apply.
+<span class="lineNum">     200 </span>            :      */
+<span class="lineNum">     201 </span>            :     type at_array(int nindices, const irange *indices) const;
+<span class="lineNum">     202 </span>            : 
+<span class="lineNum">     203 </span>            :     /**
+<span class="lineNum">     204 </span>            :      * The 'at_single' function is used for indexing by a single dimension,
+<span class="lineNum">     205 </span>            :      *without
+<span class="lineNum">     206 </span>            :      * touching any leading dimensions after the first, in contrast to the 'at'
+<span class="lineNum">     207 </span>            :      * function. Overloading operator[] isn't
+<span class="lineNum">     208 </span>            :      * practical for multidimensional objects. Indexing one dimension with
+<span class="lineNum">     209 </span>            :      * an integer index is special-cased, both for higher performance and
+<span class="lineNum">     210 </span>            :      * to provide a way to get a arrmeta pointer for the result type.
+<span class="lineNum">     211 </span>            :      *
+<span class="lineNum">     212 </span>            :      * \param i0  The index to apply.
+<span class="lineNum">     213 </span>            :      * \param inout_arrmeta  If non-NULL, points to an arrmeta pointer for
+<span class="lineNum">     214 </span>            :      *                        this type that is modified to point to the
+<span class="lineNum">     215 </span>            :      *                        result's arrmeta.
+<span class="lineNum">     216 </span>            :      * \param inout_data  If non-NULL, points to a data pointer that is modified
+<span class="lineNum">     217 </span>            :      *                    to point to the result's data. If `inout_data` is
+<span class="lineNum">     218 </span>            :      *non-NULL,
+<span class="lineNum">     219 </span>            :      *                    `inout_arrmeta` must also be non-NULL.
+<span class="lineNum">     220 </span>            :      *
+<a name="221"><span class="lineNum">     221 </span>            :      * \returns  The type that results from the indexing operation.</a>
+<span class="lineNum">     222 </span>            :      */
+<span class="lineNum">     223 </span><span class="lineCov">          4 :     type at_single(intptr_t i0, const char **inout_arrmeta = NULL, const char **inout_data = NULL) const</span>
+<span class="lineNum">     224 </span>            :     {
+<span class="lineNum">     225 </span><span class="lineCov">          4 :       if (!is_builtin()) {</span>
+<span class="lineNum">     226 </span><span class="lineCov">          8 :         return m_ptr-&gt;at_single(i0, inout_arrmeta, inout_data);</span>
+<span class="lineNum">     227 </span>            :       }
+<span class="lineNum">     228 </span>            :       else {
+<span class="lineNum">     229 </span><span class="lineNoCov">          0 :         throw too_many_indices(*this, 1, 0);</span>
+<span class="lineNum">     230 </span>            :       }
+<span class="lineNum">     231 </span>            :     }
+<span class="lineNum">     232 </span>            : 
+<span class="lineNum">     233 </span>            :     /**
+<span class="lineNum">     234 </span>            :      * The 'at' function is used for indexing. Overloading operator[] isn't
+<span class="lineNum">     235 </span>            :      * practical for multidimensional objects.
+<span class="lineNum">     236 </span>            :      *
+<span class="lineNum">     237 </span>            :      * NOTE: Calling 'at' may simplify the leading dimension after the indices,
+<span class="lineNum">     238 </span>            :      *       e.g. convert a var_dim to a strided_dim, or collapsing pointers.
+<span class="lineNum">     239 </span>            :      *       If you do not want this collapsing behavior, use the 'at_single'
+<a name="240"><span class="lineNum">     240 </span>            :      *function.</a>
+<span class="lineNum">     241 </span>            :      */
+<span class="lineNum">     242 </span><span class="lineCov">         12 :     type at(const irange &amp;i0) const { return at_array(1, &amp;i0); }</span>
+<span class="lineNum">     243 </span>            : 
+<span class="lineNum">     244 </span>            :     /** Indexing with two index values */
+<span class="lineNum">     245 </span>            :     type at(const irange &amp;i0, const irange &amp;i1) const
+<span class="lineNum">     246 </span>            :     {
+<span class="lineNum">     247 </span>            :       irange i[2] = {i0, i1};
+<span class="lineNum">     248 </span>            :       return at_array(2, i);
+<span class="lineNum">     249 </span>            :     }
+<span class="lineNum">     250 </span>            : 
+<span class="lineNum">     251 </span>            :     /** Indexing with three index values */
+<span class="lineNum">     252 </span>            :     type at(const irange &amp;i0, const irange &amp;i1, const irange &amp;i2) const
+<span class="lineNum">     253 </span>            :     {
+<span class="lineNum">     254 </span>            :       irange i[3] = {i0, i1, i2};
+<span class="lineNum">     255 </span>            :       return at_array(3, i);
+<span class="lineNum">     256 </span>            :     }
+<span class="lineNum">     257 </span>            :     /** Indexing with four index values */
+<span class="lineNum">     258 </span>            :     type at(const irange &amp;i0, const irange &amp;i1, const irange &amp;i2, const irange &amp;i3) const
+<span class="lineNum">     259 </span>            :     {
+<span class="lineNum">     260 </span>            :       irange i[4] = {i0, i1, i2, i3};
+<span class="lineNum">     261 </span>            :       return at_array(4, i);
+<span class="lineNum">     262 </span>            :     }
+<span class="lineNum">     263 </span>            : 
+<span class="lineNum">     264 </span>            :     /**
+<span class="lineNum">     265 </span>            :      * Matches the provided candidate type against the current type. The
+<span class="lineNum">     266 </span>            :      * 'this' type is the pattern to match against, and may be symbolic
+<span class="lineNum">     267 </span>            :      * or concrete. If it is concrete, the candidate type must be equal
+<span class="lineNum">     268 </span>            :      * for the match to succeed.
+<span class="lineNum">     269 </span>            :      *
+<span class="lineNum">     270 </span>            :      * The candidate type may also be symbolic.
+<span class="lineNum">     271 </span>            :      *
+<span class="lineNum">     272 </span>            :      * Returns true if it matches, false otherwise.
+<span class="lineNum">     273 </span>            :      *
+<span class="lineNum">     274 </span>            :      * This function may be called multiple times in a row, building up the
+<span class="lineNum">     275 </span>            :      * typevars dictionary which is used to enforce consistent usage of
+<span class="lineNum">     276 </span>            :      * type vars.
+<span class="lineNum">     277 </span>            :      *
+<span class="lineNum">     278 </span>            :      * \param arrmeta     The arrmeta for this type, maybe NULL.
+<span class="lineNum">     279 </span>            :      * \param candidate_tp    A type to match against this one.
+<span class="lineNum">     280 </span>            :      * \param candidate_arrmeta   The arrmeta for the candidate type,
+<span class="lineNum">     281 </span>            :      *                            may be NULL.
+<span class="lineNum">     282 </span>            :      * \param tp_vars     A map of names to matched type vars.
+<span class="lineNum">     283 </span>            :      */
+<span class="lineNum">     284 </span>            :     bool match(const char *arrmeta, const ndt::type &amp;candidate_tp, const char *candidate_arrmeta,
+<span class="lineNum">     285 </span>            :                std::map&lt;std::string, ndt::type&gt; &amp;tp_vars) const;
+<span class="lineNum">     286 </span>            : 
+<span class="lineNum">     287 </span>            :     bool match(const char *arrmeta, const ndt::type &amp;candidate_tp, const char *candidate_arrmeta) const;
+<span class="lineNum">     288 </span>            : 
+<span class="lineNum">     289 </span>            :     bool match(const ndt::type &amp;candidate_tp, std::map&lt;std::string, ndt::type&gt; &amp;tp_vars) const;
+<span class="lineNum">     290 </span>            : 
+<span class="lineNum">     291 </span>            :     bool match(const ndt::type &amp;candidate_tp) const;
+<span class="lineNum">     292 </span>            : 
+<span class="lineNum">     293 </span>            :     /**
+<span class="lineNum">     294 </span>            :      * Accesses a dynamic property of the type.
+<span class="lineNum">     295 </span>            :      *
+<span class="lineNum">     296 </span>            :      * \param name  The property to access.
+<span class="lineNum">     297 </span>            :      */
+<span class="lineNum">     298 </span>            :     nd::array p(const char *name) const;
+<span class="lineNum">     299 </span>            :     nd::array p(const std::string &amp;name) const;
+<span class="lineNum">     300 </span>            : 
+<span class="lineNum">     301 </span>            :     /**
+<span class="lineNum">     302 </span>            :      * Indexes into the type, intended for recursive calls from the
+<span class="lineNum">     303 </span>            :      * extended-type version. See
+<span class="lineNum">     304 </span>            :      * the function in base_type with the same name for more details.
+<span class="lineNum">     305 </span>            :      */
+<span class="lineNum">     306 </span>            :     type apply_linear_index(intptr_t nindices, const irange *indices, size_t current_i, const type &amp;root_tp,
+<span class="lineNum">     307 </span>            :                             bool leading_dimension) const;
+<span class="lineNum">     308 </span>            : 
+<span class="lineNum">     309 </span>            :     /**
+<span class="lineNum">     310 </span>            :      * Returns the non-expression type that this
+<span class="lineNum">     311 </span>            :      * type looks like for the purposes of calculation,
+<span class="lineNum">     312 </span>            :      * printing, etc.
+<span class="lineNum">     313 </span>            :      */
+<span class="lineNum">     314 </span>            :     const type &amp;value_type() const;
+<span class="lineNum">     315 </span>            : 
+<span class="lineNum">     316 </span>            :     /**
+<span class="lineNum">     317 </span>            :      * For expression types, returns the operand type,
+<span class="lineNum">     318 </span>            :      * which is the source type of this type's expression.
+<a name="319"><span class="lineNum">     319 </span>            :      * This is one link down the expression chain.</a>
+<span class="lineNum">     320 </span>            :      */
+<span class="lineNum">     321 </span><span class="lineCov">          1 :     const type &amp;operand_type() const</span>
+<span class="lineNum">     322 </span>            :     {
+<span class="lineNum">     323 </span>            :       // Only expr_kind types have different operand_type
+<span class="lineNum">     324 </span><span class="lineCov">          1 :       if (is_builtin() || m_ptr-&gt;get_kind() != expr_kind) {</span>
+<span class="lineNum">     325 </span><span class="lineNoCov">          0 :         return *this;</span>
+<span class="lineNum">     326 </span>            :       }
+<span class="lineNum">     327 </span>            :       else {
+<span class="lineNum">     328 </span><span class="lineCov">          1 :         return static_cast&lt;const base_expr_type *&gt;(m_ptr)-&gt;get_operand_type();</span>
+<span class="lineNum">     329 </span>            :       }
+<span class="lineNum">     330 </span>            :     }
+<span class="lineNum">     331 </span>            : 
+<span class="lineNum">     332 </span>            :     /**
+<span class="lineNum">     333 </span>            :      * For expression types, returns the storage type,
+<span class="lineNum">     334 </span>            :      * which is the type of the underlying input data.
+<span class="lineNum">     335 </span>            :      * This is the bottom of the expression chain.
+<span class="lineNum">     336 </span>            :      */
+<span class="lineNum">     337 </span>            :     const type &amp;storage_type() const;
+<span class="lineNum">     338 </span>            : 
+<span class="lineNum">     339 </span>            :     /**
+<span class="lineNum">     340 </span>            :      * The type number is an enumeration of data types, starting
+<span class="lineNum">     341 </span>            :      * at 0, with one value for each unique data type. This is
+<span class="lineNum">     342 </span>            :      * inspired by the approach in NumPy, and the intention is
+<a name="343"><span class="lineNum">     343 </span>            :      * to have the default</a>
+<span class="lineNum">     344 </span>            :      */
+<span class="lineNum">     345 </span><span class="lineCov">      49675 :     type_id_t get_id() const</span>
+<span class="lineNum">     346 </span>            :     {
+<span class="lineNum">     347 </span><span class="lineCov">      49675 :       if (is_builtin()) {</span>
+<span class="lineNum">     348 </span><span class="lineCov">      19719 :         return static_cast&lt;type_id_t&gt;(reinterpret_cast&lt;intptr_t&gt;(m_ptr));</span>
+<span class="lineNum">     349 </span>            :       }
+<span class="lineNum">     350 </span>            :       else {
+<span class="lineNum">     351 </span><span class="lineCov">      29956 :         return m_ptr-&gt;get_id();</span>
+<span class="lineNum">     352 </span>            :       }
+<span class="lineNum">     353 </span>            :     }
+<span class="lineNum">     354 </span>            : 
+<span class="lineNum">     355 </span>            :     /**
+<span class="lineNum">     356 </span>            :      * For when it is known that the type is a builtin type,
+<span class="lineNum">     357 </span>            :      * to simply retrieve that type id.
+<span class="lineNum">     358 </span>            :      *
+<a name="359"><span class="lineNum">     359 </span>            :      * WARNING: Normally just use get_id().</a>
+<span class="lineNum">     360 </span>            :      */
+<span class="lineNum">     361 </span><span class="lineCov">          6 :     type_id_t unchecked_get_builtin_id() const</span>
+<span class="lineNum">     362 </span>            :     {
+<span class="lineNum">     363 </span><span class="lineCov">          6 :       return static_cast&lt;type_id_t&gt;(reinterpret_cast&lt;intptr_t&gt;(m_ptr));</span>
+<span class="lineNum">     364 </span>            :     }
+<a name="365"><span class="lineNum">     365 </span>            : </a>
+<span class="lineNum">     366 </span>            :     /** The 'kind' of the type (int, uint, float, etc) */
+<span class="lineNum">     367 </span><span class="lineCov">      17719 :     type_kind_t get_kind() const { return get_base_type_kind(m_ptr); }</span>
+<span class="lineNum">     368 </span>            : 
+<span class="lineNum">     369 </span>            :     type_id_t get_base_id() const;
+<a name="370"><span class="lineNum">     370 </span>            : </a>
+<span class="lineNum">     371 </span>            :     /** The alignment of the type */
+<span class="lineNum">     372 </span><span class="lineCov">      18219 :     size_t get_data_alignment() const { return get_base_type_alignment(m_ptr); }</span>
+<a name="373"><span class="lineNum">     373 </span>            : </a>
+<span class="lineNum">     374 </span>            :     /** The element size of the type */
+<span class="lineNum">     375 </span><span class="lineCov">       4261 :     size_t get_data_size() const { return get_base_type_data_size(m_ptr); }</span>
+<a name="376"><span class="lineNum">     376 </span>            : </a>
+<span class="lineNum">     377 </span>            :     /** The element size of the type when default-constructed */
+<span class="lineNum">     378 </span><span class="lineCov">        906 :     size_t get_default_data_size() const</span>
+<span class="lineNum">     379 </span>            :     {
+<span class="lineNum">     380 </span><span class="lineCov">        906 :       if (is_builtin_type(m_ptr)) {</span>
+<span class="lineNum">     381 </span><span class="lineCov">        825 :         return static_cast&lt;intptr_t&gt;(detail::builtin_data_sizes[reinterpret_cast&lt;uintptr_t&gt;(m_ptr)]);</span>
+<span class="lineNum">     382 </span>            :       }
+<span class="lineNum">     383 </span>            :       else {
+<span class="lineNum">     384 </span><span class="lineCov">         81 :         return m_ptr-&gt;get_default_data_size();</span>
+<span class="lineNum">     385 </span>            :       }
+<a name="386"><span class="lineNum">     386 </span>            :     }</a>
+<span class="lineNum">     387 </span>            : 
+<span class="lineNum">     388 </span><span class="lineCov">      22902 :     size_t get_arrmeta_size() const</span>
+<span class="lineNum">     389 </span>            :     {
+<span class="lineNum">     390 </span><span class="lineCov">      22902 :       if (is_builtin()) {</span>
+<span class="lineNum">     391 </span><span class="lineCov">      10117 :         return 0;</span>
+<span class="lineNum">     392 </span>            :       }
+<span class="lineNum">     393 </span>            :       else {
+<span class="lineNum">     394 </span><span class="lineCov">      12785 :         return m_ptr-&gt;get_arrmeta_size();</span>
+<span class="lineNum">     395 </span>            :       }
+<span class="lineNum">     396 </span>            :     }
+<span class="lineNum">     397 </span>            : 
+<span class="lineNum">     398 </span>            :     /**
+<span class="lineNum">     399 </span>            :      * Returns true if the data layout (both data and arrmeta)
+<span class="lineNum">     400 </span>            :      * is compatible with that of 'rhs'. If this returns true,
+<span class="lineNum">     401 </span>            :      * the types can be substituted for each other in an nd::array.
+<span class="lineNum">     402 </span>            :      */
+<span class="lineNum">     403 </span>            :     bool data_layout_compatible_with(const type &amp;rhs) const;
+<span class="lineNum">     404 </span>            : 
+<span class="lineNum">     405 </span>            :     /**
+<span class="lineNum">     406 </span>            :      * Returns true if the given type is a subarray of this type.
+<span class="lineNum">     407 </span>            :      * For example, &quot;int&quot; is a subarray of &quot;strided, int&quot;. This
+<span class="lineNum">     408 </span>            :      * relationship may exist for unequal types with the same number
+<span class="lineNum">     409 </span>            :      * of dimensions, for example &quot;int&quot; is a subarray of &quot;pointer(int)&quot;.
+<span class="lineNum">     410 </span>            :      *
+<a name="411"><span class="lineNum">     411 </span>            :      * \param subarray_tp  Testing if it is a subarray of 'this'.</a>
+<span class="lineNum">     412 </span>            :      */
+<span class="lineNum">     413 </span><span class="lineCov">         38 :     bool is_type_subarray(const ndt::type &amp;subarray_tp) const</span>
+<span class="lineNum">     414 </span>            :     {
+<span class="lineNum">     415 </span><span class="lineCov">         38 :       if (is_builtin()) {</span>
+<span class="lineNum">     416 </span><span class="lineCov">          8 :         return *this == subarray_tp;</span>
+<span class="lineNum">     417 </span>            :       }
+<span class="lineNum">     418 </span>            :       else {
+<span class="lineNum">     419 </span><span class="lineCov">         30 :         return m_ptr-&gt;is_type_subarray(subarray_tp);</span>
+<span class="lineNum">     420 </span>            :       }
+<span class="lineNum">     421 </span>            :     }
+<span class="lineNum">     422 </span>            : 
+<span class="lineNum">     423 </span>            :     /**
+<span class="lineNum">     424 </span>            :      * Returns true if the type represents a chunk of
+<a name="425"><span class="lineNum">     425 </span>            :      * consecutive memory of raw data.</a>
+<span class="lineNum">     426 </span>            :      */
+<span class="lineNum">     427 </span><span class="lineCov">         39 :     bool is_pod() const</span>
+<span class="lineNum">     428 </span>            :     {
+<span class="lineNum">     429 </span><span class="lineCov">         39 :       if (is_builtin()) {</span>
+<span class="lineNum">     430 </span><span class="lineCov">         10 :         return true;</span>
+<span class="lineNum">     431 </span>            :       }
+<span class="lineNum">     432 </span>            :       else {
+<span class="lineNum">     433 </span><span class="lineCov">         29 :         return m_ptr-&gt;get_data_size() &gt; 0 &amp;&amp; (m_ptr-&gt;get_flags() &amp; (type_flag_blockref | type_flag_destructor)) == 0;</span>
+<span class="lineNum">     434 </span>            :       }
+<a name="435"><span class="lineNum">     435 </span>            :     }</a>
+<span class="lineNum">     436 </span>            : 
+<span class="lineNum">     437 </span><span class="lineCov">          3 :     bool is_c_contiguous(const char *arrmeta) const</span>
+<span class="lineNum">     438 </span>            :     {
+<span class="lineNum">     439 </span><span class="lineCov">          3 :       if (is_builtin()) {</span>
+<span class="lineNum">     440 </span><span class="lineCov">          1 :         return true;</span>
+<span class="lineNum">     441 </span>            :       }
+<span class="lineNum">     442 </span>            : 
+<span class="lineNum">     443 </span><span class="lineCov">          2 :       return m_ptr-&gt;is_c_contiguous(arrmeta);</span>
+<a name="444"><span class="lineNum">     444 </span>            :     }</a>
+<span class="lineNum">     445 </span>            : 
+<a name="446"><span class="lineNum">     446 </span><span class="lineCov">     196170 :     bool is_indexable() const { return !is_builtin() &amp;&amp; m_ptr-&gt;is_indexable(); }</span></a>
+<span class="lineNum">     447 </span>            : 
+<span class="lineNum">     448 </span><span class="lineCov">        297 :     bool is_scalar() const { return is_builtin() || m_ptr-&gt;is_scalar(); }</span>
+<span class="lineNum">     449 </span>            : 
+<span class="lineNum">     450 </span>            : #ifdef DYND_CUDA
+<span class="lineNum">     451 </span>            : 
+<span class="lineNum">     452 </span>            :     bool is_cuda_device_readable() const
+<span class="lineNum">     453 </span>            :     {
+<span class="lineNum">     454 </span>            :       if (is_builtin()) {
+<span class="lineNum">     455 </span>            :         return get_kind() == void_kind;
+<span class="lineNum">     456 </span>            :       }
+<span class="lineNum">     457 </span>            : 
+<span class="lineNum">     458 </span>            :       return m_ptr-&gt;get_id() == cuda_device_id;
+<span class="lineNum">     459 </span>            :     }
+<span class="lineNum">     460 </span>            : 
+<span class="lineNum">     461 </span>            : #endif
+<span class="lineNum">     462 </span>            : 
+<span class="lineNum">     463 </span>            :     /**
+<span class="lineNum">     464 </span>            :      * Returns true if the type contains any expression
+<a name="465"><span class="lineNum">     465 </span>            :      * type within it somewhere.</a>
+<span class="lineNum">     466 </span>            :      */
+<span class="lineNum">     467 </span><span class="lineCov">       4407 :     bool is_expression() const</span>
+<span class="lineNum">     468 </span>            :     {
+<span class="lineNum">     469 </span><span class="lineCov">       4407 :       if (is_builtin()) {</span>
+<span class="lineNum">     470 </span><span class="lineCov">       2783 :         return false;</span>
+<span class="lineNum">     471 </span>            :       }
+<span class="lineNum">     472 </span>            :       else {
+<span class="lineNum">     473 </span><span class="lineCov">       1624 :         return m_ptr-&gt;is_expression();</span>
+<span class="lineNum">     474 </span>            :       }
+<span class="lineNum">     475 </span>            :     }
+<span class="lineNum">     476 </span>            : 
+<span class="lineNum">     477 </span>            :     /**
+<span class="lineNum">     478 </span>            :      * Returns true if the type contains a symbolic construct
+<a name="479"><span class="lineNum">     479 </span>            :      * like a type var.</a>
+<span class="lineNum">     480 </span>            :      */
+<span class="lineNum">     481 </span><span class="lineCov">       9493 :     bool is_symbolic() const { return !is_builtin() &amp;&amp; (m_ptr-&gt;get_flags() &amp; type_flag_symbolic); }</span>
+<span class="lineNum">     482 </span>            : 
+<span class="lineNum">     483 </span>            :     /**
+<span class="lineNum">     484 </span>            :      * Returns true if the type constains a symbolic dimension
+<a name="485"><span class="lineNum">     485 </span>            :      * which matches a variadic number of dimensions.</a>
+<span class="lineNum">     486 </span>            :      */
+<span class="lineNum">     487 </span><span class="lineCov">         53 :     bool is_variadic() const { return !is_builtin() &amp;&amp; (m_ptr-&gt;get_flags() &amp; type_flag_variadic); }</span>
+<span class="lineNum">     488 </span>            : 
+<span class="lineNum">     489 </span>            :     /**
+<span class="lineNum">     490 </span>            :      * For array types, recursively applies to each child type, and for
+<span class="lineNum">     491 </span>            :      * scalar types converts to the provided one.
+<span class="lineNum">     492 </span>            :      *
+<span class="lineNum">     493 </span>            :      * \param scalar_type  The scalar type to convert all scalars to.
+<span class="lineNum">     494 </span>            :      */
+<span class="lineNum">     495 </span>            :     type with_replaced_scalar_types(const type &amp;scalar_type) const;
+<span class="lineNum">     496 </span>            : 
+<span class="lineNum">     497 </span>            :     /**
+<span class="lineNum">     498 </span>            :      * Replaces the data type of the this type with the provided one.
+<span class="lineNum">     499 </span>            :      *
+<span class="lineNum">     500 </span>            :      * \param replacement_tp  The type to substitute for the existing one.
+<span class="lineNum">     501 </span>            :      * \param replace_ndim  The number of array dimensions to include in
+<span class="lineNum">     502 </span>            :      *                      the data type which is replaced.
+<span class="lineNum">     503 </span>            :      */
+<span class="lineNum">     504 </span>            :     type with_replaced_dtype(const type &amp;replacement_tp, intptr_t replace_ndim = 0) const;
+<span class="lineNum">     505 </span>            : 
+<span class="lineNum">     506 </span>            :     /**
+<span class="lineNum">     507 </span>            :      * Returns this type without the leading memory type, if there is one.
+<span class="lineNum">     508 </span>            :      */
+<span class="lineNum">     509 </span>            :     type without_memory_type() const;
+<span class="lineNum">     510 </span>            : 
+<span class="lineNum">     511 </span>            :     /**
+<span class="lineNum">     512 </span>            :      * Returns this type with a new strided dimension.
+<span class="lineNum">     513 </span>            :      *
+<span class="lineNum">     514 </span>            :      * \param i  The axis of the new strided dimension.
+<span class="lineNum">     515 </span>            :      */
+<span class="lineNum">     516 </span>            :     type with_new_axis(intptr_t i, intptr_t new_ndim = 1) const;
+<span class="lineNum">     517 </span>            : 
+<span class="lineNum">     518 </span>            :     /**
+<span class="lineNum">     519 </span>            :      * Returns a modified type with all expression types replaced with
+<span class="lineNum">     520 </span>            :      * their value types, and types replaced with &quot;standard versions&quot;
+<span class="lineNum">     521 </span>            :      * whereever appropriate. For example, an offset-based uniform array
+<a name="522"><span class="lineNum">     522 </span>            :      * would be replaced by a strided uniform array.</a>
+<span class="lineNum">     523 </span>            :      */
+<span class="lineNum">     524 </span><span class="lineCov">         42 :     type get_canonical_type() const</span>
+<span class="lineNum">     525 </span>            :     {
+<span class="lineNum">     526 </span><span class="lineCov">         42 :       if (is_builtin()) {</span>
+<span class="lineNum">     527 </span><span class="lineCov">         14 :         return *this;</span>
+<span class="lineNum">     528 </span>            :       }
+<span class="lineNum">     529 </span>            :       else {
+<span class="lineNum">     530 </span><span class="lineCov">         28 :         return m_ptr-&gt;get_canonical_type();</span>
+<span class="lineNum">     531 </span>            :       }
+<a name="532"><span class="lineNum">     532 </span>            :     }</a>
+<span class="lineNum">     533 </span>            : 
+<span class="lineNum">     534 </span><span class="lineCov">      25040 :     base_type::flags_type get_flags() const</span>
+<span class="lineNum">     535 </span>            :     {
+<span class="lineNum">     536 </span><span class="lineCov">      25040 :       if (is_builtin()) {</span>
+<span class="lineNum">     537 </span><span class="lineCov">       6155 :         return type_flag_none;</span>
+<span class="lineNum">     538 </span>            :       }
+<span class="lineNum">     539 </span>            :       else {
+<span class="lineNum">     540 </span><span class="lineCov">      18885 :         return m_ptr-&gt;get_flags();</span>
+<span class="lineNum">     541 </span>            :       }
+<span class="lineNum">     542 </span>            :     }
+<span class="lineNum">     543 </span>            : 
+<span class="lineNum">     544 </span>            :     /**
+<a name="545"><span class="lineNum">     545 </span>            :      * Gets the number of array dimensions in the type.</a>
+<span class="lineNum">     546 </span>            :      */
+<span class="lineNum">     547 </span><span class="lineCov">      18271 :     intptr_t get_ndim() const</span>
+<span class="lineNum">     548 </span>            :     {
+<span class="lineNum">     549 </span><span class="lineCov">      18271 :       if (is_builtin()) {</span>
+<span class="lineNum">     550 </span><span class="lineCov">       6648 :         return 0;</span>
+<span class="lineNum">     551 </span>            :       }
+<span class="lineNum">     552 </span>            :       else {
+<span class="lineNum">     553 </span><span class="lineCov">      11623 :         return m_ptr-&gt;get_ndim();</span>
+<span class="lineNum">     554 </span>            :       }
+<span class="lineNum">     555 </span>            :     }
+<span class="lineNum">     556 </span>            : 
+<span class="lineNum">     557 </span>            :     /**
+<span class="lineNum">     558 </span>            :      * Gets the number of outer strided dimensions this type has in a row.
+<span class="lineNum">     559 </span>            :      * The initial arrmeta for this type begins with this many
+<a name="560"><span class="lineNum">     560 </span>            :      * strided_dim_type_arrmeta instances.</a>
+<span class="lineNum">     561 </span>            :      */
+<span class="lineNum">     562 </span><span class="lineCov">       3150 :     intptr_t get_strided_ndim() const</span>
+<span class="lineNum">     563 </span>            :     {
+<span class="lineNum">     564 </span><span class="lineCov">       3150 :       if (is_builtin()) {</span>
+<span class="lineNum">     565 </span><span class="lineCov">        998 :         return 0;</span>
+<span class="lineNum">     566 </span>            :       }
+<span class="lineNum">     567 </span>            :       else {
+<span class="lineNum">     568 </span><span class="lineCov">       2152 :         return m_ptr-&gt;get_strided_ndim();</span>
+<span class="lineNum">     569 </span>            :       }
+<span class="lineNum">     570 </span>            :     }
+<span class="lineNum">     571 </span>            : 
+<span class="lineNum">     572 </span>            :     /**
+<span class="lineNum">     573 </span>            :      * Gets the type with array dimensions stripped away.
+<span class="lineNum">     574 </span>            :      *
+<span class="lineNum">     575 </span>            :      * \param include_ndim  The number of array dimensions to keep.
+<span class="lineNum">     576 </span>            :      * \param inout_arrmeta  If non-NULL, is a pointer to arrmeta to advance
+<a name="577"><span class="lineNum">     577 </span>            :      *                       in place.</a>
+<span class="lineNum">     578 </span>            :      */
+<span class="lineNum">     579 </span><span class="lineCov">        640 :     type get_dtype(size_t include_ndim = 0, char **inout_arrmeta = NULL) const</span>
+<span class="lineNum">     580 </span>            :     {
+<span class="lineNum">     581 </span><span class="lineCov">        640 :       size_t ndim = get_ndim();</span>
+<span class="lineNum">     582 </span><span class="lineCov">        640 :       if (ndim == include_ndim) {</span>
+<span class="lineNum">     583 </span><span class="lineCov">         54 :         return *this;</span>
+<span class="lineNum">     584 </span>            :       }
+<span class="lineNum">     585 </span><span class="lineCov">        586 :       else if (ndim &gt; include_ndim) {</span>
+<span class="lineNum">     586 </span><span class="lineCov">        586 :         return m_ptr-&gt;get_type_at_dimension(inout_arrmeta, ndim - include_ndim);</span>
+<span class="lineNum">     587 </span>            :       }
+<span class="lineNum">     588 </span>            :       else {
+<span class="lineNum">     589 </span><span class="lineNoCov">          0 :         std::stringstream ss;</span>
+<span class="lineNum">     590 </span><span class="lineNoCov">          0 :         ss &lt;&lt; &quot;Cannot use &quot; &lt;&lt; include_ndim &lt;&lt; &quot; array &quot;;</span>
+<span class="lineNum">     591 </span><span class="lineNoCov">          0 :         ss &lt;&lt; &quot;dimensions from dynd type &quot; &lt;&lt; *this;</span>
+<span class="lineNum">     592 </span><span class="lineNoCov">          0 :         ss &lt;&lt; &quot;, it only has &quot; &lt;&lt; ndim;</span>
+<span class="lineNum">     593 </span><span class="lineNoCov">          0 :         throw dynd::type_error(ss.str());</span>
+<span class="lineNum">     594 </span>            :       }
+<span class="lineNum">     595 </span>            :     }
+<span class="lineNum">     596 </span>            : 
+<span class="lineNum">     597 </span>            :     type get_dtype(size_t include_ndim, const char **inout_arrmeta) const
+<span class="lineNum">     598 </span>            :     {
+<span class="lineNum">     599 </span>            :       return get_dtype(include_ndim, const_cast&lt;char **&gt;(inout_arrmeta));
+<span class="lineNum">     600 </span>            :     }
+<span class="lineNum">     601 </span>            : 
+<span class="lineNum">     602 </span>            :     intptr_t get_dim_size(const char *arrmeta, const char *data) const;
+<span class="lineNum">     603 </span>            : 
+<a name="604"><span class="lineNum">     604 </span>            :     intptr_t get_size(const char *arrmeta) const;</a>
+<span class="lineNum">     605 </span>            : 
+<span class="lineNum">     606 </span><span class="lineCov">       2683 :     type get_type_at_dimension(char **inout_arrmeta, intptr_t i, intptr_t total_ndim = 0) const</span>
+<span class="lineNum">     607 </span>            :     {
+<span class="lineNum">     608 </span><span class="lineCov">       2683 :       if (!is_builtin()) {</span>
+<span class="lineNum">     609 </span><span class="lineCov">       1637 :         return m_ptr-&gt;get_type_at_dimension(inout_arrmeta, i, total_ndim);</span>
+<span class="lineNum">     610 </span>            :       }
+<span class="lineNum">     611 </span><span class="lineCov">       1046 :       else if (i == 0) {</span>
+<span class="lineNum">     612 </span><span class="lineCov">       1046 :         return *this;</span>
+<span class="lineNum">     613 </span>            :       }
+<span class="lineNum">     614 </span>            :       else {
+<span class="lineNum">     615 </span><span class="lineNoCov">          0 :         throw too_many_indices(*this, total_ndim + i, total_ndim);</span>
+<span class="lineNum">     616 </span>            :       }
+<a name="617"><span class="lineNum">     617 </span>            :     }</a>
+<span class="lineNum">     618 </span>            : 
+<span class="lineNum">     619 </span><span class="lineNoCov">          0 :     void get_vars(std::unordered_set&lt;std::string&gt; &amp;vars) const</span>
+<span class="lineNum">     620 </span>            :     {
+<span class="lineNum">     621 </span><span class="lineNoCov">          0 :       if (!is_builtin()) {</span>
+<span class="lineNum">     622 </span><span class="lineNoCov">          0 :         m_ptr-&gt;get_vars(vars);</span>
+<span class="lineNum">     623 </span>            :       }
+<span class="lineNum">     624 </span><span class="lineNoCov">          0 :     }</span>
+<span class="lineNum">     625 </span>            : 
+<span class="lineNum">     626 </span>            :     std::unordered_set&lt;std::string&gt; get_vars() const
+<span class="lineNum">     627 </span>            :     {
+<span class="lineNum">     628 </span>            :       std::unordered_set&lt;std::string&gt; vars;
+<span class="lineNum">     629 </span>            :       get_vars(vars);
+<span class="lineNum">     630 </span>            : 
+<span class="lineNum">     631 </span>            :       return vars;
+<span class="lineNum">     632 </span>            :     }
+<span class="lineNum">     633 </span>            : 
+<span class="lineNum">     634 </span>            :     std::map&lt;std::string, nd::callable&gt; get_properties() const;
+<span class="lineNum">     635 </span>            :     std::map&lt;std::string, nd::callable&gt; get_functions() const;
+<span class="lineNum">     636 </span>            :     std::map&lt;std::string, nd::callable&gt; get_array_properties() const;
+<span class="lineNum">     637 </span>            :     std::map&lt;std::string, nd::callable&gt; get_array_functions() const;
+<span class="lineNum">     638 </span>            : 
+<span class="lineNum">     639 </span>            :     /**
+<span class="lineNum">     640 </span>            :      * Returns a const pointer to the base_type object which
+<span class="lineNum">     641 </span>            :      * contains information about the type, or NULL if no extended
+<span class="lineNum">     642 </span>            :      * type information exists. The returned pointer is only valid during
+<a name="643"><span class="lineNum">     643 </span>            :      * the lifetime of the type.</a>
+<span class="lineNum">     644 </span>            :      */
+<span class="lineNum">     645 </span><span class="lineCov">     269176 :     const base_type *extended() const { return m_ptr; }</span>
+<span class="lineNum">     646 </span>            : 
+<span class="lineNum">     647 </span>            :     /**
+<span class="lineNum">     648 </span>            :      * Casts to the specified &lt;x&gt;_type class using static_cast.
+<span class="lineNum">     649 </span>            :      * This does not validate the type id to make sure this is
+<span class="lineNum">     650 </span>            :      * a valid cast, the caller MUST check this itself.
+<a name="651"><span class="lineNum">     651 </span>            :      */</a>
+<span class="lineNum">     652 </span>            :     template &lt;class T&gt;
+<span class="lineNum">     653 </span><span class="lineCov">      78032 :     const T *extended() const</span>
+<span class="lineNum">     654 </span>            :     {
+<span class="lineNum">     655 </span>            :       // TODO: In debug mode, assert the type id
+<span class="lineNum">     656 </span><span class="lineCov">      78032 :       return static_cast&lt;const T *&gt;(m_ptr);</span>
+<span class="lineNum">     657 </span>            :     }
+<span class="lineNum">     658 </span>            : 
+<span class="lineNum">     659 </span>            :     /**
+<span class="lineNum">     660 </span>            :      * If the type is a strided dimension type, where the dimension has a fixed
+<span class="lineNum">     661 </span>            :      * size and the data is at addresses `dst`, `dst + stride`, etc, this
+<span class="lineNum">     662 </span>            :      * extracts those values and returns true.
+<span class="lineNum">     663 </span>            :      *
+<span class="lineNum">     664 </span>            :      * \param arrmeta  The arrmeta for the type.
+<span class="lineNum">     665 </span>            :      * \param out_el_tp  Is filled with the element type.
+<span class="lineNum">     666 </span>            :      * \param out_el_arrmeta  Is filled with the arrmeta of the element type.
+<span class="lineNum">     667 </span>            :      *
+<span class="lineNum">     668 </span>            :      * \returns  True if it is a strided array type, false otherwise.
+<span class="lineNum">     669 </span>            :      */
+<span class="lineNum">     670 </span>            :     bool get_as_strided(const char *arrmeta, intptr_t *out_dim_size, intptr_t *out_stride, ndt::type *out_el_tp,
+<span class="lineNum">     671 </span>            :                         const char **out_el_arrmeta) const;
+<span class="lineNum">     672 </span>            : 
+<span class="lineNum">     673 </span>            :     /**
+<span class="lineNum">     674 </span>            :      * If the type is a multidimensional strided dimension type, where the
+<span class="lineNum">     675 </span>            :      * dimension has a fixed size and the data is at addresses `dst`, `dst +
+<span class="lineNum">     676 </span>            :      * stride`, etc, this extracts those values and returns true.
+<span class="lineNum">     677 </span>            :      *
+<span class="lineNum">     678 </span>            :      * \param arrmeta  The arrmeta for the type.
+<span class="lineNum">     679 </span>            :      * \param ndim  The number of strided dimensions desired.
+<span class="lineNum">     680 </span>            :      * \param out_size_stride  Is filled with a pointer to an array of
+<span class="lineNum">     681 </span>            :      *                         size_stride_t of length ``ndim``.
+<span class="lineNum">     682 </span>            :      * \param out_el_tp  Is filled with the element type.
+<span class="lineNum">     683 </span>            :      * \param out_el_arrmeta  Is filled with the arrmeta of the element type.
+<span class="lineNum">     684 </span>            :      *
+<span class="lineNum">     685 </span>            :      * \returns  True if it is a strided array type, false otherwise.
+<span class="lineNum">     686 </span>            :      */
+<span class="lineNum">     687 </span>            :     bool get_as_strided(const char *arrmeta, intptr_t ndim, const size_stride_t **out_size_stride, ndt::type *out_el_tp,
+<span class="lineNum">     688 </span>            :                         const char **out_el_arrmeta) const;
+<a name="689"><span class="lineNum">     689 </span>            : </a>
+<span class="lineNum">     690 </span>            :     /** The size of the data required for uniform iteration */
+<span class="lineNum">     691 </span><span class="lineCov">         80 :     size_t get_iterdata_size(intptr_t ndim) const</span>
+<span class="lineNum">     692 </span>            :     {
+<span class="lineNum">     693 </span><span class="lineCov">         80 :       if (is_builtin()) {</span>
+<span class="lineNum">     694 </span><span class="lineNoCov">          0 :         return 0;</span>
+<span class="lineNum">     695 </span>            :       }
+<span class="lineNum">     696 </span>            :       else {
+<span class="lineNum">     697 </span><span class="lineCov">         80 :         return m_ptr-&gt;get_iterdata_size(ndim);</span>
+<span class="lineNum">     698 </span>            :       }
+<span class="lineNum">     699 </span>            :     }
+<span class="lineNum">     700 </span>            :     /**
+<span class="lineNum">     701 </span>            :      * \brief Constructs the iterdata for processing iteration of the specified
+<span class="lineNum">     702 </span>            :      *        shape.
+<span class="lineNum">     703 </span>            :      *
+<span class="lineNum">     704 </span>            :      * \param iterdata  The allocated iterdata to construct.
+<span class="lineNum">     705 </span>            :      * \param inout_arrmeta  The arrmeta corresponding to the type for the
+<span class="lineNum">     706 </span>            :      *                       iterdata construction. This is modified in place to
+<span class="lineNum">     707 </span>            :      *                       become the arrmeta for the array data type.
+<span class="lineNum">     708 </span>            :      * \param ndim      Number of iteration dimensions.
+<span class="lineNum">     709 </span>            :      * \param shape     The iteration shape.
+<span class="lineNum">     710 </span>            :      * \param out_uniform_type  This is populated with the type of each iterated
+<span class="lineNum">     711 </span>            :      *                          element
+<span class="lineNum">     712 </span>            :      */
+<span class="lineNum">     713 </span>            :     void iterdata_construct(iterdata_common *iterdata, const char **inout_arrmeta, intptr_t ndim, const intptr_t *shape,
+<span class="lineNum">     714 </span>            :                             type &amp;out_uniform_type) const
+<span class="lineNum">     715 </span>            :     {
+<span class="lineNum">     716 </span>            :       if (!is_builtin()) {
+<span class="lineNum">     717 </span>            :         m_ptr-&gt;iterdata_construct(iterdata, inout_arrmeta, ndim, shape, out_uniform_type);
+<span class="lineNum">     718 </span>            :       }
+<span class="lineNum">     719 </span>            :     }
+<a name="720"><span class="lineNum">     720 </span>            : </a>
+<span class="lineNum">     721 </span>            :     /** Destructs any references or other state contained in the iterdata */
+<span class="lineNum">     722 </span><span class="lineCov">        262 :     void iterdata_destruct(iterdata_common *iterdata, intptr_t ndim) const</span>
+<span class="lineNum">     723 </span>            :     {
+<span class="lineNum">     724 </span><span class="lineCov">        262 :       if (!is_builtin()) {</span>
+<span class="lineNum">     725 </span><span class="lineCov">        262 :         m_ptr-&gt;iterdata_destruct(iterdata, ndim);</span>
+<span class="lineNum">     726 </span>            :       }
+<a name="727"><span class="lineNum">     727 </span><span class="lineCov">        262 :     }</span></a>
+<span class="lineNum">     728 </span>            : 
+<span class="lineNum">     729 </span><span class="lineCov">        262 :     size_t get_broadcasted_iterdata_size(intptr_t ndim) const</span>
+<span class="lineNum">     730 </span>            :     {
+<span class="lineNum">     731 </span><span class="lineCov">        262 :       if (is_builtin()) {</span>
+<span class="lineNum">     732 </span><span class="lineNoCov">          0 :         return sizeof(iterdata_broadcasting_terminator);</span>
+<span class="lineNum">     733 </span>            :       }
+<span class="lineNum">     734 </span>            :       else {
+<span class="lineNum">     735 </span><span class="lineCov">        262 :         return m_ptr-&gt;get_iterdata_size(ndim) + sizeof(iterdata_broadcasting_terminator);</span>
+<span class="lineNum">     736 </span>            :       }
+<span class="lineNum">     737 </span>            :     }
+<span class="lineNum">     738 </span>            : 
+<span class="lineNum">     739 </span>            :     /**
+<span class="lineNum">     740 </span>            :      * Constructs an iterdata which can be broadcast to the left indefinitely,
+<span class="lineNum">     741 </span>            :      * by capping off the iterdata with a iterdata_broadcasting_terminator.
+<span class="lineNum">     742 </span>            :      *
+<span class="lineNum">     743 </span>            :      * \param iterdata  The allocated iterdata to construct.
+<span class="lineNum">     744 </span>            :      * \param inout_arrmeta  The arrmeta corresponding to the type for the
+<span class="lineNum">     745 </span>            :      *                       iterdata construction. This is modified in place to
+<span class="lineNum">     746 </span>            :      *                       become the arrmeta for the array data type.
+<span class="lineNum">     747 </span>            :      * \param ndim      Number of iteration dimensions.
+<span class="lineNum">     748 </span>            :      * \param shape     The iteration shape.
+<span class="lineNum">     749 </span>            :      * \param out_uniform_tp  This is populated with the type of each iterated
+<a name="750"><span class="lineNum">     750 </span>            :      *                        element</a>
+<span class="lineNum">     751 </span>            :      */
+<span class="lineNum">     752 </span><span class="lineCov">        262 :     void broadcasted_iterdata_construct(iterdata_common *iterdata, const char **inout_arrmeta, intptr_t ndim,</span>
+<span class="lineNum">     753 </span>            :                                         const intptr_t *shape, type &amp;out_uniform_tp) const
+<span class="lineNum">     754 </span>            :     {
+<span class="lineNum">     755 </span>            :       size_t size;
+<span class="lineNum">     756 </span><span class="lineCov">        262 :       if (is_builtin()) {</span>
+<span class="lineNum">     757 </span><span class="lineNoCov">          0 :         size = 0;</span>
+<span class="lineNum">     758 </span>            :       }
+<span class="lineNum">     759 </span>            :       else {
+<span class="lineNum">     760 </span><span class="lineCov">        262 :         size = m_ptr-&gt;iterdata_construct(iterdata, inout_arrmeta, ndim, shape, out_uniform_tp);</span>
+<span class="lineNum">     761 </span>            :       }
+<span class="lineNum">     762 </span>            :       iterdata_broadcasting_terminator *id =
+<span class="lineNum">     763 </span><span class="lineCov">        262 :           reinterpret_cast&lt;iterdata_broadcasting_terminator *&gt;(reinterpret_cast&lt;char *&gt;(iterdata) + size);</span>
+<span class="lineNum">     764 </span><span class="lineCov">        262 :       id-&gt;common.incr = &amp;iterdata_broadcasting_terminator_incr;</span>
+<span class="lineNum">     765 </span><span class="lineCov">        262 :       id-&gt;common.adv = &amp;iterdata_broadcasting_terminator_adv;</span>
+<span class="lineNum">     766 </span><span class="lineCov">        262 :       id-&gt;common.reset = &amp;iterdata_broadcasting_terminator_reset;</span>
+<span class="lineNum">     767 </span><span class="lineCov">        262 :     }</span>
+<span class="lineNum">     768 </span>            : 
+<span class="lineNum">     769 </span>            :     /**
+<span class="lineNum">     770 </span>            :      * print data interpreted as a single value of this type
+<span class="lineNum">     771 </span>            :      *
+<span class="lineNum">     772 </span>            :      * \param o         the std::ostream to print to
+<span class="lineNum">     773 </span>            :      * \param data      pointer to the data element to print
+<span class="lineNum">     774 </span>            :      * \param arrmeta  pointer to the nd::array arrmeta for the data element
+<span class="lineNum">     775 </span>            :      */
+<a name="776"><span class="lineNum">     776 </span>            :     void print_data(std::ostream &amp;o, const char *arrmeta, const char *data) const;</a>
+<span class="lineNum">     777 </span>            : 
+<span class="lineNum">     778 </span><span class="lineCov">         97 :     std::string str() const</span>
+<span class="lineNum">     779 </span>            :     {
+<span class="lineNum">     780 </span><span class="lineCov">        194 :       std::stringstream ss;</span>
+<span class="lineNum">     781 </span><span class="lineCov">         97 :       ss &lt;&lt; *this;</span>
+<span class="lineNum">     782 </span><span class="lineCov">        194 :       return ss.str();</span>
+<span class="lineNum">     783 </span>            :     }
+<span class="lineNum">     784 </span>            : 
+<span class="lineNum">     785 </span>            :     static type make(type_id_t tp_id, const nd::array &amp;args);
+<span class="lineNum">     786 </span>            : 
+<span class="lineNum">     787 </span>            :     friend DYND_API std::ostream &amp;operator&lt;&lt;(std::ostream &amp;o, const type &amp;rhs);
+<span class="lineNum">     788 </span>            :   };
+<span class="lineNum">     789 </span>            : 
+<span class="lineNum">     790 </span>            :   template &lt;&gt;
+<span class="lineNum">     791 </span>            :   struct traits&lt;void&gt; {
+<span class="lineNum">     792 </span>            :     static const size_t ndim = 0;
+<span class="lineNum">     793 </span>            : 
+<a name="794"><span class="lineNum">     794 </span>            :     static const bool is_same_layout = false;</a>
+<span class="lineNum">     795 </span>            : 
+<span class="lineNum">     796 </span><span class="lineCov">        309 :     static type equivalent() { return type(type_id_of&lt;void&gt;::value); }</span>
+<span class="lineNum">     797 </span>            :   };
+<span class="lineNum">     798 </span>            : 
+<span class="lineNum">     799 </span>            :   namespace detail {
+<span class="lineNum">     800 </span>            : 
+<span class="lineNum">     801 </span>            :     /**
+<span class="lineNum">     802 </span>            :      * Returns the equivalent type.
+<a name="803"><span class="lineNum">     803 </span>            :      */</a>
+<span class="lineNum">     804 </span>            :     template &lt;typename T, typename... ArgTypes&gt;
+<span class="lineNum">     805 </span><span class="lineCov">     211096 :     auto make_type(int, ArgTypes &amp;&amp;... args) -&gt; decltype(traits&lt;T&gt;::equivalent(std::forward&lt;ArgTypes&gt;(args)...))</span>
+<span class="lineNum">     806 </span>            :     {
+<span class="lineNum">     807 </span><span class="lineCov">     211096 :       return traits&lt;T&gt;::equivalent(std::forward&lt;ArgTypes&gt;(args)...);</span>
+<span class="lineNum">     808 </span>            :     }
+<span class="lineNum">     809 </span>            : 
+<span class="lineNum">     810 </span>            :     /**
+<span class="lineNum">     811 </span>            :      * Returns the equivalent type.
+<a name="812"><span class="lineNum">     812 </span>            :      */</a>
+<span class="lineNum">     813 </span>            :     template &lt;typename T, typename... ArgTypes&gt;
+<span class="lineNum">     814 </span><span class="lineCov">       3011 :     auto make_type(char, ArgTypes &amp;&amp;... DYND_UNUSED(args)) -&gt; decltype(traits&lt;T&gt;::equivalent())</span>
+<span class="lineNum">     815 </span>            :     {
+<span class="lineNum">     816 </span><span class="lineCov">       3011 :       return traits&lt;T&gt;::equivalent();</span>
+<span class="lineNum">     817 </span>            :     }
+<span class="lineNum">     818 </span>            : 
+<span class="lineNum">     819 </span>            :   } // namespace dynd::ndt::detail
+<span class="lineNum">     820 </span>            : 
+<span class="lineNum">     821 </span>            :   /**
+<span class="lineNum">     822 </span>            :    * Returns the equivalent type.
+<a name="823"><span class="lineNum">     823 </span>            :    */</a>
+<span class="lineNum">     824 </span>            :   template &lt;typename T, typename... ArgTypes&gt;
+<span class="lineNum">     825 </span><span class="lineCov">     214107 :   auto make_type(ArgTypes &amp;&amp;... args) -&gt; decltype(detail::make_type&lt;T&gt;(0, std::forward&lt;ArgTypes&gt;(args)...))</span>
+<span class="lineNum">     826 </span>            :   {
+<span class="lineNum">     827 </span><span class="lineCov">     214107 :     return detail::make_type&lt;T&gt;(0, std::forward&lt;ArgTypes&gt;(args)...);</span>
+<span class="lineNum">     828 </span>            :   }
+<a name="829"><span class="lineNum">     829 </span>            : </a>
+<span class="lineNum">     830 </span>            :   template &lt;typename ValueType&gt;
+<span class="lineNum">     831 </span><span class="lineCov">       3125 :   type type_for(const ValueType &amp;value)</span>
+<span class="lineNum">     832 </span>            :   {
+<span class="lineNum">     833 </span><span class="lineCov">       3125 :     return make_type&lt;ValueType&gt;(value);</span>
+<span class="lineNum">     834 </span>            :   }
+<a name="835"><span class="lineNum">     835 </span>            : </a>
+<span class="lineNum">     836 </span>            :   template &lt;typename ValueType&gt;
+<span class="lineNum">     837 </span><span class="lineCov">        171 :   type type_for(const std::initializer_list&lt;ValueType&gt; &amp;values)</span>
+<span class="lineNum">     838 </span>            :   {
+<span class="lineNum">     839 </span><span class="lineCov">        171 :     return make_type&lt;std::initializer_list&lt;ValueType&gt;&gt;(values);</span>
+<span class="lineNum">     840 </span>            :   }
+<a name="841"><span class="lineNum">     841 </span>            : </a>
+<span class="lineNum">     842 </span>            :   template &lt;typename ValueType&gt;
+<span class="lineNum">     843 </span><span class="lineCov">         41 :   type type_for(const std::initializer_list&lt;std::initializer_list&lt;ValueType&gt;&gt; &amp;values)</span>
+<span class="lineNum">     844 </span>            :   {
+<span class="lineNum">     845 </span><span class="lineCov">         41 :     return make_type&lt;std::initializer_list&lt;std::initializer_list&lt;ValueType&gt;&gt;&gt;(values);</span>
+<span class="lineNum">     846 </span>            :   }
+<a name="847"><span class="lineNum">     847 </span>            : </a>
+<span class="lineNum">     848 </span>            :   template &lt;typename ValueType&gt;
+<span class="lineNum">     849 </span><span class="lineCov">         11 :   type type_for(const std::initializer_list&lt;std::initializer_list&lt;std::initializer_list&lt;ValueType&gt;&gt;&gt; &amp;values)</span>
+<span class="lineNum">     850 </span>            :   {
+<span class="lineNum">     851 </span><span class="lineCov">         11 :     return make_type&lt;std::initializer_list&lt;std::initializer_list&lt;std::initializer_list&lt;ValueType&gt;&gt;&gt;&gt;(values);</span>
+<span class="lineNum">     852 </span>            :   }
+<span class="lineNum">     853 </span>            : 
+<span class="lineNum">     854 </span>            :   /**
+<span class="lineNum">     855 </span>            :    * Allocates and constructs a type with a use count of 1.
+<a name="856"><span class="lineNum">     856 </span>            :    */</a>
+<span class="lineNum">     857 </span>            :   template &lt;typename T, typename... ArgTypes&gt;
+<span class="lineNum">     858 </span><span class="lineCov">       1526 :   std::enable_if_t&lt;std::is_base_of&lt;base_type, T&gt;::value, type&gt; make_type(ArgTypes &amp;&amp;... args)</span>
+<span class="lineNum">     859 </span>            :   {
+<span class="lineNum">     860 </span><span class="lineCov">       1526 :     return type(new T(std::forward&lt;ArgTypes&gt;(args)...), false);</span>
+<span class="lineNum">     861 </span>            :   }
+<span class="lineNum">     862 </span>            : 
+<span class="lineNum">     863 </span>            :   /*
+<span class="lineNum">     864 </span>            :   #define DYND_BOOL_NA (2)
+<span class="lineNum">     865 </span>            :   #define DYND_INT8_NA (std::numeric_limits&lt;int8_t&gt;::min())
+<span class="lineNum">     866 </span>            :   #define DYND_INT16_NA (std::numeric_limits&lt;int16_t&gt;::min())
+<span class="lineNum">     867 </span>            :   #define DYND_INT32_NA (std::numeric_limits&lt;int32_t&gt;::min())
+<span class="lineNum">     868 </span>            :   #define DYND_INT64_NA (std::numeric_limits&lt;int64_t&gt;::min())
+<span class="lineNum">     869 </span>            :   #define DYND_INT128_NA (std::numeric_limits&lt;int128&gt;::min())
+<span class="lineNum">     870 </span>            :   #define DYND_FLOAT16_NA_AS_UINT (0x7e0au)
+<span class="lineNum">     871 </span>            :   #define DYND_FLOAT32_NA_AS_UINT (0x7f8007a2U)
+<span class="lineNum">     872 </span>            :   #define DYND_FLOAT64_NA_AS_UINT (0x7ff00000000007a2ULL)
+<span class="lineNum">     873 </span>            :   */
+<span class="lineNum">     874 </span>            : 
+<span class="lineNum">     875 </span>            :   template &lt;&gt;
+<span class="lineNum">     876 </span>            :   struct traits&lt;bool1&gt; {
+<span class="lineNum">     877 </span>            :     static const size_t ndim = 0;
+<span class="lineNum">     878 </span>            : 
+<a name="879"><span class="lineNum">     879 </span>            :     static const bool is_same_layout = true;</a>
+<span class="lineNum">     880 </span>            : 
+<span class="lineNum">     881 </span><span class="lineCov">       3160 :     static type equivalent() { return type(type_id_of&lt;bool1&gt;::value); }</span>
+<span class="lineNum">     882 </span>            :   };
+<span class="lineNum">     883 </span>            : 
+<span class="lineNum">     884 </span>            :   template &lt;&gt;
+<span class="lineNum">     885 </span>            :   struct traits&lt;bool&gt; {
+<span class="lineNum">     886 </span>            :     static const size_t ndim = 0;
+<span class="lineNum">     887 </span>            : 
+<a name="888"><span class="lineNum">     888 </span>            :     static const bool is_same_layout = false;</a>
+<span class="lineNum">     889 </span>            : 
+<span class="lineNum">     890 </span><span class="lineCov">       1366 :     static type equivalent() { return traits&lt;bool1&gt;::equivalent(); }</span>
+<span class="lineNum">     891 </span>            :   };
+<span class="lineNum">     892 </span>            : 
+<span class="lineNum">     893 </span>            :   template &lt;&gt;
+<span class="lineNum">     894 </span>            :   struct traits&lt;signed char&gt; {
+<span class="lineNum">     895 </span>            :     static const size_t ndim = 0;
+<span class="lineNum">     896 </span>            : 
+<a name="897"><span class="lineNum">     897 </span>            :     static const bool is_same_layout = true;</a>
+<span class="lineNum">     898 </span>            : 
+<span class="lineNum">     899 </span><span class="lineCov">        149 :     static type equivalent() { return type(type_id_of&lt;signed char&gt;::value); }</span>
+<span class="lineNum">     900 </span>            : 
+<span class="lineNum">     901 </span>            :     static signed char na() { return std::numeric_limits&lt;signed char&gt;::min(); }
+<span class="lineNum">     902 </span>            :   };
+<span class="lineNum">     903 </span>            : 
+<span class="lineNum">     904 </span>            :   template &lt;&gt;
+<span class="lineNum">     905 </span>            :   struct traits&lt;short&gt; {
+<span class="lineNum">     906 </span>            :     static const size_t ndim = 0;
+<span class="lineNum">     907 </span>            : 
+<a name="908"><span class="lineNum">     908 </span>            :     static const bool is_same_layout = true;</a>
+<span class="lineNum">     909 </span>            : 
+<span class="lineNum">     910 </span><span class="lineCov">        165 :     static type equivalent() { return type(type_id_of&lt;short&gt;::value); }</span>
+<span class="lineNum">     911 </span>            :   };
+<span class="lineNum">     912 </span>            : 
+<span class="lineNum">     913 </span>            :   template &lt;&gt;
+<span class="lineNum">     914 </span>            :   struct traits&lt;int&gt; {
+<span class="lineNum">     915 </span>            :     static const size_t ndim = 0;
+<span class="lineNum">     916 </span>            : 
+<a name="917"><span class="lineNum">     917 </span>            :     static const bool is_same_layout = true;</a>
+<span class="lineNum">     918 </span>            : 
+<span class="lineNum">     919 </span><span class="lineCov">      60969 :     static type equivalent() { return type(type_id_of&lt;int&gt;::value); }</span>
+<span class="lineNum">     920 </span>            : 
+<span class="lineNum">     921 </span>            :     static int na() { return std::numeric_limits&lt;int&gt;::min(); }
+<span class="lineNum">     922 </span>            :   };
+<span class="lineNum">     923 </span>            : 
+<span class="lineNum">     924 </span>            :   template &lt;&gt;
+<span class="lineNum">     925 </span>            :   struct traits&lt;long&gt; {
+<span class="lineNum">     926 </span>            :     static const size_t ndim = 0;
+<span class="lineNum">     927 </span>            : 
+<a name="928"><span class="lineNum">     928 </span>            :     static const bool is_same_layout = true;</a>
+<span class="lineNum">     929 </span>            : 
+<span class="lineNum">     930 </span><span class="lineCov">      10296 :     static type equivalent() { return type(type_id_of&lt;long&gt;::value); }</span>
+<span class="lineNum">     931 </span>            :   };
+<span class="lineNum">     932 </span>            : 
+<span class="lineNum">     933 </span>            :   template &lt;&gt;
+<span class="lineNum">     934 </span>            :   struct traits&lt;long long&gt; {
+<span class="lineNum">     935 </span>            :     static const size_t ndim = 0;
+<span class="lineNum">     936 </span>            : 
+<a name="937"><span class="lineNum">     937 </span>            :     static const bool is_same_layout = true;</a>
+<span class="lineNum">     938 </span>            : 
+<span class="lineNum">     939 </span><span class="lineCov">         16 :     static type equivalent() { return type(type_id_of&lt;long long&gt;::value); }</span>
+<span class="lineNum">     940 </span>            :   };
+<span class="lineNum">     941 </span>            : 
+<span class="lineNum">     942 </span>            :   template &lt;&gt;
+<span class="lineNum">     943 </span>            :   struct traits&lt;int128&gt; {
+<span class="lineNum">     944 </span>            :     static const size_t ndim = 0;
+<span class="lineNum">     945 </span>            : 
+<a name="946"><span class="lineNum">     946 </span>            :     static const bool is_same_layout = true;</a>
+<span class="lineNum">     947 </span>            : 
+<span class="lineNum">     948 </span><span class="lineCov">         11 :     static type equivalent() { return type(type_id_of&lt;int128&gt;::value); }</span>
+<span class="lineNum">     949 </span>            :   };
+<span class="lineNum">     950 </span>            : 
+<span class="lineNum">     951 </span>            :   template &lt;&gt;
+<span class="lineNum">     952 </span>            :   struct traits&lt;unsigned char&gt; {
+<span class="lineNum">     953 </span>            :     static const size_t ndim = 0;
+<span class="lineNum">     954 </span>            : 
+<a name="955"><span class="lineNum">     955 </span>            :     static const bool is_same_layout = true;</a>
+<span class="lineNum">     956 </span>            : 
+<span class="lineNum">     957 </span><span class="lineCov">        145 :     static type equivalent() { return type(type_id_of&lt;unsigned char&gt;::value); }</span>
+<span class="lineNum">     958 </span>            :   };
+<span class="lineNum">     959 </span>            : 
+<span class="lineNum">     960 </span>            :   template &lt;&gt;
+<span class="lineNum">     961 </span>            :   struct traits&lt;unsigned short&gt; {
+<span class="lineNum">     962 </span>            :     static const size_t ndim = 0;
+<span class="lineNum">     963 </span>            : 
+<a name="964"><span class="lineNum">     964 </span>            :     static const bool is_same_layout = true;</a>
+<span class="lineNum">     965 </span>            : 
+<span class="lineNum">     966 </span><span class="lineCov">        139 :     static type equivalent() { return type(type_id_of&lt;unsigned short&gt;::value); }</span>
+<span class="lineNum">     967 </span>            :   };
+<span class="lineNum">     968 </span>            : 
+<span class="lineNum">     969 </span>            :   template &lt;&gt;
+<span class="lineNum">     970 </span>            :   struct traits&lt;unsigned int&gt; {
+<span class="lineNum">     971 </span>            :     static const size_t ndim = 0;
+<span class="lineNum">     972 </span>            : 
+<a name="973"><span class="lineNum">     973 </span>            :     static const bool is_same_layout = true;</a>
+<span class="lineNum">     974 </span>            : 
+<a name="975"><span class="lineNum">     975 </span><span class="lineCov">      12183 :     static type equivalent() { return type(type_id_of&lt;unsigned int&gt;::value); }</span></a>
+<span class="lineNum">     976 </span>            : 
+<span class="lineNum">     977 </span><span class="lineCov">         32 :     static unsigned int na() { return std::numeric_limits&lt;unsigned int&gt;::max(); }</span>
+<span class="lineNum">     978 </span>            :   };
+<span class="lineNum">     979 </span>            : 
+<span class="lineNum">     980 </span>            :   template &lt;&gt;
+<span class="lineNum">     981 </span>            :   struct traits&lt;unsigned long&gt; {
+<span class="lineNum">     982 </span>            :     static const size_t ndim = 0;
+<span class="lineNum">     983 </span>            : 
+<a name="984"><span class="lineNum">     984 </span>            :     static const bool is_same_layout = true;</a>
+<span class="lineNum">     985 </span>            : 
+<span class="lineNum">     986 </span><span class="lineCov">      10244 :     static type equivalent() { return type(type_id_of&lt;unsigned long&gt;::value); }</span>
+<span class="lineNum">     987 </span>            :   };
+<span class="lineNum">     988 </span>            : 
+<span class="lineNum">     989 </span>            :   template &lt;&gt;
+<span class="lineNum">     990 </span>            :   struct traits&lt;unsigned long long&gt; {
+<span class="lineNum">     991 </span>            :     static const size_t ndim = 0;
+<span class="lineNum">     992 </span>            : 
+<a name="993"><span class="lineNum">     993 </span>            :     static const bool is_same_layout = true;</a>
+<span class="lineNum">     994 </span>            : 
+<span class="lineNum">     995 </span><span class="lineCov">          3 :     static type equivalent() { return type(type_id_of&lt;unsigned long long&gt;::value); }</span>
+<span class="lineNum">     996 </span>            :   };
+<span class="lineNum">     997 </span>            : 
+<span class="lineNum">     998 </span>            :   template &lt;&gt;
+<span class="lineNum">     999 </span>            :   struct traits&lt;uint128&gt; {
+<span class="lineNum">    1000 </span>            :     static const size_t ndim = 0;
+<span class="lineNum">    1001 </span>            : 
+<a name="1002"><span class="lineNum">    1002 </span>            :     static const bool is_same_layout = true;</a>
+<span class="lineNum">    1003 </span>            : 
+<span class="lineNum">    1004 </span><span class="lineCov">         17 :     static type equivalent() { return type(type_id_of&lt;uint128&gt;::value); }</span>
+<span class="lineNum">    1005 </span>            :   };
+<span class="lineNum">    1006 </span>            : 
+<span class="lineNum">    1007 </span>            :   template &lt;&gt;
+<span class="lineNum">    1008 </span>            :   struct traits&lt;char&gt; {
+<span class="lineNum">    1009 </span>            :     static const size_t ndim = 0;
+<span class="lineNum">    1010 </span>            : 
+<a name="1011"><span class="lineNum">    1011 </span>            :     static const bool is_same_layout = true;</a>
+<span class="lineNum">    1012 </span>            : 
+<span class="lineNum">    1013 </span><span class="lineCov">         33 :     static type equivalent() { return type(type_id_of&lt;char&gt;::value); }</span>
+<span class="lineNum">    1014 </span>            :   };
+<span class="lineNum">    1015 </span>            : 
+<span class="lineNum">    1016 </span>            :   template &lt;&gt;
+<span class="lineNum">    1017 </span>            :   struct traits&lt;float16&gt; {
+<span class="lineNum">    1018 </span>            :     static const size_t ndim = 0;
+<span class="lineNum">    1019 </span>            : 
+<a name="1020"><span class="lineNum">    1020 </span>            :     static const bool is_same_layout = true;</a>
+<span class="lineNum">    1021 </span>            : 
+<span class="lineNum">    1022 </span><span class="lineCov">         11 :     static type equivalent() { return type(type_id_of&lt;float16&gt;::value); }</span>
+<span class="lineNum">    1023 </span>            :   };
+<span class="lineNum">    1024 </span>            : 
+<span class="lineNum">    1025 </span>            :   template &lt;&gt;
+<span class="lineNum">    1026 </span>            :   struct traits&lt;float&gt; {
+<span class="lineNum">    1027 </span>            :     static const size_t ndim = 0;
+<span class="lineNum">    1028 </span>            : 
+<a name="1029"><span class="lineNum">    1029 </span>            :     static const bool is_same_layout = true;</a>
+<span class="lineNum">    1030 </span>            : 
+<span class="lineNum">    1031 </span><span class="lineCov">      10510 :     static type equivalent() { return type(type_id_of&lt;float&gt;::value); }</span>
+<span class="lineNum">    1032 </span>            :   };
+<span class="lineNum">    1033 </span>            : 
+<span class="lineNum">    1034 </span>            :   template &lt;&gt;
+<span class="lineNum">    1035 </span>            :   struct traits&lt;double&gt; {
+<span class="lineNum">    1036 </span>            :     static const size_t ndim = 0;
+<span class="lineNum">    1037 </span>            : 
+<a name="1038"><span class="lineNum">    1038 </span>            :     static const bool is_same_layout = true;</a>
+<span class="lineNum">    1039 </span>            : 
+<span class="lineNum">    1040 </span><span class="lineCov">      96556 :     static type equivalent() { return type(type_id_of&lt;double&gt;::value); }</span>
+<span class="lineNum">    1041 </span>            :   };
+<span class="lineNum">    1042 </span>            : 
+<span class="lineNum">    1043 </span>            :   template &lt;&gt;
+<span class="lineNum">    1044 </span>            :   struct traits&lt;float128&gt; {
+<span class="lineNum">    1045 </span>            :     static const size_t ndim = 0;
+<span class="lineNum">    1046 </span>            : 
+<a name="1047"><span class="lineNum">    1047 </span>            :     static const bool is_same_layout = true;</a>
+<span class="lineNum">    1048 </span>            : 
+<span class="lineNum">    1049 </span><span class="lineCov">          6 :     static type equivalent() { return type(type_id_of&lt;float128&gt;::value); }</span>
+<span class="lineNum">    1050 </span>            :   };
+<span class="lineNum">    1051 </span>            : 
+<span class="lineNum">    1052 </span>            :   template &lt;typename T&gt;
+<span class="lineNum">    1053 </span>            :   struct traits&lt;complex&lt;T&gt;&gt; {
+<span class="lineNum">    1054 </span>            :     static const size_t ndim = 0;
+<span class="lineNum">    1055 </span>            : 
+<a name="1056"><span class="lineNum">    1056 </span>            :     static const bool is_same_layout = true;</a>
+<span class="lineNum">    1057 </span>            : 
+<span class="lineNum">    1058 </span><span class="lineCov">        827 :     static type equivalent() { return type(type_id_of&lt;complex&lt;T&gt;&gt;::value); }</span>
+<span class="lineNum">    1059 </span>            :   };
+<span class="lineNum">    1060 </span>            : 
+<span class="lineNum">    1061 </span>            :   template &lt;typename T&gt;
+<span class="lineNum">    1062 </span>            :   struct traits&lt;std::complex&lt;T&gt;&gt; {
+<span class="lineNum">    1063 </span>            :     static const size_t ndim = 0;
+<span class="lineNum">    1064 </span>            : 
+<a name="1065"><span class="lineNum">    1065 </span>            :     static const bool is_same_layout = true;</a>
+<span class="lineNum">    1066 </span>            : 
+<span class="lineNum">    1067 </span><span class="lineCov">          4 :     static type equivalent() { return type(type_id_of&lt;std::complex&lt;T&gt;&gt;::value); }</span>
+<span class="lineNum">    1068 </span>            :   };
+<span class="lineNum">    1069 </span>            : 
+<span class="lineNum">    1070 </span>            :   template &lt;&gt;
+<span class="lineNum">    1071 </span>            :   struct traits&lt;const char *&gt; {
+<span class="lineNum">    1072 </span>            :     static const size_t ndim = 0;
+<span class="lineNum">    1073 </span>            : 
+<a name="1074"><span class="lineNum">    1074 </span>            :     static const bool is_same_layout = false;</a>
+<span class="lineNum">    1075 </span>            : 
+<span class="lineNum">    1076 </span><span class="lineCov">         24 :     static type equivalent() { return type(string_id); }</span>
+<span class="lineNum">    1077 </span>            :   };
+<span class="lineNum">    1078 </span>            : 
+<span class="lineNum">    1079 </span>            :   template &lt;size_t N&gt;
+<span class="lineNum">    1080 </span>            :   struct traits&lt;char[N]&gt; {
+<span class="lineNum">    1081 </span>            :     static const size_t ndim = 0;
+<span class="lineNum">    1082 </span>            : 
+<a name="1083"><span class="lineNum">    1083 </span>            :     static const bool is_same_layout = false;</a>
+<span class="lineNum">    1084 </span>            : 
+<span class="lineNum">    1085 </span><span class="lineCov">        108 :     static type equivalent() { return type(string_id); }</span>
+<span class="lineNum">    1086 </span>            :   };
+<span class="lineNum">    1087 </span>            : 
+<span class="lineNum">    1088 </span>            :   template &lt;size_t N&gt;
+<span class="lineNum">    1089 </span>            :   struct traits&lt;const char[N]&gt; {
+<span class="lineNum">    1090 </span>            :     static const size_t ndim = 0;
+<span class="lineNum">    1091 </span>            : 
+<span class="lineNum">    1092 </span>            :     static const bool is_same_layout = false;
+<span class="lineNum">    1093 </span>            : 
+<span class="lineNum">    1094 </span>            :     static type equivalent() { return type(string_id); }
+<span class="lineNum">    1095 </span>            :   };
+<span class="lineNum">    1096 </span>            : 
+<span class="lineNum">    1097 </span>            :   template &lt;&gt;
+<span class="lineNum">    1098 </span>            :   struct traits&lt;type&gt; {
+<span class="lineNum">    1099 </span>            :     static const size_t ndim = 0;
+<span class="lineNum">    1100 </span>            : 
+<a name="1101"><span class="lineNum">    1101 </span>            :     static const bool is_same_layout = true;</a>
+<span class="lineNum">    1102 </span>            : 
+<span class="lineNum">    1103 </span><span class="lineCov">       4197 :     static type equivalent() { return type(type_id); }</span>
+<span class="lineNum">    1104 </span>            :   };
+<span class="lineNum">    1105 </span>            : 
+<span class="lineNum">    1106 </span>            :   template &lt;typename T&gt;
+<span class="lineNum">    1107 </span>            :   struct traits&lt;const T&gt; {
+<span class="lineNum">    1108 </span>            :     static const size_t ndim = traits&lt;T&gt;::ndim;
+<span class="lineNum">    1109 </span>            : 
+<a name="1110"><span class="lineNum">    1110 </span>            :     static const bool is_same_layout = traits&lt;T&gt;::is_same_layout;</a>
+<span class="lineNum">    1111 </span>            : 
+<span class="lineNum">    1112 </span><span class="lineCov">          1 :     static type equivalent() { return traits&lt;T&gt;::equivalent(); }</span>
+<span class="lineNum">    1113 </span>            :   };
+<span class="lineNum">    1114 </span>            : 
+<span class="lineNum">    1115 </span>            :   // Same as for const
+<span class="lineNum">    1116 </span>            :   template &lt;typename T&gt;
+<span class="lineNum">    1117 </span>            :   struct traits&lt;T &amp;&gt; {
+<span class="lineNum">    1118 </span>            :     static const size_t ndim = traits&lt;T&gt;::ndim;
+<span class="lineNum">    1119 </span>            : 
+<a name="1120"><span class="lineNum">    1120 </span>            :     static const bool is_same_layout = traits&lt;T&gt;::is_same_layout;</a>
+<span class="lineNum">    1121 </span>            : 
+<span class="lineNum">    1122 </span><span class="lineCov">         11 :     static type equivalent() { return traits&lt;T&gt;::equivalent(); }</span>
+<span class="lineNum">    1123 </span>            :   };
+<span class="lineNum">    1124 </span>            : 
+<span class="lineNum">    1125 </span>            :   // Same as for const
+<span class="lineNum">    1126 </span>            :   template &lt;typename T&gt;
+<span class="lineNum">    1127 </span>            :   struct traits&lt;T &amp;&amp;&gt; {
+<span class="lineNum">    1128 </span>            :     static const size_t ndim = traits&lt;T&gt;::ndim;
+<span class="lineNum">    1129 </span>            : 
+<span class="lineNum">    1130 </span>            :     static const bool is_same_layout = traits&lt;T&gt;::is_same_layout;
+<span class="lineNum">    1131 </span>            : 
+<span class="lineNum">    1132 </span>            :     static type equivalent() { return traits&lt;T&gt;::equivalent(); }
+<span class="lineNum">    1133 </span>            :   };
+<span class="lineNum">    1134 </span>            : 
+<span class="lineNum">    1135 </span>            :   template &lt;typename T, size_t N&gt;
+<span class="lineNum">    1136 </span>            :   struct traits&lt;T[N]&gt; {
+<span class="lineNum">    1137 </span>            :     static const size_t ndim = traits&lt;T&gt;::ndim + 1;
+<span class="lineNum">    1138 </span>            : 
+<a name="1139"><span class="lineNum">    1139 </span>            :     static const bool is_same_layout = traits&lt;T&gt;::is_same_layout;</a>
+<span class="lineNum">    1140 </span>            : 
+<span class="lineNum">    1141 </span><span class="lineCov">        177 :     static type equivalent() { return make_fixed_dim(N, make_type&lt;T&gt;()); }</span>
+<span class="lineNum">    1142 </span>            :   };
+<span class="lineNum">    1143 </span>            : 
+<span class="lineNum">    1144 </span>            :   template &lt;&gt;
+<span class="lineNum">    1145 </span>            :   struct traits&lt;assign_error_mode&gt; {
+<span class="lineNum">    1146 </span>            :     static const size_t ndim = 0;
+<span class="lineNum">    1147 </span>            : 
+<a name="1148"><span class="lineNum">    1148 </span>            :     static const bool is_same_layout = true;</a>
+<span class="lineNum">    1149 </span>            : 
+<a name="1150"><span class="lineNum">    1150 </span><span class="lineCov">       1972 :     static type equivalent() { return make_type&lt;typename std::underlying_type&lt;assign_error_mode&gt;::type&gt;(); }</span></a>
+<span class="lineNum">    1151 </span>            : 
+<span class="lineNum">    1152 </span><span class="lineCov">         32 :     static assign_error_mode na()</span>
+<span class="lineNum">    1153 </span>            :     {
+<span class="lineNum">    1154 </span><span class="lineCov">         32 :       return static_cast&lt;assign_error_mode&gt;(traits&lt;typename std::underlying_type&lt;assign_error_mode&gt;::type&gt;::na());</span>
+<span class="lineNum">    1155 </span>            :     }
+<span class="lineNum">    1156 </span>            :   };
+<span class="lineNum">    1157 </span>            : 
+<span class="lineNum">    1158 </span>            :   // Need to handle const properly
+<span class="lineNum">    1159 </span>            :   template &lt;typename T, size_t N&gt;
+<span class="lineNum">    1160 </span>            :   struct traits&lt;const T[N]&gt; {
+<span class="lineNum">    1161 </span>            :     static const size_t ndim = traits&lt;T[N]&gt;::ndim;
+<span class="lineNum">    1162 </span>            : 
+<a name="1163"><span class="lineNum">    1163 </span>            :     static const bool is_same_layout = traits&lt;T[N]&gt;::is_same_layout;</a>
+<span class="lineNum">    1164 </span>            : 
+<span class="lineNum">    1165 </span><span class="lineCov">         10 :     static type equivalent() { return make_type&lt;T[N]&gt;(); }</span>
+<span class="lineNum">    1166 </span>            :   };
+<span class="lineNum">    1167 </span>            : 
+<span class="lineNum">    1168 </span>            :   template &lt;typename ContainerType, size_t NDim&gt;
+<span class="lineNum">    1169 </span>            :   struct container_traits {
+<span class="lineNum">    1170 </span>            :     static const size_t ndim = NDim;
+<span class="lineNum">    1171 </span>            : 
+<a name="1172"><span class="lineNum">    1172 </span>            :     static const bool is_same_layout = false;</a>
+<span class="lineNum">    1173 </span>            : 
+<span class="lineNum">    1174 </span><span class="lineCov">         52 :     static type equivalent(const ContainerType &amp;values)</span>
+<span class="lineNum">    1175 </span>            :     {
+<span class="lineNum">    1176 </span>            :       intptr_t shape[ndim];
+<span class="lineNum">    1177 </span><span class="lineCov">         52 :       container_traits::shape(shape, values);</span>
+<span class="lineNum">    1178 </span>            : 
+<span class="lineNum">    1179 </span><span class="lineCov">         52 :       type tp = value_type();</span>
+<span class="lineNum">    1180 </span><span class="lineCov">        167 :       for (intptr_t i = ndim - 1; i &gt;= 0; --i) {</span>
+<span class="lineNum">    1181 </span><span class="lineCov">        115 :         if (shape[i] == -1) {</span>
+<span class="lineNum">    1182 </span><span class="lineCov">          7 :           tp = make_var_dim(tp);</span>
+<span class="lineNum">    1183 </span>            :         }
+<span class="lineNum">    1184 </span>            :         else {
+<span class="lineNum">    1185 </span><span class="lineCov">        108 :           tp = make_fixed_dim(shape[i], tp);</span>
+<span class="lineNum">    1186 </span>            :         }
+<span class="lineNum">    1187 </span>            :       }
+<span class="lineNum">    1188 </span>            : 
+<span class="lineNum">    1189 </span><span class="lineCov">         52 :       return tp;</span>
+<a name="1190"><span class="lineNum">    1190 </span>            :     }</a>
+<span class="lineNum">    1191 </span>            : 
+<span class="lineNum">    1192 </span><span class="lineCov">         78 :     static void shape(intptr_t *res, const ContainerType &amp;values)</span>
+<span class="lineNum">    1193 </span>            :     {
+<span class="lineNum">    1194 </span><span class="lineCov">         78 :       res[0] = values.size();</span>
+<span class="lineNum">    1195 </span>            : 
+<span class="lineNum">    1196 </span><span class="lineCov">         78 :       auto iter = values.begin();</span>
+<span class="lineNum">    1197 </span><span class="lineCov">         78 :       ndt::traits&lt;typename ContainerType::value_type&gt;::shape(res + 1, *iter);</span>
+<span class="lineNum">    1198 </span>            : 
+<span class="lineNum">    1199 </span><span class="lineCov">        300 :       while (++iter != values.end()) {</span>
+<span class="lineNum">    1200 </span>            :         intptr_t next_shape[ndim - 1];
+<span class="lineNum">    1201 </span><span class="lineCov">        111 :         ndt::traits&lt;typename ContainerType::value_type&gt;::shape(next_shape, *iter);</span>
+<span class="lineNum">    1202 </span>            : 
+<span class="lineNum">    1203 </span><span class="lineCov">        237 :         for (size_t i = 1; i &lt; ndim; ++i) {</span>
+<span class="lineNum">    1204 </span><span class="lineCov">        126 :           if (res[i] != next_shape[i - 1]) {</span>
+<span class="lineNum">    1205 </span><span class="lineCov">         10 :             res[i] = -1;</span>
+<span class="lineNum">    1206 </span>            :           }
+<span class="lineNum">    1207 </span>            :         }
+<span class="lineNum">    1208 </span>            :       }
+<a name="1209"><span class="lineNum">    1209 </span><span class="lineCov">         78 :     }</span></a>
+<span class="lineNum">    1210 </span>            : 
+<span class="lineNum">    1211 </span><span class="lineCov">         63 :     static type value_type() { return container_traits&lt;typename ContainerType::value_type, ndim - 1&gt;::value_type(); }</span>
+<span class="lineNum">    1212 </span>            :   };
+<span class="lineNum">    1213 </span>            : 
+<span class="lineNum">    1214 </span>            :   template &lt;typename ContainerType&gt;
+<span class="lineNum">    1215 </span>            :   struct container_traits&lt;ContainerType, 1&gt; {
+<span class="lineNum">    1216 </span>            :     static const size_t ndim = 1;
+<span class="lineNum">    1217 </span>            : 
+<a name="1218"><span class="lineNum">    1218 </span>            :     static const bool is_same_layout = false;</a>
+<span class="lineNum">    1219 </span>            : 
+<span class="lineNum">    1220 </span><span class="lineCov">        285 :     static type equivalent(const ContainerType &amp;values)</span>
+<span class="lineNum">    1221 </span>            :     {
+<span class="lineNum">    1222 </span>            :       intptr_t size;
+<span class="lineNum">    1223 </span><span class="lineCov">        285 :       shape(&amp;size, values);</span>
+<span class="lineNum">    1224 </span>            : 
+<span class="lineNum">    1225 </span><span class="lineCov">        285 :       return make_fixed_dim(size, value_type());</span>
+<a name="1226"><span class="lineNum">    1226 </span>            :     }</a>
+<span class="lineNum">    1227 </span>            : 
+<a name="1228"><span class="lineNum">    1228 </span><span class="lineCov">        448 :     static void shape(intptr_t *res, const ContainerType &amp;values) { res[0] = values.size(); }</span></a>
+<span class="lineNum">    1229 </span>            : 
+<span class="lineNum">    1230 </span><span class="lineCov">        337 :     static type value_type() { return traits&lt;typename ContainerType::value_type&gt;::equivalent(); }</span>
+<span class="lineNum">    1231 </span>            :   };
+<span class="lineNum">    1232 </span>            : 
+<span class="lineNum">    1233 </span>            :   template &lt;typename ValueType&gt;
+<span class="lineNum">    1234 </span>            :   struct traits&lt;std::initializer_list&lt;ValueType&gt;&gt;
+<span class="lineNum">    1235 </span>            :       : container_traits&lt;std::initializer_list&lt;ValueType&gt;, traits&lt;ValueType&gt;::ndim + 1&gt; {
+<span class="lineNum">    1236 </span>            :   };
+<span class="lineNum">    1237 </span>            : 
+<span class="lineNum">    1238 </span>            :   template &lt;typename ValueType&gt;
+<span class="lineNum">    1239 </span>            :   struct traits&lt;std::vector&lt;ValueType&gt;&gt; : container_traits&lt;std::vector&lt;ValueType&gt;, traits&lt;ValueType&gt;::ndim + 1&gt; {
+<span class="lineNum">    1240 </span>            :   };
+<span class="lineNum">    1241 </span>            : 
+<span class="lineNum">    1242 </span>            :   /**
+<span class="lineNum">    1243 </span>            :     * Returns the common type of two types. For built-in types, this is analogous to
+<span class="lineNum">    1244 </span>            :     * std::common_type.
+<span class="lineNum">    1245 </span>            :     */
+<span class="lineNum">    1246 </span>            :   DYND_API extern class common_type {
+<span class="lineNum">    1247 </span>            :     typedef type (*child_type)(const type &amp;, const type &amp;);
+<span class="lineNum">    1248 </span>            : 
+<span class="lineNum">    1249 </span>            :     struct init;
+<span class="lineNum">    1250 </span>            : 
+<span class="lineNum">    1251 </span>            :     static std::map&lt;std::array&lt;type_id_t, 2&gt;, child_type&gt; children;
+<span class="lineNum">    1252 </span>            : 
+<span class="lineNum">    1253 </span>            :   public:
+<span class="lineNum">    1254 </span>            :     common_type();
+<span class="lineNum">    1255 </span>            : 
+<span class="lineNum">    1256 </span>            :     DYND_API ndt::type operator()(const ndt::type &amp;tp0, const ndt::type &amp;tp1) const;
+<span class="lineNum">    1257 </span>            :   } common_type;
+<span class="lineNum">    1258 </span>            : 
+<span class="lineNum">    1259 </span>            :   /**
+<span class="lineNum">    1260 </span>            :    * Constructs an array type from a shape and
+<span class="lineNum">    1261 </span>            :    * a data type. Each dimension &gt;= 0 is made
+<span class="lineNum">    1262 </span>            :    * using a fixed_dim type, and each dimension == -1
+<span class="lineNum">    1263 </span>            :    * is made using a var_dim type.
+<span class="lineNum">    1264 </span>            :    *
+<span class="lineNum">    1265 </span>            :    * \param ndim   The number of dimensions in the shape
+<span class="lineNum">    1266 </span>            :    * \param shape  The shape of the array type to create.
+<span class="lineNum">    1267 </span>            :    * \param dtype  The data type of each array element.
+<span class="lineNum">    1268 </span>            :    */
+<span class="lineNum">    1269 </span>            :   DYND_API type make_type(intptr_t ndim, const intptr_t *shape, const ndt::type &amp;dtype);
+<span class="lineNum">    1270 </span>            : 
+<span class="lineNum">    1271 </span>            :   /**
+<span class="lineNum">    1272 </span>            :    * Constructs an array type from a shape and
+<span class="lineNum">    1273 </span>            :    * a data type specified as a string. Each dimension &gt;= 0 is made
+<span class="lineNum">    1274 </span>            :    * using a fixed_dim type, and each dimension == -1
+<span class="lineNum">    1275 </span>            :    * is made using a var_dim type.
+<span class="lineNum">    1276 </span>            :    *
+<span class="lineNum">    1277 </span>            :    * \param ndim   The number of dimensions in the shape
+<span class="lineNum">    1278 </span>            :    * \param shape  The shape of the array type to create.
+<span class="lineNum">    1279 </span>            :    * \param dtype  The data type of each array element.
+<a name="1280"><span class="lineNum">    1280 </span>            :    */</a>
+<span class="lineNum">    1281 </span>            :   template &lt;int N&gt;
+<span class="lineNum">    1282 </span><span class="lineCov">          2 :   inline type make_type(intptr_t ndim, const intptr_t *shape, const char(&amp;dtype)[N])</span>
+<span class="lineNum">    1283 </span>            :   {
+<span class="lineNum">    1284 </span><span class="lineCov">          2 :     return make_type(ndim, shape, ndt::type(dtype));</span>
+<span class="lineNum">    1285 </span>            :   }
+<span class="lineNum">    1286 </span>            : 
+<span class="lineNum">    1287 </span>            :   /**
+<span class="lineNum">    1288 </span>            :    * Constructs an array type from a shape and
+<span class="lineNum">    1289 </span>            :    * a data type. Each dimension &gt;= 0 is made
+<span class="lineNum">    1290 </span>            :    * using a fixed_dim type, and each dimension == -1
+<span class="lineNum">    1291 </span>            :    * is made using a var_dim type.
+<span class="lineNum">    1292 </span>            :    *
+<span class="lineNum">    1293 </span>            :    * \param ndim   The number of dimensions in the shape
+<span class="lineNum">    1294 </span>            :    * \param shape  The shape of the array type to create.
+<span class="lineNum">    1295 </span>            :    * \param dtype  The data type of each array element.
+<span class="lineNum">    1296 </span>            :    * \param out_any_var  This output variable is set to true if any var
+<span class="lineNum">    1297 </span>            :    *                     dimension is in the shape. If no var dimension
+<span class="lineNum">    1298 </span>            :    *                     is encountered, it is untouched, so the caller
+<span class="lineNum">    1299 </span>            :    *                     should initialize it to false.
+<span class="lineNum">    1300 </span>            :    */
+<span class="lineNum">    1301 </span>            :   DYND_API type make_type(intptr_t ndim, const intptr_t *shape, const ndt::type &amp;dtype, bool &amp;out_any_var);
+<span class="lineNum">    1302 </span>            : 
+<span class="lineNum">    1303 </span>            :   DYND_API type_id_t register_type(const std::string &amp;name, type_make_t make);
+<a name="1304"><span class="lineNum">    1304 </span>            : </a>
+<span class="lineNum">    1305 </span>            :   template &lt;typename TypeType&gt;
+<span class="lineNum">    1306 </span><span class="lineCov">          1 :   type_id_t register_type(const std::string &amp;name)</span>
+<a name="1307"><span class="lineNum">    1307 </span>            :   {</a>
+<span class="lineNum">    1308 </span><span class="lineCov">          2 :     return register_type(name,</span>
+<span class="lineNum">    1309 </span><span class="lineCov">          5 :                          [](type_id_t tp_id, const nd::array &amp;args) { return type(new TypeType(tp_id, args), false); });</span>
+<span class="lineNum">    1310 </span>            :   }
+<span class="lineNum">    1311 </span>            : 
+<span class="lineNum">    1312 </span>            :   DYND_API std::ostream &amp;operator&lt;&lt;(std::ostream &amp;o, const type &amp;rhs);
+<span class="lineNum">    1313 </span>            : 
+<span class="lineNum">    1314 </span>            : } // namespace dynd::ndt
+<span class="lineNum">    1315 </span>            : 
+<span class="lineNum">    1316 </span>            : /** Prints raw bytes as hexadecimal */
+<span class="lineNum">    1317 </span>            : DYND_API void hexadecimal_print(std::ostream &amp;o, char value);
+<span class="lineNum">    1318 </span>            : DYND_API void hexadecimal_print(std::ostream &amp;o, unsigned char value);
+<span class="lineNum">    1319 </span>            : DYND_API void hexadecimal_print(std::ostream &amp;o, unsigned short value);
+<span class="lineNum">    1320 </span>            : DYND_API void hexadecimal_print(std::ostream &amp;o, unsigned int value);
+<span class="lineNum">    1321 </span>            : DYND_API void hexadecimal_print(std::ostream &amp;o, unsigned long value);
+<span class="lineNum">    1322 </span>            : DYND_API void hexadecimal_print(std::ostream &amp;o, unsigned long long value);
+<span class="lineNum">    1323 </span>            : DYND_API void hexadecimal_print(std::ostream &amp;o, const char *data, intptr_t element_size);
+<span class="lineNum">    1324 </span>            : DYND_API void hexadecimal_print_summarized(std::ostream &amp;o, const char *data, intptr_t element_size,
+<span class="lineNum">    1325 </span>            :                                            intptr_t summary_size);
+<span class="lineNum">    1326 </span>            : 
+<span class="lineNum">    1327 </span>            : DYND_API void strided_array_summarized(std::ostream &amp;o, const ndt::type &amp;tp, const char *arrmeta, const char *data,
+<span class="lineNum">    1328 </span>            :                                        intptr_t dim_size, intptr_t stride);
+<span class="lineNum">    1329 </span>            : DYND_API void print_indented(std::ostream &amp;o, const std::string &amp;indent, const std::string &amp;s,
+<span class="lineNum">    1330 </span>            :                              bool skipfirstline = false);
+<span class="lineNum">    1331 </span>            : 
+<span class="lineNum">    1332 </span>            : /** If 'src' can always be cast to 'dst' with no loss of information */
+<span class="lineNum">    1333 </span>            : DYND_API bool is_lossless_assignment(const ndt::type &amp;dst_tp, const ndt::type &amp;src_tp);
+<span class="lineNum">    1334 </span>            : 
+<span class="lineNum">    1335 </span>            : } // namespace dynd
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.10</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

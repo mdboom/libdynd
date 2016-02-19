@@ -1,0 +1,187 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - coverage.info.cleaned - include/dynd/types/dim_fragment_type.hpp</title>
+  <link rel="stylesheet" type="text/css" href="../../../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../../../index.html">top level</a> - <a href="index.html">include/dynd/types</a> - dim_fragment_type.hpp<span style="font-size: 80%;"> (source / <a href="dim_fragment_type.hpp.func.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">coverage.info.cleaned</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">9</td>
+            <td class="headerCovTableEntry">10</td>
+            <td class="headerCovTableEntryHi">90.0 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2016-02-19</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">5</td>
+            <td class="headerCovTableEntry">5</td>
+            <td class="headerCovTableEntryHi">100.0 %</td>
+          </tr>
+          <tr><td><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : //</a>
+<span class="lineNum">       2 </span>            : // Copyright (C) 2011-15 DyND Developers
+<span class="lineNum">       3 </span>            : // BSD 2-Clause License, see LICENSE.txt
+<span class="lineNum">       4 </span>            : //
+<span class="lineNum">       5 </span>            : 
+<span class="lineNum">       6 </span>            : #pragma once
+<span class="lineNum">       7 </span>            : 
+<span class="lineNum">       8 </span>            : #include &lt;vector&gt;
+<span class="lineNum">       9 </span>            : #include &lt;string&gt;
+<span class="lineNum">      10 </span>            : 
+<span class="lineNum">      11 </span>            : #include &lt;dynd/array.hpp&gt;
+<span class="lineNum">      12 </span>            : #include &lt;dynd/types/base_dim_type.hpp&gt;
+<span class="lineNum">      13 </span>            : 
+<span class="lineNum">      14 </span>            : namespace dynd {
+<span class="lineNum">      15 </span>            : 
+<span class="lineNum">      16 </span>            : /**
+<span class="lineNum">      17 </span>            :  * Names for the values in the tagged dims
+<span class="lineNum">      18 </span>            :  * of the dim_fragment_type
+<span class="lineNum">      19 </span>            :  */
+<span class="lineNum">      20 </span>            : enum {
+<span class="lineNum">      21 </span>            :   dim_fragment_var = -1,
+<span class="lineNum">      22 </span>            :   dim_fragment_fixed_sym = -2
+<span class="lineNum">      23 </span>            :   // values &gt;= 0 mean fixed[N]
+<span class="lineNum">      24 </span>            : };
+<span class="lineNum">      25 </span>            : 
+<span class="lineNum">      26 </span>            : namespace ndt {
+<span class="lineNum">      27 </span>            : 
+<span class="lineNum">      28 </span>            :   class DYND_API dim_fragment_type : public base_dim_type {
+<span class="lineNum">      29 </span>            :     dimvector m_tagged_dims;
+<span class="lineNum">      30 </span>            : 
+<span class="lineNum">      31 </span>            :   public:
+<span class="lineNum">      32 </span>            :     dim_fragment_type(intptr_t ndim, const intptr_t *tagged_dims);
+<a name="33"><span class="lineNum">      33 </span>            :     dim_fragment_type(intptr_t ndim, const type &amp;tp);</a>
+<span class="lineNum">      34 </span>            : 
+<span class="lineNum">      35 </span><span class="lineCov">        271 :     virtual ~dim_fragment_type() {}</span>
+<span class="lineNum">      36 </span>            : 
+<span class="lineNum">      37 </span>            :     /**
+<span class="lineNum">      38 </span>            :      * The tagged_dims should be interpreted as an array of
+<span class="lineNum">      39 </span>            :      * size get_ndim() containing:
+<span class="lineNum">      40 </span>            :      *   -1 : var
+<span class="lineNum">      41 </span>            :      *   -2 : strided
+<a name="42"><span class="lineNum">      42 </span>            :      *   N &gt;= 0 : fixed[N]</a>
+<span class="lineNum">      43 </span>            :      */
+<span class="lineNum">      44 </span><span class="lineCov">         22 :     inline const intptr_t *get_tagged_dims() const { return m_tagged_dims.get(); }</span>
+<span class="lineNum">      45 </span>            : 
+<span class="lineNum">      46 </span>            :     /**
+<span class="lineNum">      47 </span>            :      * Broadcasts this dim_fragment with some dimensions of
+<span class="lineNum">      48 </span>            :      * another type, producing another dim_fragment, or
+<span class="lineNum">      49 </span>            :      * a null type if there is a broadcasting error.
+<span class="lineNum">      50 </span>            :      */
+<span class="lineNum">      51 </span>            :     type broadcast_with_type(intptr_t ndim, const type &amp;tp) const;
+<span class="lineNum">      52 </span>            : 
+<span class="lineNum">      53 </span>            :     /**
+<span class="lineNum">      54 </span>            :      * Applies the dim_fragment to the provided dtype.
+<span class="lineNum">      55 </span>            :      */
+<span class="lineNum">      56 </span>            :     type apply_to_dtype(const type &amp;dtp) const;
+<span class="lineNum">      57 </span>            : 
+<span class="lineNum">      58 </span>            :     void print_data(std::ostream &amp;o, const char *arrmeta, const char *data) const;
+<span class="lineNum">      59 </span>            : 
+<span class="lineNum">      60 </span>            :     void print_type(std::ostream &amp;o) const;
+<span class="lineNum">      61 </span>            : 
+<span class="lineNum">      62 </span>            :     type apply_linear_index(intptr_t nindices, const irange *indices, size_t current_i, const type &amp;root_tp,
+<span class="lineNum">      63 </span>            :                             bool leading_dimension) const;
+<span class="lineNum">      64 </span>            :     intptr_t apply_linear_index(intptr_t nindices, const irange *indices, const char *arrmeta, const type &amp;result_tp,
+<span class="lineNum">      65 </span>            :                                 char *out_arrmeta, const intrusive_ptr&lt;memory_block_data&gt; &amp;embedded_reference,
+<span class="lineNum">      66 </span>            :                                 size_t current_i, const type &amp;root_tp, bool leading_dimension, char **inout_data,
+<span class="lineNum">      67 </span>            :                                 intrusive_ptr&lt;memory_block_data&gt; &amp;inout_dataref) const;
+<span class="lineNum">      68 </span>            : 
+<span class="lineNum">      69 </span>            :     intptr_t get_dim_size(const char *arrmeta, const char *data) const;
+<span class="lineNum">      70 </span>            : 
+<span class="lineNum">      71 </span>            :     bool is_lossless_assignment(const type &amp;dst_tp, const type &amp;src_tp) const;
+<span class="lineNum">      72 </span>            : 
+<span class="lineNum">      73 </span>            :     bool operator==(const base_type &amp;rhs) const;
+<span class="lineNum">      74 </span>            : 
+<span class="lineNum">      75 </span>            :     void arrmeta_default_construct(char *arrmeta, bool blockref_alloc) const;
+<span class="lineNum">      76 </span>            :     void arrmeta_copy_construct(char *dst_arrmeta, const char *src_arrmeta,
+<span class="lineNum">      77 </span>            :                                 const intrusive_ptr&lt;memory_block_data&gt; &amp;embedded_reference) const;
+<span class="lineNum">      78 </span>            :     size_t arrmeta_copy_construct_onedim(char *dst_arrmeta, const char *src_arrmeta,
+<span class="lineNum">      79 </span>            :                                          const intrusive_ptr&lt;memory_block_data&gt; &amp;embedded_reference) const;
+<span class="lineNum">      80 </span>            :     void arrmeta_destruct(char *arrmeta) const;
+<span class="lineNum">      81 </span>            : 
+<span class="lineNum">      82 </span>            :     virtual type with_element_type(const type &amp;element_tp) const;
+<span class="lineNum">      83 </span>            :   }; // class dim_fragment_type
+<span class="lineNum">      84 </span>            : 
+<span class="lineNum">      85 </span>            :   /** Makes an empty dim fragment */
+<span class="lineNum">      86 </span>            :   DYND_API const type &amp;make_dim_fragment();
+<a name="87"><span class="lineNum">      87 </span>            : </a>
+<span class="lineNum">      88 </span>            :   /** Makes a dim fragment out of the tagged dims provided */
+<span class="lineNum">      89 </span><span class="lineCov">         12 :   inline type make_dim_fragment(intptr_t ndim, const intptr_t *tagged_dims)</span>
+<span class="lineNum">      90 </span>            :   {
+<span class="lineNum">      91 </span><span class="lineCov">         12 :     if (ndim &gt; 0) {</span>
+<span class="lineNum">      92 </span><span class="lineCov">         12 :       return type(new dim_fragment_type(ndim, tagged_dims), false);</span>
+<span class="lineNum">      93 </span>            :     }
+<span class="lineNum">      94 </span>            :     else {
+<span class="lineNum">      95 </span><span class="lineNoCov">          0 :       return make_dim_fragment();</span>
+<span class="lineNum">      96 </span>            :     }
+<span class="lineNum">      97 </span>            :   }
+<a name="98"><span class="lineNum">      98 </span>            : </a>
+<span class="lineNum">      99 </span>            :   /** Make a dim fragment from the provided type */
+<span class="lineNum">     100 </span><span class="lineCov">        126 :   inline type make_dim_fragment(intptr_t ndim, const type &amp;tp)</span>
+<span class="lineNum">     101 </span>            :   {
+<span class="lineNum">     102 </span><span class="lineCov">        126 :     if (ndim &gt; 0) {</span>
+<span class="lineNum">     103 </span><span class="lineCov">        123 :       return type(new dim_fragment_type(ndim, tp), false);</span>
+<span class="lineNum">     104 </span>            :     }
+<span class="lineNum">     105 </span>            :     else {
+<span class="lineNum">     106 </span><span class="lineCov">          3 :       return make_dim_fragment();</span>
+<span class="lineNum">     107 </span>            :     }
+<span class="lineNum">     108 </span>            :   }
+<span class="lineNum">     109 </span>            : 
+<span class="lineNum">     110 </span>            : } // namespace dynd::ndt
+<span class="lineNum">     111 </span>            : } // namespace dynd
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.10</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

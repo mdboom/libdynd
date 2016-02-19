@@ -1,0 +1,317 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - coverage.info.cleaned - src/dynd/kernels/take_kernel.cpp</title>
+  <link rel="stylesheet" type="text/css" href="../../../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../../../index.html">top level</a> - <a href="index.html">src/dynd/kernels</a> - take_kernel.cpp<span style="font-size: 80%;"> (source / <a href="take_kernel.cpp.func.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">coverage.info.cleaned</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">89</td>
+            <td class="headerCovTableEntry">136</td>
+            <td class="headerCovTableEntryLo">65.4 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2016-02-19</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">8</td>
+            <td class="headerCovTableEntry">8</td>
+            <td class="headerCovTableEntryHi">100.0 %</td>
+          </tr>
+          <tr><td><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : //</a>
+<span class="lineNum">       2 </span>            : // Copyright (C) 2011-15 DyND Developers
+<span class="lineNum">       3 </span>            : // BSD 2-Clause License, see LICENSE.txt
+<span class="lineNum">       4 </span>            : //
+<span class="lineNum">       5 </span>            : 
+<span class="lineNum">       6 </span>            : #include &lt;dynd/shape_tools.hpp&gt;
+<span class="lineNum">       7 </span>            : #include &lt;dynd/func/assignment.hpp&gt;
+<span class="lineNum">       8 </span>            : #include &lt;dynd/kernels/take_kernel.hpp&gt;
+<span class="lineNum">       9 </span>            : #include &lt;dynd/types/var_dim_type.hpp&gt;
+<span class="lineNum">      10 </span>            : 
+<span class="lineNum">      11 </span>            : using namespace std;
+<a name="12"><span class="lineNum">      12 </span>            : using namespace dynd;</a>
+<span class="lineNum">      13 </span>            : 
+<span class="lineNum">      14 </span><span class="lineCov">          2 : void nd::masked_take_ck::single(char *dst, char *const *src)</span>
+<span class="lineNum">      15 </span>            : {
+<span class="lineNum">      16 </span><span class="lineCov">          2 :   kernel_prefix *child = get_child();</span>
+<span class="lineNum">      17 </span><span class="lineCov">          2 :   kernel_strided_t child_fn = child-&gt;get_function&lt;kernel_strided_t&gt;();</span>
+<span class="lineNum">      18 </span><span class="lineCov">          2 :   char *src0 = src[0];</span>
+<span class="lineNum">      19 </span><span class="lineCov">          2 :   char *mask = src[1];</span>
+<span class="lineNum">      20 </span><span class="lineCov">          2 :   intptr_t dim_size = m_dim_size, src0_stride = m_src0_stride, mask_stride = m_mask_stride;</span>
+<span class="lineNum">      21 </span>            :   // Start with the dst matching the dim size. (Maybe better to
+<span class="lineNum">      22 </span>            :   // do smaller? This means no resize required in the loop.)
+<span class="lineNum">      23 </span><span class="lineCov">          2 :   ndt::var_dim_type::data_type *vdd = reinterpret_cast&lt;ndt::var_dim_type::data_type *&gt;(dst);</span>
+<span class="lineNum">      24 </span><span class="lineCov">          2 :   vdd-&gt;begin = reinterpret_cast&lt;const ndt::var_dim_type::metadata_type *&gt;(m_dst_meta)-&gt;blockref-&gt;alloc(dim_size);</span>
+<span class="lineNum">      25 </span><span class="lineCov">          2 :   vdd-&gt;size = dim_size;</span>
+<span class="lineNum">      26 </span><span class="lineCov">          2 :   char *dst_ptr = vdd-&gt;begin;</span>
+<span class="lineNum">      27 </span><span class="lineCov">          2 :   intptr_t dst_stride = reinterpret_cast&lt;const ndt::var_dim_type::metadata_type *&gt;(m_dst_meta)-&gt;stride;</span>
+<span class="lineNum">      28 </span><span class="lineCov">          2 :   intptr_t dst_count = 0;</span>
+<span class="lineNum">      29 </span><span class="lineCov">          2 :   intptr_t i = 0;</span>
+<span class="lineNum">      30 </span><span class="lineCov">         10 :   while (i &lt; dim_size) {</span>
+<span class="lineNum">      31 </span>            :     // Run of false
+<span class="lineNum">      32 </span><span class="lineCov">          7 :     for (; i &lt; dim_size &amp;&amp; *mask == 0; src0 += src0_stride, mask += mask_stride, ++i) {</span>
+<span class="lineNum">      33 </span>            :     }
+<span class="lineNum">      34 </span>            :     // Run of true
+<span class="lineNum">      35 </span><span class="lineCov">          4 :     intptr_t i_saved = i;</span>
+<span class="lineNum">      36 </span><span class="lineCov">          9 :     for (; i &lt; dim_size &amp;&amp; *mask != 0; mask += mask_stride, ++i) {</span>
+<span class="lineNum">      37 </span>            :     }
+<span class="lineNum">      38 </span>            :     // Copy the run of true
+<span class="lineNum">      39 </span><span class="lineCov">          4 :     if (i &gt; i_saved) {</span>
+<span class="lineNum">      40 </span><span class="lineCov">          4 :       intptr_t run_count = i - i_saved;</span>
+<span class="lineNum">      41 </span><span class="lineCov">          4 :       child_fn(child, dst_ptr, dst_stride, &amp;src0, &amp;src0_stride, run_count);</span>
+<span class="lineNum">      42 </span><span class="lineCov">          4 :       dst_ptr += run_count * dst_stride;</span>
+<span class="lineNum">      43 </span><span class="lineCov">          4 :       src0 += run_count * src0_stride;</span>
+<span class="lineNum">      44 </span><span class="lineCov">          4 :       dst_count += run_count;</span>
+<span class="lineNum">      45 </span>            :     }
+<span class="lineNum">      46 </span>            :   }
+<span class="lineNum">      47 </span>            : 
+<span class="lineNum">      48 </span>            :   vdd-&gt;begin =
+<span class="lineNum">      49 </span><span class="lineCov">          2 :       reinterpret_cast&lt;const ndt::var_dim_type::metadata_type *&gt;(m_dst_meta)-&gt;blockref-&gt;resize(vdd-&gt;begin, dst_count);</span>
+<span class="lineNum">      50 </span><span class="lineCov">          2 :   vdd-&gt;size = dst_count;</span>
+<a name="51"><span class="lineNum">      51 </span><span class="lineCov">          2 : }</span></a>
+<span class="lineNum">      52 </span>            : 
+<span class="lineNum">      53 </span><span class="lineCov">          2 : void nd::masked_take_ck::instantiate(char *DYND_UNUSED(static_data), char *DYND_UNUSED(data), kernel_builder *ckb,</span>
+<span class="lineNum">      54 </span>            :                                      const ndt::type &amp;dst_tp, const char *dst_arrmeta, intptr_t DYND_UNUSED(nsrc),
+<span class="lineNum">      55 </span>            :                                      const ndt::type *src_tp, const char *const *src_arrmeta, kernel_request_t kernreq,
+<span class="lineNum">      56 </span>            :                                      intptr_t DYND_UNUSED(nkwd), const nd::array *DYND_UNUSED(kwds),
+<span class="lineNum">      57 </span>            :                                      const std::map&lt;std::string, ndt::type&gt; &amp;DYND_UNUSED(tp_vars))
+<span class="lineNum">      58 </span>            : {
+<span class="lineNum">      59 </span>            :   typedef nd::masked_take_ck self_type;
+<span class="lineNum">      60 </span>            : 
+<span class="lineNum">      61 </span><span class="lineCov">          2 :   intptr_t ckb_offset = ckb-&gt;size();</span>
+<span class="lineNum">      62 </span><span class="lineCov">          2 :   ckb-&gt;emplace_back&lt;self_type&gt;(kernreq);</span>
+<span class="lineNum">      63 </span><span class="lineCov">          2 :   self_type *self = ckb-&gt;get_at&lt;self_type&gt;(ckb_offset);</span>
+<span class="lineNum">      64 </span>            : 
+<span class="lineNum">      65 </span><span class="lineCov">          2 :   if (dst_tp.get_id() != var_dim_id) {</span>
+<span class="lineNum">      66 </span><span class="lineNoCov">          0 :     stringstream ss;</span>
+<span class="lineNum">      67 </span><span class="lineNoCov">          0 :     ss &lt;&lt; &quot;masked take arrfunc: could not process type &quot; &lt;&lt; dst_tp;</span>
+<span class="lineNum">      68 </span><span class="lineNoCov">          0 :     ss &lt;&lt; &quot; as a var dimension&quot;;</span>
+<span class="lineNum">      69 </span><span class="lineNoCov">          0 :     throw type_error(ss.str());</span>
+<span class="lineNum">      70 </span>            :   }
+<span class="lineNum">      71 </span><span class="lineCov">          2 :   self-&gt;m_dst_tp = dst_tp;</span>
+<span class="lineNum">      72 </span><span class="lineCov">          2 :   self-&gt;m_dst_meta = dst_arrmeta;</span>
+<span class="lineNum">      73 </span><span class="lineCov">          4 :   ndt::type dst_el_tp = self-&gt;m_dst_tp.extended&lt;ndt::var_dim_type&gt;()-&gt;get_element_type();</span>
+<span class="lineNum">      74 </span><span class="lineCov">          2 :   const char *dst_el_meta = self-&gt;m_dst_meta + sizeof(ndt::var_dim_type::metadata_type);</span>
+<span class="lineNum">      75 </span>            : 
+<span class="lineNum">      76 </span>            :   intptr_t src0_dim_size, mask_dim_size;
+<span class="lineNum">      77 </span><span class="lineCov">          4 :   ndt::type src0_el_tp, mask_el_tp;</span>
+<span class="lineNum">      78 </span>            :   const char *src0_el_meta, *mask_el_meta;
+<span class="lineNum">      79 </span><span class="lineCov">          2 :   if (!src_tp[0].get_as_strided(src_arrmeta[0], &amp;src0_dim_size, &amp;self-&gt;m_src0_stride, &amp;src0_el_tp, &amp;src0_el_meta)) {</span>
+<span class="lineNum">      80 </span><span class="lineNoCov">          0 :     stringstream ss;</span>
+<span class="lineNum">      81 </span><span class="lineNoCov">          0 :     ss &lt;&lt; &quot;masked take arrfunc: could not process type &quot; &lt;&lt; src_tp[0];</span>
+<span class="lineNum">      82 </span><span class="lineNoCov">          0 :     ss &lt;&lt; &quot; as a strided dimension&quot;;</span>
+<span class="lineNum">      83 </span><span class="lineNoCov">          0 :     throw type_error(ss.str());</span>
+<span class="lineNum">      84 </span>            :   }
+<span class="lineNum">      85 </span><span class="lineCov">          2 :   if (!src_tp[1].get_as_strided(src_arrmeta[1], &amp;mask_dim_size, &amp;self-&gt;m_mask_stride, &amp;mask_el_tp, &amp;mask_el_meta)) {</span>
+<span class="lineNum">      86 </span><span class="lineNoCov">          0 :     stringstream ss;</span>
+<span class="lineNum">      87 </span><span class="lineNoCov">          0 :     ss &lt;&lt; &quot;masked take arrfunc: could not process type &quot; &lt;&lt; src_tp[1];</span>
+<span class="lineNum">      88 </span><span class="lineNoCov">          0 :     ss &lt;&lt; &quot; as a strided dimension&quot;;</span>
+<span class="lineNum">      89 </span><span class="lineNoCov">          0 :     throw type_error(ss.str());</span>
+<span class="lineNum">      90 </span>            :   }
+<span class="lineNum">      91 </span><span class="lineCov">          2 :   if (src0_dim_size != mask_dim_size) {</span>
+<span class="lineNum">      92 </span><span class="lineNoCov">          0 :     stringstream ss;</span>
+<span class="lineNum">      93 </span><span class="lineNoCov">          0 :     ss &lt;&lt; &quot;masked take arrfunc: source data and mask have different sizes, &quot;;</span>
+<span class="lineNum">      94 </span><span class="lineNoCov">          0 :     ss &lt;&lt; src0_dim_size &lt;&lt; &quot; and &quot; &lt;&lt; mask_dim_size;</span>
+<span class="lineNum">      95 </span><span class="lineNoCov">          0 :     throw invalid_argument(ss.str());</span>
+<span class="lineNum">      96 </span>            :   }
+<span class="lineNum">      97 </span><span class="lineCov">          2 :   self-&gt;m_dim_size = src0_dim_size;</span>
+<span class="lineNum">      98 </span><span class="lineCov">          2 :   if (mask_el_tp.get_id() != bool_id) {</span>
+<span class="lineNum">      99 </span><span class="lineNoCov">          0 :     stringstream ss;</span>
+<span class="lineNum">     100 </span><span class="lineNoCov">          0 :     ss &lt;&lt; &quot;masked take arrfunc: mask type should be bool, not &quot;;</span>
+<span class="lineNum">     101 </span><span class="lineNoCov">          0 :     ss &lt;&lt; mask_el_tp;</span>
+<span class="lineNum">     102 </span><span class="lineNoCov">          0 :     throw type_error(ss.str());</span>
+<span class="lineNum">     103 </span>            :   }
+<span class="lineNum">     104 </span>            : 
+<span class="lineNum">     105 </span>            :   // Create the child element assignment ckernel
+<span class="lineNum">     106 </span>            :   make_assignment_kernel(ckb, dst_el_tp, dst_el_meta, src0_el_tp, src0_el_meta, kernel_request_strided,
+<span class="lineNum">     107 </span><span class="lineCov">          2 :                          &amp;eval::default_eval_context);</span>
+<a name="108"><span class="lineNum">     108 </span><span class="lineCov">          2 : }</span></a>
+<span class="lineNum">     109 </span>            : 
+<span class="lineNum">     110 </span><span class="lineCov">          2 : void nd::indexed_take_ck::single(char *dst, char *const *src)</span>
+<span class="lineNum">     111 </span>            : {
+<span class="lineNum">     112 </span><span class="lineCov">          2 :   kernel_prefix *child = get_child();</span>
+<span class="lineNum">     113 </span><span class="lineCov">          2 :   kernel_single_t child_fn = child-&gt;get_function&lt;kernel_single_t&gt;();</span>
+<span class="lineNum">     114 </span><span class="lineCov">          2 :   char *src0 = src[0];</span>
+<span class="lineNum">     115 </span><span class="lineCov">          2 :   const char *index = src[1];</span>
+<span class="lineNum">     116 </span><span class="lineCov">          2 :   intptr_t dst_dim_size = m_dst_dim_size, src0_dim_size = m_src0_dim_size, dst_stride = m_dst_stride,</span>
+<span class="lineNum">     117 </span><span class="lineCov">          2 :            src0_stride = m_src0_stride, index_stride = m_index_stride;</span>
+<span class="lineNum">     118 </span><span class="lineCov">         10 :   for (intptr_t i = 0; i &lt; dst_dim_size; ++i) {</span>
+<span class="lineNum">     119 </span><span class="lineCov">          8 :     intptr_t ix = *reinterpret_cast&lt;const intptr_t *&gt;(index);</span>
+<span class="lineNum">     120 </span>            :     // Handle Python-style negative index, bounds checking
+<span class="lineNum">     121 </span><span class="lineCov">          8 :     ix = apply_single_index(ix, src0_dim_size, NULL);</span>
+<span class="lineNum">     122 </span>            :     // Copy one element at a time
+<span class="lineNum">     123 </span><span class="lineCov">          8 :     char *child_src0 = src0 + ix * src0_stride;</span>
+<span class="lineNum">     124 </span><span class="lineCov">          8 :     child_fn(child, dst, &amp;child_src0);</span>
+<span class="lineNum">     125 </span><span class="lineCov">          8 :     dst += dst_stride;</span>
+<span class="lineNum">     126 </span><span class="lineCov">          8 :     index += index_stride;</span>
+<span class="lineNum">     127 </span>            :   }
+<a name="128"><span class="lineNum">     128 </span><span class="lineCov">          2 : }</span></a>
+<span class="lineNum">     129 </span>            : 
+<span class="lineNum">     130 </span><span class="lineCov">          2 : void nd::indexed_take_ck::instantiate(char *DYND_UNUSED(static_data), char *DYND_UNUSED(data), kernel_builder *ckb,</span>
+<span class="lineNum">     131 </span>            :                                       const ndt::type &amp;dst_tp, const char *dst_arrmeta, intptr_t DYND_UNUSED(nsrc),
+<span class="lineNum">     132 </span>            :                                       const ndt::type *src_tp, const char *const *src_arrmeta, kernel_request_t kernreq,
+<span class="lineNum">     133 </span>            :                                       intptr_t DYND_UNUSED(nkwd), const nd::array *DYND_UNUSED(kwds),
+<span class="lineNum">     134 </span>            :                                       const std::map&lt;std::string, ndt::type&gt; &amp;DYND_UNUSED(tp_vars))
+<span class="lineNum">     135 </span>            : {
+<span class="lineNum">     136 </span>            :   typedef nd::indexed_take_ck self_type;
+<span class="lineNum">     137 </span>            : 
+<span class="lineNum">     138 </span><span class="lineCov">          2 :   intptr_t ckb_offset = ckb-&gt;size();</span>
+<span class="lineNum">     139 </span><span class="lineCov">          2 :   ckb-&gt;emplace_back&lt;self_type&gt;(kernreq);</span>
+<span class="lineNum">     140 </span><span class="lineCov">          2 :   self_type *self = ckb-&gt;get_at&lt;self_type&gt;(ckb_offset);</span>
+<span class="lineNum">     141 </span><span class="lineCov">          2 :   ckb_offset = ckb-&gt;size();</span>
+<span class="lineNum">     142 </span>            : 
+<span class="lineNum">     143 </span><span class="lineCov">          4 :   ndt::type dst_el_tp;</span>
+<span class="lineNum">     144 </span>            :   const char *dst_el_meta;
+<span class="lineNum">     145 </span><span class="lineCov">          2 :   if (!dst_tp.get_as_strided(dst_arrmeta, &amp;self-&gt;m_dst_dim_size, &amp;self-&gt;m_dst_stride, &amp;dst_el_tp, &amp;dst_el_meta)) {</span>
+<span class="lineNum">     146 </span><span class="lineNoCov">          0 :     stringstream ss;</span>
+<span class="lineNum">     147 </span><span class="lineNoCov">          0 :     ss &lt;&lt; &quot;indexed take arrfunc: could not process type &quot; &lt;&lt; dst_tp;</span>
+<span class="lineNum">     148 </span><span class="lineNoCov">          0 :     ss &lt;&lt; &quot; as a strided dimension&quot;;</span>
+<span class="lineNum">     149 </span><span class="lineNoCov">          0 :     throw type_error(ss.str());</span>
+<span class="lineNum">     150 </span>            :   }
+<span class="lineNum">     151 </span>            : 
+<span class="lineNum">     152 </span>            :   intptr_t index_dim_size;
+<span class="lineNum">     153 </span><span class="lineCov">          4 :   ndt::type src0_el_tp, index_el_tp;</span>
+<span class="lineNum">     154 </span>            :   const char *src0_el_meta, *index_el_meta;
+<span class="lineNum">     155 </span><span class="lineCov">          2 :   if (!src_tp[0].get_as_strided(src_arrmeta[0], &amp;self-&gt;m_src0_dim_size, &amp;self-&gt;m_src0_stride, &amp;src0_el_tp,</span>
+<span class="lineNum">     156 </span>            :                                 &amp;src0_el_meta)) {
+<span class="lineNum">     157 </span><span class="lineNoCov">          0 :     stringstream ss;</span>
+<span class="lineNum">     158 </span><span class="lineNoCov">          0 :     ss &lt;&lt; &quot;indexed take arrfunc: could not process type &quot; &lt;&lt; src_tp[0];</span>
+<span class="lineNum">     159 </span><span class="lineNoCov">          0 :     ss &lt;&lt; &quot; as a strided dimension&quot;;</span>
+<span class="lineNum">     160 </span><span class="lineNoCov">          0 :     throw type_error(ss.str());</span>
+<span class="lineNum">     161 </span>            :   }
+<span class="lineNum">     162 </span><span class="lineCov">          2 :   if (!src_tp[1].get_as_strided(src_arrmeta[1], &amp;index_dim_size, &amp;self-&gt;m_index_stride, &amp;index_el_tp, &amp;index_el_meta)) {</span>
+<span class="lineNum">     163 </span><span class="lineNoCov">          0 :     stringstream ss;</span>
+<span class="lineNum">     164 </span><span class="lineNoCov">          0 :     ss &lt;&lt; &quot;take arrfunc: could not process type &quot; &lt;&lt; src_tp[1];</span>
+<span class="lineNum">     165 </span><span class="lineNoCov">          0 :     ss &lt;&lt; &quot; as a strided dimension&quot;;</span>
+<span class="lineNum">     166 </span><span class="lineNoCov">          0 :     throw type_error(ss.str());</span>
+<span class="lineNum">     167 </span>            :   }
+<span class="lineNum">     168 </span><span class="lineCov">          2 :   if (self-&gt;m_dst_dim_size != index_dim_size) {</span>
+<span class="lineNum">     169 </span><span class="lineNoCov">          0 :     stringstream ss;</span>
+<span class="lineNum">     170 </span><span class="lineNoCov">          0 :     ss &lt;&lt; &quot;indexed take arrfunc: index data and dest have different sizes, &quot;;</span>
+<span class="lineNum">     171 </span><span class="lineNoCov">          0 :     ss &lt;&lt; index_dim_size &lt;&lt; &quot; and &quot; &lt;&lt; self-&gt;m_dst_dim_size;</span>
+<span class="lineNum">     172 </span><span class="lineNoCov">          0 :     throw invalid_argument(ss.str());</span>
+<span class="lineNum">     173 </span>            :   }
+<span class="lineNum">     174 </span><span class="lineCov">          2 :   if (index_el_tp.get_id() != (type_id_t)type_id_of&lt;intptr_t&gt;::value) {</span>
+<span class="lineNum">     175 </span><span class="lineNoCov">          0 :     stringstream ss;</span>
+<span class="lineNum">     176 </span><span class="lineNoCov">          0 :     ss &lt;&lt; &quot;indexed take arrfunc: index type should be intptr, not &quot;;</span>
+<span class="lineNum">     177 </span><span class="lineNoCov">          0 :     ss &lt;&lt; index_el_tp;</span>
+<span class="lineNum">     178 </span><span class="lineNoCov">          0 :     throw type_error(ss.str());</span>
+<span class="lineNum">     179 </span>            :   }
+<span class="lineNum">     180 </span>            : 
+<span class="lineNum">     181 </span>            :   // Create the child element assignment ckernel
+<span class="lineNum">     182 </span>            :   make_assignment_kernel(ckb, dst_el_tp, dst_el_meta, src0_el_tp, src0_el_meta, kernel_request_single,
+<span class="lineNum">     183 </span><span class="lineCov">          2 :                          &amp;eval::default_eval_context);</span>
+<a name="184"><span class="lineNum">     184 </span><span class="lineCov">          2 : }</span></a>
+<span class="lineNum">     185 </span>            : 
+<span class="lineNum">     186 </span><span class="lineCov">          4 : void nd::take_ck::instantiate(char *DYND_UNUSED(static_data), char *DYND_UNUSED(data), kernel_builder *ckb,</span>
+<span class="lineNum">     187 </span>            :                               const ndt::type &amp;dst_tp, const char *dst_arrmeta, intptr_t nsrc, const ndt::type *src_tp,
+<span class="lineNum">     188 </span>            :                               const char *const *src_arrmeta, kernel_request_t kernreq, intptr_t nkwd,
+<span class="lineNum">     189 </span>            :                               const nd::array *kwds, const std::map&lt;std::string, ndt::type&gt; &amp;tp_vars)
+<span class="lineNum">     190 </span>            : {
+<span class="lineNum">     191 </span><span class="lineCov">          8 :   ndt::type mask_el_tp = src_tp[1].get_type_at_dimension(NULL, 1);</span>
+<span class="lineNum">     192 </span><span class="lineCov">          4 :   if (mask_el_tp.get_id() == bool_id) {</span>
+<span class="lineNum">     193 </span>            :     nd::masked_take_ck::instantiate(NULL, NULL, ckb, dst_tp, dst_arrmeta, nsrc, src_tp, src_arrmeta, kernreq, nkwd,
+<span class="lineNum">     194 </span><span class="lineCov">          2 :                                     kwds, tp_vars);</span>
+<span class="lineNum">     195 </span><span class="lineCov">          2 :     return;</span>
+<span class="lineNum">     196 </span>            :   }
+<span class="lineNum">     197 </span><span class="lineCov">          2 :   else if (mask_el_tp.get_id() == (type_id_t)type_id_of&lt;intptr_t&gt;::value) {</span>
+<span class="lineNum">     198 </span>            :     nd::indexed_take_ck::instantiate(NULL, NULL, ckb, dst_tp, dst_arrmeta, nsrc, src_tp, src_arrmeta, kernreq, nkwd,
+<span class="lineNum">     199 </span><span class="lineCov">          2 :                                      kwds, tp_vars);</span>
+<span class="lineNum">     200 </span><span class="lineCov">          2 :     return;</span>
+<span class="lineNum">     201 </span>            :   }
+<span class="lineNum">     202 </span>            :   else {
+<span class="lineNum">     203 </span><span class="lineNoCov">          0 :     stringstream ss;</span>
+<span class="lineNum">     204 </span><span class="lineNoCov">          0 :     ss &lt;&lt; &quot;take: unsupported type for the index &quot; &lt;&lt; mask_el_tp &lt;&lt; &quot;, need bool or intptr&quot;;</span>
+<span class="lineNum">     205 </span><span class="lineNoCov">          0 :     throw invalid_argument(ss.str());</span>
+<span class="lineNum">     206 </span>            :   }
+<a name="207"><span class="lineNum">     207 </span>            : }</a>
+<span class="lineNum">     208 </span>            : 
+<span class="lineNum">     209 </span><span class="lineCov">          4 : void nd::take_ck::resolve_dst_type(char *DYND_UNUSED(static_data), char *DYND_UNUSED(data), ndt::type &amp;dst_tp,</span>
+<span class="lineNum">     210 </span>            :                                    intptr_t DYND_UNUSED(nsrc), const ndt::type *src_tp, intptr_t DYND_UNUSED(nkwd),
+<span class="lineNum">     211 </span>            :                                    const nd::array *DYND_UNUSED(kwds),
+<span class="lineNum">     212 </span>            :                                    const std::map&lt;std::string, ndt::type&gt; &amp;DYND_UNUSED(tp_vars))
+<span class="lineNum">     213 </span>            : {
+<span class="lineNum">     214 </span>            :   /*
+<span class="lineNum">     215 </span>            :     if (nsrc != 2) {
+<span class="lineNum">     216 </span>            :       stringstream ss;
+<span class="lineNum">     217 </span>            :       ss &lt;&lt; &quot;Wrong number of arguments to take arrfunc with prototype &quot; &lt;&lt; af_tp
+<span class="lineNum">     218 </span>            :          &lt;&lt; &quot;, got &quot; &lt;&lt; nsrc &lt;&lt; &quot; arguments&quot;;
+<span class="lineNum">     219 </span>            :       throw invalid_argument(ss.str());
+<span class="lineNum">     220 </span>            :     }
+<span class="lineNum">     221 </span>            :   */
+<span class="lineNum">     222 </span>            : 
+<span class="lineNum">     223 </span><span class="lineCov">          8 :   ndt::type mask_el_tp = src_tp[1].get_type_at_dimension(NULL, 1);</span>
+<span class="lineNum">     224 </span><span class="lineCov">          4 :   if (mask_el_tp.get_id() == bool_id) {</span>
+<span class="lineNum">     225 </span><span class="lineCov">          2 :     dst_tp = ndt::var_dim_type::make(src_tp[0].get_type_at_dimension(NULL, 1).get_canonical_type());</span>
+<span class="lineNum">     226 </span>            :   }
+<span class="lineNum">     227 </span><span class="lineCov">          2 :   else if (mask_el_tp.get_id() == (type_id_t)type_id_of&lt;intptr_t&gt;::value) {</span>
+<span class="lineNum">     228 </span><span class="lineCov">          2 :     if (src_tp[1].get_id() == var_dim_id) {</span>
+<span class="lineNum">     229 </span><span class="lineNoCov">          0 :       dst_tp = ndt::var_dim_type::make(src_tp[0].get_type_at_dimension(NULL, 1).get_canonical_type());</span>
+<span class="lineNum">     230 </span>            :     }
+<span class="lineNum">     231 </span>            :     else {
+<span class="lineNum">     232 </span><span class="lineCov">          4 :       dst_tp = ndt::make_fixed_dim(src_tp[1].get_dim_size(NULL, NULL),</span>
+<span class="lineNum">     233 </span><span class="lineCov">          6 :                                    src_tp[0].get_type_at_dimension(NULL, 1).get_canonical_type());</span>
+<span class="lineNum">     234 </span>            :     }
+<span class="lineNum">     235 </span>            :   }
+<span class="lineNum">     236 </span>            :   else {
+<span class="lineNum">     237 </span><span class="lineNoCov">          0 :     stringstream ss;</span>
+<span class="lineNum">     238 </span><span class="lineNoCov">          0 :     ss &lt;&lt; &quot;take: unsupported type for the index &quot; &lt;&lt; mask_el_tp &lt;&lt; &quot;, need bool or intptr&quot;;</span>
+<a name="239"><span class="lineNum">     239 </span><span class="lineNoCov">          0 :     throw invalid_argument(ss.str());</span></a>
+<span class="lineNum">     240 </span>            :   }
+<span class="lineNum">     241 </span><span class="lineCov">          7 : }</span>
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.10</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

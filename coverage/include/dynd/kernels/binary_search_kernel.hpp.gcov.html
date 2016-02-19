@@ -1,0 +1,167 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - coverage.info.cleaned - include/dynd/kernels/binary_search_kernel.hpp</title>
+  <link rel="stylesheet" type="text/css" href="../../../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../../../index.html">top level</a> - <a href="index.html">include/dynd/kernels</a> - binary_search_kernel.hpp<span style="font-size: 80%;"> (source / <a href="binary_search_kernel.hpp.func.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">coverage.info.cleaned</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">30</td>
+            <td class="headerCovTableEntry">31</td>
+            <td class="headerCovTableEntryHi">96.8 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2016-02-19</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">4</td>
+            <td class="headerCovTableEntry">4</td>
+            <td class="headerCovTableEntryHi">100.0 %</td>
+          </tr>
+          <tr><td><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : //</a>
+<span class="lineNum">       2 </span>            : // Copyright (C) 2011-15 DyND Developers
+<span class="lineNum">       3 </span>            : // BSD 2-Clause License, see LICENSE.txt
+<span class="lineNum">       4 </span>            : //
+<span class="lineNum">       5 </span>            : 
+<span class="lineNum">       6 </span>            : #pragma once
+<span class="lineNum">       7 </span>            : 
+<span class="lineNum">       8 </span>            : #include &lt;dynd/func/comparison.hpp&gt;
+<span class="lineNum">       9 </span>            : #include &lt;dynd/kernels/base_kernel.hpp&gt;
+<span class="lineNum">      10 </span>            : 
+<span class="lineNum">      11 </span>            : namespace dynd {
+<span class="lineNum">      12 </span>            : namespace nd {
+<span class="lineNum">      13 </span>            : 
+<span class="lineNum">      14 </span>            :   struct binary_search_kernel : base_kernel&lt;binary_search_kernel, 2&gt; {
+<span class="lineNum">      15 </span>            :     const intptr_t src0_size;
+<a name="16"><span class="lineNum">      16 </span>            :     const intptr_t src0_stride;</a>
+<span class="lineNum">      17 </span>            : 
+<a name="18"><span class="lineNum">      18 </span><span class="lineCov">          3 :     binary_search_kernel(intptr_t src0_size, intptr_t src0_stride) : src0_size(src0_size), src0_stride(src0_stride) {}</span></a>
+<span class="lineNum">      19 </span>            : 
+<span class="lineNum">      20 </span><span class="lineCov">          3 :     void single(char *dst, char *const *src)</span>
+<span class="lineNum">      21 </span>            :     {
+<span class="lineNum">      22 </span><span class="lineCov">          3 :       kernel_prefix *child = get_child();</span>
+<span class="lineNum">      23 </span>            : 
+<span class="lineNum">      24 </span><span class="lineCov">          3 :       intptr_t first = 0, last = src0_size;</span>
+<span class="lineNum">      25 </span><span class="lineCov">          7 :       while (first &lt; last) {</span>
+<span class="lineNum">      26 </span><span class="lineCov">          4 :         intptr_t trial = first + (last - first) / 2;</span>
+<span class="lineNum">      27 </span><span class="lineCov">          4 :         char *trial_data = src[0] + trial * src0_stride;</span>
+<span class="lineNum">      28 </span>            : 
+<span class="lineNum">      29 </span>            :         // In order for the data to always match up with the arrmeta, need to have
+<span class="lineNum">      30 </span>            :         // trial_data first and data second in the comparison operations.
+<span class="lineNum">      31 </span><span class="lineCov">          4 :         char *src_try0[2] = {src[1], trial_data};</span>
+<span class="lineNum">      32 </span><span class="lineCov">          4 :         char *src_try1[2] = {trial_data, src[1]};</span>
+<span class="lineNum">      33 </span>            :         int child_dst0;
+<span class="lineNum">      34 </span><span class="lineCov">          4 :         child-&gt;single(reinterpret_cast&lt;char *&gt;(&amp;child_dst0), src_try0);</span>
+<span class="lineNum">      35 </span><span class="lineCov">          4 :         if (child_dst0) {</span>
+<span class="lineNum">      36 </span>            :           // value &lt; arr[trial]
+<span class="lineNum">      37 </span><span class="lineNoCov">          0 :           last = trial;</span>
+<span class="lineNum">      38 </span>            :         }
+<span class="lineNum">      39 </span>            :         else {
+<span class="lineNum">      40 </span>            :           int child_dst1;
+<span class="lineNum">      41 </span><span class="lineCov">          4 :           child-&gt;single(reinterpret_cast&lt;char *&gt;(&amp;child_dst1), src_try1);</span>
+<span class="lineNum">      42 </span><span class="lineCov">          4 :           if (child_dst1) {</span>
+<span class="lineNum">      43 </span>            :             // value &gt; arr[trial]
+<span class="lineNum">      44 </span><span class="lineCov">          2 :             first = trial + 1;</span>
+<span class="lineNum">      45 </span>            :           }
+<span class="lineNum">      46 </span>            :           else {
+<span class="lineNum">      47 </span><span class="lineCov">          2 :             *reinterpret_cast&lt;intptr_t *&gt;(dst) = trial;</span>
+<span class="lineNum">      48 </span><span class="lineCov">          2 :             return;</span>
+<span class="lineNum">      49 </span>            :           }
+<span class="lineNum">      50 </span>            :         }
+<span class="lineNum">      51 </span>            :       }
+<span class="lineNum">      52 </span>            : 
+<span class="lineNum">      53 </span><span class="lineCov">          1 :       *reinterpret_cast&lt;intptr_t *&gt;(dst) = -1;</span>
+<a name="54"><span class="lineNum">      54 </span>            :     }</a>
+<span class="lineNum">      55 </span>            : 
+<span class="lineNum">      56 </span><span class="lineCov">          3 :     static void instantiate(char *DYND_UNUSED(static_data), char *data, kernel_builder *ckb,</span>
+<span class="lineNum">      57 </span>            :                             const ndt::type &amp;DYND_UNUSED(dst_tp), const char *DYND_UNUSED(dst_arrmeta),
+<span class="lineNum">      58 </span>            :                             intptr_t DYND_UNUSED(nsrc), const ndt::type *src_tp, const char *const *src_arrmeta,
+<span class="lineNum">      59 </span>            :                             kernel_request_t kernreq, intptr_t DYND_UNUSED(nkwd), const nd::array *DYND_UNUSED(kwds),
+<span class="lineNum">      60 </span>            :                             const std::map&lt;std::string, ndt::type&gt; &amp;tp_vars)
+<span class="lineNum">      61 </span>            :     {
+<span class="lineNum">      62 </span><span class="lineCov">          6 :       ckb-&gt;emplace_back&lt;binary_search_kernel&gt;(</span>
+<span class="lineNum">      63 </span><span class="lineCov">          3 :           kernreq, reinterpret_cast&lt;const fixed_dim_type_arrmeta *&gt;(src_arrmeta[0])-&gt;dim_size,</span>
+<span class="lineNum">      64 </span><span class="lineCov">          6 :           reinterpret_cast&lt;const fixed_dim_type_arrmeta *&gt;(src_arrmeta[0])-&gt;stride);</span>
+<span class="lineNum">      65 </span>            : 
+<span class="lineNum">      66 </span><span class="lineCov">          3 :       const char *n_arrmeta = src_arrmeta[0];</span>
+<span class="lineNum">      67 </span><span class="lineCov">          6 :       ndt::type element_tp = src_tp[0].at_single(0, &amp;n_arrmeta);</span>
+<span class="lineNum">      68 </span>            : 
+<span class="lineNum">      69 </span><span class="lineCov">          6 :       ndt::type child_src_tp[2] = {element_tp, element_tp};</span>
+<span class="lineNum">      70 </span><span class="lineCov">          3 :       const char *child_src_arrmeta[2] = {n_arrmeta, n_arrmeta};</span>
+<span class="lineNum">      71 </span>            : 
+<span class="lineNum">      72 </span><span class="lineCov">          6 :       total_order::get().get()-&gt;instantiate(total_order::get().get()-&gt;static_data(), data, ckb, ndt::make_type&lt;int&gt;(),</span>
+<span class="lineNum">      73 </span>            :                                             NULL, 2, child_src_tp, child_src_arrmeta,
+<span class="lineNum">      74 </span><span class="lineCov">          3 :                                             kernreq | kernel_request_data_only, 0, NULL, tp_vars);</span>
+<span class="lineNum">      75 </span><span class="lineCov">          3 :     }</span>
+<span class="lineNum">      76 </span>            :   };
+<span class="lineNum">      77 </span>            : 
+<span class="lineNum">      78 </span>            : } // namespace dynd::nd
+<span class="lineNum">      79 </span>            : 
+<span class="lineNum">      80 </span>            : namespace ndt {
+<span class="lineNum">      81 </span>            : 
+<a name="82"><span class="lineNum">      82 </span>            :   template &lt;&gt;</a>
+<span class="lineNum">      83 </span>            :   struct traits&lt;nd::binary_search_kernel&gt; {
+<span class="lineNum">      84 </span><span class="lineCov">          1 :     static type equivalent()</span>
+<span class="lineNum">      85 </span>            :     {
+<span class="lineNum">      86 </span><span class="lineCov">          1 :       return callable_type::make(make_type&lt;intptr_t&gt;(), {type(&quot;Fixed * Scalar&quot;), type(&quot;Scalar&quot;)});</span>
+<span class="lineNum">      87 </span>            :     }
+<span class="lineNum">      88 </span>            :   };
+<span class="lineNum">      89 </span>            : 
+<span class="lineNum">      90 </span>            : } // namespace dynd::ndt
+<span class="lineNum">      91 </span>            : } // namespace dynd
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.10</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

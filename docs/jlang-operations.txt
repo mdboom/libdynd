@@ -1,0 +1,27 @@
+J Language Operations
+=====================
+
+The J language is one of the main descendents of APL, and as such
+embodies a large amount of knowledge about array programming. It is
+this author's opinion that any serious array programming system should
+be able to express all of the concepts and operators in J.
+
+While simply doing a feature-wise comparison might satisfy many that
+this is the case, I think a better approach would be to write a J
+interpreter using the ndarray as its underlying computational
+infrastructure.
+
+A first step is to catalog some J primitives, and indicate how
+they can correspond to functions and expression graph nodes in the
+ndarray system. To do this comparison, I'm using the "J Primer"
+on www.jsoftware.com.
+
+Right-associativity
+-------------------
+
+Operations in general, and reduction operations in particular,
+are right-associative in J. For example, "1 - 2 - 3" means
+"1 - (2 - 3)", contrary to the typical mathematical interpretation
+of "(1 - 2) - 3".
+
+

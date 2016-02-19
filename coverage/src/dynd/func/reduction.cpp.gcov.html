@@ -1,0 +1,119 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - coverage.info.cleaned - src/dynd/func/reduction.cpp</title>
+  <link rel="stylesheet" type="text/css" href="../../../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../../../index.html">top level</a> - <a href="index.html">src/dynd/func</a> - reduction.cpp<span style="font-size: 80%;"> (source / <a href="reduction.cpp.func.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">coverage.info.cleaned</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">15</td>
+            <td class="headerCovTableEntry">15</td>
+            <td class="headerCovTableEntryHi">100.0 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2016-02-19</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">3</td>
+            <td class="headerCovTableEntry">3</td>
+            <td class="headerCovTableEntryHi">100.0 %</td>
+          </tr>
+          <tr><td><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : //</a>
+<span class="lineNum">       2 </span>            : // Copyright (C) 2011-15 DyND Developers
+<span class="lineNum">       3 </span>            : // BSD 2-Clause License, see LICENSE.txt
+<span class="lineNum">       4 </span>            : //
+<span class="lineNum">       5 </span>            : 
+<span class="lineNum">       6 </span>            : #include &lt;dynd/func/compound.hpp&gt;
+<span class="lineNum">       7 </span>            : #include &lt;dynd/func/reduction.hpp&gt;
+<span class="lineNum">       8 </span>            : #include &lt;dynd/kernels/reduction_kernel.hpp&gt;
+<span class="lineNum">       9 </span>            : #include &lt;dynd/types/fixed_dim_type.hpp&gt;
+<span class="lineNum">      10 </span>            : #include &lt;dynd/types/option_type.hpp&gt;
+<span class="lineNum">      11 </span>            : #include &lt;dynd/types/var_dim_type.hpp&gt;
+<span class="lineNum">      12 </span>            : #include &lt;dynd/types/ellipsis_dim_type.hpp&gt;
+<span class="lineNum">      13 </span>            : 
+<span class="lineNum">      14 </span>            : using namespace std;
+<a name="15"><span class="lineNum">      15 </span>            : using namespace dynd;</a>
+<span class="lineNum">      16 </span>            : 
+<span class="lineNum">      17 </span><span class="lineCov">         34 : nd::callable nd::functional::reduction(const callable &amp;child)</span>
+<span class="lineNum">      18 </span>            : {
+<span class="lineNum">      19 </span><span class="lineCov">         34 :   if (child.is_null()) {</span>
+<span class="lineNum">      20 </span><span class="lineCov">          1 :     throw invalid_argument(&quot;'child' cannot be null&quot;);</span>
+<span class="lineNum">      21 </span>            :   }
+<span class="lineNum">      22 </span>            : 
+<span class="lineNum">      23 </span><span class="lineCov">         33 :   switch (child.get_narg()) {</span>
+<span class="lineNum">      24 </span>            :   case 1:
+<span class="lineNum">      25 </span><span class="lineCov">         17 :     break;</span>
+<span class="lineNum">      26 </span>            :   case 2:
+<span class="lineNum">      27 </span><span class="lineCov">         13 :     return reduction((child.get_flags() | right_associative) ? left_compound(child) : right_compound(child));</span>
+<span class="lineNum">      28 </span>            :   default: {
+<span class="lineNum">      29 </span><span class="lineCov">          6 :     stringstream ss;</span>
+<span class="lineNum">      30 </span><span class="lineCov">          3 :     ss &lt;&lt; &quot;'child' must be a unary callable, but its signature is &quot; &lt;&lt; child.get_array_type();</span>
+<span class="lineNum">      31 </span><span class="lineCov">          3 :     throw invalid_argument(ss.str());</span>
+<span class="lineNum">      32 </span>            :   }
+<span class="lineNum">      33 </span>            :   }
+<span class="lineNum">      34 </span>            : 
+<span class="lineNum">      35 </span>            :   return callable::make&lt;reduction_virtual_kernel&gt;(
+<span class="lineNum">      36 </span><span class="lineCov">        221 :       ndt::callable_type::make(ndt::ellipsis_dim_type::make_if_not_variadic(child.get_ret_type()),</span>
+<span class="lineNum">      37 </span><span class="lineCov">         17 :                                {ndt::ellipsis_dim_type::make_if_not_variadic(child.get_arg_type(0))},</span>
+<span class="lineNum">      38 </span>            :                                {&quot;axes&quot;, &quot;identity&quot;, &quot;keepdims&quot;},
+<span class="lineNum">      39 </span>            :                                {ndt::make_type&lt;ndt::option_type&gt;(ndt::type(&quot;Fixed * int32&quot;)),
+<span class="lineNum">      40 </span><span class="lineCov">         17 :                                 ndt::make_type&lt;ndt::option_type&gt;(child.get_ret_type()),</span>
+<a name="41"><span class="lineNum">      41 </span><span class="lineCov">        153 :                                 ndt::make_type&lt;ndt::option_type&gt;(ndt::make_type&lt;bool1&gt;())}),</span></a>
+<span class="lineNum">      42 </span><span class="lineCov">         51 :       reduction_virtual_kernel::static_data_type(child));</span>
+<span class="lineNum">      43 </span><span class="lineCov">          3 : }</span>
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.10</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

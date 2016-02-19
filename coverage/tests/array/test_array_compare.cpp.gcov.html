@@ -1,0 +1,996 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - coverage.info.cleaned - tests/array/test_array_compare.cpp</title>
+  <link rel="stylesheet" type="text/css" href="../../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../../index.html">top level</a> - <a href="index.html">tests/array</a> - test_array_compare.cpp<span style="font-size: 80%;"> (source / <a href="test_array_compare.cpp.func.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">coverage.info.cleaned</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">263</td>
+            <td class="headerCovTableEntry">263</td>
+            <td class="headerCovTableEntryHi">100.0 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2016-02-19</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">26</td>
+            <td class="headerCovTableEntry">26</td>
+            <td class="headerCovTableEntryHi">100.0 %</td>
+          </tr>
+          <tr><td><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : //</a>
+<span class="lineNum">       2 </span>            : // Copyright (C) 2011-15 DyND Developers
+<span class="lineNum">       3 </span>            : // BSD 2-Clause License, see LICENSE.txt
+<span class="lineNum">       4 </span>            : //
+<span class="lineNum">       5 </span>            : 
+<span class="lineNum">       6 </span>            : #include &lt;iostream&gt;
+<span class="lineNum">       7 </span>            : #include &lt;stdexcept&gt;
+<span class="lineNum">       8 </span>            : #include &lt;algorithm&gt;
+<span class="lineNum">       9 </span>            : #include &lt;cmath&gt;
+<span class="lineNum">      10 </span>            : 
+<span class="lineNum">      11 </span>            : #include &quot;inc_gtest.hpp&quot;
+<span class="lineNum">      12 </span>            : #include &quot;../dynd_assertions.hpp&quot;
+<span class="lineNum">      13 </span>            : 
+<span class="lineNum">      14 </span>            : #include &lt;dynd/array.hpp&gt;
+<span class="lineNum">      15 </span>            : #include &lt;dynd/func/comparison.hpp&gt;
+<span class="lineNum">      16 </span>            : #include &lt;dynd/types/fixed_bytes_type.hpp&gt;
+<span class="lineNum">      17 </span>            : #include &lt;dynd/types/string_type.hpp&gt;
+<span class="lineNum">      18 </span>            : #include &lt;dynd/types/date_type.hpp&gt;
+<span class="lineNum">      19 </span>            : 
+<span class="lineNum">      20 </span>            : using namespace std;
+<a name="21"><span class="lineNum">      21 </span>            : using namespace dynd;</a>
+<span class="lineNum">      22 </span>            : 
+<span class="lineNum">      23 </span><span class="lineCov">          5 : TEST(ArrayCompare, Bool)</span>
+<span class="lineNum">      24 </span>            : {
+<span class="lineNum">      25 </span>            :   // Equality
+<span class="lineNum">      26 </span><span class="lineCov">          1 :   EXPECT_ALL_TRUE(nd::array(true) == nd::array(true));</span>
+<span class="lineNum">      27 </span><span class="lineCov">          1 :   EXPECT_ALL_TRUE(nd::array(false) == nd::array(false));</span>
+<span class="lineNum">      28 </span><span class="lineCov">          1 :   EXPECT_ALL_FALSE(nd::array(true) == nd::array(false));</span>
+<span class="lineNum">      29 </span><span class="lineCov">          1 :   EXPECT_ALL_FALSE(nd::array(false) == nd::array(true));</span>
+<span class="lineNum">      30 </span>            :   // Inequality
+<span class="lineNum">      31 </span><span class="lineCov">          1 :   EXPECT_ALL_FALSE(nd::array(true) != nd::array(true));</span>
+<span class="lineNum">      32 </span><span class="lineCov">          1 :   EXPECT_ALL_FALSE(nd::array(false) != nd::array(false));</span>
+<span class="lineNum">      33 </span><span class="lineCov">          1 :   EXPECT_ALL_TRUE(nd::array(true) != nd::array(false));</span>
+<span class="lineNum">      34 </span><span class="lineCov">          1 :   EXPECT_ALL_TRUE(nd::array(false) != nd::array(true));</span>
+<span class="lineNum">      35 </span>            : 
+<span class="lineNum">      36 </span>            :   // Comparison for sorting
+<span class="lineNum">      37 </span><span class="lineCov">          1 :   EXPECT_ALL_TRUE(nd::total_order(false, true));</span>
+<span class="lineNum">      38 </span>            :   /*
+<span class="lineNum">      39 </span>            :       EXPECT_FALSE(nd::array(false).op_sorting_less(nd::array(false)));
+<span class="lineNum">      40 </span>            :       EXPECT_FALSE(nd::array(true).op_sorting_less(nd::array(true)));
+<span class="lineNum">      41 </span>            :       EXPECT_FALSE(nd::array(true).op_sorting_less(nd::array(false)));
+<span class="lineNum">      42 </span>            :       // Other comparisons are not permitted
+<span class="lineNum">      43 </span>            :       EXPECT_THROW((nd::array(false) &lt; nd::array(true)), not_comparable_error);
+<span class="lineNum">      44 </span>            :       EXPECT_THROW((nd::array(false) &lt;= nd::array(true)), not_comparable_error);
+<span class="lineNum">      45 </span>            :       EXPECT_THROW((nd::array(false) &gt;= nd::array(true)), not_comparable_error);
+<span class="lineNum">      46 </span>            :       EXPECT_THROW((nd::array(false) &gt; nd::array(true)), not_comparable_error);
+<span class="lineNum">      47 </span>            : */
+<span class="lineNum">      48 </span>            : 
+<span class="lineNum">      49 </span>            :   // Compare Bool with other types
+<span class="lineNum">      50 </span>            :   /*
+<span class="lineNum">      51 </span>            :     EXPECT_TRUE(nd::array(true) == nd::array(1));
+<span class="lineNum">      52 </span>            :     EXPECT_TRUE(nd::array(true) == nd::array(1.f));
+<span class="lineNum">      53 </span>            :     EXPECT_TRUE(nd::array(true) == nd::array(1.0));
+<span class="lineNum">      54 </span>            :     EXPECT_TRUE(nd::array(true) == nd::array(dynd::complex&lt;double&gt;(1.0)));
+<span class="lineNum">      55 </span>            :     EXPECT_TRUE(nd::array(false) == nd::array(0));
+<span class="lineNum">      56 </span>            :     EXPECT_TRUE(nd::array(false) == nd::array(0.f));
+<span class="lineNum">      57 </span>            :     EXPECT_TRUE(nd::array(false) == nd::array(0.0));
+<span class="lineNum">      58 </span>            :     EXPECT_TRUE(nd::array(false) == nd::array(dynd::complex&lt;double&gt;()));
+<span class="lineNum">      59 </span>            :     EXPECT_TRUE(nd::array(true) != nd::array(2));
+<span class="lineNum">      60 </span>            :     EXPECT_TRUE(nd::array(true) != nd::array(2.f));
+<span class="lineNum">      61 </span>            :     EXPECT_TRUE(nd::array(true) != nd::array(2.0));
+<span class="lineNum">      62 </span>            :     EXPECT_TRUE(nd::array(true) != nd::array(dynd::complex&lt;double&gt;(1, 1)));
+<span class="lineNum">      63 </span>            :     EXPECT_TRUE(nd::array(false) != nd::array(-1));
+<span class="lineNum">      64 </span>            :     EXPECT_TRUE(nd::array(false) != nd::array(-1.f));
+<span class="lineNum">      65 </span>            :     EXPECT_TRUE(nd::array(false) != nd::array(-1.0));
+<span class="lineNum">      66 </span>            :     EXPECT_TRUE(nd::array(false) != nd::array(dynd::complex&lt;double&gt;(0, 1)));
+<span class="lineNum">      67 </span>            :   */
+<a name="68"><span class="lineNum">      68 </span><span class="lineCov">          1 : }</span></a>
+<span class="lineNum">      69 </span>            : 
+<span class="lineNum">      70 </span><span class="lineCov">          5 : TEST(ArrayCompare, EqualityIntUInt)</span>
+<span class="lineNum">      71 </span>            : {
+<span class="lineNum">      72 </span>            :   // Equality
+<span class="lineNum">      73 </span><span class="lineCov">          1 :   EXPECT_ALL_TRUE(nd::array((uint8_t)127) == nd::array((int8_t)127));</span>
+<span class="lineNum">      74 </span><span class="lineCov">          1 :   EXPECT_ALL_TRUE(nd::array((int8_t)127) == nd::array((uint8_t)127));</span>
+<span class="lineNum">      75 </span><span class="lineCov">          1 :   EXPECT_ALL_TRUE(nd::array((uint16_t)32767) == nd::array((int16_t)32767));</span>
+<span class="lineNum">      76 </span><span class="lineCov">          1 :   EXPECT_ALL_TRUE(nd::array((int16_t)32767) == nd::array((uint16_t)32767));</span>
+<span class="lineNum">      77 </span><span class="lineCov">          1 :   EXPECT_ALL_TRUE(nd::array((uint32_t)2147483647) == nd::array((int32_t)2147483647));</span>
+<span class="lineNum">      78 </span><span class="lineCov">          1 :   EXPECT_ALL_TRUE(nd::array((int32_t)2147483647) == nd::array((uint32_t)2147483647));</span>
+<span class="lineNum">      79 </span><span class="lineCov">          1 :   EXPECT_ALL_TRUE(nd::array((uint64_t)9223372036854775807LL) == nd::array((int64_t)9223372036854775807LL));</span>
+<span class="lineNum">      80 </span><span class="lineCov">          1 :   EXPECT_ALL_TRUE(nd::array((int64_t)9223372036854775807LL) == nd::array((uint64_t)9223372036854775807LL));</span>
+<span class="lineNum">      81 </span>            :   // Inequality
+<span class="lineNum">      82 </span><span class="lineCov">          1 :   EXPECT_ALL_FALSE(nd::array((uint8_t)127) != nd::array((int16_t)127));</span>
+<span class="lineNum">      83 </span><span class="lineCov">          1 :   EXPECT_ALL_FALSE(nd::array((int8_t)127) != nd::array((uint16_t)127));</span>
+<span class="lineNum">      84 </span><span class="lineCov">          1 :   EXPECT_ALL_FALSE(nd::array((uint16_t)32767) != nd::array((int16_t)32767));</span>
+<span class="lineNum">      85 </span><span class="lineCov">          1 :   EXPECT_ALL_FALSE(nd::array((int16_t)32767) != nd::array((uint16_t)32767));</span>
+<span class="lineNum">      86 </span><span class="lineCov">          1 :   EXPECT_ALL_FALSE(nd::array((uint32_t)2147483647) != nd::array((int32_t)2147483647));</span>
+<span class="lineNum">      87 </span><span class="lineCov">          1 :   EXPECT_ALL_FALSE(nd::array((int32_t)2147483647) != nd::array((uint32_t)2147483647));</span>
+<span class="lineNum">      88 </span><span class="lineCov">          1 :   EXPECT_ALL_FALSE(nd::array((uint64_t)9223372036854775807LL) != nd::array((int64_t)9223372036854775807LL));</span>
+<span class="lineNum">      89 </span><span class="lineCov">          1 :   EXPECT_ALL_FALSE(nd::array((int64_t)9223372036854775807LL) != nd::array((uint64_t)9223372036854775807LL));</span>
+<span class="lineNum">      90 </span>            :   // Equality with same bits
+<span class="lineNum">      91 </span><span class="lineCov">          1 :   EXPECT_ALL_FALSE(nd::array((uint8_t)255) == nd::array((int8_t) - 1));</span>
+<span class="lineNum">      92 </span><span class="lineCov">          1 :   EXPECT_ALL_FALSE(nd::array((int8_t) - 1) == nd::array((uint8_t)255));</span>
+<span class="lineNum">      93 </span><span class="lineCov">          1 :   EXPECT_ALL_FALSE(nd::array((uint16_t)65535) == nd::array((int16_t) - 1));</span>
+<span class="lineNum">      94 </span><span class="lineCov">          1 :   EXPECT_ALL_FALSE(nd::array((int16_t) - 1) == nd::array((uint16_t)65535));</span>
+<span class="lineNum">      95 </span><span class="lineCov">          1 :   EXPECT_ALL_TRUE(nd::array((uint32_t)4294967295u) == nd::array((int32_t) - 1));</span>
+<span class="lineNum">      96 </span><span class="lineCov">          1 :   EXPECT_ALL_TRUE(nd::array((int32_t) - 1) == nd::array((uint32_t)4294967295u));</span>
+<span class="lineNum">      97 </span><span class="lineCov">          1 :   EXPECT_ALL_TRUE(nd::array((uint64_t)18446744073709551615ULL) == nd::array((int64_t) - 1));</span>
+<span class="lineNum">      98 </span><span class="lineCov">          1 :   EXPECT_ALL_TRUE(nd::array((int64_t) - 1) == nd::array((uint64_t)18446744073709551615ULL));</span>
+<span class="lineNum">      99 </span>            :   // Inequality with same bits
+<span class="lineNum">     100 </span><span class="lineCov">          1 :   EXPECT_ALL_TRUE(nd::array((uint8_t)255) != nd::array((int8_t) - 1));</span>
+<span class="lineNum">     101 </span><span class="lineCov">          1 :   EXPECT_ALL_TRUE(nd::array((int8_t) - 1) != nd::array((uint8_t)255));</span>
+<span class="lineNum">     102 </span><span class="lineCov">          1 :   EXPECT_ALL_TRUE(nd::array((uint16_t)65535) != nd::array((int16_t) - 1));</span>
+<span class="lineNum">     103 </span><span class="lineCov">          1 :   EXPECT_ALL_TRUE(nd::array((int16_t) - 1) != nd::array((uint16_t)65535));</span>
+<span class="lineNum">     104 </span><span class="lineCov">          1 :   EXPECT_ALL_FALSE(nd::array((uint32_t)4294967295u) != nd::array((int32_t) - 1));</span>
+<span class="lineNum">     105 </span><span class="lineCov">          1 :   EXPECT_ALL_FALSE(nd::array((int32_t) - 1) != nd::array((uint32_t)4294967295u));</span>
+<span class="lineNum">     106 </span><span class="lineCov">          1 :   EXPECT_ALL_FALSE(nd::array((uint64_t)18446744073709551615ULL) != nd::array((int64_t) - 1));</span>
+<span class="lineNum">     107 </span><span class="lineCov">          1 :   EXPECT_ALL_FALSE(nd::array((int64_t) - 1) != nd::array((uint64_t)18446744073709551615ULL));</span>
+<a name="108"><span class="lineNum">     108 </span><span class="lineCov">          1 : }</span></a>
+<span class="lineNum">     109 </span>            : 
+<span class="lineNum">     110 </span><span class="lineCov">          5 : TEST(ArrayCompare, InequalityInt8UInt8)</span>
+<span class="lineNum">     111 </span>            : {
+<span class="lineNum">     112 </span><span class="lineCov">          2 :   nd::array a, b;</span>
+<span class="lineNum">     113 </span>            : 
+<span class="lineNum">     114 </span><span class="lineCov">          1 :   a = (int8_t) - 1;</span>
+<span class="lineNum">     115 </span><span class="lineCov">          1 :   b = (uint8_t)0;</span>
+<span class="lineNum">     116 </span><span class="lineCov">          1 :   EXPECT_ALL_TRUE(a &lt; b);</span>
+<span class="lineNum">     117 </span><span class="lineCov">          1 :   EXPECT_ALL_TRUE(a &lt;= b);</span>
+<span class="lineNum">     118 </span><span class="lineCov">          1 :   EXPECT_ALL_FALSE(a &gt;= b);</span>
+<span class="lineNum">     119 </span><span class="lineCov">          1 :   EXPECT_ALL_FALSE(a &gt; b);</span>
+<span class="lineNum">     120 </span><span class="lineCov">          1 :   EXPECT_ALL_FALSE(b &lt; a);</span>
+<span class="lineNum">     121 </span><span class="lineCov">          1 :   EXPECT_ALL_FALSE(b &lt;= a);</span>
+<span class="lineNum">     122 </span><span class="lineCov">          1 :   EXPECT_ALL_TRUE(b &gt;= a);</span>
+<span class="lineNum">     123 </span><span class="lineCov">          1 :   EXPECT_ALL_TRUE(b &gt; a);</span>
+<span class="lineNum">     124 </span>            : 
+<span class="lineNum">     125 </span><span class="lineCov">          1 :   a = (int8_t)0;</span>
+<span class="lineNum">     126 </span><span class="lineCov">          1 :   b = (uint8_t)0;</span>
+<span class="lineNum">     127 </span><span class="lineCov">          1 :   EXPECT_ALL_FALSE(a &lt; b);</span>
+<span class="lineNum">     128 </span><span class="lineCov">          1 :   EXPECT_ALL_TRUE(a &lt;= b);</span>
+<span class="lineNum">     129 </span><span class="lineCov">          1 :   EXPECT_ALL_TRUE(a &gt;= b);</span>
+<span class="lineNum">     130 </span><span class="lineCov">          1 :   EXPECT_ALL_FALSE(a &gt; b);</span>
+<span class="lineNum">     131 </span><span class="lineCov">          1 :   EXPECT_ALL_FALSE(b &lt; a);</span>
+<span class="lineNum">     132 </span><span class="lineCov">          1 :   EXPECT_ALL_TRUE(b &lt;= a);</span>
+<span class="lineNum">     133 </span><span class="lineCov">          1 :   EXPECT_ALL_TRUE(b &gt;= a);</span>
+<span class="lineNum">     134 </span><span class="lineCov">          1 :   EXPECT_ALL_FALSE(b &gt; a);</span>
+<span class="lineNum">     135 </span>            : 
+<span class="lineNum">     136 </span><span class="lineCov">          1 :   a = (int8_t)1;</span>
+<span class="lineNum">     137 </span><span class="lineCov">          1 :   b = (uint8_t)0;</span>
+<span class="lineNum">     138 </span><span class="lineCov">          1 :   EXPECT_ALL_FALSE(a &lt; b);</span>
+<span class="lineNum">     139 </span><span class="lineCov">          1 :   EXPECT_ALL_FALSE(a &lt;= b);</span>
+<span class="lineNum">     140 </span><span class="lineCov">          1 :   EXPECT_ALL_TRUE(a &gt;= b);</span>
+<span class="lineNum">     141 </span><span class="lineCov">          1 :   EXPECT_ALL_TRUE(a &gt; b);</span>
+<span class="lineNum">     142 </span><span class="lineCov">          1 :   EXPECT_ALL_TRUE(b &lt; a);</span>
+<span class="lineNum">     143 </span><span class="lineCov">          1 :   EXPECT_ALL_TRUE(b &lt;= a);</span>
+<span class="lineNum">     144 </span><span class="lineCov">          1 :   EXPECT_ALL_FALSE(b &gt;= a);</span>
+<span class="lineNum">     145 </span><span class="lineCov">          1 :   EXPECT_ALL_FALSE(b &gt; a);</span>
+<span class="lineNum">     146 </span>            : 
+<span class="lineNum">     147 </span><span class="lineCov">          1 :   a = (int8_t)127;</span>
+<span class="lineNum">     148 </span><span class="lineCov">          1 :   b = (uint8_t)126;</span>
+<span class="lineNum">     149 </span><span class="lineCov">          1 :   EXPECT_ALL_FALSE(a &lt; b);</span>
+<span class="lineNum">     150 </span><span class="lineCov">          1 :   EXPECT_ALL_FALSE(a &lt;= b);</span>
+<span class="lineNum">     151 </span><span class="lineCov">          1 :   EXPECT_ALL_TRUE(a &gt;= b);</span>
+<span class="lineNum">     152 </span><span class="lineCov">          1 :   EXPECT_ALL_TRUE(a &gt; b);</span>
+<span class="lineNum">     153 </span><span class="lineCov">          1 :   EXPECT_ALL_TRUE(b &lt; a);</span>
+<span class="lineNum">     154 </span><span class="lineCov">          1 :   EXPECT_ALL_TRUE(b &lt;= a);</span>
+<span class="lineNum">     155 </span><span class="lineCov">          1 :   EXPECT_ALL_FALSE(b &gt;= a);</span>
+<span class="lineNum">     156 </span><span class="lineCov">          1 :   EXPECT_ALL_FALSE(b &gt; a);</span>
+<span class="lineNum">     157 </span>            : 
+<span class="lineNum">     158 </span><span class="lineCov">          1 :   a = (int8_t)127;</span>
+<span class="lineNum">     159 </span><span class="lineCov">          1 :   b = (uint8_t)127;</span>
+<span class="lineNum">     160 </span><span class="lineCov">          1 :   EXPECT_ALL_FALSE(a &lt; b);</span>
+<span class="lineNum">     161 </span><span class="lineCov">          1 :   EXPECT_ALL_TRUE(a &lt;= b);</span>
+<span class="lineNum">     162 </span><span class="lineCov">          1 :   EXPECT_ALL_TRUE(a &gt;= b);</span>
+<span class="lineNum">     163 </span><span class="lineCov">          1 :   EXPECT_ALL_FALSE(a &gt; b);</span>
+<span class="lineNum">     164 </span><span class="lineCov">          1 :   EXPECT_ALL_FALSE(b &lt; a);</span>
+<span class="lineNum">     165 </span><span class="lineCov">          1 :   EXPECT_ALL_TRUE(b &lt;= a);</span>
+<span class="lineNum">     166 </span><span class="lineCov">          1 :   EXPECT_ALL_TRUE(b &gt;= a);</span>
+<span class="lineNum">     167 </span><span class="lineCov">          1 :   EXPECT_ALL_FALSE(b &gt; a);</span>
+<span class="lineNum">     168 </span>            : 
+<span class="lineNum">     169 </span><span class="lineCov">          1 :   a = (int8_t)127;</span>
+<span class="lineNum">     170 </span><span class="lineCov">          1 :   b = (uint8_t)128;</span>
+<span class="lineNum">     171 </span><span class="lineCov">          1 :   EXPECT_ALL_TRUE(a &lt; b);</span>
+<span class="lineNum">     172 </span><span class="lineCov">          1 :   EXPECT_ALL_TRUE(a &lt;= b);</span>
+<span class="lineNum">     173 </span><span class="lineCov">          1 :   EXPECT_ALL_FALSE(a &gt;= b);</span>
+<span class="lineNum">     174 </span><span class="lineCov">          1 :   EXPECT_ALL_FALSE(a &gt; b);</span>
+<span class="lineNum">     175 </span><span class="lineCov">          1 :   EXPECT_ALL_FALSE(b &lt; a);</span>
+<span class="lineNum">     176 </span><span class="lineCov">          1 :   EXPECT_ALL_FALSE(b &lt;= a);</span>
+<span class="lineNum">     177 </span><span class="lineCov">          1 :   EXPECT_ALL_TRUE(b &gt;= a);</span>
+<span class="lineNum">     178 </span><span class="lineCov">          1 :   EXPECT_ALL_TRUE(b &gt; a);</span>
+<a name="179"><span class="lineNum">     179 </span><span class="lineCov">          1 : }</span></a>
+<span class="lineNum">     180 </span>            : 
+<span class="lineNum">     181 </span><span class="lineCov">          5 : TEST(ArrayCompare, InequalityInt64UInt64)</span>
+<span class="lineNum">     182 </span>            : {
+<span class="lineNum">     183 </span><span class="lineCov">          2 :   nd::array a, b;</span>
+<span class="lineNum">     184 </span>            : 
+<span class="lineNum">     185 </span><span class="lineCov">          1 :   a = (int64_t) - 1;</span>
+<span class="lineNum">     186 </span><span class="lineCov">          1 :   b = (uint64_t)0;</span>
+<span class="lineNum">     187 </span><span class="lineCov">          1 :   EXPECT_ALL_FALSE(a &lt; b);</span>
+<span class="lineNum">     188 </span><span class="lineCov">          1 :   EXPECT_ALL_FALSE(a &lt;= b);</span>
+<span class="lineNum">     189 </span><span class="lineCov">          1 :   EXPECT_ALL_TRUE(a &gt;= b);</span>
+<span class="lineNum">     190 </span><span class="lineCov">          1 :   EXPECT_ALL_TRUE(a &gt; b);</span>
+<span class="lineNum">     191 </span><span class="lineCov">          1 :   EXPECT_ALL_TRUE(b &lt; a);</span>
+<span class="lineNum">     192 </span><span class="lineCov">          1 :   EXPECT_ALL_TRUE(b &lt;= a);</span>
+<span class="lineNum">     193 </span><span class="lineCov">          1 :   EXPECT_ALL_FALSE(b &gt;= a);</span>
+<span class="lineNum">     194 </span><span class="lineCov">          1 :   EXPECT_ALL_FALSE(b &gt; a);</span>
+<span class="lineNum">     195 </span>            : 
+<span class="lineNum">     196 </span><span class="lineCov">          1 :   a = (int64_t)0;</span>
+<span class="lineNum">     197 </span><span class="lineCov">          1 :   b = (uint64_t)0;</span>
+<span class="lineNum">     198 </span><span class="lineCov">          1 :   EXPECT_ALL_FALSE(a &lt; b);</span>
+<span class="lineNum">     199 </span><span class="lineCov">          1 :   EXPECT_ALL_TRUE(a &lt;= b);</span>
+<span class="lineNum">     200 </span><span class="lineCov">          1 :   EXPECT_ALL_TRUE(a &gt;= b);</span>
+<span class="lineNum">     201 </span><span class="lineCov">          1 :   EXPECT_ALL_FALSE(a &gt; b);</span>
+<span class="lineNum">     202 </span><span class="lineCov">          1 :   EXPECT_ALL_FALSE(b &lt; a);</span>
+<span class="lineNum">     203 </span><span class="lineCov">          1 :   EXPECT_ALL_TRUE(b &lt;= a);</span>
+<span class="lineNum">     204 </span><span class="lineCov">          1 :   EXPECT_ALL_TRUE(b &gt;= a);</span>
+<span class="lineNum">     205 </span><span class="lineCov">          1 :   EXPECT_ALL_FALSE(b &gt; a);</span>
+<span class="lineNum">     206 </span>            : 
+<span class="lineNum">     207 </span><span class="lineCov">          1 :   a = (int64_t)1;</span>
+<span class="lineNum">     208 </span><span class="lineCov">          1 :   b = (uint64_t)0;</span>
+<span class="lineNum">     209 </span><span class="lineCov">          1 :   EXPECT_ALL_FALSE(a &lt; b);</span>
+<span class="lineNum">     210 </span><span class="lineCov">          1 :   EXPECT_ALL_FALSE(a &lt;= b);</span>
+<span class="lineNum">     211 </span><span class="lineCov">          1 :   EXPECT_ALL_TRUE(a &gt;= b);</span>
+<span class="lineNum">     212 </span><span class="lineCov">          1 :   EXPECT_ALL_TRUE(a &gt; b);</span>
+<span class="lineNum">     213 </span><span class="lineCov">          1 :   EXPECT_ALL_TRUE(b &lt; a);</span>
+<span class="lineNum">     214 </span><span class="lineCov">          1 :   EXPECT_ALL_TRUE(b &lt;= a);</span>
+<span class="lineNum">     215 </span><span class="lineCov">          1 :   EXPECT_ALL_FALSE(b &gt;= a);</span>
+<span class="lineNum">     216 </span><span class="lineCov">          1 :   EXPECT_ALL_FALSE(b &gt; a);</span>
+<span class="lineNum">     217 </span>            : 
+<span class="lineNum">     218 </span><span class="lineCov">          1 :   a = (int64_t)9223372036854775807LL;</span>
+<span class="lineNum">     219 </span><span class="lineCov">          1 :   b = (uint64_t)9223372036854775806LL;</span>
+<span class="lineNum">     220 </span><span class="lineCov">          1 :   EXPECT_ALL_FALSE(a &lt; b);</span>
+<span class="lineNum">     221 </span><span class="lineCov">          1 :   EXPECT_ALL_FALSE(a &lt;= b);</span>
+<span class="lineNum">     222 </span><span class="lineCov">          1 :   EXPECT_ALL_TRUE(a &gt;= b);</span>
+<span class="lineNum">     223 </span><span class="lineCov">          1 :   EXPECT_ALL_TRUE(a &gt; b);</span>
+<span class="lineNum">     224 </span><span class="lineCov">          1 :   EXPECT_ALL_TRUE(b &lt; a);</span>
+<span class="lineNum">     225 </span><span class="lineCov">          1 :   EXPECT_ALL_TRUE(b &lt;= a);</span>
+<span class="lineNum">     226 </span><span class="lineCov">          1 :   EXPECT_ALL_FALSE(b &gt;= a);</span>
+<span class="lineNum">     227 </span><span class="lineCov">          1 :   EXPECT_ALL_FALSE(b &gt; a);</span>
+<span class="lineNum">     228 </span>            : 
+<span class="lineNum">     229 </span><span class="lineCov">          1 :   a = (int64_t)9223372036854775807LL;</span>
+<span class="lineNum">     230 </span><span class="lineCov">          1 :   b = (uint64_t)9223372036854775807LL;</span>
+<span class="lineNum">     231 </span><span class="lineCov">          1 :   EXPECT_ALL_FALSE(a &lt; b);</span>
+<span class="lineNum">     232 </span><span class="lineCov">          1 :   EXPECT_ALL_TRUE(a &lt;= b);</span>
+<span class="lineNum">     233 </span><span class="lineCov">          1 :   EXPECT_ALL_TRUE(a &gt;= b);</span>
+<span class="lineNum">     234 </span><span class="lineCov">          1 :   EXPECT_ALL_FALSE(a &gt; b);</span>
+<span class="lineNum">     235 </span><span class="lineCov">          1 :   EXPECT_ALL_FALSE(b &lt; a);</span>
+<span class="lineNum">     236 </span><span class="lineCov">          1 :   EXPECT_ALL_TRUE(b &lt;= a);</span>
+<span class="lineNum">     237 </span><span class="lineCov">          1 :   EXPECT_ALL_TRUE(b &gt;= a);</span>
+<span class="lineNum">     238 </span><span class="lineCov">          1 :   EXPECT_ALL_FALSE(b &gt; a);</span>
+<span class="lineNum">     239 </span>            : 
+<span class="lineNum">     240 </span><span class="lineCov">          1 :   a = (int64_t)9223372036854775807LL;</span>
+<span class="lineNum">     241 </span><span class="lineCov">          1 :   b = (uint64_t)9223372036854775808ULL;</span>
+<span class="lineNum">     242 </span><span class="lineCov">          1 :   EXPECT_ALL_TRUE(a &lt; b);</span>
+<span class="lineNum">     243 </span><span class="lineCov">          1 :   EXPECT_ALL_TRUE(a &lt;= b);</span>
+<span class="lineNum">     244 </span><span class="lineCov">          1 :   EXPECT_ALL_FALSE(a &gt;= b);</span>
+<span class="lineNum">     245 </span><span class="lineCov">          1 :   EXPECT_ALL_FALSE(a &gt; b);</span>
+<span class="lineNum">     246 </span><span class="lineCov">          1 :   EXPECT_ALL_FALSE(b &lt; a);</span>
+<span class="lineNum">     247 </span><span class="lineCov">          1 :   EXPECT_ALL_FALSE(b &lt;= a);</span>
+<span class="lineNum">     248 </span><span class="lineCov">          1 :   EXPECT_ALL_TRUE(b &gt;= a);</span>
+<span class="lineNum">     249 </span><span class="lineCov">          1 :   EXPECT_ALL_TRUE(b &gt; a);</span>
+<span class="lineNum">     250 </span>            : 
+<span class="lineNum">     251 </span>            :   // Smallest int64_t vs largest uint64_t
+<span class="lineNum">     252 </span><span class="lineCov">          1 :   a = numeric_limits&lt;int64_t&gt;::min();</span>
+<span class="lineNum">     253 </span><span class="lineCov">          1 :   b = numeric_limits&lt;uint64_t&gt;::max();</span>
+<span class="lineNum">     254 </span><span class="lineCov">          1 :   EXPECT_ALL_TRUE(a &lt; b);</span>
+<span class="lineNum">     255 </span><span class="lineCov">          1 :   EXPECT_ALL_TRUE(a &lt;= b);</span>
+<span class="lineNum">     256 </span><span class="lineCov">          1 :   EXPECT_ALL_FALSE(a &gt;= b);</span>
+<span class="lineNum">     257 </span><span class="lineCov">          1 :   EXPECT_ALL_FALSE(a &gt; b);</span>
+<span class="lineNum">     258 </span><span class="lineCov">          1 :   EXPECT_ALL_FALSE(b &lt; a);</span>
+<span class="lineNum">     259 </span><span class="lineCov">          1 :   EXPECT_ALL_FALSE(b &lt;= a);</span>
+<span class="lineNum">     260 </span><span class="lineCov">          1 :   EXPECT_ALL_TRUE(b &gt;= a);</span>
+<span class="lineNum">     261 </span><span class="lineCov">          1 :   EXPECT_ALL_TRUE(b &gt; a);</span>
+<a name="262"><span class="lineNum">     262 </span><span class="lineCov">          1 : }</span></a>
+<span class="lineNum">     263 </span>            : 
+<span class="lineNum">     264 </span><span class="lineCov">          5 : TEST(ArrayCompare, EqualityIntFloat)</span>
+<span class="lineNum">     265 </span>            : {
+<span class="lineNum">     266 </span><span class="lineCov">          2 :   nd::array a, b;</span>
+<span class="lineNum">     267 </span>            : 
+<span class="lineNum">     268 </span>            :   // 2**24 is the end of the consecutive float32 integers
+<span class="lineNum">     269 </span><span class="lineCov">          1 :   a = 16777216;</span>
+<span class="lineNum">     270 </span><span class="lineCov">          1 :   b = 16777216.f;</span>
+<span class="lineNum">     271 </span>            :   //  EXPECT_FALSE(a.op_sorting_less(b));
+<span class="lineNum">     272 </span><span class="lineCov">          1 :   EXPECT_ALL_FALSE(a &lt; b);</span>
+<span class="lineNum">     273 </span><span class="lineCov">          1 :   EXPECT_ALL_TRUE(a &lt;= b);</span>
+<span class="lineNum">     274 </span><span class="lineCov">          1 :   EXPECT_ALL_TRUE(a == b);</span>
+<span class="lineNum">     275 </span><span class="lineCov">          1 :   EXPECT_ALL_FALSE(a != b);</span>
+<span class="lineNum">     276 </span><span class="lineCov">          1 :   EXPECT_ALL_TRUE(a &gt;= b);</span>
+<span class="lineNum">     277 </span><span class="lineCov">          1 :   EXPECT_ALL_FALSE(a &gt; b);</span>
+<span class="lineNum">     278 </span>            :   //  EXPECT_FALSE(b.op_sorting_less(a));
+<span class="lineNum">     279 </span><span class="lineCov">          1 :   EXPECT_ALL_FALSE(b &lt; a);</span>
+<span class="lineNum">     280 </span><span class="lineCov">          1 :   EXPECT_ALL_TRUE(b &lt;= a);</span>
+<span class="lineNum">     281 </span><span class="lineCov">          1 :   EXPECT_ALL_TRUE(b == a);</span>
+<span class="lineNum">     282 </span><span class="lineCov">          1 :   EXPECT_ALL_FALSE(b != a);</span>
+<span class="lineNum">     283 </span><span class="lineCov">          1 :   EXPECT_ALL_TRUE(b &gt;= a);</span>
+<span class="lineNum">     284 </span><span class="lineCov">          1 :   EXPECT_ALL_FALSE(b &gt; a);</span>
+<span class="lineNum">     285 </span>            : 
+<span class="lineNum">     286 </span>            :   // Some of the following tests are excluded
+<span class="lineNum">     287 </span>            :   // because they return the wrong answer.
+<span class="lineNum">     288 </span>            :   // THIS IS COMMON TO C/C++/NumPy/etc, TOO.
+<span class="lineNum">     289 </span>            :   // TODO: Implement rigorous comparisons between types.
+<span class="lineNum">     290 </span><span class="lineCov">          1 :   a = 16777217;</span>
+<span class="lineNum">     291 </span><span class="lineCov">          1 :   b = 16777216.f;</span>
+<span class="lineNum">     292 </span>            :   //  EXPECT_FALSE(a.op_sorting_less(b));
+<span class="lineNum">     293 </span><span class="lineCov">          1 :   EXPECT_ALL_FALSE(a &lt; b);</span>
+<span class="lineNum">     294 </span>            :   // EXPECT_FALSE(a &lt;= b);
+<span class="lineNum">     295 </span><span class="lineCov">          1 :   EXPECT_ALL_TRUE(a == b);</span>
+<span class="lineNum">     296 </span><span class="lineCov">          1 :   EXPECT_ALL_FALSE(a != b);</span>
+<span class="lineNum">     297 </span><span class="lineCov">          1 :   EXPECT_ALL_TRUE(a &gt;= b);</span>
+<span class="lineNum">     298 </span>            :   // EXPECT_TRUE(a &gt; b);
+<span class="lineNum">     299 </span>            :   // EXPECT_TRUE(b.op_sorting_less(a));
+<span class="lineNum">     300 </span>            :   // EXPECT_TRUE(b &lt; a);
+<span class="lineNum">     301 </span><span class="lineCov">          1 :   EXPECT_ALL_TRUE(b &lt;= a);</span>
+<span class="lineNum">     302 </span><span class="lineCov">          1 :   EXPECT_ALL_TRUE(b == a);</span>
+<span class="lineNum">     303 </span><span class="lineCov">          1 :   EXPECT_ALL_FALSE(b != a);</span>
+<span class="lineNum">     304 </span>            :   // EXPECT_FALSE(b &gt;= a);
+<span class="lineNum">     305 </span><span class="lineCov">          1 :   EXPECT_ALL_FALSE(b &gt; a);</span>
+<span class="lineNum">     306 </span>            : 
+<span class="lineNum">     307 </span>            :   // The following work because the platforms tested on
+<span class="lineNum">     308 </span>            :   // convert 16777217 -&gt; 16777216.f before doing
+<span class="lineNum">     309 </span>            :   // the operations.
+<span class="lineNum">     310 </span><span class="lineCov">          1 :   a = 16777217;</span>
+<span class="lineNum">     311 </span><span class="lineCov">          1 :   b = 16777218.f;</span>
+<span class="lineNum">     312 </span>            :   //  EXPECT_TRUE(a.op_sorting_less(b));
+<span class="lineNum">     313 </span><span class="lineCov">          1 :   EXPECT_ALL_TRUE(a &lt; b);</span>
+<span class="lineNum">     314 </span><span class="lineCov">          1 :   EXPECT_ALL_TRUE(a &lt;= b);</span>
+<span class="lineNum">     315 </span><span class="lineCov">          1 :   EXPECT_ALL_FALSE(a == b);</span>
+<span class="lineNum">     316 </span><span class="lineCov">          1 :   EXPECT_ALL_TRUE(a != b);</span>
+<span class="lineNum">     317 </span><span class="lineCov">          1 :   EXPECT_ALL_FALSE(a &gt;= b);</span>
+<span class="lineNum">     318 </span><span class="lineCov">          1 :   EXPECT_ALL_FALSE(a &gt; b);</span>
+<span class="lineNum">     319 </span>            :   //  EXPECT_FALSE(b.op_sorting_less(a));
+<span class="lineNum">     320 </span><span class="lineCov">          1 :   EXPECT_ALL_FALSE(b &lt; a);</span>
+<span class="lineNum">     321 </span><span class="lineCov">          1 :   EXPECT_ALL_FALSE(b &lt;= a);</span>
+<span class="lineNum">     322 </span><span class="lineCov">          1 :   EXPECT_ALL_FALSE(b == a);</span>
+<span class="lineNum">     323 </span><span class="lineCov">          1 :   EXPECT_ALL_TRUE(b != a);</span>
+<span class="lineNum">     324 </span><span class="lineCov">          1 :   EXPECT_ALL_TRUE(b &gt;= a);</span>
+<span class="lineNum">     325 </span><span class="lineCov">          1 :   EXPECT_ALL_TRUE(b &gt; a);</span>
+<a name="326"><span class="lineNum">     326 </span><span class="lineCov">          1 : }</span></a>
+<span class="lineNum">     327 </span>            : 
+<span class="lineNum">     328 </span><span class="lineCov">          5 : TEST(ArrayCompare, EqualityUIntFloat)</span>
+<span class="lineNum">     329 </span>            : {
+<span class="lineNum">     330 </span><span class="lineCov">          2 :   nd::array a, b;</span>
+<span class="lineNum">     331 </span>            : 
+<span class="lineNum">     332 </span>            :   // 2**24 is the end of the consecutive float32 integers
+<span class="lineNum">     333 </span><span class="lineCov">          1 :   a = (uint32_t)16777216;</span>
+<span class="lineNum">     334 </span><span class="lineCov">          1 :   b = 16777216.f;</span>
+<span class="lineNum">     335 </span>            :   //  EXPECT_ALL_FALSE(a.op_sorting_less(b));
+<span class="lineNum">     336 </span><span class="lineCov">          1 :   EXPECT_ALL_FALSE(a &lt; b);</span>
+<span class="lineNum">     337 </span><span class="lineCov">          1 :   EXPECT_ALL_TRUE(a &lt;= b);</span>
+<span class="lineNum">     338 </span><span class="lineCov">          1 :   EXPECT_ALL_TRUE(a == b);</span>
+<span class="lineNum">     339 </span><span class="lineCov">          1 :   EXPECT_ALL_FALSE(a != b);</span>
+<span class="lineNum">     340 </span><span class="lineCov">          1 :   EXPECT_ALL_TRUE(a &gt;= b);</span>
+<span class="lineNum">     341 </span><span class="lineCov">          1 :   EXPECT_ALL_FALSE(a &gt; b);</span>
+<span class="lineNum">     342 </span>            :   //  EXPECT_ALL_FALSE(b.op_sorting_less(a));
+<span class="lineNum">     343 </span><span class="lineCov">          1 :   EXPECT_ALL_FALSE(b &lt; a);</span>
+<span class="lineNum">     344 </span><span class="lineCov">          1 :   EXPECT_ALL_TRUE(b &lt;= a);</span>
+<span class="lineNum">     345 </span><span class="lineCov">          1 :   EXPECT_ALL_TRUE(b == a);</span>
+<span class="lineNum">     346 </span><span class="lineCov">          1 :   EXPECT_ALL_FALSE(b != a);</span>
+<span class="lineNum">     347 </span><span class="lineCov">          1 :   EXPECT_ALL_TRUE(b &gt;= a);</span>
+<span class="lineNum">     348 </span><span class="lineCov">          1 :   EXPECT_ALL_FALSE(b &gt; a);</span>
+<span class="lineNum">     349 </span>            : 
+<span class="lineNum">     350 </span>            :   // Some of the following tests are excluded
+<span class="lineNum">     351 </span>            :   // because they return the wrong answer.
+<span class="lineNum">     352 </span>            :   // THIS IS COMMON TO C/C++/NumPy/etc, TOO.
+<span class="lineNum">     353 </span>            :   // TODO: Implement rigorous comparisons between types.
+<span class="lineNum">     354 </span><span class="lineCov">          1 :   a = (uint32_t)16777217;</span>
+<span class="lineNum">     355 </span><span class="lineCov">          1 :   b = 16777216.f;</span>
+<span class="lineNum">     356 </span>            :   //  EXPECT_ALL_FALSE(a.op_sorting_less(b));
+<span class="lineNum">     357 </span><span class="lineCov">          1 :   EXPECT_ALL_FALSE(a &lt; b);</span>
+<span class="lineNum">     358 </span>            :   // EXPECT_FALSE(a &lt;= b);
+<span class="lineNum">     359 </span><span class="lineCov">          1 :   EXPECT_ALL_TRUE(a == b);</span>
+<span class="lineNum">     360 </span><span class="lineCov">          1 :   EXPECT_ALL_FALSE(a != b);</span>
+<span class="lineNum">     361 </span><span class="lineCov">          1 :   EXPECT_ALL_TRUE(a &gt;= b);</span>
+<span class="lineNum">     362 </span>            :   // EXPECT_TRUE(a &gt; b);
+<span class="lineNum">     363 </span>            :   // EXPECT_TRUE(b.op_sorting_less(a));
+<span class="lineNum">     364 </span>            :   // EXPECT_TRUE(b &lt; a);
+<span class="lineNum">     365 </span><span class="lineCov">          1 :   EXPECT_ALL_TRUE(b &lt;= a);</span>
+<span class="lineNum">     366 </span><span class="lineCov">          1 :   EXPECT_ALL_TRUE(b == a);</span>
+<span class="lineNum">     367 </span><span class="lineCov">          1 :   EXPECT_ALL_FALSE(b != a);</span>
+<span class="lineNum">     368 </span>            :   // EXPECT_FALSE(b &gt;= a);
+<span class="lineNum">     369 </span><span class="lineCov">          1 :   EXPECT_ALL_FALSE(b &gt; a);</span>
+<span class="lineNum">     370 </span>            : 
+<span class="lineNum">     371 </span>            :   // The following work because the platforms tested on
+<span class="lineNum">     372 </span>            :   // convert 16777217 -&gt; 16777216.f before doing
+<span class="lineNum">     373 </span>            :   // the operations.
+<span class="lineNum">     374 </span><span class="lineCov">          1 :   a = (uint32_t)16777217;</span>
+<span class="lineNum">     375 </span><span class="lineCov">          1 :   b = 16777218.f;</span>
+<span class="lineNum">     376 </span>            :   //  EXPECT_ALL_TRUE(a.op_sorting_less(b));
+<span class="lineNum">     377 </span><span class="lineCov">          1 :   EXPECT_ALL_TRUE(a &lt; b);</span>
+<span class="lineNum">     378 </span><span class="lineCov">          1 :   EXPECT_ALL_TRUE(a &lt;= b);</span>
+<span class="lineNum">     379 </span><span class="lineCov">          1 :   EXPECT_ALL_FALSE(a == b);</span>
+<span class="lineNum">     380 </span><span class="lineCov">          1 :   EXPECT_ALL_TRUE(a != b);</span>
+<span class="lineNum">     381 </span><span class="lineCov">          1 :   EXPECT_ALL_FALSE(a &gt;= b);</span>
+<span class="lineNum">     382 </span><span class="lineCov">          1 :   EXPECT_ALL_FALSE(a &gt; b);</span>
+<span class="lineNum">     383 </span>            :   //  EXPECT_ALL_FALSE(b.op_sorting_less(a));
+<span class="lineNum">     384 </span><span class="lineCov">          1 :   EXPECT_ALL_FALSE(b &lt; a);</span>
+<span class="lineNum">     385 </span><span class="lineCov">          1 :   EXPECT_ALL_FALSE(b &lt;= a);</span>
+<span class="lineNum">     386 </span><span class="lineCov">          1 :   EXPECT_ALL_FALSE(b == a);</span>
+<span class="lineNum">     387 </span><span class="lineCov">          1 :   EXPECT_ALL_TRUE(b != a);</span>
+<a name="388"><span class="lineNum">     388 </span><span class="lineCov">          1 :   EXPECT_ALL_TRUE(b &gt;= a);</span></a>
+<span class="lineNum">     389 </span><span class="lineCov">          1 :   EXPECT_ALL_TRUE(b &gt; a);</span>
+<span class="lineNum">     390 </span><span class="lineCov">          4 : }</span>
+<span class="lineNum">     391 </span>            : 
+<span class="lineNum">     392 </span>            : /*
+<span class="lineNum">     393 </span>            : TEST(ArrayCompare, NaNFloat32)
+<span class="lineNum">     394 </span>            : {
+<span class="lineNum">     395 </span>            :   nd::array a, b;
+<span class="lineNum">     396 </span>            :   nd::array nan = nd::array(&quot;nan&quot;).ucast&lt;float&gt;().eval();
+<span class="lineNum">     397 </span>            :   nd::array pinf = nd::array(&quot;inf&quot;).ucast&lt;float&gt;().eval();
+<span class="lineNum">     398 </span>            : 
+<span class="lineNum">     399 </span>            :   // A NaN, compared against itself
+<span class="lineNum">     400 </span>            :   a = nan;
+<span class="lineNum">     401 </span>            :   EXPECT_FALSE(a.op_sorting_less(a));
+<span class="lineNum">     402 </span>            :   EXPECT_FALSE(a &lt; a);
+<span class="lineNum">     403 </span>            :   EXPECT_FALSE(a &lt;= a);
+<span class="lineNum">     404 </span>            :   EXPECT_FALSE(a == a);
+<span class="lineNum">     405 </span>            :   EXPECT_TRUE(a != a);
+<span class="lineNum">     406 </span>            :   EXPECT_FALSE(a &gt;= a);
+<span class="lineNum">     407 </span>            :   EXPECT_FALSE(a &gt; a);
+<span class="lineNum">     408 </span>            : 
+<span class="lineNum">     409 </span>            :   // Compare NaN against zero.
+<span class="lineNum">     410 </span>            :   // Special &quot;sorting less than&quot; orders them, other
+<span class="lineNum">     411 </span>            :   // comparisons do not.
+<span class="lineNum">     412 </span>            :   a = nan;
+<span class="lineNum">     413 </span>            :   b = 0.f;
+<span class="lineNum">     414 </span>            :   EXPECT_FALSE(a.op_sorting_less(b));
+<span class="lineNum">     415 </span>            :   EXPECT_FALSE(a &lt; b);
+<span class="lineNum">     416 </span>            :   EXPECT_FALSE(a &lt;= b);
+<span class="lineNum">     417 </span>            :   EXPECT_FALSE(a == b);
+<span class="lineNum">     418 </span>            :   EXPECT_TRUE(a != b);
+<span class="lineNum">     419 </span>            :   EXPECT_FALSE(a &gt;= b);
+<span class="lineNum">     420 </span>            :   EXPECT_FALSE(a &gt; b);
+<span class="lineNum">     421 </span>            :   EXPECT_TRUE(b.op_sorting_less(a));
+<span class="lineNum">     422 </span>            :   EXPECT_FALSE(b &lt; a);
+<span class="lineNum">     423 </span>            :   EXPECT_FALSE(b &lt;= a);
+<span class="lineNum">     424 </span>            :   EXPECT_FALSE(b == a);
+<span class="lineNum">     425 </span>            :   EXPECT_TRUE(b != a);
+<span class="lineNum">     426 </span>            :   EXPECT_FALSE(b &gt;= a);
+<span class="lineNum">     427 </span>            :   EXPECT_FALSE(b &gt; a);
+<span class="lineNum">     428 </span>            : 
+<span class="lineNum">     429 </span>            :   // Compare NaN against inf.
+<span class="lineNum">     430 </span>            :   // Special &quot;sorting less than&quot; orders them, other
+<span class="lineNum">     431 </span>            :   // comparisons do not.
+<span class="lineNum">     432 </span>            :   a = nan;
+<span class="lineNum">     433 </span>            :   b = pinf;
+<span class="lineNum">     434 </span>            :   EXPECT_FALSE(a.op_sorting_less(b));
+<span class="lineNum">     435 </span>            :   EXPECT_FALSE(a &lt; b);
+<span class="lineNum">     436 </span>            :   EXPECT_FALSE(a &lt;= b);
+<span class="lineNum">     437 </span>            :   EXPECT_FALSE(a == b);
+<span class="lineNum">     438 </span>            :   EXPECT_TRUE(a != b);
+<span class="lineNum">     439 </span>            :   EXPECT_FALSE(a &gt;= b);
+<span class="lineNum">     440 </span>            :   EXPECT_FALSE(a &gt; b);
+<span class="lineNum">     441 </span>            :   EXPECT_TRUE(b.op_sorting_less(a));
+<span class="lineNum">     442 </span>            :   EXPECT_FALSE(b &lt; a);
+<span class="lineNum">     443 </span>            :   EXPECT_FALSE(b &lt;= a);
+<span class="lineNum">     444 </span>            :   EXPECT_FALSE(b == a);
+<span class="lineNum">     445 </span>            :   EXPECT_TRUE(b != a);
+<span class="lineNum">     446 </span>            :   EXPECT_FALSE(b &gt;= a);
+<span class="lineNum">     447 </span>            :   EXPECT_FALSE(b &gt; a);
+<span class="lineNum">     448 </span>            : }
+<span class="lineNum">     449 </span>            : 
+<span class="lineNum">     450 </span>            : TEST(ArrayCompare, NaNFloat64)
+<span class="lineNum">     451 </span>            : {
+<span class="lineNum">     452 </span>            :   nd::array a, b;
+<span class="lineNum">     453 </span>            :   nd::array nan = nd::array(&quot;nan&quot;).ucast&lt;double&gt;().eval();
+<span class="lineNum">     454 </span>            :   nd::array pinf = nd::array(&quot;inf&quot;).ucast&lt;double&gt;().eval();
+<span class="lineNum">     455 </span>            : 
+<span class="lineNum">     456 </span>            :   // A NaN, compared against itself
+<span class="lineNum">     457 </span>            :   a = nan;
+<span class="lineNum">     458 </span>            :   EXPECT_FALSE(a.op_sorting_less(a));
+<span class="lineNum">     459 </span>            :   EXPECT_FALSE(a &lt; a);
+<span class="lineNum">     460 </span>            :   EXPECT_FALSE(a &lt;= a);
+<span class="lineNum">     461 </span>            :   EXPECT_FALSE(a == a);
+<span class="lineNum">     462 </span>            :   EXPECT_TRUE(a != a);
+<span class="lineNum">     463 </span>            :   EXPECT_FALSE(a &gt;= a);
+<span class="lineNum">     464 </span>            :   EXPECT_FALSE(a &gt; a);
+<span class="lineNum">     465 </span>            : 
+<span class="lineNum">     466 </span>            :   // Compare NaN against zero.
+<span class="lineNum">     467 </span>            :   // Special &quot;sorting less than&quot; orders them, other
+<span class="lineNum">     468 </span>            :   // comparisons do not.
+<span class="lineNum">     469 </span>            :   a = nan;
+<span class="lineNum">     470 </span>            :   b = 0.0;
+<span class="lineNum">     471 </span>            :   EXPECT_FALSE(a.op_sorting_less(b));
+<span class="lineNum">     472 </span>            :   EXPECT_FALSE(a &lt; b);
+<span class="lineNum">     473 </span>            :   EXPECT_FALSE(a &lt;= b);
+<span class="lineNum">     474 </span>            :   EXPECT_FALSE(a == b);
+<span class="lineNum">     475 </span>            :   EXPECT_TRUE(a != b);
+<span class="lineNum">     476 </span>            :   EXPECT_FALSE(a &gt;= b);
+<span class="lineNum">     477 </span>            :   EXPECT_FALSE(a &gt; b);
+<span class="lineNum">     478 </span>            :   EXPECT_TRUE(b.op_sorting_less(a));
+<span class="lineNum">     479 </span>            :   EXPECT_FALSE(b &lt; a);
+<span class="lineNum">     480 </span>            :   EXPECT_FALSE(b &lt;= a);
+<span class="lineNum">     481 </span>            :   EXPECT_FALSE(b == a);
+<span class="lineNum">     482 </span>            :   EXPECT_TRUE(b != a);
+<span class="lineNum">     483 </span>            :   EXPECT_FALSE(b &gt;= a);
+<span class="lineNum">     484 </span>            :   EXPECT_FALSE(b &gt; a);
+<span class="lineNum">     485 </span>            : 
+<span class="lineNum">     486 </span>            :   // Compare NaN against inf.
+<span class="lineNum">     487 </span>            :   // Special &quot;sorting less than&quot; orders them, other
+<span class="lineNum">     488 </span>            :   // comparisons do not.
+<span class="lineNum">     489 </span>            :   a = nan;
+<span class="lineNum">     490 </span>            :   b = pinf;
+<span class="lineNum">     491 </span>            :   EXPECT_FALSE(a.op_sorting_less(b));
+<span class="lineNum">     492 </span>            :   EXPECT_FALSE(a &lt; b);
+<span class="lineNum">     493 </span>            :   EXPECT_FALSE(a &lt;= b);
+<span class="lineNum">     494 </span>            :   EXPECT_FALSE(a == b);
+<span class="lineNum">     495 </span>            :   EXPECT_TRUE(a != b);
+<span class="lineNum">     496 </span>            :   EXPECT_FALSE(a &gt;= b);
+<span class="lineNum">     497 </span>            :   EXPECT_FALSE(a &gt; b);
+<span class="lineNum">     498 </span>            :   EXPECT_TRUE(b.op_sorting_less(a));
+<span class="lineNum">     499 </span>            :   EXPECT_FALSE(b &lt; a);
+<span class="lineNum">     500 </span>            :   EXPECT_FALSE(b &lt;= a);
+<span class="lineNum">     501 </span>            :   EXPECT_FALSE(b == a);
+<span class="lineNum">     502 </span>            :   EXPECT_TRUE(b != a);
+<span class="lineNum">     503 </span>            :   EXPECT_FALSE(b &gt;= a);
+<span class="lineNum">     504 </span>            :   EXPECT_FALSE(b &gt; a);
+<span class="lineNum">     505 </span>            : }
+<span class="lineNum">     506 </span>            : 
+<span class="lineNum">     507 </span>            : TEST(ArrayCompare, ComplexFloat32)
+<span class="lineNum">     508 </span>            : {
+<span class="lineNum">     509 </span>            :   nd::array a, b;
+<span class="lineNum">     510 </span>            :   // For complex, op_sorting_less is lexicographic,
+<span class="lineNum">     511 </span>            :   // and other inequalities raise exceptions.
+<span class="lineNum">     512 </span>            : 
+<span class="lineNum">     513 </span>            :   // Compare 0 with 0
+<span class="lineNum">     514 </span>            :   a = dynd::complex&lt;float&gt;();
+<span class="lineNum">     515 </span>            :   b = dynd::complex&lt;float&gt;();
+<span class="lineNum">     516 </span>            :   EXPECT_FALSE(a.op_sorting_less(b));
+<span class="lineNum">     517 </span>            :   EXPECT_THROW((a &lt; b), not_comparable_error);
+<span class="lineNum">     518 </span>            :   EXPECT_THROW((a &lt;= b), not_comparable_error);
+<span class="lineNum">     519 </span>            :   EXPECT_TRUE(a == b);
+<span class="lineNum">     520 </span>            :   EXPECT_FALSE(a != b);
+<span class="lineNum">     521 </span>            :   EXPECT_THROW((a &gt;= b), not_comparable_error);
+<span class="lineNum">     522 </span>            :   EXPECT_THROW((a &gt; b), not_comparable_error);
+<span class="lineNum">     523 </span>            :   EXPECT_FALSE(b.op_sorting_less(a));
+<span class="lineNum">     524 </span>            :   EXPECT_THROW((b &lt; a), not_comparable_error);
+<span class="lineNum">     525 </span>            :   EXPECT_THROW((b &lt;= a), not_comparable_error);
+<span class="lineNum">     526 </span>            :   EXPECT_TRUE(b == a);
+<span class="lineNum">     527 </span>            :   EXPECT_FALSE(b != a);
+<span class="lineNum">     528 </span>            :   EXPECT_THROW((b &gt;= a), not_comparable_error);
+<span class="lineNum">     529 </span>            :   EXPECT_THROW((b &gt; a), not_comparable_error);
+<span class="lineNum">     530 </span>            : 
+<span class="lineNum">     531 </span>            :   // Compare 0+1j with 1+1j
+<span class="lineNum">     532 </span>            :   a = dynd::complex&lt;float&gt;(0, 1);
+<span class="lineNum">     533 </span>            :   b = dynd::complex&lt;float&gt;(1, 1);
+<span class="lineNum">     534 </span>            :   EXPECT_TRUE(a.op_sorting_less(b));
+<span class="lineNum">     535 </span>            :   EXPECT_THROW((a &lt; b), not_comparable_error);
+<span class="lineNum">     536 </span>            :   EXPECT_THROW((a &lt;= b), not_comparable_error);
+<span class="lineNum">     537 </span>            :   EXPECT_FALSE(a == b);
+<span class="lineNum">     538 </span>            :   EXPECT_TRUE(a != b);
+<span class="lineNum">     539 </span>            :   EXPECT_THROW((a &gt;= b), not_comparable_error);
+<span class="lineNum">     540 </span>            :   EXPECT_THROW((a &gt; b), not_comparable_error);
+<span class="lineNum">     541 </span>            :   EXPECT_FALSE(b.op_sorting_less(a));
+<span class="lineNum">     542 </span>            :   EXPECT_THROW((b &lt; a), not_comparable_error);
+<span class="lineNum">     543 </span>            :   EXPECT_THROW((b &lt;= a), not_comparable_error);
+<span class="lineNum">     544 </span>            :   EXPECT_FALSE(b == a);
+<span class="lineNum">     545 </span>            :   EXPECT_TRUE(b != a);
+<span class="lineNum">     546 </span>            :   EXPECT_THROW((b &gt;= a), not_comparable_error);
+<span class="lineNum">     547 </span>            :   EXPECT_THROW((b &gt; a), not_comparable_error);
+<span class="lineNum">     548 </span>            : 
+<span class="lineNum">     549 </span>            :   // Compare 0+1j with 0+2j
+<span class="lineNum">     550 </span>            :   a = dynd::complex&lt;float&gt;(0, 1);
+<span class="lineNum">     551 </span>            :   b = dynd::complex&lt;float&gt;(0, 2);
+<span class="lineNum">     552 </span>            :   EXPECT_TRUE(a.op_sorting_less(b));
+<span class="lineNum">     553 </span>            :   EXPECT_THROW((a &lt; b), not_comparable_error);
+<span class="lineNum">     554 </span>            :   EXPECT_THROW((a &lt;= b), not_comparable_error);
+<span class="lineNum">     555 </span>            :   EXPECT_FALSE(a == b);
+<span class="lineNum">     556 </span>            :   EXPECT_TRUE(a != b);
+<span class="lineNum">     557 </span>            :   EXPECT_THROW((a &gt;= b), not_comparable_error);
+<span class="lineNum">     558 </span>            :   EXPECT_THROW((a &gt; b), not_comparable_error);
+<span class="lineNum">     559 </span>            :   EXPECT_FALSE(b.op_sorting_less(a));
+<span class="lineNum">     560 </span>            :   EXPECT_THROW((b &lt; a), not_comparable_error);
+<span class="lineNum">     561 </span>            :   EXPECT_THROW((b &lt;= a), not_comparable_error);
+<span class="lineNum">     562 </span>            :   EXPECT_FALSE(b == a);
+<span class="lineNum">     563 </span>            :   EXPECT_TRUE(b != a);
+<span class="lineNum">     564 </span>            :   EXPECT_THROW((b &gt;= a), not_comparable_error);
+<span class="lineNum">     565 </span>            :   EXPECT_THROW((b &gt; a), not_comparable_error);
+<span class="lineNum">     566 </span>            : }
+<span class="lineNum">     567 </span>            : 
+<span class="lineNum">     568 </span>            : TEST(ArrayCompare, ComplexFloat64)
+<span class="lineNum">     569 </span>            : {
+<span class="lineNum">     570 </span>            :   nd::array a, b;
+<span class="lineNum">     571 </span>            :   // For complex, op_sorting_less is lexicographic,
+<span class="lineNum">     572 </span>            :   // and other inequalities raise exceptions.
+<span class="lineNum">     573 </span>            : 
+<span class="lineNum">     574 </span>            :   // Compare 0 with 0
+<span class="lineNum">     575 </span>            :   a = dynd::complex&lt;double&gt;();
+<span class="lineNum">     576 </span>            :   b = dynd::complex&lt;double&gt;();
+<span class="lineNum">     577 </span>            :   EXPECT_FALSE(a.op_sorting_less(b));
+<span class="lineNum">     578 </span>            :   EXPECT_THROW((a &lt; b), not_comparable_error);
+<span class="lineNum">     579 </span>            :   EXPECT_THROW((a &lt;= b), not_comparable_error);
+<span class="lineNum">     580 </span>            :   EXPECT_TRUE(a == b);
+<span class="lineNum">     581 </span>            :   EXPECT_FALSE(a != b);
+<span class="lineNum">     582 </span>            :   EXPECT_THROW((a &gt;= b), not_comparable_error);
+<span class="lineNum">     583 </span>            :   EXPECT_THROW((a &gt; b), not_comparable_error);
+<span class="lineNum">     584 </span>            :   EXPECT_FALSE(b.op_sorting_less(a));
+<span class="lineNum">     585 </span>            :   EXPECT_THROW((b &lt; a), not_comparable_error);
+<span class="lineNum">     586 </span>            :   EXPECT_THROW((b &lt;= a), not_comparable_error);
+<span class="lineNum">     587 </span>            :   EXPECT_TRUE(b == a);
+<span class="lineNum">     588 </span>            :   EXPECT_FALSE(b != a);
+<span class="lineNum">     589 </span>            :   EXPECT_THROW((b &gt;= a), not_comparable_error);
+<span class="lineNum">     590 </span>            :   EXPECT_THROW((b &gt; a), not_comparable_error);
+<span class="lineNum">     591 </span>            : 
+<span class="lineNum">     592 </span>            :   // Compare 0+1j with 1+1j
+<span class="lineNum">     593 </span>            :   a = dynd::complex&lt;double&gt;(0, 1);
+<span class="lineNum">     594 </span>            :   b = dynd::complex&lt;double&gt;(1, 1);
+<span class="lineNum">     595 </span>            :   EXPECT_TRUE(a.op_sorting_less(b));
+<span class="lineNum">     596 </span>            :   EXPECT_THROW((a &lt; b), not_comparable_error);
+<span class="lineNum">     597 </span>            :   EXPECT_THROW((a &lt;= b), not_comparable_error);
+<span class="lineNum">     598 </span>            :   EXPECT_FALSE(a == b);
+<span class="lineNum">     599 </span>            :   EXPECT_TRUE(a != b);
+<span class="lineNum">     600 </span>            :   EXPECT_THROW((a &gt;= b), not_comparable_error);
+<span class="lineNum">     601 </span>            :   EXPECT_THROW((a &gt; b), not_comparable_error);
+<span class="lineNum">     602 </span>            :   EXPECT_FALSE(b.op_sorting_less(a));
+<span class="lineNum">     603 </span>            :   EXPECT_THROW((b &lt; a), not_comparable_error);
+<span class="lineNum">     604 </span>            :   EXPECT_THROW((b &lt;= a), not_comparable_error);
+<span class="lineNum">     605 </span>            :   EXPECT_FALSE(b == a);
+<span class="lineNum">     606 </span>            :   EXPECT_TRUE(b != a);
+<span class="lineNum">     607 </span>            :   EXPECT_THROW((b &gt;= a), not_comparable_error);
+<span class="lineNum">     608 </span>            :   EXPECT_THROW((b &gt; a), not_comparable_error);
+<span class="lineNum">     609 </span>            : 
+<span class="lineNum">     610 </span>            :   // Compare 0+1j with 0+2j
+<span class="lineNum">     611 </span>            :   a = dynd::complex&lt;double&gt;(0, 1);
+<span class="lineNum">     612 </span>            :   b = dynd::complex&lt;double&gt;(0, 2);
+<span class="lineNum">     613 </span>            :   EXPECT_TRUE(a.op_sorting_less(b));
+<span class="lineNum">     614 </span>            :   EXPECT_THROW((a &lt; b), not_comparable_error);
+<span class="lineNum">     615 </span>            :   EXPECT_THROW((a &lt;= b), not_comparable_error);
+<span class="lineNum">     616 </span>            :   EXPECT_FALSE(a == b);
+<span class="lineNum">     617 </span>            :   EXPECT_TRUE(a != b);
+<span class="lineNum">     618 </span>            :   EXPECT_THROW((a &gt;= b), not_comparable_error);
+<span class="lineNum">     619 </span>            :   EXPECT_THROW((a &gt; b), not_comparable_error);
+<span class="lineNum">     620 </span>            :   EXPECT_FALSE(b.op_sorting_less(a));
+<span class="lineNum">     621 </span>            :   EXPECT_THROW((b &lt; a), not_comparable_error);
+<span class="lineNum">     622 </span>            :   EXPECT_THROW((b &lt;= a), not_comparable_error);
+<span class="lineNum">     623 </span>            :   EXPECT_FALSE(b == a);
+<span class="lineNum">     624 </span>            :   EXPECT_TRUE(b != a);
+<span class="lineNum">     625 </span>            :   EXPECT_THROW((b &gt;= a), not_comparable_error);
+<span class="lineNum">     626 </span>            :   EXPECT_THROW((b &gt; a), not_comparable_error);
+<span class="lineNum">     627 </span>            : }
+<span class="lineNum">     628 </span>            : 
+<span class="lineNum">     629 </span>            : TEST(ArrayCompare, NaNComplexFloat32)
+<span class="lineNum">     630 </span>            : {
+<span class="lineNum">     631 </span>            :   // The strange way to assign complex values is because
+<span class="lineNum">     632 </span>            :   // on clang, dynd_complex&lt;float&gt;(0.f, nan) was creating (nan, nan)
+<span class="lineNum">     633 </span>            :   // instead of the requested complex.
+<span class="lineNum">     634 </span>            :   float cval[2];
+<span class="lineNum">     635 </span>            :   nd::array a, b;
+<span class="lineNum">     636 </span>            :   a = nd::empty(ndt::make_type&lt;dynd::complex&lt;float&gt;&gt;());
+<span class="lineNum">     637 </span>            :   b = nd::empty(ndt::make_type&lt;dynd::complex&lt;float&gt;&gt;());
+<span class="lineNum">     638 </span>            :   float nan = nd::array(&quot;nan&quot;).ucast&lt;float&gt;().as&lt;float&gt;();
+<span class="lineNum">     639 </span>            : 
+<span class="lineNum">     640 </span>            :   // real component NaN, compared against itself
+<span class="lineNum">     641 </span>            :   cval[0] = nan;
+<span class="lineNum">     642 </span>            :   cval[1] = 0.f;
+<span class="lineNum">     643 </span>            :   a.val_assign(ndt::make_type&lt;dynd::complex&lt;float&gt;&gt;(), NULL,
+<span class="lineNum">     644 </span>            :                reinterpret_cast&lt;const char *&gt;(&amp;cval[0]));
+<span class="lineNum">     645 </span>            :   EXPECT_TRUE(dynd::isnan(a.p(&quot;real&quot;).as&lt;float&gt;()));
+<span class="lineNum">     646 </span>            :   EXPECT_FALSE(dynd::isnan(a.p(&quot;imag&quot;).as&lt;float&gt;()));
+<span class="lineNum">     647 </span>            :   EXPECT_FALSE(a.op_sorting_less(a));
+<span class="lineNum">     648 </span>            :   EXPECT_THROW((a &lt; a), not_comparable_error);
+<span class="lineNum">     649 </span>            :   EXPECT_THROW((a &lt;= a), not_comparable_error);
+<span class="lineNum">     650 </span>            :   EXPECT_FALSE(a == a);
+<span class="lineNum">     651 </span>            :   EXPECT_TRUE(a != a);
+<span class="lineNum">     652 </span>            :   EXPECT_THROW((a &gt;= a), not_comparable_error);
+<span class="lineNum">     653 </span>            :   EXPECT_THROW((a &gt; a), not_comparable_error);
+<span class="lineNum">     654 </span>            : 
+<span class="lineNum">     655 </span>            :   // imaginary component NaN, compared against itself
+<span class="lineNum">     656 </span>            :   cval[0] = 0.f;
+<span class="lineNum">     657 </span>            :   cval[1] = nan;
+<span class="lineNum">     658 </span>            :   a.val_assign(ndt::make_type&lt;dynd::complex&lt;float&gt;&gt;(), NULL,
+<span class="lineNum">     659 </span>            :                reinterpret_cast&lt;const char *&gt;(&amp;cval[0]));
+<span class="lineNum">     660 </span>            :   EXPECT_FALSE(dynd::isnan(a.p(&quot;real&quot;).as&lt;float&gt;()));
+<span class="lineNum">     661 </span>            :   EXPECT_TRUE(dynd::isnan(a.p(&quot;imag&quot;).as&lt;float&gt;()));
+<span class="lineNum">     662 </span>            :   EXPECT_FALSE(a.op_sorting_less(a));
+<span class="lineNum">     663 </span>            :   EXPECT_THROW((a &lt; a), not_comparable_error);
+<span class="lineNum">     664 </span>            :   EXPECT_THROW((a &lt;= a), not_comparable_error);
+<span class="lineNum">     665 </span>            :   EXPECT_FALSE(a == a);
+<span class="lineNum">     666 </span>            :   EXPECT_TRUE(a != a);
+<span class="lineNum">     667 </span>            :   EXPECT_THROW((a &gt;= a), not_comparable_error);
+<span class="lineNum">     668 </span>            :   EXPECT_THROW((a &gt; a), not_comparable_error);
+<span class="lineNum">     669 </span>            : 
+<span class="lineNum">     670 </span>            :   // both components NaN, compared against itself
+<span class="lineNum">     671 </span>            :   cval[0] = nan;
+<span class="lineNum">     672 </span>            :   cval[1] = nan;
+<span class="lineNum">     673 </span>            :   a.val_assign(ndt::make_type&lt;dynd::complex&lt;float&gt;&gt;(), NULL,
+<span class="lineNum">     674 </span>            :                reinterpret_cast&lt;const char *&gt;(&amp;cval[0]));
+<span class="lineNum">     675 </span>            :   EXPECT_TRUE(dynd::isnan(a.p(&quot;real&quot;).as&lt;float&gt;()));
+<span class="lineNum">     676 </span>            :   EXPECT_TRUE(dynd::isnan(a.p(&quot;imag&quot;).as&lt;float&gt;()));
+<span class="lineNum">     677 </span>            :   EXPECT_FALSE(a.op_sorting_less(a));
+<span class="lineNum">     678 </span>            :   EXPECT_THROW((a &lt; a), not_comparable_error);
+<span class="lineNum">     679 </span>            :   EXPECT_THROW((a &lt;= a), not_comparable_error);
+<span class="lineNum">     680 </span>            :   EXPECT_FALSE(a == a);
+<span class="lineNum">     681 </span>            :   EXPECT_TRUE(a != a);
+<span class="lineNum">     682 </span>            :   EXPECT_THROW((a &gt;= a), not_comparable_error);
+<span class="lineNum">     683 </span>            :   EXPECT_THROW((a &gt; a), not_comparable_error);
+<span class="lineNum">     684 </span>            : 
+<span class="lineNum">     685 </span>            :   // NaNs compared against non-NaNs
+<span class="lineNum">     686 </span>            :   cval[0] = nan;
+<span class="lineNum">     687 </span>            :   cval[1] = 0.f;
+<span class="lineNum">     688 </span>            :   a.val_assign(ndt::make_type&lt;dynd::complex&lt;float&gt;&gt;(), NULL,
+<span class="lineNum">     689 </span>            :                reinterpret_cast&lt;const char *&gt;(&amp;cval[0]));
+<span class="lineNum">     690 </span>            :   cval[0] = 0.f;
+<span class="lineNum">     691 </span>            :   cval[1] = 1.f;
+<span class="lineNum">     692 </span>            :   b.val_assign(ndt::make_type&lt;dynd::complex&lt;float&gt;&gt;(), NULL,
+<span class="lineNum">     693 </span>            :                reinterpret_cast&lt;const char *&gt;(&amp;cval[0]));
+<span class="lineNum">     694 </span>            :   EXPECT_FALSE(a.op_sorting_less(b));
+<span class="lineNum">     695 </span>            :   EXPECT_THROW((a &lt; b), not_comparable_error);
+<span class="lineNum">     696 </span>            :   EXPECT_THROW((a &lt;= b), not_comparable_error);
+<span class="lineNum">     697 </span>            :   EXPECT_FALSE(a == b);
+<span class="lineNum">     698 </span>            :   EXPECT_TRUE(a != b);
+<span class="lineNum">     699 </span>            :   EXPECT_THROW((a &gt;= b), not_comparable_error);
+<span class="lineNum">     700 </span>            :   EXPECT_THROW((a &gt; b), not_comparable_error);
+<span class="lineNum">     701 </span>            :   EXPECT_TRUE(b.op_sorting_less(a));
+<span class="lineNum">     702 </span>            :   EXPECT_THROW((b &lt; a), not_comparable_error);
+<span class="lineNum">     703 </span>            :   EXPECT_THROW((b &lt;= a), not_comparable_error);
+<span class="lineNum">     704 </span>            :   EXPECT_FALSE(b == a);
+<span class="lineNum">     705 </span>            :   EXPECT_TRUE(b != a);
+<span class="lineNum">     706 </span>            :   EXPECT_THROW((b &gt;= a), not_comparable_error);
+<span class="lineNum">     707 </span>            :   EXPECT_THROW((b &gt; a), not_comparable_error);
+<span class="lineNum">     708 </span>            : 
+<span class="lineNum">     709 </span>            :   cval[0] = 0.f;
+<span class="lineNum">     710 </span>            :   cval[1] = nan;
+<span class="lineNum">     711 </span>            :   a.val_assign(ndt::make_type&lt;dynd::complex&lt;float&gt;&gt;(), NULL,
+<span class="lineNum">     712 </span>            :                reinterpret_cast&lt;const char *&gt;(&amp;cval[0]));
+<span class="lineNum">     713 </span>            :   cval[0] = 1.f;
+<span class="lineNum">     714 </span>            :   cval[1] = 1.f;
+<span class="lineNum">     715 </span>            :   b.val_assign(ndt::make_type&lt;dynd::complex&lt;float&gt;&gt;(), NULL,
+<span class="lineNum">     716 </span>            :                reinterpret_cast&lt;const char *&gt;(&amp;cval[0]));
+<span class="lineNum">     717 </span>            :   EXPECT_FALSE(a.op_sorting_less(b));
+<span class="lineNum">     718 </span>            :   EXPECT_THROW((a &lt; b), not_comparable_error);
+<span class="lineNum">     719 </span>            :   EXPECT_THROW((a &lt;= b), not_comparable_error);
+<span class="lineNum">     720 </span>            :   EXPECT_FALSE(a == b);
+<span class="lineNum">     721 </span>            :   EXPECT_TRUE(a != b);
+<span class="lineNum">     722 </span>            :   EXPECT_THROW((a &gt;= b), not_comparable_error);
+<span class="lineNum">     723 </span>            :   EXPECT_THROW((a &gt; b), not_comparable_error);
+<span class="lineNum">     724 </span>            :   EXPECT_TRUE(b.op_sorting_less(a));
+<span class="lineNum">     725 </span>            :   EXPECT_THROW((b &lt; a), not_comparable_error);
+<span class="lineNum">     726 </span>            :   EXPECT_THROW((b &lt;= a), not_comparable_error);
+<span class="lineNum">     727 </span>            :   EXPECT_FALSE(b == a);
+<span class="lineNum">     728 </span>            :   EXPECT_TRUE(b != a);
+<span class="lineNum">     729 </span>            :   EXPECT_THROW((b &gt;= a), not_comparable_error);
+<span class="lineNum">     730 </span>            :   EXPECT_THROW((b &gt; a), not_comparable_error);
+<span class="lineNum">     731 </span>            : 
+<span class="lineNum">     732 </span>            :   cval[0] = nan;
+<span class="lineNum">     733 </span>            :   cval[1] = nan;
+<span class="lineNum">     734 </span>            :   a.val_assign(ndt::make_type&lt;dynd::complex&lt;float&gt;&gt;(), NULL,
+<span class="lineNum">     735 </span>            :                reinterpret_cast&lt;const char *&gt;(&amp;cval[0]));
+<span class="lineNum">     736 </span>            :   cval[0] = 1.f;
+<span class="lineNum">     737 </span>            :   cval[1] = 1.f;
+<span class="lineNum">     738 </span>            :   b.val_assign(ndt::make_type&lt;dynd::complex&lt;float&gt;&gt;(), NULL,
+<span class="lineNum">     739 </span>            :                reinterpret_cast&lt;const char *&gt;(&amp;cval[0]));
+<span class="lineNum">     740 </span>            :   EXPECT_FALSE(a.op_sorting_less(b));
+<span class="lineNum">     741 </span>            :   EXPECT_THROW((a &lt; b), not_comparable_error);
+<span class="lineNum">     742 </span>            :   EXPECT_THROW((a &lt;= b), not_comparable_error);
+<span class="lineNum">     743 </span>            :   EXPECT_FALSE(a == b);
+<span class="lineNum">     744 </span>            :   EXPECT_TRUE(a != b);
+<span class="lineNum">     745 </span>            :   EXPECT_THROW((a &gt;= b), not_comparable_error);
+<span class="lineNum">     746 </span>            :   EXPECT_THROW((a &gt; b), not_comparable_error);
+<span class="lineNum">     747 </span>            :   EXPECT_TRUE(b.op_sorting_less(a));
+<span class="lineNum">     748 </span>            :   EXPECT_THROW((b &lt; a), not_comparable_error);
+<span class="lineNum">     749 </span>            :   EXPECT_THROW((b &lt;= a), not_comparable_error);
+<span class="lineNum">     750 </span>            :   EXPECT_FALSE(b == a);
+<span class="lineNum">     751 </span>            :   EXPECT_TRUE(b != a);
+<span class="lineNum">     752 </span>            :   EXPECT_THROW((b &gt;= a), not_comparable_error);
+<span class="lineNum">     753 </span>            :   EXPECT_THROW((b &gt; a), not_comparable_error);
+<span class="lineNum">     754 </span>            : 
+<span class="lineNum">     755 </span>            :   // NaNs compared against NaNs
+<span class="lineNum">     756 </span>            :   cval[0] = nan;
+<span class="lineNum">     757 </span>            :   cval[1] = 0.f;
+<span class="lineNum">     758 </span>            :   a.val_assign(ndt::make_type&lt;dynd::complex&lt;float&gt;&gt;(), NULL,
+<span class="lineNum">     759 </span>            :                reinterpret_cast&lt;const char *&gt;(&amp;cval[0]));
+<span class="lineNum">     760 </span>            :   cval[0] = nan;
+<span class="lineNum">     761 </span>            :   cval[1] = 1.f;
+<span class="lineNum">     762 </span>            :   b.val_assign(ndt::make_type&lt;dynd::complex&lt;float&gt;&gt;(), NULL,
+<span class="lineNum">     763 </span>            :                reinterpret_cast&lt;const char *&gt;(&amp;cval[0]));
+<span class="lineNum">     764 </span>            :   EXPECT_TRUE(a.op_sorting_less(b));
+<span class="lineNum">     765 </span>            :   EXPECT_THROW((a &lt; b), not_comparable_error);
+<span class="lineNum">     766 </span>            :   EXPECT_THROW((a &lt;= b), not_comparable_error);
+<span class="lineNum">     767 </span>            :   EXPECT_FALSE(a == b);
+<span class="lineNum">     768 </span>            :   EXPECT_TRUE(a != b);
+<span class="lineNum">     769 </span>            :   EXPECT_THROW((a &gt;= b), not_comparable_error);
+<span class="lineNum">     770 </span>            :   EXPECT_THROW((a &gt; b), not_comparable_error);
+<span class="lineNum">     771 </span>            :   EXPECT_FALSE(b.op_sorting_less(a));
+<span class="lineNum">     772 </span>            :   EXPECT_THROW((b &lt; a), not_comparable_error);
+<span class="lineNum">     773 </span>            :   EXPECT_THROW((b &lt;= a), not_comparable_error);
+<span class="lineNum">     774 </span>            :   EXPECT_FALSE(b == a);
+<span class="lineNum">     775 </span>            :   EXPECT_TRUE(b != a);
+<span class="lineNum">     776 </span>            :   EXPECT_THROW((b &gt;= a), not_comparable_error);
+<span class="lineNum">     777 </span>            :   EXPECT_THROW((b &gt; a), not_comparable_error);
+<span class="lineNum">     778 </span>            : 
+<span class="lineNum">     779 </span>            :   cval[0] = 0.f;
+<span class="lineNum">     780 </span>            :   cval[1] = nan;
+<span class="lineNum">     781 </span>            :   a.val_assign(ndt::make_type&lt;dynd::complex&lt;float&gt;&gt;(), NULL,
+<span class="lineNum">     782 </span>            :                reinterpret_cast&lt;const char *&gt;(&amp;cval[0]));
+<span class="lineNum">     783 </span>            :   cval[0] = nan;
+<span class="lineNum">     784 </span>            :   cval[1] = 1.f;
+<span class="lineNum">     785 </span>            :   b.val_assign(ndt::make_type&lt;dynd::complex&lt;float&gt;&gt;(), NULL,
+<span class="lineNum">     786 </span>            :                reinterpret_cast&lt;const char *&gt;(&amp;cval[0]));
+<span class="lineNum">     787 </span>            :   EXPECT_FALSE(dynd::isnan(a.p(&quot;real&quot;).as&lt;float&gt;()));
+<span class="lineNum">     788 </span>            :   EXPECT_TRUE(dynd::isnan(a.p(&quot;imag&quot;).as&lt;float&gt;()));
+<span class="lineNum">     789 </span>            :   EXPECT_TRUE(a.op_sorting_less(b));
+<span class="lineNum">     790 </span>            :   EXPECT_THROW((a &lt; b), not_comparable_error);
+<span class="lineNum">     791 </span>            :   EXPECT_THROW((a &lt;= b), not_comparable_error);
+<span class="lineNum">     792 </span>            :   EXPECT_FALSE(a == b);
+<span class="lineNum">     793 </span>            :   EXPECT_TRUE(a != b);
+<span class="lineNum">     794 </span>            :   EXPECT_THROW((a &gt;= b), not_comparable_error);
+<span class="lineNum">     795 </span>            :   EXPECT_THROW((a &gt; b), not_comparable_error);
+<span class="lineNum">     796 </span>            :   EXPECT_FALSE(b.op_sorting_less(a));
+<span class="lineNum">     797 </span>            :   EXPECT_THROW((b &lt; a), not_comparable_error);
+<span class="lineNum">     798 </span>            :   EXPECT_THROW((b &lt;= a), not_comparable_error);
+<span class="lineNum">     799 </span>            :   EXPECT_FALSE(b == a);
+<span class="lineNum">     800 </span>            :   EXPECT_TRUE(b != a);
+<span class="lineNum">     801 </span>            :   EXPECT_THROW((b &gt;= a), not_comparable_error);
+<span class="lineNum">     802 </span>            :   EXPECT_THROW((b &gt; a), not_comparable_error);
+<span class="lineNum">     803 </span>            : 
+<span class="lineNum">     804 </span>            :   cval[0] = nan;
+<span class="lineNum">     805 </span>            :   cval[1] = nan;
+<span class="lineNum">     806 </span>            :   a.val_assign(ndt::make_type&lt;dynd::complex&lt;float&gt;&gt;(), NULL,
+<span class="lineNum">     807 </span>            :                reinterpret_cast&lt;const char *&gt;(&amp;cval[0]));
+<span class="lineNum">     808 </span>            :   cval[0] = nan;
+<span class="lineNum">     809 </span>            :   cval[1] = 1.f;
+<span class="lineNum">     810 </span>            :   b.val_assign(ndt::make_type&lt;dynd::complex&lt;float&gt;&gt;(), NULL,
+<span class="lineNum">     811 </span>            :                reinterpret_cast&lt;const char *&gt;(&amp;cval[0]));
+<span class="lineNum">     812 </span>            :   EXPECT_FALSE(a.op_sorting_less(b));
+<span class="lineNum">     813 </span>            :   EXPECT_THROW((a &lt; b), not_comparable_error);
+<span class="lineNum">     814 </span>            :   EXPECT_THROW((a &lt;= b), not_comparable_error);
+<span class="lineNum">     815 </span>            :   EXPECT_FALSE(a == b);
+<span class="lineNum">     816 </span>            :   EXPECT_TRUE(a != b);
+<span class="lineNum">     817 </span>            :   EXPECT_THROW((a &gt;= b), not_comparable_error);
+<span class="lineNum">     818 </span>            :   EXPECT_THROW((a &gt; b), not_comparable_error);
+<span class="lineNum">     819 </span>            :   EXPECT_TRUE(b.op_sorting_less(a));
+<span class="lineNum">     820 </span>            :   EXPECT_THROW((b &lt; a), not_comparable_error);
+<span class="lineNum">     821 </span>            :   EXPECT_THROW((b &lt;= a), not_comparable_error);
+<span class="lineNum">     822 </span>            :   EXPECT_FALSE(b == a);
+<span class="lineNum">     823 </span>            :   EXPECT_TRUE(b != a);
+<span class="lineNum">     824 </span>            :   EXPECT_THROW((b &gt;= a), not_comparable_error);
+<span class="lineNum">     825 </span>            :   EXPECT_THROW((b &gt; a), not_comparable_error);
+<span class="lineNum">     826 </span>            : 
+<span class="lineNum">     827 </span>            :   cval[0] = 0.f;
+<span class="lineNum">     828 </span>            :   cval[1] = nan;
+<span class="lineNum">     829 </span>            :   a.val_assign(ndt::make_type&lt;dynd::complex&lt;float&gt;&gt;(), NULL,
+<span class="lineNum">     830 </span>            :                reinterpret_cast&lt;const char *&gt;(&amp;cval[0]));
+<span class="lineNum">     831 </span>            :   cval[0] = 1.f;
+<span class="lineNum">     832 </span>            :   cval[1] = nan;
+<span class="lineNum">     833 </span>            :   b.val_assign(ndt::make_type&lt;dynd::complex&lt;float&gt;&gt;(), NULL,
+<span class="lineNum">     834 </span>            :                reinterpret_cast&lt;const char *&gt;(&amp;cval[0]));
+<span class="lineNum">     835 </span>            :   EXPECT_TRUE(a.op_sorting_less(b));
+<span class="lineNum">     836 </span>            :   EXPECT_THROW((a &lt; b), not_comparable_error);
+<span class="lineNum">     837 </span>            :   EXPECT_THROW((a &lt;= b), not_comparable_error);
+<span class="lineNum">     838 </span>            :   EXPECT_FALSE(a == b);
+<span class="lineNum">     839 </span>            :   EXPECT_TRUE(a != b);
+<span class="lineNum">     840 </span>            :   EXPECT_THROW((a &gt;= b), not_comparable_error);
+<span class="lineNum">     841 </span>            :   EXPECT_THROW((a &gt; b), not_comparable_error);
+<span class="lineNum">     842 </span>            :   EXPECT_FALSE(b.op_sorting_less(a));
+<span class="lineNum">     843 </span>            :   EXPECT_THROW((b &lt; a), not_comparable_error);
+<span class="lineNum">     844 </span>            :   EXPECT_THROW((b &lt;= a), not_comparable_error);
+<span class="lineNum">     845 </span>            :   EXPECT_FALSE(b == a);
+<span class="lineNum">     846 </span>            :   EXPECT_TRUE(b != a);
+<span class="lineNum">     847 </span>            :   EXPECT_THROW((b &gt;= a), not_comparable_error);
+<span class="lineNum">     848 </span>            :   EXPECT_THROW((b &gt; a), not_comparable_error);
+<span class="lineNum">     849 </span>            : 
+<span class="lineNum">     850 </span>            :   cval[0] = nan;
+<span class="lineNum">     851 </span>            :   cval[1] = nan;
+<span class="lineNum">     852 </span>            :   a.val_assign(ndt::make_type&lt;dynd::complex&lt;float&gt;&gt;(), NULL,
+<span class="lineNum">     853 </span>            :                reinterpret_cast&lt;const char *&gt;(&amp;cval[0]));
+<span class="lineNum">     854 </span>            :   cval[0] = 0.f;
+<span class="lineNum">     855 </span>            :   cval[1] = nan;
+<span class="lineNum">     856 </span>            :   b.val_assign(ndt::make_type&lt;dynd::complex&lt;float&gt;&gt;(), NULL,
+<span class="lineNum">     857 </span>            :                reinterpret_cast&lt;const char *&gt;(&amp;cval[0]));
+<span class="lineNum">     858 </span>            :   EXPECT_FALSE(a.op_sorting_less(b));
+<span class="lineNum">     859 </span>            :   EXPECT_THROW((a &lt; b), not_comparable_error);
+<span class="lineNum">     860 </span>            :   EXPECT_THROW((a &lt;= b), not_comparable_error);
+<span class="lineNum">     861 </span>            :   EXPECT_FALSE(a == b);
+<span class="lineNum">     862 </span>            :   EXPECT_TRUE(a != b);
+<span class="lineNum">     863 </span>            :   EXPECT_THROW((a &gt;= b), not_comparable_error);
+<span class="lineNum">     864 </span>            :   EXPECT_THROW((a &gt; b), not_comparable_error);
+<span class="lineNum">     865 </span>            :   EXPECT_TRUE(b.op_sorting_less(a));
+<span class="lineNum">     866 </span>            :   EXPECT_THROW((b &lt; a), not_comparable_error);
+<span class="lineNum">     867 </span>            :   EXPECT_THROW((b &lt;= a), not_comparable_error);
+<span class="lineNum">     868 </span>            :   EXPECT_FALSE(b == a);
+<span class="lineNum">     869 </span>            :   EXPECT_TRUE(b != a);
+<span class="lineNum">     870 </span>            :   EXPECT_THROW((b &gt;= a), not_comparable_error);
+<span class="lineNum">     871 </span>            :   EXPECT_THROW((b &gt; a), not_comparable_error);
+<span class="lineNum">     872 </span>            : }
+<span class="lineNum">     873 </span>            : */
+<span class="lineNum">     874 </span>            : 
+<span class="lineNum">     875 </span>            : /*
+<span class="lineNum">     876 </span>            : TEST(ArrayCompare, ExpressionDType)
+<span class="lineNum">     877 </span>            : {
+<span class="lineNum">     878 </span>            :   nd::array a, b;
+<span class="lineNum">     879 </span>            :   // One expression operand
+<span class="lineNum">     880 </span>            :   a = nd::array(3).ucast&lt;float&gt;();
+<span class="lineNum">     881 </span>            :   b = nd::array(4.0);
+<span class="lineNum">     882 </span>            :   EXPECT_TRUE(a.op_sorting_less(b));
+<span class="lineNum">     883 </span>            :   EXPECT_TRUE(a &lt; b);
+<span class="lineNum">     884 </span>            :   EXPECT_TRUE(a &lt;= b);
+<span class="lineNum">     885 </span>            :   EXPECT_FALSE(a == b);
+<span class="lineNum">     886 </span>            :   EXPECT_TRUE(a != b);
+<span class="lineNum">     887 </span>            :   EXPECT_FALSE(a &gt;= b);
+<span class="lineNum">     888 </span>            :   EXPECT_FALSE(a &gt; b);
+<span class="lineNum">     889 </span>            :   EXPECT_FALSE(b.op_sorting_less(a));
+<span class="lineNum">     890 </span>            :   EXPECT_FALSE(b &lt; a);
+<span class="lineNum">     891 </span>            :   EXPECT_FALSE(b &lt;= a);
+<span class="lineNum">     892 </span>            :   EXPECT_FALSE(b == a);
+<span class="lineNum">     893 </span>            :   EXPECT_TRUE(b != a);
+<span class="lineNum">     894 </span>            :   EXPECT_TRUE(b &gt;= a);
+<span class="lineNum">     895 </span>            :   EXPECT_TRUE(b &gt; a);
+<span class="lineNum">     896 </span>            : 
+<span class="lineNum">     897 </span>            :   // Two expression operand
+<span class="lineNum">     898 </span>            :   a = nd::array(3).ucast&lt;float&gt;();
+<span class="lineNum">     899 </span>            :   b = nd::array(&quot;2012-03-04&quot;).ucast(ndt::date_type::make()).p(&quot;day&quot;);
+<span class="lineNum">     900 </span>            :   EXPECT_TRUE(a.op_sorting_less(b));
+<span class="lineNum">     901 </span>            :   EXPECT_TRUE(a &lt; b);
+<span class="lineNum">     902 </span>            :   EXPECT_TRUE(a &lt;= b);
+<span class="lineNum">     903 </span>            :   EXPECT_FALSE(a == b);
+<span class="lineNum">     904 </span>            :   EXPECT_TRUE(a != b);
+<span class="lineNum">     905 </span>            :   EXPECT_FALSE(a &gt;= b);
+<span class="lineNum">     906 </span>            :   EXPECT_FALSE(a &gt; b);
+<span class="lineNum">     907 </span>            :   EXPECT_FALSE(b.op_sorting_less(a));
+<span class="lineNum">     908 </span>            :   EXPECT_FALSE(b &lt; a);
+<span class="lineNum">     909 </span>            :   EXPECT_FALSE(b &lt;= a);
+<span class="lineNum">     910 </span>            :   EXPECT_FALSE(b == a);
+<span class="lineNum">     911 </span>            :   EXPECT_TRUE(b != a);
+<span class="lineNum">     912 </span>            :   EXPECT_TRUE(b &gt;= a);
+<span class="lineNum">     913 </span>            :   EXPECT_TRUE(b &gt; a);
+<span class="lineNum">     914 </span>            : 
+<span class="lineNum">     915 </span>            :   // Non-comparable operands should raise
+<span class="lineNum">     916 </span>            :   a = nd::array(3).ucast&lt;dynd::complex&lt;float&gt;&gt;();
+<span class="lineNum">     917 </span>            :   b = nd::array(4.0);
+<span class="lineNum">     918 </span>            :   EXPECT_THROW((a &lt; b), not_comparable_error);
+<span class="lineNum">     919 </span>            : }
+<span class="lineNum">     920 </span>            : */
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.10</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

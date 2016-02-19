@@ -1,0 +1,277 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - coverage.info.cleaned - include/dynd/callables/base_callable.hpp</title>
+  <link rel="stylesheet" type="text/css" href="../../../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../../../index.html">top level</a> - <a href="index.html">include/dynd/callables</a> - base_callable.hpp<span style="font-size: 80%;"> (source / <a href="base_callable.hpp.func.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">coverage.info.cleaned</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">16</td>
+            <td class="headerCovTableEntry">19</td>
+            <td class="headerCovTableEntryMed">84.2 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2016-02-19</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">10</td>
+            <td class="headerCovTableEntry">12</td>
+            <td class="headerCovTableEntryMed">83.3 %</td>
+          </tr>
+          <tr><td><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : //</a>
+<span class="lineNum">       2 </span>            : // Copyright (C) 2011-15 DyND Developers
+<span class="lineNum">       3 </span>            : // BSD 2-Clause License, see LICENSE.txt
+<span class="lineNum">       4 </span>            : //
+<span class="lineNum">       5 </span>            : 
+<span class="lineNum">       6 </span>            : #pragma once
+<span class="lineNum">       7 </span>            : 
+<span class="lineNum">       8 </span>            : #include &lt;atomic&gt;
+<span class="lineNum">       9 </span>            : #include &lt;map&gt;
+<span class="lineNum">      10 </span>            : 
+<span class="lineNum">      11 </span>            : #include &lt;dynd/array.hpp&gt;
+<span class="lineNum">      12 </span>            : 
+<span class="lineNum">      13 </span>            : namespace dynd {
+<span class="lineNum">      14 </span>            : namespace nd {
+<span class="lineNum">      15 </span>            : 
+<span class="lineNum">      16 </span>            :   /**
+<span class="lineNum">      17 </span>            :    * Resolves any missing keyword arguments for this callable based on
+<span class="lineNum">      18 </span>            :    * the types of the positional arguments and the available keywords arguments.
+<span class="lineNum">      19 </span>            :    *
+<span class="lineNum">      20 </span>            :    * \param self    The callable.
+<span class="lineNum">      21 </span>            :    * \param self_tp The function prototype of the callable.
+<span class="lineNum">      22 </span>            :    * \param nsrc    The number of positional arguments.
+<span class="lineNum">      23 </span>            :    * \param src_tp  An array of the source types.
+<span class="lineNum">      24 </span>            :    * \param kwds    An array of the.
+<span class="lineNum">      25 </span>            :    */
+<span class="lineNum">      26 </span>            :   typedef char *(*callable_data_init_t)(char *static_data, const ndt::type &amp;dst_tp, intptr_t nsrc,
+<span class="lineNum">      27 </span>            :                                         const ndt::type *src_tp, intptr_t nkwd, const array *kwds,
+<span class="lineNum">      28 </span>            :                                         const std::map&lt;std::string, ndt::type&gt; &amp;tp_vars);
+<span class="lineNum">      29 </span>            : 
+<span class="lineNum">      30 </span>            :   /**
+<span class="lineNum">      31 </span>            :    * Resolves the destination type for this callable based on the types
+<span class="lineNum">      32 </span>            :    * of the source parameters.
+<span class="lineNum">      33 </span>            :    *
+<span class="lineNum">      34 </span>            :    * \param self  The callable.
+<span class="lineNum">      35 </span>            :    * \param af_tp  The function prototype of the callable.
+<span class="lineNum">      36 </span>            :    * \param dst_tp  To be filled with the destination type.
+<span class="lineNum">      37 </span>            :    * \param nsrc  The number of source parameters.
+<span class="lineNum">      38 </span>            :    * \param src_tp  An array of the source types.
+<span class="lineNum">      39 </span>            :    */
+<span class="lineNum">      40 </span>            :   typedef void (*callable_resolve_dst_type_t)(char *static_data, char *data, ndt::type &amp;dst_tp, intptr_t nsrc,
+<span class="lineNum">      41 </span>            :                                               const ndt::type *src_tp, intptr_t nkwd, const array *kwds,
+<span class="lineNum">      42 </span>            :                                               const std::map&lt;std::string, ndt::type&gt; &amp;tp_vars);
+<span class="lineNum">      43 </span>            : 
+<span class="lineNum">      44 </span>            :   /**
+<span class="lineNum">      45 </span>            :    * Function prototype for instantiating a kernel from an
+<span class="lineNum">      46 </span>            :    * callable. To use this function, the
+<span class="lineNum">      47 </span>            :    * caller should first allocate a `ckernel_builder` instance,
+<span class="lineNum">      48 </span>            :    * either from C++ normally or by reserving appropriately aligned/sized
+<span class="lineNum">      49 </span>            :    * data and calling the C function constructor dynd provides. When the
+<span class="lineNum">      50 </span>            :    * data types of the kernel require arrmeta, such as for 'strided'
+<span class="lineNum">      51 </span>            :    * or 'var' dimension types, the arrmeta must be provided as well.
+<span class="lineNum">      52 </span>            :    *
+<span class="lineNum">      53 </span>            :    * \param self  The callable.
+<span class="lineNum">      54 </span>            :    * \param self_tp  The function prototype of the callable.
+<span class="lineNum">      55 </span>            :    * \param ckb  A ckernel_builder instance where the kernel is placed.
+<span class="lineNum">      56 </span>            :    * \param ckb_offset  The offset into the output ckernel_builder `ckb`
+<span class="lineNum">      57 </span>            :    *                    where the kernel should be placed.
+<span class="lineNum">      58 </span>            :    * \param dst_tp  The destination type of the ckernel to generate. This may be
+<span class="lineNum">      59 </span>            :    *                different from the one in the function prototype, but must
+<span class="lineNum">      60 </span>            :    *                match its pattern.
+<span class="lineNum">      61 </span>            :    * \param dst_arrmeta  The destination arrmeta.
+<span class="lineNum">      62 </span>            :    * \param nsrc  The number of source arrays.
+<span class="lineNum">      63 </span>            :    * \param src_tp  An array of the source types of the ckernel to generate. These
+<span class="lineNum">      64 </span>            :    *                may be different from the ones in the function prototype, but
+<span class="lineNum">      65 </span>            :    *                must match the patterns.
+<span class="lineNum">      66 </span>            :    * \param src_arrmeta  An array of dynd arrmeta pointers,
+<span class="lineNum">      67 </span>            :    *                     corresponding to the source types.
+<span class="lineNum">      68 </span>            :    * \param kernreq  What kind of C function prototype the resulting ckernel
+<span class="lineNum">      69 </span>            :    *                 should follow. Defined by the enum with kernel_request_*
+<span class="lineNum">      70 </span>            :    *                 values.
+<span class="lineNum">      71 </span>            :    * \param kwds  A struct array of named auxiliary arguments.
+<span class="lineNum">      72 </span>            :    */
+<span class="lineNum">      73 </span>            :   typedef void (*callable_instantiate_t)(char *static_data, char *data, kernel_builder *ckb, const ndt::type &amp;dst_tp,
+<span class="lineNum">      74 </span>            :                                          const char *dst_arrmeta, intptr_t nsrc, const ndt::type *src_tp,
+<span class="lineNum">      75 </span>            :                                          const char *const *src_arrmeta, kernel_request_t kernreq, intptr_t nkwd,
+<span class="lineNum">      76 </span>            :                                          const array *kwds, const std::map&lt;std::string, ndt::type&gt; &amp;tp_vars);
+<span class="lineNum">      77 </span>            : 
+<span class="lineNum">      78 </span>            :   /**
+<span class="lineNum">      79 </span>            :    * A function which deallocates the memory behind data_ptr after
+<span class="lineNum">      80 </span>            :    * freeing any additional resources it might contain.
+<span class="lineNum">      81 </span>            :    */
+<span class="lineNum">      82 </span>            :   typedef void (*callable_static_data_free_t)(char *static_data);
+<span class="lineNum">      83 </span>            : 
+<span class="lineNum">      84 </span>            :   enum callable_property {
+<span class="lineNum">      85 </span>            :     none = 0x00000000,
+<span class="lineNum">      86 </span>            :     left_associative = 0x00000001,
+<span class="lineNum">      87 </span>            :     right_associative = 0x00000002,
+<span class="lineNum">      88 </span>            :     commutative = 0x00000004
+<a name="89"><span class="lineNum">      89 </span>            :   };</a>
+<span class="lineNum">      90 </span>            : 
+<span class="lineNum">      91 </span><span class="lineCov">         13 :   inline callable_property operator|(callable_property a, callable_property b)</span>
+<span class="lineNum">      92 </span>            :   {
+<span class="lineNum">      93 </span><span class="lineCov">         13 :     return static_cast&lt;callable_property&gt;(static_cast&lt;int&gt;(a) | static_cast&lt;int&gt;(b));</span>
+<span class="lineNum">      94 </span>            :   }
+<span class="lineNum">      95 </span>            : 
+<span class="lineNum">      96 </span>            :   struct single_t {
+<span class="lineNum">      97 </span>            :     volatile kernel_single_t func;
+<span class="lineNum">      98 </span>            :     const char *ir;
+<span class="lineNum">      99 </span>            : 
+<span class="lineNum">     100 </span>            :     single_t() = default;
+<span class="lineNum">     101 </span>            : 
+<span class="lineNum">     102 </span>            :     single_t(volatile kernel_single_t func, const volatile char *ir) : func(func), ir(const_cast&lt;const char *&gt;(ir)) {}
+<span class="lineNum">     103 </span>            :   };
+<span class="lineNum">     104 </span>            : 
+<span class="lineNum">     105 </span>            :   /**
+<span class="lineNum">     106 </span>            :    * This is a struct designed for interoperability at
+<span class="lineNum">     107 </span>            :    * the C ABI level. It contains enough information
+<span class="lineNum">     108 </span>            :    * to pass callable from one library to another
+<span class="lineNum">     109 </span>            :    * with no dependencies between them.
+<span class="lineNum">     110 </span>            :    *
+<span class="lineNum">     111 </span>            :    * The callable can produce a ckernel with with a few
+<span class="lineNum">     112 </span>            :    * variations, like choosing between a single
+<span class="lineNum">     113 </span>            :    * operation and a strided operation, or constructing
+<span class="lineNum">     114 </span>            :    * with different array arrmeta.
+<span class="lineNum">     115 </span>            :    */
+<span class="lineNum">     116 </span>            :   struct DYND_API base_callable {
+<span class="lineNum">     117 </span>            :     std::atomic_long use_count;
+<span class="lineNum">     118 </span>            :     ndt::type tp;
+<span class="lineNum">     119 </span>            :     kernel_targets_t targets;
+<span class="lineNum">     120 </span>            :     const char *ir;
+<span class="lineNum">     121 </span>            :     callable_data_init_t data_init;
+<span class="lineNum">     122 </span>            :     callable_resolve_dst_type_t resolve_dst_type;
+<span class="lineNum">     123 </span>            :     callable_instantiate_t instantiate;
+<span class="lineNum">     124 </span>            : 
+<span class="lineNum">     125 </span>            :     base_callable() : use_count(0), data_init(NULL), resolve_dst_type(NULL), instantiate(NULL) {}
+<span class="lineNum">     126 </span>            : 
+<span class="lineNum">     127 </span>            :     base_callable(const ndt::type &amp;tp, const base_callable &amp;other)
+<span class="lineNum">     128 </span>            :         : use_count(0), tp(tp), targets(other.targets), ir(other.ir), data_init(other.data_init),
+<span class="lineNum">     129 </span>            :           resolve_dst_type(other.resolve_dst_type), instantiate(other.instantiate)
+<span class="lineNum">     130 </span>            :     {
+<span class="lineNum">     131 </span>            :     }
+<span class="lineNum">     132 </span>            : 
+<span class="lineNum">     133 </span>            :     base_callable(const ndt::type &amp;tp, kernel_targets_t targets)
+<span class="lineNum">     134 </span>            :         : use_count(0), tp(tp), targets(targets), data_init(&amp;kernel_prefix::data_init), resolve_dst_type(NULL),
+<span class="lineNum">     135 </span>            :           instantiate(&amp;kernel_prefix::instantiate)
+<span class="lineNum">     136 </span>            :     {
+<span class="lineNum">     137 </span>            :       new (static_data()) kernel_targets_t(targets);
+<a name="138"><span class="lineNum">     138 </span>            :     }</a>
+<span class="lineNum">     139 </span>            : 
+<span class="lineNum">     140 </span><span class="lineCov">       5566 :     base_callable(const ndt::type &amp;tp, kernel_targets_t targets, const volatile char *ir,</span>
+<span class="lineNum">     141 </span>            :                   callable_data_init_t data_init, callable_resolve_dst_type_t resolve_dst_type,
+<span class="lineNum">     142 </span>            :                   callable_instantiate_t instantiate)
+<span class="lineNum">     143 </span>            :         : use_count(0), tp(tp), targets(targets), ir(const_cast&lt;const char *&gt;(ir)), data_init(data_init),
+<span class="lineNum">     144 </span><span class="lineCov">       5566 :           resolve_dst_type(resolve_dst_type), instantiate(instantiate)</span>
+<span class="lineNum">     145 </span>            :     {
+<span class="lineNum">     146 </span><span class="lineCov">       5566 :     }</span>
+<span class="lineNum">     147 </span>            : 
+<span class="lineNum">     148 </span>            :     // non-copyable
+<a name="149"><span class="lineNum">     149 </span>            :     base_callable(const base_callable &amp;) = delete;</a>
+<span class="lineNum">     150 </span>            : 
+<a name="151"><span class="lineNum">     151 </span><span class="lineCov">       7534 :     virtual ~base_callable() {}</span></a>
+<span class="lineNum">     152 </span>            : 
+<a name="153"><span class="lineNum">     153 </span><span class="lineCov">      15880 :     char *static_data() { return reinterpret_cast&lt;char *&gt;(this + 1); }</span></a>
+<span class="lineNum">     154 </span>            : 
+<a name="155"><span class="lineNum">     155 </span><span class="lineCov">        231 :     const char *static_data() const { return reinterpret_cast&lt;const char *&gt;(this + 1); }</span></a>
+<span class="lineNum">     156 </span>            : 
+<span class="lineNum">     157 </span><span class="lineNoCov">          0 :     virtual callable &amp;overload(const ndt::type &amp;DYND_UNUSED(ret_tp), intptr_t DYND_UNUSED(narg),</span>
+<span class="lineNum">     158 </span>            :                                const ndt::type *DYND_UNUSED(arg_tp))
+<span class="lineNum">     159 </span>            :     {
+<span class="lineNum">     160 </span><span class="lineNoCov">          0 :       throw std::runtime_error(&quot;callable is not overloadable&quot;);</span>
+<span class="lineNum">     161 </span>            :     }
+<span class="lineNum">     162 </span>            : 
+<span class="lineNum">     163 </span>            :     array call(ndt::type &amp;dst_tp, intptr_t nsrc, const ndt::type *src_tp, const char *const *src_arrmeta,
+<span class="lineNum">     164 </span>            :                char *const *src_data, intptr_t nkwd, const array *kwds,
+<span class="lineNum">     165 </span>            :                const std::map&lt;std::string, ndt::type&gt; &amp;tp_vars);
+<span class="lineNum">     166 </span>            : 
+<span class="lineNum">     167 </span>            :     array call(ndt::type &amp;dst_tp, intptr_t nsrc, const ndt::type *src_tp, const char *const *src_arrmeta,
+<span class="lineNum">     168 </span>            :                const array *src_data, intptr_t nkwd, const array *kwds,
+<span class="lineNum">     169 </span>            :                const std::map&lt;std::string, ndt::type&gt; &amp;tp_vars);
+<span class="lineNum">     170 </span>            : 
+<span class="lineNum">     171 </span>            :     void call(const ndt::type &amp;dst_tp, const char *dst_arrmeta, array *dst_data, intptr_t nsrc, const ndt::type *src_tp,
+<span class="lineNum">     172 </span>            :               const char *const *src_arrmeta, const array *src_data, intptr_t nkwd, const array *kwds,
+<span class="lineNum">     173 </span>            :               const std::map&lt;std::string, ndt::type&gt; &amp;tp_vars);
+<span class="lineNum">     174 </span>            : 
+<span class="lineNum">     175 </span>            :     void call(const ndt::type &amp;dst_tp, const char *dst_arrmeta, char *dst_data, intptr_t nsrc, const ndt::type *src_tp,
+<span class="lineNum">     176 </span>            :               const char *const *src_arrmeta, char *const *src_data, intptr_t nkwd, const array *kwds,
+<a name="177"><span class="lineNum">     177 </span>            :               const std::map&lt;std::string, ndt::type&gt; &amp;tp_vars);</a>
+<span class="lineNum">     178 </span>            : 
+<span class="lineNum">     179 </span><span class="lineCov">       5566 :     static void *operator new(size_t size, size_t static_data_size = 0)</span>
+<span class="lineNum">     180 </span>            :     {
+<span class="lineNum">     181 </span><span class="lineCov">       5566 :       return ::operator new(size + static_data_size);</span>
+<a name="182"><span class="lineNum">     182 </span>            :     }</a>
+<span class="lineNum">     183 </span>            : 
+<a name="184"><span class="lineNum">     184 </span><span class="lineCov">       5566 :     static void operator delete(void *ptr) { ::operator delete(ptr); }</span></a>
+<span class="lineNum">     185 </span>            : 
+<span class="lineNum">     186 </span><span class="lineNoCov">          0 :     static void operator delete(void *ptr, size_t DYND_UNUSED(static_data_size)) { ::operator delete(ptr); }</span>
+<a name="187"><span class="lineNum">     187 </span>            :   };</a>
+<span class="lineNum">     188 </span>            : 
+<a name="189"><span class="lineNum">     189 </span><span class="lineCov">      13044 :   inline void intrusive_ptr_retain(base_callable *ptr) { ++ptr-&gt;use_count; }</span></a>
+<span class="lineNum">     190 </span>            : 
+<span class="lineNum">     191 </span><span class="lineCov">      13044 :   inline void intrusive_ptr_release(base_callable *ptr)</span>
+<span class="lineNum">     192 </span>            :   {
+<span class="lineNum">     193 </span><span class="lineCov">      13044 :     if (--ptr-&gt;use_count == 0) {</span>
+<span class="lineNum">     194 </span><span class="lineCov">       5566 :       delete ptr;</span>
+<span class="lineNum">     195 </span>            :     }
+<span class="lineNum">     196 </span><span class="lineCov">      13044 :   }</span>
+<span class="lineNum">     197 </span>            : 
+<span class="lineNum">     198 </span>            :   inline long intrusive_ptr_use_count(base_callable *ptr) { return ptr-&gt;use_count; }
+<span class="lineNum">     199 </span>            : 
+<span class="lineNum">     200 </span>            : } // namespace dynd::nd
+<span class="lineNum">     201 </span>            : } // namespace dynd
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.10</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

@@ -1,0 +1,326 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - coverage.info.cleaned - include/dynd/kernels/apply_callable_kernel.hpp</title>
+  <link rel="stylesheet" type="text/css" href="../../../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../../../index.html">top level</a> - <a href="index.html">include/dynd/kernels</a> - apply_callable_kernel.hpp<span style="font-size: 80%;"> (source / <a href="apply_callable_kernel.hpp.func.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">coverage.info.cleaned</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">2</td>
+            <td class="headerCovTableEntry">2</td>
+            <td class="headerCovTableEntryHi">100.0 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2016-02-19</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">301</td>
+            <td class="headerCovTableEntry">556</td>
+            <td class="headerCovTableEntryLo">54.1 %</td>
+          </tr>
+          <tr><td><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : //</a>
+<span class="lineNum">       2 </span>            : // Copyright (C) 2011-15 DyND Developers
+<span class="lineNum">       3 </span>            : // BSD 2-Clause License, see LICENSE.txt
+<span class="lineNum">       4 </span>            : //
+<span class="lineNum">       5 </span>            : 
+<span class="lineNum">       6 </span>            : #pragma once
+<span class="lineNum">       7 </span>            : 
+<span class="lineNum">       8 </span>            : #include &lt;dynd/kernels/apply.hpp&gt;
+<span class="lineNum">       9 </span>            : #include &lt;dynd/kernels/base_kernel.hpp&gt;
+<span class="lineNum">      10 </span>            : 
+<span class="lineNum">      11 </span>            : namespace dynd {
+<span class="lineNum">      12 </span>            : namespace nd {
+<span class="lineNum">      13 </span>            :   namespace functional {
+<span class="lineNum">      14 </span>            :     namespace detail {
+<span class="lineNum">      15 </span>            : 
+<span class="lineNum">      16 </span>            :       template &lt;typename func_type, typename R, typename A, typename I, typename K, typename J&gt;
+<span class="lineNum">      17 </span>            :       struct apply_callable_kernel;
+<span class="lineNum">      18 </span>            : 
+<span class="lineNum">      19 </span>            : #define APPLY_CALLABLE_KERNEL(...)                                                                                     \
+<span class="lineNum">      20 </span>            :   template &lt;typename func_type, typename R, typename... A, size_t... I, typename... K, size_t... J&gt;                    \
+<span class="lineNum">      21 </span>            :   struct apply_callable_kernel&lt;func_type, R, type_sequence&lt;A...&gt;, index_sequence&lt;I...&gt;, type_sequence&lt;K...&gt;,           \
+<span class="lineNum">      22 </span>            :                                index_sequence&lt;J...&gt;&gt;                                                                   \
+<span class="lineNum">      23 </span>            :       : base_kernel&lt;apply_callable_kernel&lt;func_type, R, type_sequence&lt;A...&gt;, index_sequence&lt;I...&gt;,                     \
+<span class="lineNum">      24 </span>            :                                           type_sequence&lt;K...&gt;, index_sequence&lt;J...&gt;&gt;,                                  \
+<span class="lineNum">      25 </span>            :                     sizeof...(A)&gt;,                                                                                     \
+<span class="lineNum">      26 </span>            :         apply_args&lt;type_sequence&lt;A...&gt;, index_sequence&lt;I...&gt;&gt;,                                                         \
+<span class="lineNum">      27 </span>            :         apply_kwds&lt;type_sequence&lt;K...&gt;, index_sequence&lt;J...&gt;&gt; {                                                        \
+<span class="lineNum">      28 </span>            :     typedef apply_args&lt;type_sequence&lt;A...&gt;, index_sequence&lt;I...&gt;&gt; args_type;                                           \
+<span class="lineNum">      29 </span>            :     typedef apply_kwds&lt;type_sequence&lt;K...&gt;, index_sequence&lt;J...&gt;&gt; kwds_type;                                           \
+<span class="lineNum">      30 </span>            :                                                                                                                        \
+<span class="lineNum">      31 </span>            :     func_type func;                                                                                                    \
+<span class="lineNum">      32 </span>            :                                                                                                                        \
+<span class="lineNum">      33 </span>            :     __VA_ARGS__ apply_callable_kernel(func_type func, args_type args, kwds_type kwds)                                  \
+<span class="lineNum">      34 </span>            :         : args_type(args), kwds_type(kwds), func(func)                                                                 \
+<span class="lineNum">      35 </span>            :     {                                                                                                                  \
+<span class="lineNum">      36 </span>            :     }                                                                                                                  \
+<span class="lineNum">      37 </span>            :                                                                                                                        \
+<span class="lineNum">      38 </span>            :     __VA_ARGS__ void single(char *dst, char *const *DYND_IGNORE_UNUSED(src))                                           \
+<span class="lineNum">      39 </span>            :     {                                                                                                                  \
+<span class="lineNum">      40 </span>            :       *reinterpret_cast&lt;R *&gt;(dst) = func(apply_arg&lt;A, I&gt;::get(src[I])..., apply_kwd&lt;K, J&gt;::get()...);                  \
+<span class="lineNum">      41 </span>            :     }                                                                                                                  \
+<span class="lineNum">      42 </span>            :                                                                                                                        \
+<span class="lineNum">      43 </span>            :     __VA_ARGS__ void strided(char *dst, intptr_t dst_stride, char *const *DYND_IGNORE_UNUSED(src_copy),                \
+<span class="lineNum">      44 </span>            :                              const intptr_t *DYND_IGNORE_UNUSED(src_stride), size_t count)                             \
+<span class="lineNum">      45 </span>            :     {                                                                                                                  \
+<span class="lineNum">      46 </span>            :       dynd::detail::array_wrapper&lt;char *, sizeof...(A)&gt; src;                                                           \
+<span class="lineNum">      47 </span>            :                                                                                                                        \
+<span class="lineNum">      48 </span>            :       dst += DYND_THREAD_ID(0) * dst_stride;                                                                           \
+<span class="lineNum">      49 </span>            :       for (size_t j = 0; j != sizeof...(A); ++j) {                                                                     \
+<span class="lineNum">      50 </span>            :         src[j] = src_copy[j] + DYND_THREAD_ID(0) * src_stride[j];                                                      \
+<span class="lineNum">      51 </span>            :       }                                                                                                                \
+<span class="lineNum">      52 </span>            :                                                                                                                        \
+<span class="lineNum">      53 </span>            :       for (std::ptrdiff_t i = DYND_THREAD_ID(0); i &lt; (std::ptrdiff_t)count; i += DYND_THREAD_COUNT(0)) {               \
+<span class="lineNum">      54 </span>            :         *reinterpret_cast&lt;R *&gt;(dst) = func(apply_arg&lt;A, I&gt;::get(src[I])..., apply_kwd&lt;K, J&gt;::get()...);                \
+<span class="lineNum">      55 </span>            :         dst += DYND_THREAD_COUNT(0) * dst_stride;                                                                      \
+<span class="lineNum">      56 </span>            :         for (size_t j = 0; j != sizeof...(A); ++j) {                                                                   \
+<span class="lineNum">      57 </span>            :           src[j] += DYND_THREAD_COUNT(0) * src_stride[j];                                                              \
+<span class="lineNum">      58 </span>            :         }                                                                                                              \
+<span class="lineNum">      59 </span>            :       }                                                                                                                \
+<span class="lineNum">      60 </span>            :     }                                                                                                                  \
+<span class="lineNum">      61 </span>            :                                                                                                                        \
+<span class="lineNum">      62 </span>            :     static void instantiate(char *static_data, char *DYND_UNUSED(data), kernel_builder *ckb,                           \
+<span class="lineNum">      63 </span>            :                             const ndt::type &amp;DYND_UNUSED(dst_tp), const char *DYND_UNUSED(dst_arrmeta),                \
+<span class="lineNum">      64 </span>            :                             intptr_t DYND_UNUSED(nsrc), const ndt::type *src_tp, const char *const *src_arrmeta,       \
+<span class="lineNum">      65 </span>            :                             kernel_request_t kernreq, intptr_t nkwd, const array *kwds,                                \
+<span class="lineNum">      66 </span>            :                             const std::map&lt;std::string, ndt::type&gt; &amp;DYND_UNUSED(tp_vars))                              \
+<span class="lineNum">      67 </span>            :     {                                                                                                                  \
+<span class="lineNum">      68 </span>            :       ckb-&gt;emplace_back&lt;apply_callable_kernel&gt;(                                                                        \
+<span class="lineNum">      69 </span>            :           kernreq, dynd::detail::make_value_wrapper(*reinterpret_cast&lt;func_type *&gt;(static_data)),                      \
+<span class="lineNum">      70 </span>            :           args_type(src_tp, src_arrmeta, kwds), kwds_type(nkwd, kwds));                                                \
+<span class="lineNum">      71 </span>            :     }                                                                                                                  \
+<span class="lineNum">      72 </span>            :   };                                                                                                                   \
+<span class="lineNum">      73 </span>            :                                                                                                                        \
+<span class="lineNum">      74 </span>            :   template &lt;typename func_type, typename... A, size_t... I, typename... K, size_t... J&gt;                                \
+<span class="lineNum">      75 </span>            :   struct apply_callable_kernel&lt;func_type, void, type_sequence&lt;A...&gt;, index_sequence&lt;I...&gt;, type_sequence&lt;K...&gt;,        \
+<span class="lineNum">      76 </span>            :                                index_sequence&lt;J...&gt;&gt;                                                                   \
+<span class="lineNum">      77 </span>            :       : base_kernel&lt;apply_callable_kernel&lt;func_type, void, type_sequence&lt;A...&gt;, index_sequence&lt;I...&gt;,                  \
+<span class="lineNum">      78 </span>            :                                           type_sequence&lt;K...&gt;, index_sequence&lt;J...&gt;&gt;,                                  \
+<span class="lineNum">      79 </span>            :                     sizeof...(A)&gt;,                                                                                     \
+<span class="lineNum">      80 </span>            :         apply_args&lt;type_sequence&lt;A...&gt;, index_sequence&lt;I...&gt;&gt;,                                                         \
+<span class="lineNum">      81 </span>            :         apply_kwds&lt;type_sequence&lt;K...&gt;, index_sequence&lt;J...&gt;&gt; {                                                        \
+<span class="lineNum">      82 </span>            :     typedef apply_args&lt;type_sequence&lt;A...&gt;, index_sequence&lt;I...&gt;&gt; args_type;                                           \
+<span class="lineNum">      83 </span>            :     typedef apply_kwds&lt;type_sequence&lt;K...&gt;, index_sequence&lt;J...&gt;&gt; kwds_type;                                           \
+<span class="lineNum">      84 </span>            :                                                                                                                        \
+<span class="lineNum">      85 </span>            :     func_type func;                                                                                                    \
+<span class="lineNum">      86 </span>            :                                                                                                                        \
+<span class="lineNum">      87 </span>            :     __VA_ARGS__ apply_callable_kernel(func_type func, args_type args, kwds_type kwds)                                  \
+<span class="lineNum">      88 </span>            :         : args_type(args), kwds_type(kwds), func(func)                                                                 \
+<span class="lineNum">      89 </span>            :     {                                                                                                                  \
+<span class="lineNum">      90 </span>            :     }                                                                                                                  \
+<span class="lineNum">      91 </span>            :                                                                                                                        \
+<span class="lineNum">      92 </span>            :     __VA_ARGS__ void single(char *DYND_UNUSED(dst), char *const *DYND_IGNORE_UNUSED(src))                              \
+<span class="lineNum">      93 </span>            :     {                                                                                                                  \
+<span class="lineNum">      94 </span>            :       func(apply_arg&lt;A, I&gt;::get(src[I])..., apply_kwd&lt;K, J&gt;::get()...);                                                \
+<span class="lineNum">      95 </span>            :     }                                                                                                                  \
+<span class="lineNum">      96 </span>            :                                                                                                                        \
+<span class="lineNum">      97 </span>            :     __VA_ARGS__ void strided(char *DYND_UNUSED(dst), intptr_t DYND_UNUSED(dst_stride),                                 \
+<span class="lineNum">      98 </span>            :                              char *const *DYND_IGNORE_UNUSED(src_copy),                                                \
+<span class="lineNum">      99 </span>            :                              const intptr_t *DYND_IGNORE_UNUSED(src_stride), size_t count)                             \
+<span class="lineNum">     100 </span>            :     {                                                                                                                  \
+<span class="lineNum">     101 </span>            :       dynd::detail::array_wrapper&lt;char *, sizeof...(A)&gt; src;                                                           \
+<span class="lineNum">     102 </span>            :                                                                                                                        \
+<span class="lineNum">     103 </span>            :       for (size_t j = 0; j != sizeof...(A); ++j) {                                                                     \
+<span class="lineNum">     104 </span>            :         src[j] = src_copy[j] + DYND_THREAD_ID(0) * src_stride[j];                                                      \
+<span class="lineNum">     105 </span>            :       }                                                                                                                \
+<span class="lineNum">     106 </span>            :                                                                                                                        \
+<span class="lineNum">     107 </span>            :       for (std::ptrdiff_t i = DYND_THREAD_ID(0); i &lt; (std::ptrdiff_t)count; i += DYND_THREAD_COUNT(0)) {               \
+<span class="lineNum">     108 </span>            :         func(apply_arg&lt;A, I&gt;::get(src[I])..., apply_kwd&lt;K, J&gt;::get()...);                                              \
+<span class="lineNum">     109 </span>            :         for (size_t j = 0; j != sizeof...(A); ++j) {                                                                   \
+<span class="lineNum">     110 </span>            :           src[j] += DYND_THREAD_COUNT(0) * src_stride[j];                                                              \
+<span class="lineNum">     111 </span>            :         }                                                                                                              \
+<span class="lineNum">     112 </span>            :       }                                                                                                                \
+<span class="lineNum">     113 </span>            :     }                                                                                                                  \
+<span class="lineNum">     114 </span>            :                                                                                                                        \
+<span class="lineNum">     115 </span>            :     static void instantiate(char *static_data, char *DYND_UNUSED(data), kernel_builder *ckb,                           \
+<span class="lineNum">     116 </span>            :                             const ndt::type &amp;DYND_UNUSED(dst_tp), const char *DYND_UNUSED(dst_arrmeta),                \
+<span class="lineNum">     117 </span>            :                             intptr_t DYND_UNUSED(nsrc), const ndt::type *src_tp, const char *const *src_arrmeta,       \
+<span class="lineNum">     118 </span>            :                             kernel_request_t kernreq, intptr_t nkwd, const nd::array *kwds,                            \
+<span class="lineNum">     119 </span>            :                             const std::map&lt;std::string, ndt::type&gt; &amp;DYND_UNUSED(tp_vars))                              \
+<span class="lineNum">     120 </span>            :     {                                                                                                                  \
+<span class="lineNum">     121 </span>            :       ckb-&gt;emplace_back&lt;apply_callable_kernel&gt;(                                                                        \
+<span class="lineNum">     122 </span>            :           kernreq, dynd::detail::make_value_wrapper(*reinterpret_cast&lt;func_type *&gt;(static_data)),                      \
+<span class="lineNum">     123 </span>            :           args_type(src_tp, src_arrmeta, kwds), kwds_type(nkwd, kwds));                                                \
+<span class="lineNum">     124 </span>            :     }                                                                                                                  \
+<a name="125"><span class="lineNum">     125 </span>            :   }</a>
+<span class="lineNum">     126 </span>            : 
+<span class="lineNum">     127 </span><span class="lineCov">        286 :       APPLY_CALLABLE_KERNEL();</span>
+<span class="lineNum">     128 </span>            : 
+<span class="lineNum">     129 </span>            : #undef APPLY_CALLABLE_KERNEL
+<span class="lineNum">     130 </span>            : 
+<span class="lineNum">     131 </span>            : #define APPLY_CALLABLE_KERNEL(...)                                                                                     \
+<span class="lineNum">     132 </span>            :   template &lt;typename func_type, typename R, typename... A, size_t... I, typename... K, size_t... J&gt;                    \
+<span class="lineNum">     133 </span>            :   struct apply_callable_kernel&lt;func_type *, R, type_sequence&lt;A...&gt;, index_sequence&lt;I...&gt;, type_sequence&lt;K...&gt;,         \
+<span class="lineNum">     134 </span>            :                                index_sequence&lt;J...&gt;&gt;                                                                   \
+<span class="lineNum">     135 </span>            :       : base_kernel&lt;apply_callable_kernel&lt;func_type *, R, type_sequence&lt;A...&gt;, index_sequence&lt;I...&gt;,                   \
+<span class="lineNum">     136 </span>            :                                           type_sequence&lt;K...&gt;, index_sequence&lt;J...&gt;&gt;,                                  \
+<span class="lineNum">     137 </span>            :                     sizeof...(A)&gt;,                                                                                     \
+<span class="lineNum">     138 </span>            :         apply_args&lt;type_sequence&lt;A...&gt;, index_sequence&lt;I...&gt;&gt;,                                                         \
+<span class="lineNum">     139 </span>            :         apply_kwds&lt;type_sequence&lt;K...&gt;, index_sequence&lt;J...&gt;&gt; {                                                        \
+<span class="lineNum">     140 </span>            :     typedef apply_args&lt;type_sequence&lt;A...&gt;, index_sequence&lt;I...&gt;&gt; args_type;                                           \
+<span class="lineNum">     141 </span>            :     typedef apply_kwds&lt;type_sequence&lt;K...&gt;, index_sequence&lt;J...&gt;&gt; kwds_type;                                           \
+<span class="lineNum">     142 </span>            :                                                                                                                        \
+<span class="lineNum">     143 </span>            :     func_type *func;                                                                                                   \
+<span class="lineNum">     144 </span>            :                                                                                                                        \
+<span class="lineNum">     145 </span>            :     __VA_ARGS__ apply_callable_kernel(func_type *func, args_type args, kwds_type kwds)                                 \
+<span class="lineNum">     146 </span>            :         : args_type(args), kwds_type(kwds), func(func)                                                                 \
+<span class="lineNum">     147 </span>            :     {                                                                                                                  \
+<span class="lineNum">     148 </span>            :     }                                                                                                                  \
+<span class="lineNum">     149 </span>            :                                                                                                                        \
+<span class="lineNum">     150 </span>            :     __VA_ARGS__ void single(char *dst, char *const *DYND_IGNORE_UNUSED(src))                                           \
+<span class="lineNum">     151 </span>            :     {                                                                                                                  \
+<span class="lineNum">     152 </span>            :       *reinterpret_cast&lt;R *&gt;(dst) = (*func)(apply_arg&lt;A, I&gt;::get(src[I])..., apply_kwd&lt;K, J&gt;::get()...);               \
+<span class="lineNum">     153 </span>            :     }                                                                                                                  \
+<span class="lineNum">     154 </span>            :                                                                                                                        \
+<span class="lineNum">     155 </span>            :     __VA_ARGS__ void strided(char *dst, intptr_t dst_stride, char *const *DYND_IGNORE_UNUSED(src_copy),                \
+<span class="lineNum">     156 </span>            :                              const intptr_t *DYND_IGNORE_UNUSED(src_stride), size_t count)                             \
+<span class="lineNum">     157 </span>            :     {                                                                                                                  \
+<span class="lineNum">     158 </span>            :       dynd::detail::array_wrapper&lt;char *, sizeof...(A)&gt; src;                                                           \
+<span class="lineNum">     159 </span>            :                                                                                                                        \
+<span class="lineNum">     160 </span>            :       dst += DYND_THREAD_ID(0) * dst_stride;                                                                           \
+<span class="lineNum">     161 </span>            :       for (size_t j = 0; j != sizeof...(A); ++j) {                                                                     \
+<span class="lineNum">     162 </span>            :         src[j] = src_copy[j] + DYND_THREAD_ID(0) * src_stride[j];                                                      \
+<span class="lineNum">     163 </span>            :       }                                                                                                                \
+<span class="lineNum">     164 </span>            :                                                                                                                        \
+<span class="lineNum">     165 </span>            :       for (std::ptrdiff_t i = DYND_THREAD_ID(0); i &lt; (std::ptrdiff_t)count; i += DYND_THREAD_COUNT(0)) {               \
+<span class="lineNum">     166 </span>            :         *reinterpret_cast&lt;R *&gt;(dst) = (*func)(apply_arg&lt;A, I&gt;::get(src[I])..., apply_kwd&lt;K, J&gt;::get()...);             \
+<span class="lineNum">     167 </span>            :         dst += DYND_THREAD_COUNT(0) * dst_stride;                                                                      \
+<span class="lineNum">     168 </span>            :         for (size_t j = 0; j != sizeof...(A); ++j) {                                                                   \
+<span class="lineNum">     169 </span>            :           src[j] += DYND_THREAD_COUNT(0) * src_stride[j];                                                              \
+<span class="lineNum">     170 </span>            :         }                                                                                                              \
+<span class="lineNum">     171 </span>            :       }                                                                                                                \
+<span class="lineNum">     172 </span>            :     }                                                                                                                  \
+<span class="lineNum">     173 </span>            :                                                                                                                        \
+<span class="lineNum">     174 </span>            :     static void instantiate(char *static_data, char *DYND_UNUSED(data), kernel_builder *ckb,                           \
+<span class="lineNum">     175 </span>            :                             const ndt::type &amp;DYND_UNUSED(dst_tp), const char *DYND_UNUSED(dst_arrmeta),                \
+<span class="lineNum">     176 </span>            :                             intptr_t DYND_UNUSED(nsrc), const ndt::type *src_tp, const char *const *src_arrmeta,       \
+<span class="lineNum">     177 </span>            :                             kernel_request_t kernreq, intptr_t nkwd, const nd::array *kwds,                            \
+<span class="lineNum">     178 </span>            :                             const std::map&lt;std::string, ndt::type&gt; &amp;DYND_UNUSED(tp_vars))                              \
+<span class="lineNum">     179 </span>            :     {                                                                                                                  \
+<span class="lineNum">     180 </span>            :       ckb-&gt;emplace_back&lt;apply_callable_kernel&gt;(kernreq, *reinterpret_cast&lt;func_type **&gt;(static_data),                  \
+<span class="lineNum">     181 </span>            :                                                args_type(src_tp, src_arrmeta, kwds), kwds_type(nkwd, kwds));           \
+<span class="lineNum">     182 </span>            :     }                                                                                                                  \
+<span class="lineNum">     183 </span>            :   };                                                                                                                   \
+<span class="lineNum">     184 </span>            :                                                                                                                        \
+<span class="lineNum">     185 </span>            :   template &lt;typename func_type, typename... A, size_t... I, typename... K, size_t... J&gt;                                \
+<span class="lineNum">     186 </span>            :   struct apply_callable_kernel&lt;func_type *, void, type_sequence&lt;A...&gt;, index_sequence&lt;I...&gt;, type_sequence&lt;K...&gt;,      \
+<span class="lineNum">     187 </span>            :                                index_sequence&lt;J...&gt;&gt;                                                                   \
+<span class="lineNum">     188 </span>            :       : base_kernel&lt;apply_callable_kernel&lt;func_type *, void, type_sequence&lt;A...&gt;, index_sequence&lt;I...&gt;,                \
+<span class="lineNum">     189 </span>            :                                           type_sequence&lt;K...&gt;, index_sequence&lt;J...&gt;&gt;,                                  \
+<span class="lineNum">     190 </span>            :                     sizeof...(A)&gt;,                                                                                     \
+<span class="lineNum">     191 </span>            :         apply_args&lt;type_sequence&lt;A...&gt;, index_sequence&lt;I...&gt;&gt;,                                                         \
+<span class="lineNum">     192 </span>            :         apply_kwds&lt;type_sequence&lt;K...&gt;, index_sequence&lt;J...&gt;&gt; {                                                        \
+<span class="lineNum">     193 </span>            :     typedef apply_args&lt;type_sequence&lt;A...&gt;, index_sequence&lt;I...&gt;&gt; args_type;                                           \
+<span class="lineNum">     194 </span>            :     typedef apply_kwds&lt;type_sequence&lt;K...&gt;, index_sequence&lt;J...&gt;&gt; kwds_type;                                           \
+<span class="lineNum">     195 </span>            :                                                                                                                        \
+<span class="lineNum">     196 </span>            :     func_type *func;                                                                                                   \
+<span class="lineNum">     197 </span>            :                                                                                                                        \
+<span class="lineNum">     198 </span>            :     __VA_ARGS__ apply_callable_kernel(func_type *func, args_type args, kwds_type kwds)                                 \
+<span class="lineNum">     199 </span>            :         : args_type(args), kwds_type(kwds), func(func)                                                                 \
+<span class="lineNum">     200 </span>            :     {                                                                                                                  \
+<span class="lineNum">     201 </span>            :     }                                                                                                                  \
+<span class="lineNum">     202 </span>            :                                                                                                                        \
+<span class="lineNum">     203 </span>            :     __VA_ARGS__ void single(char *DYND_UNUSED(dst), char *const *DYND_IGNORE_UNUSED(src))                              \
+<span class="lineNum">     204 </span>            :     {                                                                                                                  \
+<span class="lineNum">     205 </span>            :       (*func)(apply_arg&lt;A, I&gt;::get(src[I])..., apply_kwd&lt;K, J&gt;::get()...);                                             \
+<span class="lineNum">     206 </span>            :     }                                                                                                                  \
+<span class="lineNum">     207 </span>            :                                                                                                                        \
+<span class="lineNum">     208 </span>            :     __VA_ARGS__ void strided(char *DYND_UNUSED(dst), intptr_t DYND_UNUSED(dst_stride),                                 \
+<span class="lineNum">     209 </span>            :                              char *const *DYND_IGNORE_UNUSED(src_copy),                                                \
+<span class="lineNum">     210 </span>            :                              const intptr_t *DYND_IGNORE_UNUSED(src_stride), size_t count)                             \
+<span class="lineNum">     211 </span>            :     {                                                                                                                  \
+<span class="lineNum">     212 </span>            :       dynd::detail::array_wrapper&lt;char *, sizeof...(A)&gt; src;                                                           \
+<span class="lineNum">     213 </span>            :                                                                                                                        \
+<span class="lineNum">     214 </span>            :       for (size_t j = 0; j != sizeof...(A); ++j) {                                                                     \
+<span class="lineNum">     215 </span>            :         src[j] = src_copy[j] + DYND_THREAD_ID(0) * src_stride[j];                                                      \
+<span class="lineNum">     216 </span>            :       }                                                                                                                \
+<span class="lineNum">     217 </span>            :                                                                                                                        \
+<span class="lineNum">     218 </span>            :       for (std::ptrdiff_t i = DYND_THREAD_ID(0); i &lt; (std::ptrdiff_t)count; i += DYND_THREAD_COUNT(0)) {               \
+<span class="lineNum">     219 </span>            :         (*func)(apply_arg&lt;A, I&gt;::get(src[I])..., apply_kwd&lt;K, J&gt;::get()...);                                           \
+<span class="lineNum">     220 </span>            :         for (size_t j = 0; j != sizeof...(A); ++j) {                                                                   \
+<span class="lineNum">     221 </span>            :           src[j] += DYND_THREAD_COUNT(0) * src_stride[j];                                                              \
+<span class="lineNum">     222 </span>            :         }                                                                                                              \
+<span class="lineNum">     223 </span>            :       }                                                                                                                \
+<span class="lineNum">     224 </span>            :     }                                                                                                                  \
+<span class="lineNum">     225 </span>            :                                                                                                                        \
+<span class="lineNum">     226 </span>            :     static void instantiate(char *static_data, char *DYND_UNUSED(data), kernel_builder *ckb,                           \
+<span class="lineNum">     227 </span>            :                             const ndt::type &amp;DYND_UNUSED(dst_tp), const char *DYND_UNUSED(dst_arrmeta),                \
+<span class="lineNum">     228 </span>            :                             intptr_t DYND_UNUSED(nsrc), const ndt::type *src_tp, const char *const *src_arrmeta,       \
+<span class="lineNum">     229 </span>            :                             kernel_request_t kernreq, intptr_t nkwd, const nd::array *kwds,                            \
+<span class="lineNum">     230 </span>            :                             const std::map&lt;std::string, ndt::type&gt; &amp;DYND_UNUSED(tp_vars))                              \
+<span class="lineNum">     231 </span>            :     {                                                                                                                  \
+<span class="lineNum">     232 </span>            :       ckb-&gt;emplace_back&lt;apply_callable_kernel&gt;(kernreq, *reinterpret_cast&lt;func_type **&gt;(static_data),                  \
+<span class="lineNum">     233 </span>            :                                                args_type(src_tp, src_arrmeta, kwds), kwds_type(nkwd, kwds));           \
+<span class="lineNum">     234 </span>            :     }                                                                                                                  \
+<a name="235"><span class="lineNum">     235 </span>            :   }</a>
+<span class="lineNum">     236 </span>            : 
+<span class="lineNum">     237 </span><span class="lineCov">       3488 :       APPLY_CALLABLE_KERNEL();</span>
+<span class="lineNum">     238 </span>            : 
+<span class="lineNum">     239 </span>            : #undef APPLY_CALLABLE_KERNEL
+<span class="lineNum">     240 </span>            : 
+<span class="lineNum">     241 </span>            :     } // namespace dynd::nd::functional::detail
+<span class="lineNum">     242 </span>            : 
+<span class="lineNum">     243 </span>            :     template &lt;typename func_type, int N&gt;
+<span class="lineNum">     244 </span>            :     using apply_callable_kernel = detail::apply_callable_kernel&lt;
+<span class="lineNum">     245 </span>            :         func_type, typename return_of&lt;func_type&gt;::type, as_apply_arg_sequence&lt;func_type, N&gt;, make_index_sequence&lt;N&gt;,
+<span class="lineNum">     246 </span>            :         as_apply_kwd_sequence&lt;func_type, N&gt;, make_index_sequence&lt;arity_of&lt;func_type&gt;::value - N&gt;&gt;;
+<span class="lineNum">     247 </span>            : 
+<span class="lineNum">     248 </span>            :   } // namespace dynd::nd::functional
+<span class="lineNum">     249 </span>            : } // namespace dynd::nd
+<span class="lineNum">     250 </span>            : } // namespace dynd
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.10</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

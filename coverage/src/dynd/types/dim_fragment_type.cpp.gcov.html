@@ -1,0 +1,342 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - coverage.info.cleaned - src/dynd/types/dim_fragment_type.cpp</title>
+  <link rel="stylesheet" type="text/css" href="../../../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../../../index.html">top level</a> - <a href="index.html">src/dynd/types</a> - dim_fragment_type.cpp<span style="font-size: 80%;"> (source / <a href="dim_fragment_type.cpp.func.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">coverage.info.cleaned</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">69</td>
+            <td class="headerCovTableEntry">132</td>
+            <td class="headerCovTableEntryLo">52.3 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2016-02-19</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">9</td>
+            <td class="headerCovTableEntry">21</td>
+            <td class="headerCovTableEntryLo">42.9 %</td>
+          </tr>
+          <tr><td><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : //</a>
+<span class="lineNum">       2 </span>            : // Copyright (C) 2011-15 DyND Developers
+<span class="lineNum">       3 </span>            : // BSD 2-Clause License, see LICENSE.txt
+<span class="lineNum">       4 </span>            : //
+<span class="lineNum">       5 </span>            : 
+<span class="lineNum">       6 </span>            : #include &lt;dynd/types/dim_fragment_type.hpp&gt;
+<span class="lineNum">       7 </span>            : #include &lt;dynd/types/fixed_dim_type.hpp&gt;
+<span class="lineNum">       8 </span>            : #include &lt;dynd/types/var_dim_type.hpp&gt;
+<span class="lineNum">       9 </span>            : #include &lt;dynd/types/fixed_dim_kind_type.hpp&gt;
+<span class="lineNum">      10 </span>            : #include &lt;dynd/types/typevar_type.hpp&gt;
+<span class="lineNum">      11 </span>            : 
+<span class="lineNum">      12 </span>            : using namespace std;
+<a name="13"><span class="lineNum">      13 </span>            : using namespace dynd;</a>
+<span class="lineNum">      14 </span>            : 
+<span class="lineNum">      15 </span><span class="lineCov">         13 : ndt::dim_fragment_type::dim_fragment_type(intptr_t ndim, const intptr_t *tagged_dims)</span>
+<span class="lineNum">      16 </span><span class="lineCov">         26 :     : base_dim_type(dim_fragment_id, pattern_kind, make_type&lt;void&gt;(), 0, 1, 0, type_flag_symbolic, false),</span>
+<span class="lineNum">      17 </span><span class="lineCov">         26 :       m_tagged_dims(ndim, tagged_dims)</span>
+<span class="lineNum">      18 </span>            : {
+<span class="lineNum">      19 </span><span class="lineCov">         13 :   this-&gt;ndim = static_cast&lt;uint8_t&gt;(ndim);</span>
+<a name="20"><span class="lineNum">      20 </span><span class="lineCov">         13 : }</span></a>
+<span class="lineNum">      21 </span>            : 
+<span class="lineNum">      22 </span><span class="lineCov">        125 : static inline ndt::type get_tagged_dims_from_type(intptr_t ndim, const ndt::type &amp;tp, intptr_t *out_tagged_dims)</span>
+<span class="lineNum">      23 </span>            : {
+<span class="lineNum">      24 </span><span class="lineCov">        125 :   ndt::type dtp = tp.without_memory_type();</span>
+<span class="lineNum">      25 </span><span class="lineCov">        307 :   for (int i = 0; i &lt; ndim; ++i) {</span>
+<span class="lineNum">      26 </span><span class="lineCov">        182 :     switch (dtp.get_id()) {</span>
+<span class="lineNum">      27 </span>            :     case fixed_dim_id:
+<span class="lineNum">      28 </span><span class="lineCov">        161 :       if (dtp.get_kind() == kind_kind) {</span>
+<span class="lineNum">      29 </span><span class="lineCov">          4 :         out_tagged_dims[i] = -2;</span>
+<span class="lineNum">      30 </span>            :       }
+<span class="lineNum">      31 </span>            :       else {
+<span class="lineNum">      32 </span><span class="lineCov">        157 :         out_tagged_dims[i] = dtp.extended&lt;ndt::fixed_dim_type&gt;()-&gt;get_fixed_dim_size();</span>
+<span class="lineNum">      33 </span>            :       }
+<span class="lineNum">      34 </span><span class="lineCov">        161 :       break;</span>
+<span class="lineNum">      35 </span>            :     case var_dim_id:
+<span class="lineNum">      36 </span><span class="lineCov">         21 :       out_tagged_dims[i] = -1;</span>
+<span class="lineNum">      37 </span><span class="lineCov">         21 :       break;</span>
+<span class="lineNum">      38 </span>            :     default: {
+<span class="lineNum">      39 </span><span class="lineNoCov">          0 :       stringstream ss;</span>
+<span class="lineNum">      40 </span><span class="lineNoCov">          0 :       ss &lt;&lt; &quot;dim_fragment_type failed to get shape from type &quot; &lt;&lt; tp;</span>
+<span class="lineNum">      41 </span><span class="lineNoCov">          0 :       throw type_error(ss.str());</span>
+<span class="lineNum">      42 </span>            :     }
+<span class="lineNum">      43 </span>            :     }
+<span class="lineNum">      44 </span><span class="lineCov">        182 :     dtp = dtp.extended&lt;ndt::base_dim_type&gt;()-&gt;get_element_type();</span>
+<span class="lineNum">      45 </span>            :   }
+<span class="lineNum">      46 </span><span class="lineCov">        125 :   return dtp;</span>
+<a name="47"><span class="lineNum">      47 </span>            : }</a>
+<span class="lineNum">      48 </span>            : 
+<span class="lineNum">      49 </span><span class="lineCov">         12 : static inline bool broadcast_tagged_dims_from_type(intptr_t ndim, ndt::type tp, const intptr_t *tagged_dims,</span>
+<span class="lineNum">      50 </span>            :                                                    intptr_t *out_tagged_dims)
+<span class="lineNum">      51 </span>            : {
+<span class="lineNum">      52 </span><span class="lineCov">         12 :   tp = tp.without_memory_type();</span>
+<span class="lineNum">      53 </span><span class="lineCov">         23 :   for (intptr_t i = 0; i &lt; ndim; ++i) {</span>
+<span class="lineNum">      54 </span><span class="lineCov">         11 :     intptr_t tagged_dim = tagged_dims[i], dim_size;</span>
+<span class="lineNum">      55 </span><span class="lineCov">         11 :     switch (tp.get_id()) {</span>
+<span class="lineNum">      56 </span>            :     case fixed_dim_id:
+<span class="lineNum">      57 </span><span class="lineCov">         10 :       if (tp.get_kind() == kind_kind) {</span>
+<span class="lineNum">      58 </span><span class="lineNoCov">          0 :         if (tagged_dim &lt; 0) {</span>
+<span class="lineNum">      59 </span><span class="lineNoCov">          0 :           out_tagged_dims[i] = -2;</span>
+<span class="lineNum">      60 </span>            :         }
+<span class="lineNum">      61 </span>            :       }
+<span class="lineNum">      62 </span>            :       else {
+<span class="lineNum">      63 </span><span class="lineCov">         10 :         dim_size = tp.extended&lt;ndt::fixed_dim_type&gt;()-&gt;get_fixed_dim_size();</span>
+<span class="lineNum">      64 </span><span class="lineCov">         10 :         if (tagged_dim &lt; 0 || tagged_dim == 1) {</span>
+<span class="lineNum">      65 </span><span class="lineCov">          1 :           out_tagged_dims[i] = dim_size;</span>
+<span class="lineNum">      66 </span>            :         }
+<span class="lineNum">      67 </span><span class="lineCov">          9 :         else if (tagged_dim != dim_size &amp;&amp; dim_size != 1) {</span>
+<span class="lineNum">      68 </span><span class="lineNoCov">          0 :           return false;</span>
+<span class="lineNum">      69 </span>            :         }
+<span class="lineNum">      70 </span>            :       }
+<span class="lineNum">      71 </span><span class="lineCov">         10 :       break;</span>
+<span class="lineNum">      72 </span>            :     case var_dim_id:
+<span class="lineNum">      73 </span>            :       // All broadcasting is done dynamically for var
+<span class="lineNum">      74 </span><span class="lineCov">          1 :       break;</span>
+<span class="lineNum">      75 </span>            :     default: {
+<span class="lineNum">      76 </span><span class="lineNoCov">          0 :       stringstream ss;</span>
+<span class="lineNum">      77 </span><span class="lineNoCov">          0 :       ss &lt;&lt; &quot;dim_fragment_type failed to get shape from type &quot; &lt;&lt; tp;</span>
+<span class="lineNum">      78 </span><span class="lineNoCov">          0 :       throw type_error(ss.str());</span>
+<span class="lineNum">      79 </span>            :     }
+<span class="lineNum">      80 </span>            :     }
+<span class="lineNum">      81 </span><span class="lineCov">         11 :     tp = tp.extended&lt;ndt::base_dim_type&gt;()-&gt;get_element_type();</span>
+<span class="lineNum">      82 </span>            :   }
+<span class="lineNum">      83 </span><span class="lineCov">         12 :   return true;</span>
+<a name="84"><span class="lineNum">      84 </span>            : }</a>
+<span class="lineNum">      85 </span>            : 
+<span class="lineNum">      86 </span><span class="lineCov">        123 : ndt::dim_fragment_type::dim_fragment_type(intptr_t ndim, const type &amp;tp)</span>
+<span class="lineNum">      87 </span><span class="lineCov">        123 :     : base_dim_type(dim_fragment_id, make_type&lt;void&gt;(), 0, 1, 0, type_flag_symbolic, false), m_tagged_dims(ndim)</span>
+<span class="lineNum">      88 </span>            : {
+<span class="lineNum">      89 </span><span class="lineCov">        123 :   if (ndim &gt; tp.get_ndim()) {</span>
+<span class="lineNum">      90 </span><span class="lineNoCov">          0 :     stringstream ss;</span>
+<span class="lineNum">      91 </span><span class="lineNoCov">          0 :     ss &lt;&lt; &quot;Tried to make a dimension fragment from type &quot; &lt;&lt; tp &lt;&lt; &quot; with &quot; &lt;&lt; ndim</span>
+<span class="lineNum">      92 </span><span class="lineNoCov">          0 :        &lt;&lt; &quot; dimensions, but the type only has &quot; &lt;&lt; tp.get_ndim() &lt;&lt; &quot; dimensions&quot;;</span>
+<span class="lineNum">      93 </span><span class="lineNoCov">          0 :     throw type_error(ss.str());</span>
+<span class="lineNum">      94 </span>            :   }
+<span class="lineNum">      95 </span><span class="lineCov">        123 :   get_tagged_dims_from_type(ndim, tp, m_tagged_dims.get());</span>
+<span class="lineNum">      96 </span><span class="lineCov">        123 :   this-&gt;ndim = static_cast&lt;uint8_t&gt;(ndim);</span>
+<a name="97"><span class="lineNum">      97 </span><span class="lineCov">        123 : }</span></a>
+<span class="lineNum">      98 </span>            : 
+<span class="lineNum">      99 </span><span class="lineCov">         12 : ndt::type ndt::dim_fragment_type::broadcast_with_type(intptr_t ndim, const type &amp;tp) const</span>
+<span class="lineNum">     100 </span>            : {
+<span class="lineNum">     101 </span><span class="lineCov">         12 :   if (ndim == 0) {</span>
+<span class="lineNum">     102 </span><span class="lineNoCov">          0 :     return type(this, true);</span>
+<span class="lineNum">     103 </span>            :   }
+<span class="lineNum">     104 </span><span class="lineCov">         12 :   intptr_t this_ndim = get_ndim();</span>
+<span class="lineNum">     105 </span>            :   // In each case, we fill in the leading dimensions from the
+<span class="lineNum">     106 </span>            :   // higher-dimension input, then broadcast the rest together
+<span class="lineNum">     107 </span><span class="lineCov">         12 :   if (ndim &gt; this_ndim) {</span>
+<span class="lineNum">     108 </span><span class="lineCov">          4 :     dimvector shape(ndim);</span>
+<span class="lineNum">     109 </span><span class="lineCov">          4 :     type dtp = get_tagged_dims_from_type(ndim - this_ndim, tp, shape.get());</span>
+<span class="lineNum">     110 </span><span class="lineCov">          2 :     if (!broadcast_tagged_dims_from_type(this_ndim, dtp, get_tagged_dims(), shape.get() + (ndim - this_ndim))) {</span>
+<span class="lineNum">     111 </span><span class="lineNoCov">          0 :       return type();</span>
+<span class="lineNum">     112 </span>            :     }
+<span class="lineNum">     113 </span><span class="lineCov">          2 :     return make_dim_fragment(ndim, shape.get());</span>
+<span class="lineNum">     114 </span>            :   }
+<span class="lineNum">     115 </span><span class="lineCov">         10 :   else if (ndim &lt; this_ndim) {</span>
+<span class="lineNum">     116 </span><span class="lineNoCov">          0 :     dimvector shape(this_ndim);</span>
+<span class="lineNum">     117 </span><span class="lineNoCov">          0 :     memcpy(shape.get(), get_tagged_dims(), (this_ndim - ndim) * sizeof(intptr_t));</span>
+<span class="lineNum">     118 </span><span class="lineNoCov">          0 :     if (!broadcast_tagged_dims_from_type(ndim, tp, get_tagged_dims() + (this_ndim - ndim),</span>
+<span class="lineNum">     119 </span><span class="lineNoCov">          0 :                                          shape.get() + (this_ndim - ndim))) {</span>
+<span class="lineNum">     120 </span><span class="lineNoCov">          0 :       return type();</span>
+<span class="lineNum">     121 </span>            :     }
+<span class="lineNum">     122 </span><span class="lineNoCov">          0 :     return make_dim_fragment(this_ndim, shape.get());</span>
+<span class="lineNum">     123 </span>            :   }
+<span class="lineNum">     124 </span>            :   else {
+<span class="lineNum">     125 </span><span class="lineCov">         20 :     dimvector shape(ndim);</span>
+<span class="lineNum">     126 </span><span class="lineCov">         10 :     memcpy(shape.get(), get_tagged_dims(), this_ndim * sizeof(intptr_t));</span>
+<span class="lineNum">     127 </span><span class="lineCov">         10 :     if (!broadcast_tagged_dims_from_type(ndim, tp, get_tagged_dims(), shape.get())) {</span>
+<span class="lineNum">     128 </span><span class="lineNoCov">          0 :       return type();</span>
+<span class="lineNum">     129 </span>            :     }
+<span class="lineNum">     130 </span><span class="lineCov">         10 :     return make_dim_fragment(ndim, shape.get());</span>
+<span class="lineNum">     131 </span>            :   }
+<a name="132"><span class="lineNum">     132 </span>            : }</a>
+<span class="lineNum">     133 </span>            : 
+<span class="lineNum">     134 </span><span class="lineCov">         16 : ndt::type ndt::dim_fragment_type::apply_to_dtype(const type &amp;dtp) const</span>
+<span class="lineNum">     135 </span>            : {
+<span class="lineNum">     136 </span><span class="lineCov">         16 :   intptr_t ndim = get_ndim();</span>
+<span class="lineNum">     137 </span><span class="lineCov">         16 :   if (ndim &gt; 0) {</span>
+<span class="lineNum">     138 </span><span class="lineCov">         28 :     type tp = dtp;</span>
+<span class="lineNum">     139 </span><span class="lineCov">         43 :     for (intptr_t i = ndim - 1; i &gt;= 0; --i) {</span>
+<span class="lineNum">     140 </span><span class="lineCov">         29 :       switch (m_tagged_dims[i]) {</span>
+<span class="lineNum">     141 </span>            :       case dim_fragment_var:
+<span class="lineNum">     142 </span><span class="lineCov">          9 :         tp = var_dim_type::make(tp);</span>
+<span class="lineNum">     143 </span><span class="lineCov">          9 :         break;</span>
+<span class="lineNum">     144 </span>            :       case dim_fragment_fixed_sym:
+<span class="lineNum">     145 </span><span class="lineCov">          8 :         tp = make_fixed_dim_kind(tp);</span>
+<span class="lineNum">     146 </span><span class="lineCov">          8 :         break;</span>
+<span class="lineNum">     147 </span>            :       default:
+<span class="lineNum">     148 </span><span class="lineCov">         12 :         tp = make_fixed_dim(m_tagged_dims[i], tp);</span>
+<span class="lineNum">     149 </span><span class="lineCov">         12 :         break;</span>
+<span class="lineNum">     150 </span>            :       }
+<span class="lineNum">     151 </span>            :     }
+<span class="lineNum">     152 </span><span class="lineCov">         14 :     return tp;</span>
+<span class="lineNum">     153 </span>            :   }
+<span class="lineNum">     154 </span>            :   else {
+<span class="lineNum">     155 </span><span class="lineCov">          2 :     return dtp;</span>
+<span class="lineNum">     156 </span>            :   }
+<a name="157"><span class="lineNum">     157 </span>            : }</a>
+<span class="lineNum">     158 </span>            : 
+<span class="lineNum">     159 </span><span class="lineNoCov">          0 : void ndt::dim_fragment_type::print_data(std::ostream &amp;DYND_UNUSED(o), const char *DYND_UNUSED(arrmeta),</span>
+<span class="lineNum">     160 </span>            :                                         const char *DYND_UNUSED(data)) const
+<span class="lineNum">     161 </span>            : {
+<span class="lineNum">     162 </span><span class="lineNoCov">          0 :   throw type_error(&quot;Cannot store data of dim_fragment type&quot;);</span>
+<a name="163"><span class="lineNum">     163 </span>            : }</a>
+<span class="lineNum">     164 </span>            : 
+<span class="lineNum">     165 </span><span class="lineNoCov">          0 : void ndt::dim_fragment_type::print_type(std::ostream &amp;o) const</span>
+<span class="lineNum">     166 </span>            : {
+<span class="lineNum">     167 </span><span class="lineNoCov">          0 :   o &lt;&lt; &quot;dim_fragment[&quot;;</span>
+<span class="lineNum">     168 </span><span class="lineNoCov">          0 :   intptr_t ndim = get_ndim();</span>
+<span class="lineNum">     169 </span><span class="lineNoCov">          0 :   for (intptr_t i = 0; i &lt; ndim; ++i) {</span>
+<span class="lineNum">     170 </span><span class="lineNoCov">          0 :     if (m_tagged_dims[i] == dim_fragment_var) {</span>
+<span class="lineNum">     171 </span><span class="lineNoCov">          0 :       o &lt;&lt; &quot;var * &quot;;</span>
+<span class="lineNum">     172 </span>            :     }
+<span class="lineNum">     173 </span><span class="lineNoCov">          0 :     else if (m_tagged_dims[i] == dim_fragment_fixed_sym) {</span>
+<span class="lineNum">     174 </span><span class="lineNoCov">          0 :       o &lt;&lt; &quot;Fixed * &quot;;</span>
+<span class="lineNum">     175 </span>            :     }
+<span class="lineNum">     176 </span>            :     else {
+<span class="lineNum">     177 </span><span class="lineNoCov">          0 :       o &lt;&lt; &quot;fixed[&quot; &lt;&lt; m_tagged_dims[i] &lt;&lt; &quot;]&quot;;</span>
+<span class="lineNum">     178 </span>            :     }
+<span class="lineNum">     179 </span>            :   }
+<span class="lineNum">     180 </span><span class="lineNoCov">          0 :   o &lt;&lt; &quot;void]&quot;;</span>
+<a name="181"><span class="lineNum">     181 </span><span class="lineNoCov">          0 : }</span></a>
+<span class="lineNum">     182 </span>            : 
+<span class="lineNum">     183 </span><span class="lineNoCov">          0 : ndt::type ndt::dim_fragment_type::apply_linear_index(intptr_t DYND_UNUSED(nindices), const irange *DYND_UNUSED(indices),</span>
+<span class="lineNum">     184 </span>            :                                                      size_t DYND_UNUSED(current_i), const type &amp;DYND_UNUSED(root_tp),
+<span class="lineNum">     185 </span>            :                                                      bool DYND_UNUSED(leading_dimension)) const
+<span class="lineNum">     186 </span>            : {
+<span class="lineNum">     187 </span><span class="lineNoCov">          0 :   throw type_error(&quot;Cannot store data of dim_fragment type&quot;);</span>
+<a name="188"><span class="lineNum">     188 </span>            : }</a>
+<span class="lineNum">     189 </span>            : 
+<span class="lineNum">     190 </span><span class="lineNoCov">          0 : intptr_t ndt::dim_fragment_type::apply_linear_index(</span>
+<span class="lineNum">     191 </span>            :     intptr_t DYND_UNUSED(nindices), const irange *DYND_UNUSED(indices), const char *DYND_UNUSED(arrmeta),
+<span class="lineNum">     192 </span>            :     const type &amp;DYND_UNUSED(result_tp), char *DYND_UNUSED(out_arrmeta),
+<span class="lineNum">     193 </span>            :     const intrusive_ptr&lt;memory_block_data&gt; &amp;DYND_UNUSED(embedded_reference), size_t DYND_UNUSED(current_i),
+<span class="lineNum">     194 </span>            :     const type &amp;DYND_UNUSED(root_tp), bool DYND_UNUSED(leading_dimension), char **DYND_UNUSED(inout_data),
+<span class="lineNum">     195 </span>            :     intrusive_ptr&lt;memory_block_data&gt; &amp;DYND_UNUSED(inout_dataref)) const
+<span class="lineNum">     196 </span>            : {
+<span class="lineNum">     197 </span><span class="lineNoCov">          0 :   throw type_error(&quot;Cannot store data of dim_fragment type&quot;);</span>
+<a name="198"><span class="lineNum">     198 </span>            : }</a>
+<span class="lineNum">     199 </span>            : 
+<span class="lineNum">     200 </span><span class="lineNoCov">          0 : intptr_t ndt::dim_fragment_type::get_dim_size(const char *DYND_UNUSED(arrmeta), const char *DYND_UNUSED(data)) const</span>
+<span class="lineNum">     201 </span>            : {
+<span class="lineNum">     202 </span><span class="lineNoCov">          0 :   if (get_ndim() &gt; 0) {</span>
+<span class="lineNum">     203 </span><span class="lineNoCov">          0 :     return m_tagged_dims[0] &gt;= 0 ? m_tagged_dims[0] : -1;</span>
+<span class="lineNum">     204 </span>            :   }
+<span class="lineNum">     205 </span>            :   else {
+<span class="lineNum">     206 </span><span class="lineNoCov">          0 :     return -1;</span>
+<span class="lineNum">     207 </span>            :   }
+<a name="208"><span class="lineNum">     208 </span>            : }</a>
+<span class="lineNum">     209 </span>            : 
+<span class="lineNum">     210 </span><span class="lineNoCov">          0 : bool ndt::dim_fragment_type::is_lossless_assignment(const type &amp;DYND_UNUSED(dst_tp),</span>
+<span class="lineNum">     211 </span>            :                                                     const type &amp;DYND_UNUSED(src_tp)) const
+<span class="lineNum">     212 </span>            : {
+<span class="lineNum">     213 </span><span class="lineNoCov">          0 :   return false;</span>
+<a name="214"><span class="lineNum">     214 </span>            : }</a>
+<span class="lineNum">     215 </span>            : 
+<span class="lineNum">     216 </span><span class="lineNoCov">          0 : bool ndt::dim_fragment_type::operator==(const base_type &amp;rhs) const</span>
+<span class="lineNum">     217 </span>            : {
+<span class="lineNum">     218 </span><span class="lineNoCov">          0 :   if (this == &amp;rhs) {</span>
+<span class="lineNum">     219 </span><span class="lineNoCov">          0 :     return true;</span>
+<span class="lineNum">     220 </span>            :   }
+<span class="lineNum">     221 </span><span class="lineNoCov">          0 :   else if (rhs.get_id() != dim_fragment_id) {</span>
+<span class="lineNum">     222 </span><span class="lineNoCov">          0 :     return false;</span>
+<span class="lineNum">     223 </span>            :   }
+<span class="lineNum">     224 </span>            :   else {
+<span class="lineNum">     225 </span><span class="lineNoCov">          0 :     const dim_fragment_type *dft = static_cast&lt;const dim_fragment_type *&gt;(&amp;rhs);</span>
+<span class="lineNum">     226 </span><span class="lineNoCov">          0 :     return get_ndim() == rhs.get_ndim() &amp;&amp;</span>
+<span class="lineNum">     227 </span><span class="lineNoCov">          0 :            memcmp(m_tagged_dims.get(), dft-&gt;m_tagged_dims.get(), get_ndim() * sizeof(intptr_t)) == 0;</span>
+<span class="lineNum">     228 </span>            :   }
+<a name="229"><span class="lineNum">     229 </span>            : }</a>
+<span class="lineNum">     230 </span>            : 
+<span class="lineNum">     231 </span><span class="lineNoCov">          0 : void ndt::dim_fragment_type::arrmeta_default_construct(char *DYND_UNUSED(arrmeta),</span>
+<span class="lineNum">     232 </span>            :                                                        bool DYND_UNUSED(blockref_alloc)) const
+<span class="lineNum">     233 </span>            : {
+<span class="lineNum">     234 </span><span class="lineNoCov">          0 :   throw type_error(&quot;Cannot store data of dim_fragment type&quot;);</span>
+<a name="235"><span class="lineNum">     235 </span>            : }</a>
+<span class="lineNum">     236 </span>            : 
+<span class="lineNum">     237 </span><span class="lineNoCov">          0 : void ndt::dim_fragment_type::arrmeta_copy_construct(</span>
+<span class="lineNum">     238 </span>            :     char *DYND_UNUSED(dst_arrmeta), const char *DYND_UNUSED(src_arrmeta),
+<span class="lineNum">     239 </span>            :     const intrusive_ptr&lt;memory_block_data&gt; &amp;DYND_UNUSED(embedded_reference)) const
+<span class="lineNum">     240 </span>            : {
+<span class="lineNum">     241 </span><span class="lineNoCov">          0 :   throw type_error(&quot;Cannot store data of dim_fragment type&quot;);</span>
+<a name="242"><span class="lineNum">     242 </span>            : }</a>
+<span class="lineNum">     243 </span>            : 
+<span class="lineNum">     244 </span><span class="lineNoCov">          0 : size_t ndt::dim_fragment_type::arrmeta_copy_construct_onedim(</span>
+<span class="lineNum">     245 </span>            :     char *DYND_UNUSED(dst_arrmeta), const char *DYND_UNUSED(src_arrmeta),
+<span class="lineNum">     246 </span>            :     const intrusive_ptr&lt;memory_block_data&gt; &amp;DYND_UNUSED(embedded_reference)) const
+<span class="lineNum">     247 </span>            : {
+<span class="lineNum">     248 </span><span class="lineNoCov">          0 :   throw type_error(&quot;Cannot store data of dim_fragment type&quot;);</span>
+<a name="249"><span class="lineNum">     249 </span>            : }</a>
+<span class="lineNum">     250 </span>            : 
+<span class="lineNum">     251 </span><span class="lineNoCov">          0 : void ndt::dim_fragment_type::arrmeta_destruct(char *DYND_UNUSED(arrmeta)) const</span>
+<span class="lineNum">     252 </span>            : {
+<span class="lineNum">     253 </span><span class="lineNoCov">          0 :   throw type_error(&quot;Cannot store data of dim_fragment type&quot;);</span>
+<a name="254"><span class="lineNum">     254 </span>            : }</a>
+<span class="lineNum">     255 </span>            : 
+<span class="lineNum">     256 </span><span class="lineCov">         50 : const ndt::type &amp;ndt::make_dim_fragment()</span>
+<span class="lineNum">     257 </span>            : {
+<span class="lineNum">     258 </span><span class="lineCov">         50 :   static dim_fragment_type dft(0, NULL);</span>
+<span class="lineNum">     259 </span><span class="lineCov">         50 :   static const type static_instance(&amp;dft, true);</span>
+<span class="lineNum">     260 </span><span class="lineCov">         50 :   return static_instance;</span>
+<a name="261"><span class="lineNum">     261 </span>            : }</a>
+<span class="lineNum">     262 </span>            : 
+<span class="lineNum">     263 </span><span class="lineNoCov">          0 : ndt::type ndt::dim_fragment_type::with_element_type(const type &amp;DYND_UNUSED(element_tp)) const</span>
+<a name="264"><span class="lineNum">     264 </span>            : {</a>
+<span class="lineNum">     265 </span><span class="lineNoCov">          0 :   throw runtime_error(&quot;with_element_type is not implemented for dim_fragment_type&quot;);</span>
+<span class="lineNum">     266 </span><span class="lineCov">          3 : }</span>
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.10</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

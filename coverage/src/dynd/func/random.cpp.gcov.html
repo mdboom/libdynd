@@ -1,0 +1,152 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - coverage.info.cleaned - src/dynd/func/random.cpp</title>
+  <link rel="stylesheet" type="text/css" href="../../../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../../../index.html">top level</a> - <a href="index.html">src/dynd/func</a> - random.cpp<span style="font-size: 80%;"> (source / <a href="random.cpp.func.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">coverage.info.cleaned</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">11</td>
+            <td class="headerCovTableEntry">12</td>
+            <td class="headerCovTableEntryHi">91.7 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2016-02-19</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">6</td>
+            <td class="headerCovTableEntry">6</td>
+            <td class="headerCovTableEntryHi">100.0 %</td>
+          </tr>
+          <tr><td><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : #include &lt;chrono&gt;</a>
+<span class="lineNum">       2 </span>            : 
+<span class="lineNum">       3 </span>            : #include &lt;dynd/func/random.hpp&gt;
+<span class="lineNum">       4 </span>            : #include &lt;dynd/functional.hpp&gt;
+<span class="lineNum">       5 </span>            : #include &lt;dynd/kernels/uniform_kernel.hpp&gt;
+<span class="lineNum">       6 </span>            : 
+<span class="lineNum">       7 </span>            : using namespace std;
+<span class="lineNum">       8 </span>            : using namespace dynd;
+<span class="lineNum">       9 </span>            : 
+<span class="lineNum">      10 </span>            : template &lt;typename GeneratorType&gt;
+<span class="lineNum">      11 </span>            : struct uniform_kernel_alias {
+<span class="lineNum">      12 </span>            :   template &lt;type_id_t DstTypeID&gt;
+<span class="lineNum">      13 </span>            :   using type = nd::random::uniform_kernel&lt;DstTypeID, GeneratorType&gt;;
+<a name="14"><span class="lineNum">      14 </span>            : };</a>
+<span class="lineNum">      15 </span>            : 
+<span class="lineNum">      16 </span><span class="lineCov">          1 : DYND_API nd::callable nd::random::uniform::make()</span>
+<span class="lineNum">      17 </span>            : {
+<span class="lineNum">      18 </span>            :   typedef type_id_sequence&lt;int32_id, int64_id, uint32_id, uint64_id, float32_id,
+<span class="lineNum">      19 </span>            :                            float64_id, complex_float32_id, complex_float64_id&gt; numeric_ids;
+<span class="lineNum">      20 </span>            : 
+<span class="lineNum">      21 </span><span class="lineCov">          2 :   std::random_device random_device;</span>
+<span class="lineNum">      22 </span>            : 
+<a name="23"><span class="lineNum">      23 </span><span class="lineCov">          2 :   auto children = callable::make_all&lt;uniform_kernel_alias&lt;std::default_random_engine&gt;::type, numeric_ids&gt;(0);</span></a>
+<a name="24"><span class="lineNum">      24 </span><span class="lineCov">          2 :   return functional::elwise(functional::dispatch(</span></a>
+<span class="lineNum">      25 </span><span class="lineCov">          3 :       ndt::type(&quot;(a: ?R, b: ?R) -&gt; R&quot;), [children](const ndt::type &amp;dst_tp, intptr_t DYND_UNUSED(nsrc),</span>
+<span class="lineNum">      26 </span><span class="lineCov">         15 :                                                    const ndt::type *DYND_UNUSED(src_tp)) mutable -&gt; callable &amp; {</span>
+<span class="lineNum">      27 </span><span class="lineCov">         15 :         callable &amp;child = children[dst_tp.get_id()];</span>
+<span class="lineNum">      28 </span><span class="lineCov">         15 :         if (child.is_null()) {</span>
+<span class="lineNum">      29 </span><span class="lineNoCov">          0 :           throw std::runtime_error(&quot;assignment error&quot;);</span>
+<span class="lineNum">      30 </span>            :         }
+<span class="lineNum">      31 </span><span class="lineCov">         15 :         return child;</span>
+<span class="lineNum">      32 </span><span class="lineCov">          2 :       }));</span>
+<a name="33"><span class="lineNum">      33 </span>            : }</a>
+<span class="lineNum">      34 </span>            : 
+<span class="lineNum">      35 </span><span class="lineCov">          3 : DYND_API struct nd::random::uniform nd::random::uniform;</span>
+<span class="lineNum">      36 </span>            : 
+<span class="lineNum">      37 </span>            : /*
+<span class="lineNum">      38 </span>            : 
+<span class="lineNum">      39 </span>            : #ifdef DYND_CUDA
+<span class="lineNum">      40 </span>            : 
+<span class="lineNum">      41 </span>            : template &lt;kernel_request_t kernreq&gt;
+<span class="lineNum">      42 </span>            : typename std::enable_if&lt;kernreq == kernel_request_cuda_device,
+<span class="lineNum">      43 </span>            :                         nd::callable&gt;::type
+<span class="lineNum">      44 </span>            : nd::random::uniform::make()
+<span class="lineNum">      45 </span>            : {
+<span class="lineNum">      46 </span>            :   unsigned int blocks_per_grid = 512;
+<span class="lineNum">      47 </span>            :   unsigned int threads_per_block = 512;
+<span class="lineNum">      48 </span>            : 
+<span class="lineNum">      49 </span>            :   curandState_t *s;
+<span class="lineNum">      50 </span>            :   cudaMalloc(&amp;s, blocks_per_grid * threads_per_block * sizeof(curandState_t));
+<span class="lineNum">      51 </span>            :   cuda_device_curand_init &lt;&lt; &lt;blocks_per_grid, threads_per_block&gt;&gt;&gt; (s);
+<span class="lineNum">      52 </span>            : 
+<span class="lineNum">      53 </span>            :   return nd::as_callable&lt;uniform_ck, kernel_request_cuda_device, curandState_t,
+<span class="lineNum">      54 </span>            :                         type_sequence&lt;double, dynd::complex&lt;double&gt;&gt;&gt;(
+<span class="lineNum">      55 </span>            :       ndt::type(&quot;(a: ?R, b: ?R) -&gt; cuda_device[R]&quot;), s);
+<span class="lineNum">      56 </span>            : }
+<span class="lineNum">      57 </span>            : 
+<span class="lineNum">      58 </span>            : #endif
+<span class="lineNum">      59 </span>            : 
+<span class="lineNum">      60 </span>            : #ifdef DYND_CUDA
+<span class="lineNum">      61 </span>            :   return nd::functional::elwise(nd::functional::multidispatch(
+<span class="lineNum">      62 </span>            :       ndt::type(&quot;(a: ?R, b: ?R) -&gt; M[R]&quot;),
+<span class="lineNum">      63 </span>            :       {make&lt;kernel_request_host&gt;(),
+<span class="lineNum">      64 </span>            :        make&lt;kernel_request_cuda_device&gt;()}));
+<span class="lineNum">      65 </span>            : #else
+<span class="lineNum">      66 </span>            : 
+<span class="lineNum">      67 </span>            : #ifdef __CUDACC__
+<span class="lineNum">      68 </span>            : 
+<span class="lineNum">      69 </span>            : __global__ void cuda_device_curand_init(curandState_t *s)
+<span class="lineNum">      70 </span>            : {
+<span class="lineNum">      71 </span>            :   curand_init(clock64(), blockIdx.x * blockDim.x + threadIdx.x, 0, s);
+<span class="lineNum">      72 </span>            : }
+<span class="lineNum">      73 </span>            : 
+<span class="lineNum">      74 </span>            : #endif
+<span class="lineNum">      75 </span>            : 
+<span class="lineNum">      76 </span>            : */
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.10</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

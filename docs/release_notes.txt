@@ -1,0 +1,320 @@
+DyND Release Notes
+==================
+
+DyND is a C++ library for array programming with a dynamic
+type system. It is currently in a preview state, and nothing
+about the API or the ABI is guaranteed to stay the same.
+
+Version 0.7.1
+-------------
+
+Commits by author since last release:
+
+  2409  Irwin Zaid
+   250  Mark Wiebe
+   194  Ian Henriksen
+    35  Phillip Cloud
+    17  Michael Droettboom
+    11  Stefan Krah
+     1  Jeff Reback
+     1  Stephan Hoyer
+     1  Brandon Burton
+
+- An extensive refactoring of DyND has occurred since the last release. At a very high-level,
+this consisted of making it easy to define and call nd::callable, dramatically simplifying
+how to write kernels, and the removal of unneeded types and features.
+- Change the supported C++ compiler to C++14 and later, in part because of expression SFINAE.
+- Moved to using a .dll on Windows
+- Irwin Zaid has taken the development lead position pushing forward on all fronts towards a 1.0 goal,
+while Mark Wiebe remains active providing design guidance and some code.
+- Ian Henriksen joined the developer team, initially as a GSoC student with support from NumFOCUS.
+
+Version 0.6.6
+-------------
+
+Commits by author since last release:
+
+   171  Irwin Zaid
+   121  Mark Wiebe
+     3  Wesley Emeneker
+
+- Allow struct field names to have spaces, like "{'a label': int32}".
+- Create arrfunc for processing every neighborhood in an array.
+- Create functor_arrfunc which creates an arrfunc from a C++ function
+  or function object.
+- Add support for powers of a dimension in the type system, like
+  "fixed**3 * int32" or the symbolic "fixed**N * int32".
+- Add prototype of an arrfunc registry, populate it with some math
+  functions to start.
+- Make nd::range work with the int128 type.
+- Rename "strided" dimension type to "fixed', and make it symbolic.
+  Now concrete arrays use concrete fixed dimensions like "3 * 5 * int32"
+  instead of "fixed * fixed * int32" with the shape only in the arrmeta.
+- Implement ndt::substitute_shape function, which replaces symbolic
+  dimension types with concrete sizes from a provided array shape.
+- Allow ndt::make_type<T>() to create types with different memory layout
+  than T, and introduce ndt::make_exact_type<T>() which satisfies this
+  property.
+- Remove const from the input parameters of arrfuncs/ckernels, to pave
+  the way towards input/out as well as input parameters in arrfuncs.
+- Reorganize the arrfunc calling convention into array parameters
+  and positional+keyword auxiliary parameters. Function prototype separates
+  array and auxiliary parameters with a ;, like
+  "(int32, float32; param: string) -> int32". The details of this are
+  still a work in progress.
+- Added simple dimension handling for the multiple dispatch arrfunc.
+- Make float## to ?T conversion change NaN to NA, following the convention
+  from R.
+- Rename type::tcast<some_type>() to type::extended<some_type>(), so it's
+  consistent with type::extended() which returns the base_type pointer.
+
+Version 0.6.5
+-------------
+
+Commits by author since last release:
+
+    42  Mark Wiebe
+     5  Irwin Zaid
+
+- Fix value assignment cases for some option[T] types.
+- Add a mechanism to create an nd::arrfunc from a C++ functor
+  or function pointer.
+- Add nd::array::get_dim_size which returns the size of a single
+  dimension.
+- Fix bug preventing view of unaligned int64 as datetime.
+- Support times formated like "11.00.00.000000000 AM".
+- Change initialization/cleanup to use libdynd_init and libdynd_cleanup
+  functions instead of C++ globals, which have non-deterministic
+  ordering.
+
+Version 0.6.4
+-------------
+
+Commits by author since last release:
+
+    26  Mark Wiebe
+    13  Irwin Zaid
+     5  Phillip Cloud
+
+- Fixes to array printing edge cases.
+- Improvements to FFT functions.
+- Change all strided dimension types (strided, fixed, cfixed) to
+  use the same metadata layout, and added a strided_ndim property
+  to the type's data. This permits simplified handling in common
+  strided cases.
+- Rename uniform_dim_kind to dim_kind, expression_kind to expr_kind.
+- Change boolean printing from true/false to True/False like Python.
+- Fix nd::view of a string as bytes to look at the string data.
+- Allow input of times like "09:30:00:000" with ":" instead of "."
+  separating seconds from the fractional seconds.
+- Allow dates to parse as datetimes, setting the time to all zeros.
+
+Version 0.6.3
+-------------
+
+Commits by author since last release:
+
+   201  Mark Wiebe
+    65  Irwin Zaid
+     4  T.J. Alumbaugh
+
+- Date parsing adjustments, making it more relaxed for now.
+- Improve JSON parsing performance.
+- Accept integer values like 123.0 and 1e5 when converting string to int.
+- Add ndarrayarg type to make the callable interface work more cleanly.
+- Add funcproto type, for function types like "(int, real) -> 3 * int"
+- Add typevar, typevar_dim and ellipsis_dim types as specified by datashape.
+- Implement type pattern matching and substitution based on typevars.
+- Design change from deferred evaluation to immediate evaluation, instead
+  with the goal of creating functional array programming primitives that
+  can be composed.
+- Rename ckernel_deferred to arrfunc as a representation of an array function.
+- Convert internal type details of tuple and struct to use nd::array for
+  arrays of field names, types, and offsets.
+- Incorporate 3rd party cephes library (from SciPy version) to add support
+  for special functions.
+- Add conversion for int128 and uint128 to/from strings.
+- Add some preliminary support for an option[T] type.
+- Add syntax like nd::empty<float[3][4]>() to create uninitialized arrays.
+- A first pass implementation of neighborhood iterators.
+- Create an adapt[] type, for providing parameterized ways to adapt between
+  types. For example, "adapt[(int32) -> date, 'days since 2012']" is a type
+  which adapts integers representing days since 2012-01-01 as a date.
+- Change nd::empty to treat integer parameters at the beginning as new
+  strided dimensions. nd::typed_empty provides the previous behavior, where
+  these parameters provide shape information to the dimensions already in
+  the type.
+- Implement permute, transpose, and rotate which apply permutations to the
+  shape of strided dimensions.
+- Add FFTW wrapper functions, enabled by a build time option.
+- Change printing code to summarize data instead of printing all of it.
+  This is useful for large arrays, which would otherwise slowly create
+  giant strings to print.
+- Fix printing of array types as strings, to longer produce a broadcasting
+  error.
+
+Version 0.6.2
+-------------
+
+Commits by author since last release:
+
+   178  Mark Wiebe
+   123  Irwin Zaid
+     2  Damien Garaud
+
+- Add basic CUDA support via new memory_kind and cuda memory types.
+  This support includes copying to/from arrays in CUDA memory.
+- Replace use of std::complex with new dynd_complex class which can
+  be compiled by CUDA.
+- Convert type system to updated datashape grammar. For example
+  a 1D int32 array is now "strided * int32" instead of "strided, int32".
+- Code for lifting scalar accumulation ckernels to multidimensional
+  reductions.
+- Add nd::view function which can switch between strided/fixed dimensions,
+  view bytes as POD data, and POD data as bytes.
+- Add .travis.yml testing of github development, including running the
+  tests through valgrind.
+- Change the preliminary date/datetime code to a new design, eliminating
+  the multiple unit selection, and including a parser which accepts more
+  general inputs than just ISO 8601 format. There are now date, time, and
+  datetime types, and the evaluation context includes options for how
+  to deal with two-digit years and YMD vs MDY vs DMY ordering.
+- Add a preprocessor metaprogramming library in the 'pp' subdirectory.
+- Add an nd::foreach function which runs a C++ functor (e.g. a C++11
+  lambda function) elementwise across provided nd::arrays. This uses
+  the preprocessor metaprogramming to generate variants with different
+  numbers of nd::array arguments.
+- Removed MSVC 2008 as a supported compiler on Windows, MSVC 2010
+  or later is required now.
+- Add function ndt::type::tcast<>() to simplify code casting to specific
+  type objects.
+- Rename previous fixed_dim type to cfixed_dim, and introduce a new
+  fixed_dim which behaves like the fixed[N] defined in datashape.
+  The naming cfixed[N] vs fixed[N] is not ideal, would be nice to find
+  a convention for the fixed-layout types (cfixed_dim, cstruct, ctuple)
+  vs the variable-layout types (fixed_dim, struct, tuple).
+- Code for creating ckernels to do simple windowed function evaluation.
+- Change slicing behavior with out-of-bounds indices to match Python.
+
+Version 0.6.1
+-------------
+
+- Tweak how some of the dimension types are printed.
+- Add a dynd::type_error exception for type-specific errors.
+- Some inf and nan-related fixes.
+- Add .conj property to the complex type.
+- Add a function which returns a ckernel_deferred from a property.
+- Fix a segfault bug from groupby on a multidimensional input.
+
+Version 0.6.0
+-------------
+
+- Add nd::memmap(filename, ...) to memory map a file as bytes.
+- Add "char" data type to represent a single unicode character.
+- The start of a 1D typed iterator primitive.
+- Replace type "cfloat##" with "complex[float##]".
+
+Version 0.5.0
+-------------
+
+- Make default access when constructing an nd::array from
+  a value be immutable instead of readwrite.
+- Add nd::array_rw(val) constructors to support creating
+  readwrite arrays from a value.
+- Some datashape printing/parsing tweaks, like "unaligned(...)"
+  support, printing the cstruct type using datashape format.
+- Add supporting code for ckernel ABI, including a
+  ckernel_deferred type, code for lifting ckernel_deferred
+  objects to higher dimensions, renaming to more consistent
+  naming schemes.
+
+Version 0.4.2
+-------------
+
+- Rename "dtype" to "ndt::type". Usage is now that "type"
+  refers to the full array type, while "dtype" refers
+  to the data type, after stripping away some or all of
+  the array dimensions.
+- Move many of the type related functions into the ndt::
+  namespace, making the C++ interface align better with
+  the Python one.
+- Add a simple implementation of string.find, modeled after
+  the Python string's find method.
+
+Version 0.4.1
+-------------
+
+- Switch indexing from a.at(...) to a(...) using operator()
+- Change how the step is specified in indexing, as irange().by(step)
+  instead of irange() / step.
+- Rename the "ndobject" to "nd::array", matching the change
+  in the Python bindings.
+- Rename "arange" to "nd::range", no need for the prefix "a".
+- Change indexing to only affect dimensions directly indexed,
+  collapsing leading "var" dims turned out to be problematic.
+- Add string concatenation via the + operator.
+
+Version 0.4.0
+-------------
+
+- Make some properties of dtypes more self-consistent.
+- Add initial datetime type, with some basic functionality.
+- Small changes towards renaming ndobject into nd::array
+
+Version 0.3.1
+-------------
+
+Version 0.3.0
+-------------
+
+Version 0.2.0
+-------------
+
+Version 0.1
+-----------
+
+This is the first preview release of the library, with the
+primary goals of demonstrating some basic computations and
+good interoperability with Numpy.
+
+Initial features include:
+
+ - Strided multi-dimensional array primitive, similar to
+   Numpy, Boost MultiArray and others. This object is fully
+   dynamic, the data type and dimensionality are specified
+   at runtime.
+
+ - Initial set of data types comparable to that
+   of Numpy, with a few exceptions such as datetime and
+   float16.
+
+ - A lazy evaluation computation infrastructure, which builds
+   up an expression graph and evaluates it when values are
+   requested.
+
+ - Elementwise computation nodes and elementwise reduction
+   computation nodes, exposed as "gfuncs" in Python. These
+   are similar to Numpy's "ufuncs" and its reduction methods
+   like "sum".
+
+ - A preliminary code generation system to adapt simple
+   functions to operate as kernels in gfuncs, and a basic
+   .dll/.so defining a few simple kernels this way.
+
+ - A proof of concept implementation of data types based on
+   array/memory block level references, initially with a
+   variable-sized string type.
+
+ - Flexible error checking in data type conversion, raising
+   errors dynamically based on values instead of just checking
+   data types.
+
+Limitations:
+
+ - The code generation system only supports 64-bit platforms
+   presently, and only can adapt unary and binary kernel functions
+   for use in gfuncs.
+
+ - Only a subset of the possible expression trees can be evaluated.
+   This can be worked around by manually creating temporaries
+   using the ndarray.vals() method.

@@ -1,0 +1,345 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - coverage.info.cleaned - src/dynd/functional.cpp</title>
+  <link rel="stylesheet" type="text/css" href="../../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../../index.html">top level</a> - <a href="index.html">src/dynd</a> - functional.cpp<span style="font-size: 80%;"> (source / <a href="functional.cpp.func.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">coverage.info.cleaned</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">98</td>
+            <td class="headerCovTableEntry">115</td>
+            <td class="headerCovTableEntryMed">85.2 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2016-02-19</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">11</td>
+            <td class="headerCovTableEntry">11</td>
+            <td class="headerCovTableEntryHi">100.0 %</td>
+          </tr>
+          <tr><td><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : //</a>
+<span class="lineNum">       2 </span>            : // Copyright (C) 2011-15 DyND Developers
+<span class="lineNum">       3 </span>            : // BSD 2-Clause License, see LICENSE.txt
+<span class="lineNum">       4 </span>            : //
+<span class="lineNum">       5 </span>            : 
+<span class="lineNum">       6 </span>            : #include &lt;algorithm&gt;
+<span class="lineNum">       7 </span>            : #include &lt;memory&gt;
+<span class="lineNum">       8 </span>            : #include &lt;set&gt;
+<span class="lineNum">       9 </span>            : #include &lt;unordered_map&gt;
+<span class="lineNum">      10 </span>            : 
+<span class="lineNum">      11 </span>            : #include &lt;dynd/functional.hpp&gt;
+<span class="lineNum">      12 </span>            : 
+<span class="lineNum">      13 </span>            : using namespace std;
+<span class="lineNum">      14 </span>            : using namespace dynd;
+<span class="lineNum">      15 </span>            : 
+<span class="lineNum">      16 </span>            : /**
+<span class="lineNum">      17 </span>            :  * Returns true if every argument type in ``lhs`` is implicitly
+<span class="lineNum">      18 </span>            :  * convertible to the corresponding argument type in ``rhs``.
+<span class="lineNum">      19 </span>            :  *
+<a name="20"><span class="lineNum">      20 </span>            :  * e.g. &quot;(int16, int16) -&gt; int16)&quot; and &quot;(int32, int16) -&gt; int32&quot;</a>
+<span class="lineNum">      21 </span>            :  */
+<span class="lineNum">      22 </span><span class="lineCov">          4 : static bool supercedes(const nd::callable &amp;lhs, const nd::callable &amp;rhs)</span>
+<span class="lineNum">      23 </span>            : {
+<span class="lineNum">      24 </span>            :   // TODO: Deal with keyword args
+<span class="lineNum">      25 </span><span class="lineCov">          4 :   if (lhs.get_type()-&gt;get_nkwd() &gt; 0 || rhs.get_type()-&gt;get_nkwd() &gt; 0) {</span>
+<span class="lineNum">      26 </span><span class="lineNoCov">          0 :     return false;</span>
+<span class="lineNum">      27 </span>            :   }
+<span class="lineNum">      28 </span>            : 
+<span class="lineNum">      29 </span><span class="lineCov">          4 :   intptr_t npos = lhs.get_type()-&gt;get_npos();</span>
+<span class="lineNum">      30 </span><span class="lineCov">          4 :   if (npos == rhs.get_type()-&gt;get_npos()) {</span>
+<span class="lineNum">      31 </span><span class="lineCov">         16 :     for (intptr_t i = 0; i &lt; npos; ++i) {</span>
+<span class="lineNum">      32 </span><span class="lineCov">         12 :       const ndt::type &amp;lpt = lhs.get_type()-&gt;get_pos_type(i);</span>
+<span class="lineNum">      33 </span><span class="lineCov">         12 :       const ndt::type &amp;rpt = rhs.get_type()-&gt;get_pos_type(i);</span>
+<span class="lineNum">      34 </span><span class="lineCov">         24 :       std::map&lt;std::string, ndt::type&gt; typevars;</span>
+<span class="lineNum">      35 </span><span class="lineCov">         12 :       if (!nd::functional::can_implicitly_convert(lpt, rpt, typevars)) {</span>
+<span class="lineNum">      36 </span><span class="lineNoCov">          0 :         return false;</span>
+<span class="lineNum">      37 </span>            :       }
+<span class="lineNum">      38 </span>            :     }
+<span class="lineNum">      39 </span><span class="lineCov">          4 :     return true;</span>
+<span class="lineNum">      40 </span>            :   }
+<span class="lineNum">      41 </span><span class="lineNoCov">          0 :   return false;</span>
+<span class="lineNum">      42 </span>            : }
+<span class="lineNum">      43 </span>            : 
+<span class="lineNum">      44 </span>            : /**
+<span class="lineNum">      45 </span>            :  * Returns true if every argument type in ``lhs`` is implicitly
+<span class="lineNum">      46 </span>            :  * convertible to the corresponding argument type in ``rhs``, or
+<span class="lineNum">      47 </span>            :  * has kind less than the kind of the type in ``rhs``.
+<span class="lineNum">      48 </span>            :  *
+<a name="49"><span class="lineNum">      49 </span>            :  * e.g. &quot;(int16, int16) -&gt; int16)&quot; and &quot;(int32, int16) -&gt; int32&quot;</a>
+<span class="lineNum">      50 </span>            :  */
+<span class="lineNum">      51 </span><span class="lineCov">        337 : static bool toposort_edge(const nd::callable &amp;lhs, const nd::callable &amp;rhs)</span>
+<span class="lineNum">      52 </span>            : {
+<span class="lineNum">      53 </span>            :   // TODO: Deal with keyword args
+<span class="lineNum">      54 </span><span class="lineCov">        337 :   if (lhs.get_type()-&gt;get_nkwd() &gt; 0 || rhs.get_type()-&gt;get_nkwd() &gt; 0) {</span>
+<span class="lineNum">      55 </span><span class="lineNoCov">          0 :     return false;</span>
+<span class="lineNum">      56 </span>            :   }
+<span class="lineNum">      57 </span>            : 
+<span class="lineNum">      58 </span><span class="lineCov">        337 :   intptr_t npos = lhs.get_type()-&gt;get_npos();</span>
+<span class="lineNum">      59 </span><span class="lineCov">        337 :   if (npos == rhs.get_type()-&gt;get_npos()) {</span>
+<span class="lineNum">      60 </span><span class="lineCov">        567 :     for (intptr_t i = 0; i &lt; npos; ++i) {</span>
+<span class="lineNum">      61 </span><span class="lineCov">        468 :       const ndt::type &amp;lpt = lhs.get_type()-&gt;get_pos_type(i);</span>
+<span class="lineNum">      62 </span><span class="lineCov">        468 :       const ndt::type &amp;rpt = rhs.get_type()-&gt;get_pos_type(i);</span>
+<span class="lineNum">      63 </span><span class="lineCov">        698 :       std::map&lt;std::string, ndt::type&gt; typevars;</span>
+<span class="lineNum">      64 </span><span class="lineCov">        468 :       if (lpt.get_kind() &gt;= rpt.get_kind() &amp;&amp; !nd::functional::can_implicitly_convert(lpt, rpt, typevars)) {</span>
+<span class="lineNum">      65 </span><span class="lineCov">        238 :         return false;</span>
+<span class="lineNum">      66 </span>            :       }
+<span class="lineNum">      67 </span>            :     }
+<span class="lineNum">      68 </span><span class="lineCov">         99 :     return true;</span>
+<span class="lineNum">      69 </span>            :   }
+<span class="lineNum">      70 </span><span class="lineNoCov">          0 :   return false;</span>
+<span class="lineNum">      71 </span>            : }
+<span class="lineNum">      72 </span>            : 
+<span class="lineNum">      73 </span>            : /**
+<span class="lineNum">      74 </span>            :  * Returns true if ``lhs`` and ``rhs`` are consistent, but neither
+<span class="lineNum">      75 </span>            :  * supercedes the other.
+<span class="lineNum">      76 </span>            :  *
+<a name="77"><span class="lineNum">      77 </span>            :  * e.g. &quot;(int16, int32) -&gt; int16)&quot; and &quot;(int32, int16) -&gt; int32&quot;</a>
+<span class="lineNum">      78 </span>            :  */
+<span class="lineNum">      79 </span><span class="lineCov">        119 : static bool ambiguous(const nd::callable &amp;lhs, const nd::callable &amp;rhs)</span>
+<span class="lineNum">      80 </span>            : {
+<span class="lineNum">      81 </span>            :   // TODO: Deal with keyword args
+<span class="lineNum">      82 </span><span class="lineCov">        119 :   if (lhs.get_type()-&gt;get_nkwd() &gt; 0 || rhs.get_type()-&gt;get_nkwd() &gt; 0) {</span>
+<span class="lineNum">      83 </span><span class="lineNoCov">          0 :     return false;</span>
+<span class="lineNum">      84 </span>            :   }
+<span class="lineNum">      85 </span>            : 
+<span class="lineNum">      86 </span><span class="lineCov">        119 :   intptr_t npos = lhs.get_type()-&gt;get_npos();</span>
+<span class="lineNum">      87 </span><span class="lineCov">        119 :   if (npos == rhs.get_type()-&gt;get_npos()) {</span>
+<span class="lineNum">      88 </span><span class="lineCov">        119 :     intptr_t lsupercount = 0, rsupercount = 0;</span>
+<span class="lineNum">      89 </span><span class="lineCov">        258 :     for (intptr_t i = 0; i &lt; npos; ++i) {</span>
+<span class="lineNum">      90 </span><span class="lineCov">        191 :       const ndt::type &amp;lpt = lhs.get_type()-&gt;get_pos_type(i);</span>
+<span class="lineNum">      91 </span><span class="lineCov">        191 :       const ndt::type &amp;rpt = rhs.get_type()-&gt;get_pos_type(i);</span>
+<span class="lineNum">      92 </span><span class="lineCov">        191 :       bool either = false;</span>
+<span class="lineNum">      93 </span><span class="lineCov">        330 :       std::map&lt;std::string, ndt::type&gt; typevars;</span>
+<span class="lineNum">      94 </span><span class="lineCov">        191 :       if (nd::functional::can_implicitly_convert(lpt, rpt, typevars)) {</span>
+<span class="lineNum">      95 </span><span class="lineCov">        136 :         lsupercount++;</span>
+<span class="lineNum">      96 </span><span class="lineCov">        136 :         either = true;</span>
+<span class="lineNum">      97 </span>            :       }
+<span class="lineNum">      98 </span><span class="lineCov">        191 :       typevars.clear();</span>
+<span class="lineNum">      99 </span><span class="lineCov">        191 :       if (nd::functional::can_implicitly_convert(rpt, lpt, typevars)) {</span>
+<span class="lineNum">     100 </span><span class="lineCov">         40 :         rsupercount++;</span>
+<span class="lineNum">     101 </span><span class="lineCov">         40 :         either = true;</span>
+<span class="lineNum">     102 </span>            :       }
+<span class="lineNum">     103 </span><span class="lineCov">        191 :       if (!either) {</span>
+<span class="lineNum">     104 </span><span class="lineCov">         52 :         return false;</span>
+<span class="lineNum">     105 </span>            :       }
+<span class="lineNum">     106 </span>            :     }
+<span class="lineNum">     107 </span><span class="lineCov">         67 :     return (lsupercount != npos &amp;&amp; rsupercount != npos) || (lsupercount == rsupercount);</span>
+<span class="lineNum">     108 </span>            :   }
+<span class="lineNum">     109 </span><span class="lineNoCov">          0 :   return false;</span>
+<span class="lineNum">     110 </span>            : }
+<span class="lineNum">     111 </span>            : 
+<span class="lineNum">     112 </span>            : namespace {
+<span class="lineNum">     113 </span>            : struct toposort_marker {
+<span class="lineNum">     114 </span>            :   bool mark, temp_mark;
+<span class="lineNum">     115 </span>            : };
+<a name="116"><span class="lineNum">     116 </span>            : } // anonymous namespace</a>
+<span class="lineNum">     117 </span>            : 
+<span class="lineNum">     118 </span><span class="lineCov">        138 : static void toposort_visit(intptr_t n, vector&lt;toposort_marker&gt; &amp;marker, vector&lt;vector&lt;intptr_t&gt;&gt; &amp;adjlist, intptr_t naf,</span>
+<span class="lineNum">     119 </span>            :                            const nd::callable *af, vector&lt;nd::callable&gt; &amp;sorted_af)
+<span class="lineNum">     120 </span>            : {
+<span class="lineNum">     121 </span><span class="lineCov">        138 :   if (marker[n].temp_mark) {</span>
+<span class="lineNum">     122 </span>            :     throw invalid_argument(&quot;Detected a graph loop trying to topologically sort &quot;
+<span class="lineNum">     123 </span><span class="lineNoCov">          0 :                            &quot;callable signatures for a multidispatch callable&quot;);</span>
+<span class="lineNum">     124 </span>            :   }
+<span class="lineNum">     125 </span><span class="lineCov">        138 :   if (!marker[n].mark) {</span>
+<span class="lineNum">     126 </span><span class="lineCov">         77 :     marker[n].temp_mark = true;</span>
+<span class="lineNum">     127 </span><span class="lineCov">         77 :     vector&lt;intptr_t&gt; &amp;outedges = adjlist[n];</span>
+<span class="lineNum">     128 </span><span class="lineCov">        176 :     for (vector&lt;intptr_t&gt;::iterator it = outedges.begin(); it != outedges.end(); ++it) {</span>
+<span class="lineNum">     129 </span><span class="lineCov">         99 :       toposort_visit(*it, marker, adjlist, naf, af, sorted_af);</span>
+<span class="lineNum">     130 </span>            :     }
+<span class="lineNum">     131 </span><span class="lineCov">         77 :     marker[n].mark = true;</span>
+<span class="lineNum">     132 </span><span class="lineCov">         77 :     marker[n].temp_mark = false;</span>
+<span class="lineNum">     133 </span><span class="lineCov">         77 :     sorted_af.push_back(af[n]);</span>
+<span class="lineNum">     134 </span>            :   }
+<span class="lineNum">     135 </span><span class="lineCov">        138 : }</span>
+<span class="lineNum">     136 </span>            : 
+<span class="lineNum">     137 </span>            : /**
+<a name="138"><span class="lineNum">     138 </span>            :  * Does a DFS-based topological sort.</a>
+<span class="lineNum">     139 </span>            :  */
+<span class="lineNum">     140 </span><span class="lineCov">         26 : static void toposort(vector&lt;vector&lt;intptr_t&gt;&gt; &amp;adjlist, intptr_t naf, const nd::callable *af,</span>
+<span class="lineNum">     141 </span>            :                      vector&lt;nd::callable&gt; &amp;sorted_af)
+<span class="lineNum">     142 </span>            : {
+<span class="lineNum">     143 </span><span class="lineCov">         52 :   vector&lt;toposort_marker&gt; marker(naf);</span>
+<span class="lineNum">     144 </span><span class="lineCov">        103 :   for (intptr_t n = 0; n &lt; naf; ++n) {</span>
+<span class="lineNum">     145 </span><span class="lineCov">         77 :     if (!marker[n].mark) {</span>
+<span class="lineNum">     146 </span><span class="lineCov">         39 :       toposort_visit(n, marker, adjlist, naf, af, sorted_af);</span>
+<span class="lineNum">     147 </span>            :     }
+<span class="lineNum">     148 </span>            :   }
+<span class="lineNum">     149 </span><span class="lineCov">         26 :   reverse(sorted_af.begin(), sorted_af.end());</span>
+<span class="lineNum">     150 </span><span class="lineCov">         26 : }</span>
+<span class="lineNum">     151 </span>            : 
+<span class="lineNum">     152 </span>            : /**
+<span class="lineNum">     153 </span>            :  * Returns all the edges with which to constrain multidispatch ordering.
+<span class="lineNum">     154 </span>            :  *
+<a name="155"><span class="lineNum">     155 </span>            :  * NOTE: Presently O(naf ** 2)</a>
+<span class="lineNum">     156 </span>            :  */
+<span class="lineNum">     157 </span><span class="lineCov">         26 : static void get_graph(intptr_t naf, const nd::callable *af, vector&lt;vector&lt;intptr_t&gt;&gt; &amp;adjlist)</span>
+<span class="lineNum">     158 </span>            : {
+<span class="lineNum">     159 </span><span class="lineCov">        103 :   for (intptr_t i = 0; i &lt; naf; ++i) {</span>
+<span class="lineNum">     160 </span><span class="lineCov">        392 :     for (intptr_t j = 0; j &lt; naf; ++j) {</span>
+<span class="lineNum">     161 </span><span class="lineCov">        315 :       if (i != j &amp;&amp; toposort_edge(af[i], af[j])) {</span>
+<span class="lineNum">     162 </span><span class="lineCov">         99 :         if (!toposort_edge(af[j], af[i])) {</span>
+<span class="lineNum">     163 </span><span class="lineCov">         99 :           adjlist[i].push_back(j);</span>
+<span class="lineNum">     164 </span>            :         }
+<span class="lineNum">     165 </span>            :         else {
+<span class="lineNum">     166 </span><span class="lineNoCov">          0 :           stringstream ss;</span>
+<span class="lineNum">     167 </span>            :           ss &lt;&lt; &quot;Multidispatch provided with two callable signatures matching &quot;
+<span class="lineNum">     168 </span><span class="lineNoCov">          0 :                 &quot;the same types: &quot;</span>
+<span class="lineNum">     169 </span><span class="lineNoCov">          0 :              &lt;&lt; af[i].get_array_type() &lt;&lt; &quot; and &quot; &lt;&lt; af[j].get_array_type();</span>
+<span class="lineNum">     170 </span><span class="lineNoCov">          0 :           throw invalid_argument(ss.str());</span>
+<span class="lineNum">     171 </span>            :         }
+<span class="lineNum">     172 </span>            :       }
+<span class="lineNum">     173 </span>            :     }
+<span class="lineNum">     174 </span>            :   }
+<a name="175"><span class="lineNum">     175 </span><span class="lineCov">         26 : }</span></a>
+<span class="lineNum">     176 </span>            : 
+<span class="lineNum">     177 </span><span class="lineCov">         26 : static void sort_callables(intptr_t naf, const nd::callable *af, vector&lt;nd::callable&gt; &amp;sorted_af)</span>
+<span class="lineNum">     178 </span>            : {
+<span class="lineNum">     179 </span><span class="lineCov">         52 :   vector&lt;vector&lt;intptr_t&gt;&gt; adjlist(naf);</span>
+<span class="lineNum">     180 </span><span class="lineCov">         26 :   get_graph(naf, af, adjlist);</span>
+<span class="lineNum">     181 </span>            : 
+<span class="lineNum">     182 </span>            :   /*
+<span class="lineNum">     183 </span>            :   cout &lt;&lt; &quot;Graph is: &quot; &lt;&lt; endl;
+<span class="lineNum">     184 </span>            :   for (intptr_t i = 0; i &lt; naf; ++i) {
+<span class="lineNum">     185 </span>            :     cout &lt;&lt; i &lt;&lt; &quot;: &quot;;
+<span class="lineNum">     186 </span>            :     for (size_t j = 0; j &lt; adjlist[i].size(); ++j) {
+<span class="lineNum">     187 </span>            :       cout &lt;&lt; adjlist[i][j] &lt;&lt; &quot; &quot;;
+<span class="lineNum">     188 </span>            :     }
+<span class="lineNum">     189 </span>            :     cout &lt;&lt; endl;
+<span class="lineNum">     190 </span>            :   }
+<span class="lineNum">     191 </span>            :   //*/
+<span class="lineNum">     192 </span><span class="lineCov">         26 :   toposort(adjlist, naf, af, sorted_af);</span>
+<span class="lineNum">     193 </span><span class="lineCov">         26 : }</span>
+<span class="lineNum">     194 </span>            : 
+<span class="lineNum">     195 </span>            : /**
+<span class="lineNum">     196 </span>            :  * Returns all the pairs of signatures which are ambiguous. This
+<span class="lineNum">     197 </span>            :  * assumes that the callable array is already topologically sorted.
+<span class="lineNum">     198 </span>            :  *
+<a name="199"><span class="lineNum">     199 </span>            :  * NOTE: Presently O(naf ** 3)</a>
+<span class="lineNum">     200 </span>            :  */
+<span class="lineNum">     201 </span><span class="lineCov">         26 : static void get_ambiguous_pairs(intptr_t naf, const nd::callable *af,</span>
+<span class="lineNum">     202 </span>            :                                 vector&lt;pair&lt;nd::callable, nd::callable&gt;&gt; &amp;ambig_pairs)
+<span class="lineNum">     203 </span>            : {
+<span class="lineNum">     204 </span><span class="lineCov">        103 :   for (intptr_t i = 0; i &lt; naf; ++i) {</span>
+<span class="lineNum">     205 </span><span class="lineCov">        196 :     for (intptr_t j = i + 1; j &lt; naf; ++j) {</span>
+<span class="lineNum">     206 </span><span class="lineCov">        119 :       if (ambiguous(af[i], af[j])) {</span>
+<span class="lineNum">     207 </span>            :         intptr_t k;
+<span class="lineNum">     208 </span><span class="lineCov">          3 :         for (k = 0; k &lt; i; ++k) {</span>
+<span class="lineNum">     209 </span><span class="lineCov">          2 :           if (supercedes(af[k], af[i]) &amp;&amp; supercedes(af[k], af[j])) {</span>
+<span class="lineNum">     210 </span><span class="lineCov">          2 :             break;</span>
+<span class="lineNum">     211 </span>            :           }
+<span class="lineNum">     212 </span>            :         }
+<span class="lineNum">     213 </span><span class="lineCov">          3 :         if (k == i) {</span>
+<span class="lineNum">     214 </span><span class="lineCov">          1 :           ambig_pairs.push_back(make_pair(af[i], af[j]));</span>
+<span class="lineNum">     215 </span>            :         }
+<span class="lineNum">     216 </span>            :       }
+<span class="lineNum">     217 </span>            :     }
+<span class="lineNum">     218 </span>            :   }
+<a name="219"><span class="lineNum">     219 </span><span class="lineCov">         26 : }</span></a>
+<span class="lineNum">     220 </span>            : 
+<span class="lineNum">     221 </span><span class="lineCov">         26 : nd::callable nd::functional::old_multidispatch(intptr_t naf, const callable *child_af)</span>
+<span class="lineNum">     222 </span>            : {
+<span class="lineNum">     223 </span><span class="lineCov">         26 :   if (naf &lt;= 0) {</span>
+<span class="lineNum">     224 </span><span class="lineNoCov">          0 :     throw invalid_argument(&quot;Require one or more functions to create a multidispatch callable&quot;);</span>
+<span class="lineNum">     225 </span>            :   }
+<span class="lineNum">     226 </span>            :   // Number of parameters must be the same across all
+<span class="lineNum">     227 </span><span class="lineCov">         26 :   intptr_t nargs = child_af[0].get_type()-&gt;get_narg();</span>
+<span class="lineNum">     228 </span><span class="lineCov">         77 :   for (intptr_t i = 1; i &lt; naf; ++i) {</span>
+<span class="lineNum">     229 </span><span class="lineCov">         51 :     if (nargs != child_af[i].get_type()-&gt;get_narg()) {</span>
+<span class="lineNum">     230 </span><span class="lineNoCov">          0 :       stringstream ss;</span>
+<span class="lineNum">     231 </span>            :       ss &lt;&lt; &quot;All child callables must have the same number of arguments to &quot;
+<span class="lineNum">     232 </span><span class="lineNoCov">          0 :             &quot;generate a multidispatch callable, differing: &quot;</span>
+<span class="lineNum">     233 </span><span class="lineNoCov">          0 :          &lt;&lt; child_af[0].get_array_type() &lt;&lt; &quot; and &quot; &lt;&lt; child_af[i].get_array_type();</span>
+<span class="lineNum">     234 </span><span class="lineNoCov">          0 :       throw invalid_argument(ss.str());</span>
+<span class="lineNum">     235 </span>            :     }
+<span class="lineNum">     236 </span>            :   }
+<span class="lineNum">     237 </span>            : 
+<span class="lineNum">     238 </span>            :   // Generate the topologically sorted array of callables
+<span class="lineNum">     239 </span><span class="lineCov">         52 :   vector&lt;nd::callable&gt; sorted_af;</span>
+<span class="lineNum">     240 </span><span class="lineCov">         26 :   sort_callables(naf, child_af, sorted_af);</span>
+<span class="lineNum">     241 </span>            : 
+<span class="lineNum">     242 </span>            :   /*
+<span class="lineNum">     243 </span>            :   cout &lt;&lt; &quot;Before: \n&quot;;
+<span class="lineNum">     244 </span>            :   for (intptr_t i = 0; i &lt; naf; ++i) {
+<span class="lineNum">     245 </span>            :     cout &lt;&lt; i &lt;&lt; &quot;: &quot; &lt;&lt; af[i].get()-&gt;func_proto &lt;&lt; endl;
+<span class="lineNum">     246 </span>            :   }
+<span class="lineNum">     247 </span>            :   cout &lt;&lt; endl;
+<span class="lineNum">     248 </span>            :   cout &lt;&lt; &quot;After: \n&quot;;
+<span class="lineNum">     249 </span>            :   for (intptr_t i = 0; i &lt; naf; ++i) {
+<span class="lineNum">     250 </span>            :     cout &lt;&lt; sorted_af[i].get()-&gt;func_proto &lt;&lt; endl;
+<span class="lineNum">     251 </span>            :   }
+<span class="lineNum">     252 </span>            :   cout &lt;&lt; endl;
+<span class="lineNum">     253 </span>            :   //*/
+<span class="lineNum">     254 </span>            : 
+<span class="lineNum">     255 </span><span class="lineCov">         52 :   vector&lt;pair&lt;nd::callable, nd::callable&gt;&gt; ambig_pairs;</span>
+<span class="lineNum">     256 </span><span class="lineCov">         26 :   get_ambiguous_pairs(naf, &amp;sorted_af[0], ambig_pairs);</span>
+<span class="lineNum">     257 </span><span class="lineCov">         26 :   if (!ambig_pairs.empty()) {</span>
+<span class="lineNum">     258 </span><span class="lineCov">          2 :     stringstream ss;</span>
+<span class="lineNum">     259 </span>            :     ss &lt;&lt; &quot;Arrfuncs provided to create multidispatch callable have ambiguous &quot;
+<span class="lineNum">     260 </span><span class="lineCov">          1 :           &quot;case(s):\n&quot;;</span>
+<span class="lineNum">     261 </span><span class="lineCov">          2 :     for (intptr_t i = 0; i &lt; (intptr_t)ambig_pairs.size(); ++i) {</span>
+<span class="lineNum">     262 </span><span class="lineCov">          1 :       ss &lt;&lt; ambig_pairs[i].first.get_array_type() &lt;&lt; &quot; and &quot; &lt;&lt; ambig_pairs[i].second.get_array_type();</span>
+<span class="lineNum">     263 </span>            :     }
+<span class="lineNum">     264 </span><span class="lineCov">          1 :     throw invalid_argument(ss.str());</span>
+<span class="lineNum">     265 </span>            :   }
+<span class="lineNum">     266 </span>            : 
+<a name="267"><span class="lineNum">     267 </span>            :   // TODO: Component callables might be arrays, not just scalars</a>
+<span class="lineNum">     268 </span><span class="lineCov">         50 :   return callable::make&lt;old_multidispatch_ck&gt;(ndt::make_generic_funcproto(nargs), std::move(sorted_af));</span>
+<span class="lineNum">     269 </span><span class="lineCov">          3 : }</span>
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.10</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

@@ -1,0 +1,234 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - coverage.info.cleaned - tests/test_bool1.cpp</title>
+  <link rel="stylesheet" type="text/css" href="../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../index.html">top level</a> - <a href="index.html">tests</a> - test_bool1.cpp<span style="font-size: 80%;"> (source / <a href="test_bool1.cpp.func.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">coverage.info.cleaned</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">51</td>
+            <td class="headerCovTableEntry">63</td>
+            <td class="headerCovTableEntryMed">81.0 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2016-02-19</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">14</td>
+            <td class="headerCovTableEntry">14</td>
+            <td class="headerCovTableEntryHi">100.0 %</td>
+          </tr>
+          <tr><td><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : //</a>
+<span class="lineNum">       2 </span>            : // Copyright (C) 2011-15 DyND Developers
+<span class="lineNum">       3 </span>            : // BSD 2-Clause License, see LICENSE.txt
+<span class="lineNum">       4 </span>            : //
+<span class="lineNum">       5 </span>            : 
+<span class="lineNum">       6 </span>            : #include &lt;iostream&gt;
+<span class="lineNum">       7 </span>            : #include &lt;stdexcept&gt;
+<span class="lineNum">       8 </span>            : #include &lt;algorithm&gt;
+<span class="lineNum">       9 </span>            : #include &lt;cmath&gt;
+<span class="lineNum">      10 </span>            : 
+<span class="lineNum">      11 </span>            : #include &quot;inc_gtest.hpp&quot;
+<span class="lineNum">      12 </span>            : #include &quot;dynd_assertions.hpp&quot;
+<span class="lineNum">      13 </span>            : 
+<span class="lineNum">      14 </span>            : #include &lt;dynd/config.hpp&gt;
+<span class="lineNum">      15 </span>            : 
+<span class="lineNum">      16 </span>            : using namespace std;
+<span class="lineNum">      17 </span>            : using namespace dynd;
+<span class="lineNum">      18 </span>            : 
+<a name="19"><span class="lineNum">      19 </span>            : //#define EXPECT_TYPE_IS_SAME(A, B) EXPECT_TRUE((std::is_same&lt;A, B&gt;::value))</a>
+<span class="lineNum">      20 </span>            : 
+<span class="lineNum">      21 </span><span class="lineCov">          5 : TEST(Bool1, ArithmeticType)</span>
+<span class="lineNum">      22 </span>            : {
+<span class="lineNum">      23 </span>            : // int32 + uint32 -&gt; uint32
+<span class="lineNum">      24 </span>            : 
+<span class="lineNum">      25 </span>            : //  EXPECT_TYPE_IS_SAME(decltype(declval&lt;bool1&gt;() / declval&lt;short&gt;()),
+<span class="lineNum">      26 </span>            : //                    (typename common_type&lt;bool, short&gt;::type));
+<span class="lineNum">      27 </span>            : 
+<span class="lineNum">      28 </span>            : #define EXPECTATIONS(OPERATOR)                                                                                         \
+<span class="lineNum">      29 </span>            :   EXPECT_TRUE((                                                                                                        \
+<span class="lineNum">      30 </span>            :       is_same&lt;decltype(declval&lt;bool1&gt;() OPERATOR declval&lt;short&gt;()), typename common_type&lt;bool, short&gt;::type&gt;::value)); \
+<span class="lineNum">      31 </span>            :   EXPECT_TRUE(                                                                                                         \
+<span class="lineNum">      32 </span>            :       (is_same&lt;decltype(declval&lt;bool1&gt;() OPERATOR declval&lt;int&gt;()), typename common_type&lt;bool, int&gt;::type&gt;::value));    \
+<span class="lineNum">      33 </span>            :   EXPECT_TRUE(                                                                                                         \
+<span class="lineNum">      34 </span>            :       (is_same&lt;decltype(declval&lt;bool1&gt;() OPERATOR declval&lt;long&gt;()), typename common_type&lt;bool, long&gt;::type&gt;::value));  \
+<span class="lineNum">      35 </span>            :   EXPECT_TRUE((is_same&lt;decltype(declval&lt;bool1&gt;() OPERATOR declval&lt;long long&gt;()),                                       \
+<span class="lineNum">      36 </span>            :                        typename common_type&lt;bool, long long&gt;::type&gt;::value));                                          \
+<span class="lineNum">      37 </span>            :   EXPECT_TRUE((is_same&lt;decltype(declval&lt;bool1&gt;() OPERATOR declval&lt;unsigned char&gt;()),                                   \
+<span class="lineNum">      38 </span>            :                        typename common_type&lt;bool, unsigned char&gt;::type&gt;::value));                                      \
+<span class="lineNum">      39 </span>            :   EXPECT_TRUE((is_same&lt;decltype(declval&lt;bool1&gt;() OPERATOR declval&lt;unsigned short&gt;()),                                  \
+<span class="lineNum">      40 </span>            :                        typename common_type&lt;bool, unsigned short&gt;::type&gt;::value));                                     \
+<span class="lineNum">      41 </span>            :   EXPECT_TRUE((is_same&lt;decltype(declval&lt;bool1&gt;() OPERATOR declval&lt;unsigned int&gt;()),                                    \
+<span class="lineNum">      42 </span>            :                        typename common_type&lt;bool, unsigned int&gt;::type&gt;::value));                                       \
+<span class="lineNum">      43 </span>            :   EXPECT_TRUE((is_same&lt;decltype(declval&lt;bool1&gt;() OPERATOR declval&lt;unsigned long&gt;()),                                   \
+<span class="lineNum">      44 </span>            :                        typename common_type&lt;bool, unsigned long&gt;::type&gt;::value));                                      \
+<span class="lineNum">      45 </span>            :   EXPECT_TRUE((is_same&lt;decltype(declval&lt;bool1&gt;() OPERATOR declval&lt;unsigned long long&gt;()),                              \
+<span class="lineNum">      46 </span>            :                        typename common_type&lt;bool, unsigned long long&gt;::type&gt;::value));                                 \
+<span class="lineNum">      47 </span>            :   EXPECT_TRUE((                                                                                                        \
+<span class="lineNum">      48 </span>            :       is_same&lt;decltype(declval&lt;bool1&gt;() OPERATOR declval&lt;float&gt;()), typename common_type&lt;bool, float&gt;::type&gt;::value)); \
+<span class="lineNum">      49 </span>            :   EXPECT_TRUE((is_same&lt;decltype(declval&lt;bool1&gt;() OPERATOR declval&lt;double&gt;()),                                          \
+<span class="lineNum">      50 </span>            :                        typename common_type&lt;bool, double&gt;::type&gt;::value));                                             \
+<span class="lineNum">      51 </span>            :                                                                                                                        \
+<span class="lineNum">      52 </span>            :   EXPECT_TRUE((is_same&lt;decltype(declval&lt;signed char&gt;() OPERATOR declval&lt;bool1&gt;()),                                     \
+<span class="lineNum">      53 </span>            :                        typename common_type&lt;signed char, bool&gt;::type&gt;::value));                                        \
+<span class="lineNum">      54 </span>            :   EXPECT_TRUE((                                                                                                        \
+<span class="lineNum">      55 </span>            :       is_same&lt;decltype(declval&lt;short&gt;() OPERATOR declval&lt;bool1&gt;()), typename common_type&lt;short, bool&gt;::type&gt;::value)); \
+<span class="lineNum">      56 </span>            :   EXPECT_TRUE(                                                                                                         \
+<span class="lineNum">      57 </span>            :       (is_same&lt;decltype(declval&lt;int&gt;() OPERATOR declval&lt;bool1&gt;()), typename common_type&lt;int, bool&gt;::type&gt;::value));    \
+<span class="lineNum">      58 </span>            :   EXPECT_TRUE(                                                                                                         \
+<span class="lineNum">      59 </span>            :       (is_same&lt;decltype(declval&lt;long&gt;() OPERATOR declval&lt;bool1&gt;()), typename common_type&lt;long, bool1&gt;::type&gt;::value)); \
+<span class="lineNum">      60 </span>            :   EXPECT_TRUE((is_same&lt;decltype(declval&lt;long long&gt;() OPERATOR declval&lt;bool1&gt;()),                                       \
+<span class="lineNum">      61 </span>            :                        typename common_type&lt;long long, bool&gt;::type&gt;::value));                                          \
+<span class="lineNum">      62 </span>            :   EXPECT_TRUE((is_same&lt;decltype(declval&lt;unsigned char&gt;() OPERATOR declval&lt;bool1&gt;()),                                   \
+<span class="lineNum">      63 </span>            :                        typename common_type&lt;unsigned char, bool&gt;::type&gt;::value));                                      \
+<span class="lineNum">      64 </span>            :   EXPECT_TRUE((is_same&lt;decltype(declval&lt;bool1&gt;() OPERATOR declval&lt;unsigned short&gt;()),                                  \
+<span class="lineNum">      65 </span>            :                        typename common_type&lt;bool, unsigned short&gt;::type&gt;::value));                                     \
+<span class="lineNum">      66 </span>            :   EXPECT_TRUE((is_same&lt;decltype(declval&lt;bool1&gt;() OPERATOR declval&lt;unsigned int&gt;()),                                    \
+<span class="lineNum">      67 </span>            :                        typename common_type&lt;bool, unsigned int&gt;::type&gt;::value));                                       \
+<span class="lineNum">      68 </span>            :   EXPECT_TRUE((is_same&lt;decltype(declval&lt;bool1&gt;() OPERATOR declval&lt;unsigned long&gt;()),                                   \
+<span class="lineNum">      69 </span>            :                        typename common_type&lt;bool, unsigned long&gt;::type&gt;::value));                                      \
+<span class="lineNum">      70 </span>            :   EXPECT_TRUE((is_same&lt;decltype(declval&lt;bool1&gt;() OPERATOR declval&lt;unsigned long long&gt;()),                              \
+<span class="lineNum">      71 </span>            :                        typename common_type&lt;bool, unsigned long long&gt;::type&gt;::value));                                 \
+<span class="lineNum">      72 </span>            :   EXPECT_TRUE((                                                                                                        \
+<span class="lineNum">      73 </span>            :       is_same&lt;decltype(declval&lt;bool1&gt;() OPERATOR declval&lt;float&gt;()), typename common_type&lt;bool, float&gt;::type&gt;::value)); \
+<span class="lineNum">      74 </span>            :   EXPECT_TRUE((is_same&lt;decltype(declval&lt;bool1&gt;() OPERATOR declval&lt;double&gt;()),                                          \
+<span class="lineNum">      75 </span>            :                        typename common_type&lt;bool, double&gt;::type&gt;::value))
+<span class="lineNum">      76 </span>            : 
+<span class="lineNum">      77 </span><span class="lineCov">          1 :   EXPECTATIONS(/ );</span>
+<a name="78"><span class="lineNum">      78 </span><span class="lineCov">          1 : }</span></a>
+<span class="lineNum">      79 </span>            : 
+<span class="lineNum">      80 </span><span class="lineCov">          5 : TEST(Complex, CommonType)</span>
+<span class="lineNum">      81 </span>            : {
+<span class="lineNum">      82 </span>            :   using dynd::complex;
+<span class="lineNum">      83 </span>            :   typedef double T;
+<span class="lineNum">      84 </span>            : 
+<span class="lineNum">      85 </span><span class="lineCov">          1 :   EXPECT_TRUE((is_same&lt;decltype(declval&lt;bool1&gt;() / declval&lt;complex&lt;float&gt;&gt;()), complex&lt;float&gt;&gt;::value));</span>
+<span class="lineNum">      86 </span><span class="lineCov">          1 :   EXPECT_TRUE((is_same&lt;decltype(declval&lt;bool1&gt;() / declval&lt;complex&lt;double&gt;&gt;()), complex&lt;double&gt;&gt;::value));</span>
+<span class="lineNum">      87 </span>            : 
+<span class="lineNum">      88 </span><span class="lineCov">          1 :   EXPECT_TRUE((is_same&lt;decltype(declval&lt;complex&lt;T&gt;&gt;() / declval&lt;signed char&gt;()),</span>
+<span class="lineNum">      89 </span><span class="lineNoCov">          0 :                        complex&lt;typename common_type&lt;T, signed char&gt;::type&gt;&gt;::value));</span>
+<span class="lineNum">      90 </span><span class="lineCov">          1 :   EXPECT_TRUE((is_same&lt;decltype(declval&lt;complex&lt;T&gt;&gt;() / declval&lt;short&gt;()),</span>
+<span class="lineNum">      91 </span><span class="lineNoCov">          0 :                        complex&lt;typename common_type&lt;T, short&gt;::type&gt;&gt;::value));</span>
+<span class="lineNum">      92 </span><span class="lineCov">          1 :   EXPECT_TRUE(</span>
+<span class="lineNum">      93 </span><span class="lineNoCov">          0 :       (is_same&lt;decltype(declval&lt;complex&lt;T&gt;&gt;() / declval&lt;int&gt;()), complex&lt;typename common_type&lt;T, int&gt;::type&gt;&gt;::value));</span>
+<span class="lineNum">      94 </span><span class="lineCov">          1 :   EXPECT_TRUE((</span>
+<span class="lineNum">      95 </span><span class="lineNoCov">          0 :       is_same&lt;decltype(declval&lt;complex&lt;T&gt;&gt;() / declval&lt;long&gt;()), complex&lt;typename common_type&lt;T, long&gt;::type&gt;&gt;::value));</span>
+<span class="lineNum">      96 </span><span class="lineCov">          1 :   EXPECT_TRUE((is_same&lt;decltype(declval&lt;complex&lt;T&gt;&gt;() / declval&lt;long long&gt;()),</span>
+<span class="lineNum">      97 </span><span class="lineNoCov">          0 :                        complex&lt;typename common_type&lt;T, long long&gt;::type&gt;&gt;::value));</span>
+<span class="lineNum">      98 </span><span class="lineCov">          1 :   EXPECT_TRUE((is_same&lt;decltype(declval&lt;complex&lt;T&gt;&gt;() / declval&lt;unsigned char&gt;()),</span>
+<span class="lineNum">      99 </span><span class="lineNoCov">          0 :                        complex&lt;typename common_type&lt;T, unsigned char&gt;::type&gt;&gt;::value));</span>
+<span class="lineNum">     100 </span><span class="lineCov">          1 :   EXPECT_TRUE((is_same&lt;decltype(declval&lt;complex&lt;T&gt;&gt;() / declval&lt;unsigned short&gt;()),</span>
+<span class="lineNum">     101 </span><span class="lineNoCov">          0 :                        complex&lt;typename common_type&lt;T, unsigned short&gt;::type&gt;&gt;::value));</span>
+<span class="lineNum">     102 </span><span class="lineCov">          1 :   EXPECT_TRUE((is_same&lt;decltype(declval&lt;complex&lt;T&gt;&gt;() / declval&lt;unsigned int&gt;()),</span>
+<span class="lineNum">     103 </span><span class="lineNoCov">          0 :                        complex&lt;typename common_type&lt;T, unsigned int&gt;::type&gt;&gt;::value));</span>
+<span class="lineNum">     104 </span><span class="lineCov">          1 :   EXPECT_TRUE((is_same&lt;decltype(declval&lt;complex&lt;T&gt;&gt;() / declval&lt;unsigned long&gt;()),</span>
+<span class="lineNum">     105 </span><span class="lineNoCov">          0 :                        complex&lt;typename common_type&lt;T, unsigned long&gt;::type&gt;&gt;::value));</span>
+<span class="lineNum">     106 </span><span class="lineCov">          1 :   EXPECT_TRUE((is_same&lt;decltype(declval&lt;complex&lt;T&gt;&gt;() / declval&lt;unsigned long long&gt;()),</span>
+<span class="lineNum">     107 </span><span class="lineNoCov">          0 :                        complex&lt;typename common_type&lt;T, unsigned long long&gt;::type&gt;&gt;::value));</span>
+<span class="lineNum">     108 </span><span class="lineCov">          1 :   EXPECT_TRUE((is_same&lt;decltype(declval&lt;complex&lt;T&gt;&gt;() / declval&lt;float&gt;()),</span>
+<span class="lineNum">     109 </span><span class="lineNoCov">          0 :                        complex&lt;typename common_type&lt;T, float&gt;::type&gt;&gt;::value));</span>
+<span class="lineNum">     110 </span><span class="lineCov">          1 :   EXPECT_TRUE((is_same&lt;decltype(declval&lt;complex&lt;T&gt;&gt;() / declval&lt;double&gt;()),</span>
+<span class="lineNum">     111 </span><span class="lineNoCov">          0 :                        complex&lt;typename common_type&lt;T, double&gt;::type&gt;&gt;::value));</span>
+<span class="lineNum">     112 </span>            : 
+<span class="lineNum">     113 </span><span class="lineCov">          1 :   EXPECT_TRUE((is_same&lt;decltype(declval&lt;complex&lt;T&gt;&gt;() / declval&lt;int128&gt;()), complex&lt;T&gt;&gt;::value));</span>
+<a name="114"><span class="lineNum">     114 </span><span class="lineCov">          1 : }</span></a>
+<span class="lineNum">     115 </span>            : 
+<span class="lineNum">     116 </span><span class="lineCov">          5 : TEST(Int128, CommonType)</span>
+<span class="lineNum">     117 </span>            : {
+<span class="lineNum">     118 </span>            :   using dynd::complex;
+<span class="lineNum">     119 </span>            : 
+<span class="lineNum">     120 </span><span class="lineCov">          1 :   EXPECT_TRUE((is_same&lt;decltype(declval&lt;int128&gt;() / declval&lt;bool1&gt;()), int128&gt;::value));</span>
+<span class="lineNum">     121 </span><span class="lineCov">          1 :   EXPECT_TRUE((is_same&lt;decltype(declval&lt;int128&gt;() / declval&lt;signed char&gt;()), int128&gt;::value));</span>
+<span class="lineNum">     122 </span><span class="lineCov">          1 :   EXPECT_TRUE((is_same&lt;decltype(declval&lt;int128&gt;() / declval&lt;short&gt;()), int128&gt;::value));</span>
+<span class="lineNum">     123 </span><span class="lineCov">          1 :   EXPECT_TRUE((is_same&lt;decltype(declval&lt;int128&gt;() / declval&lt;int&gt;()), int128&gt;::value));</span>
+<span class="lineNum">     124 </span><span class="lineCov">          1 :   EXPECT_TRUE((is_same&lt;decltype(declval&lt;int128&gt;() / declval&lt;long&gt;()), int128&gt;::value));</span>
+<span class="lineNum">     125 </span><span class="lineCov">          1 :   EXPECT_TRUE((is_same&lt;decltype(declval&lt;int128&gt;() / declval&lt;long long&gt;()), int128&gt;::value));</span>
+<span class="lineNum">     126 </span><span class="lineCov">          1 :   EXPECT_TRUE((is_same&lt;decltype(declval&lt;int128&gt;() / declval&lt;bool1&gt;()), int128&gt;::value));</span>
+<span class="lineNum">     127 </span><span class="lineCov">          1 :   EXPECT_TRUE((is_same&lt;decltype(declval&lt;int128&gt;() / declval&lt;unsigned char&gt;()), int128&gt;::value));</span>
+<span class="lineNum">     128 </span><span class="lineCov">          1 :   EXPECT_TRUE((is_same&lt;decltype(declval&lt;int128&gt;() / declval&lt;unsigned short&gt;()), int128&gt;::value));</span>
+<span class="lineNum">     129 </span><span class="lineCov">          1 :   EXPECT_TRUE((is_same&lt;decltype(declval&lt;int128&gt;() / declval&lt;unsigned int&gt;()), int128&gt;::value));</span>
+<span class="lineNum">     130 </span><span class="lineCov">          1 :   EXPECT_TRUE((is_same&lt;decltype(declval&lt;int128&gt;() / declval&lt;unsigned long&gt;()), int128&gt;::value));</span>
+<span class="lineNum">     131 </span><span class="lineCov">          1 :   EXPECT_TRUE((is_same&lt;decltype(declval&lt;int128&gt;() / declval&lt;unsigned long long&gt;()), int128&gt;::value));</span>
+<span class="lineNum">     132 </span><span class="lineCov">          1 :   EXPECT_TRUE((is_same&lt;decltype(declval&lt;int128&gt;() / declval&lt;float&gt;()), float&gt;::value));</span>
+<span class="lineNum">     133 </span><span class="lineCov">          1 :   EXPECT_TRUE((is_same&lt;decltype(declval&lt;int128&gt;() / declval&lt;double&gt;()), double&gt;::value));</span>
+<span class="lineNum">     134 </span><span class="lineCov">          1 :   EXPECT_TRUE((is_same&lt;decltype(declval&lt;int128&gt;() / declval&lt;complex&lt;float&gt;&gt;()), complex&lt;float&gt;&gt;::value));</span>
+<span class="lineNum">     135 </span><span class="lineCov">          1 :   EXPECT_TRUE((is_same&lt;decltype(declval&lt;int128&gt;() / declval&lt;complex&lt;double&gt;&gt;()), complex&lt;double&gt;&gt;::value));</span>
+<span class="lineNum">     136 </span>            : 
+<span class="lineNum">     137 </span><span class="lineCov">          1 :   EXPECT_TRUE((is_same&lt;decltype(declval&lt;bool1&gt;() / declval&lt;int128&gt;()), int128&gt;::value));</span>
+<span class="lineNum">     138 </span><span class="lineCov">          1 :   EXPECT_TRUE((is_same&lt;decltype(declval&lt;signed char&gt;() / declval&lt;int128&gt;()), int128&gt;::value));</span>
+<span class="lineNum">     139 </span><span class="lineCov">          1 :   EXPECT_TRUE((is_same&lt;decltype(declval&lt;short&gt;() / declval&lt;int128&gt;()), int128&gt;::value));</span>
+<span class="lineNum">     140 </span><span class="lineCov">          1 :   EXPECT_TRUE((is_same&lt;decltype(declval&lt;int&gt;() / declval&lt;int128&gt;()), int128&gt;::value));</span>
+<span class="lineNum">     141 </span><span class="lineCov">          1 :   EXPECT_TRUE((is_same&lt;decltype(declval&lt;long&gt;() / declval&lt;int128&gt;()), int128&gt;::value));</span>
+<span class="lineNum">     142 </span><span class="lineCov">          1 :   EXPECT_TRUE((is_same&lt;decltype(declval&lt;long long&gt;() / declval&lt;int128&gt;()), int128&gt;::value));</span>
+<span class="lineNum">     143 </span><span class="lineCov">          1 :   EXPECT_TRUE((is_same&lt;decltype(declval&lt;unsigned char&gt;() / declval&lt;int128&gt;()), int128&gt;::value));</span>
+<span class="lineNum">     144 </span><span class="lineCov">          1 :   EXPECT_TRUE((is_same&lt;decltype(declval&lt;unsigned short&gt;() / declval&lt;int128&gt;()), int128&gt;::value));</span>
+<span class="lineNum">     145 </span><span class="lineCov">          1 :   EXPECT_TRUE((is_same&lt;decltype(declval&lt;unsigned int&gt;() / declval&lt;int128&gt;()), int128&gt;::value));</span>
+<span class="lineNum">     146 </span><span class="lineCov">          1 :   EXPECT_TRUE((is_same&lt;decltype(declval&lt;unsigned long&gt;() / declval&lt;int128&gt;()), int128&gt;::value));</span>
+<span class="lineNum">     147 </span><span class="lineCov">          1 :   EXPECT_TRUE((is_same&lt;decltype(declval&lt;unsigned long long&gt;() / declval&lt;int128&gt;()), int128&gt;::value));</span>
+<span class="lineNum">     148 </span><span class="lineCov">          1 :   EXPECT_TRUE((is_same&lt;decltype(declval&lt;float&gt;() / declval&lt;int128&gt;()), float&gt;::value));</span>
+<span class="lineNum">     149 </span><span class="lineCov">          1 :   EXPECT_TRUE((is_same&lt;decltype(declval&lt;double&gt;() / declval&lt;int128&gt;()), double&gt;::value));</span>
+<span class="lineNum">     150 </span>            : 
+<span class="lineNum">     151 </span>            :   /*
+<span class="lineNum">     152 </span>            :     std::cout
+<span class="lineNum">     153 </span>            :         &lt;&lt; ndt::type::make&lt;decltype(declval&lt;int&gt;() + declval&lt;unsigned
+<span class="lineNum">     154 </span>            :     short&gt;())&gt;()
+<span class="lineNum">     155 </span>            :         &lt;&lt; std::endl;
+<a name="156"><span class="lineNum">     156 </span>            :     std::exit(-1);</a>
+<span class="lineNum">     157 </span>            :   */
+<span class="lineNum">     158 </span><span class="lineCov">          4 : }</span>
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.10</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

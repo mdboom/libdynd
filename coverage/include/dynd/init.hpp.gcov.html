@@ -1,0 +1,275 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - coverage.info.cleaned - include/dynd/init.hpp</title>
+  <link rel="stylesheet" type="text/css" href="../../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../../index.html">top level</a> - <a href="index.html">include/dynd</a> - init.hpp<span style="font-size: 80%;"> (source / <a href="init.hpp.func.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">coverage.info.cleaned</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">70</td>
+            <td class="headerCovTableEntry">72</td>
+            <td class="headerCovTableEntryHi">97.2 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2016-02-19</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">273</td>
+            <td class="headerCovTableEntry">303</td>
+            <td class="headerCovTableEntryHi">90.1 %</td>
+          </tr>
+          <tr><td><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : //</a>
+<span class="lineNum">       2 </span>            : // Copyright (C) 2011-15 DyND Developers
+<span class="lineNum">       3 </span>            : // BSD 2-Clause License, see LICENSE.txt
+<span class="lineNum">       4 </span>            : //
+<span class="lineNum">       5 </span>            : 
+<span class="lineNum">       6 </span>            : #pragma once
+<span class="lineNum">       7 </span>            : 
+<span class="lineNum">       8 </span>            : #include &lt;dynd/types/string_type.hpp&gt;
+<span class="lineNum">       9 </span>            : #include &lt;dynd/types/var_dim_type.hpp&gt;
+<span class="lineNum">      10 </span>            : 
+<span class="lineNum">      11 </span>            : namespace dynd {
+<span class="lineNum">      12 </span>            : namespace nd {
+<span class="lineNum">      13 </span>            : 
+<a name="14"><span class="lineNum">      14 </span>            :   template &lt;typename ValueType&gt;</a>
+<span class="lineNum">      15 </span>            :   struct init {
+<a name="16"><span class="lineNum">      16 </span><span class="lineCov">       3076 :     init(const ndt::type &amp;DYND_UNUSED(tp), const char *DYND_UNUSED(metadata)) {}</span></a>
+<span class="lineNum">      17 </span>            : 
+<a name="18"><span class="lineNum">      18 </span><span class="lineCov">      82517 :     void single(char *data, const ValueType &amp;value) const { *reinterpret_cast&lt;ValueType *&gt;(data) = value; }</span></a>
+<span class="lineNum">      19 </span>            : 
+<span class="lineNum">      20 </span><span class="lineCov">        337 :     void contiguous(char *data, const ValueType *values, size_t size) const</span>
+<span class="lineNum">      21 </span>            :     {
+<span class="lineNum">      22 </span><span class="lineCov">       1245 :       for (size_t i = 0; i &lt; size; ++i) {</span>
+<span class="lineNum">      23 </span><span class="lineCov">        908 :         single(data, values[i]);</span>
+<span class="lineNum">      24 </span><span class="lineCov">        908 :         data += sizeof(ValueType);</span>
+<span class="lineNum">      25 </span>            :       }
+<span class="lineNum">      26 </span><span class="lineCov">        337 :     }</span>
+<span class="lineNum">      27 </span>            :   };
+<span class="lineNum">      28 </span>            : 
+<a name="29"><span class="lineNum">      29 </span>            :   template &lt;&gt;</a>
+<span class="lineNum">      30 </span>            :   struct init&lt;bool&gt; {
+<a name="31"><span class="lineNum">      31 </span><span class="lineCov">         83 :     init(const ndt::type &amp;DYND_UNUSED(tp), const char *DYND_UNUSED(metadata)) {}</span></a>
+<span class="lineNum">      32 </span>            : 
+<a name="33"><span class="lineNum">      33 </span><span class="lineCov">        176 :     void single(char *data, bool value) const { *reinterpret_cast&lt;bool1 *&gt;(data) = value; }</span></a>
+<span class="lineNum">      34 </span>            : 
+<span class="lineNum">      35 </span><span class="lineCov">         38 :     void contiguous(char *data, const bool *values, size_t size) const</span>
+<span class="lineNum">      36 </span>            :     {
+<span class="lineNum">      37 </span><span class="lineCov">        157 :       for (size_t i = 0; i &lt; size; ++i) {</span>
+<span class="lineNum">      38 </span><span class="lineCov">        119 :         single(data, values[i]);</span>
+<span class="lineNum">      39 </span><span class="lineCov">        119 :         data += sizeof(bool1);</span>
+<span class="lineNum">      40 </span>            :       }
+<span class="lineNum">      41 </span><span class="lineCov">         38 :     }</span>
+<span class="lineNum">      42 </span>            :   };
+<span class="lineNum">      43 </span>            : 
+<a name="44"><span class="lineNum">      44 </span>            :   template &lt;&gt;</a>
+<span class="lineNum">      45 </span>            :   struct init&lt;std::string&gt; {
+<a name="46"><span class="lineNum">      46 </span><span class="lineCov">         13 :     init(const ndt::type &amp;DYND_UNUSED(tp), const char *DYND_UNUSED(metadata)) {}</span></a>
+<span class="lineNum">      47 </span>            : 
+<span class="lineNum">      48 </span><span class="lineCov">         22 :     void single(char *data, const std::string &amp;value) const</span>
+<span class="lineNum">      49 </span>            :     {
+<span class="lineNum">      50 </span><span class="lineCov">         22 :       reinterpret_cast&lt;string *&gt;(data)-&gt;assign(value.data(), value.size());</span>
+<a name="51"><span class="lineNum">      51 </span><span class="lineCov">         22 :     }</span></a>
+<span class="lineNum">      52 </span>            : 
+<span class="lineNum">      53 </span><span class="lineCov">          8 :     void contiguous(char *data, const std::string *values, size_t size) const</span>
+<span class="lineNum">      54 </span>            :     {
+<span class="lineNum">      55 </span><span class="lineCov">         25 :       for (size_t i = 0; i &lt; size; ++i) {</span>
+<span class="lineNum">      56 </span><span class="lineCov">         17 :         single(data, values[i]);</span>
+<span class="lineNum">      57 </span><span class="lineCov">         17 :         data += sizeof(string);</span>
+<span class="lineNum">      58 </span>            :       }
+<span class="lineNum">      59 </span><span class="lineCov">          8 :     }</span>
+<span class="lineNum">      60 </span>            :   };
+<span class="lineNum">      61 </span>            : 
+<a name="62"><span class="lineNum">      62 </span>            :   template &lt;&gt;</a>
+<span class="lineNum">      63 </span>            :   struct init&lt;const char *&gt; {
+<a name="64"><span class="lineNum">      64 </span><span class="lineCov">         24 :     init(const ndt::type &amp;DYND_UNUSED(tp), const char *DYND_UNUSED(metadata)) {}</span></a>
+<span class="lineNum">      65 </span>            : 
+<a name="66"><span class="lineNum">      66 </span><span class="lineCov">         99 :     void single(char *data, const char *value) const { reinterpret_cast&lt;string *&gt;(data)-&gt;assign(value, strlen(value)); }</span></a>
+<span class="lineNum">      67 </span>            : 
+<span class="lineNum">      68 </span><span class="lineCov">         17 :     void contiguous(char *data, const char *const *values, size_t size) const</span>
+<span class="lineNum">      69 </span>            :     {
+<span class="lineNum">      70 </span><span class="lineCov">         91 :       for (size_t i = 0; i &lt; size; ++i) {</span>
+<span class="lineNum">      71 </span><span class="lineCov">         74 :         single(data, values[i]);</span>
+<span class="lineNum">      72 </span><span class="lineCov">         74 :         data += sizeof(string);</span>
+<span class="lineNum">      73 </span>            :       }
+<span class="lineNum">      74 </span><span class="lineCov">         17 :     }</span>
+<span class="lineNum">      75 </span>            :   };
+<span class="lineNum">      76 </span>            : 
+<a name="77"><span class="lineNum">      77 </span>            :   template &lt;size_t N&gt;</a>
+<span class="lineNum">      78 </span>            :   struct init&lt;char[N]&gt; {
+<a name="79"><span class="lineNum">      79 </span><span class="lineCov">        108 :     init(const ndt::type &amp;DYND_UNUSED(tp), const char *DYND_UNUSED(metadata)) {}</span></a>
+<span class="lineNum">      80 </span>            : 
+<span class="lineNum">      81 </span><span class="lineCov">        108 :     void single(char *data, const char *value) const { reinterpret_cast&lt;string *&gt;(data)-&gt;assign(value, N - 1); }</span>
+<span class="lineNum">      82 </span>            : 
+<span class="lineNum">      83 </span>            :     void contiguous(char *data, const char *const *values, size_t size) const
+<span class="lineNum">      84 </span>            :     {
+<span class="lineNum">      85 </span>            :       for (size_t i = 0; i &lt; size; ++i) {
+<span class="lineNum">      86 </span>            :         single(data, values[i]);
+<span class="lineNum">      87 </span>            :         data += sizeof(string);
+<span class="lineNum">      88 </span>            :       }
+<span class="lineNum">      89 </span>            :     }
+<span class="lineNum">      90 </span>            :   };
+<span class="lineNum">      91 </span>            : 
+<span class="lineNum">      92 </span>            :   template &lt;size_t N&gt;
+<span class="lineNum">      93 </span>            :   struct init&lt;const char[N]&gt; {
+<span class="lineNum">      94 </span>            :     init(const ndt::type &amp;DYND_UNUSED(tp), const char *DYND_UNUSED(metadata)) {}
+<span class="lineNum">      95 </span>            : 
+<span class="lineNum">      96 </span>            :     void single(char *data, const char *value) const { reinterpret_cast&lt;string *&gt;(data)-&gt;assign(value, N - 1); }
+<span class="lineNum">      97 </span>            : 
+<span class="lineNum">      98 </span>            :     void contiguous(char *data, const char *const *values, size_t size) const
+<span class="lineNum">      99 </span>            :     {
+<span class="lineNum">     100 </span>            :       for (size_t i = 0; i &lt; size; ++i) {
+<span class="lineNum">     101 </span>            :         single(data, values[i]);
+<span class="lineNum">     102 </span>            :         data += sizeof(string);
+<span class="lineNum">     103 </span>            :       }
+<span class="lineNum">     104 </span>            :     }
+<span class="lineNum">     105 </span>            :   };
+<a name="106"><span class="lineNum">     106 </span>            : </a>
+<span class="lineNum">     107 </span>            :   template &lt;typename ContainerType, size_t Rank&gt;
+<span class="lineNum">     108 </span><span class="lineCov">         59 :   struct container_init {</span>
+<span class="lineNum">     109 </span>            :     typedef void (*closure_type)(const container_init *, char *, const ContainerType &amp;);
+<span class="lineNum">     110 </span>            :     typedef typename ContainerType::value_type value_type;
+<span class="lineNum">     111 </span>            : 
+<span class="lineNum">     112 </span>            :     intptr_t stride;
+<span class="lineNum">     113 </span>            :     closure_type closure;
+<a name="114"><span class="lineNum">     114 </span>            :     init&lt;value_type&gt; child;</a>
+<span class="lineNum">     115 </span>            : 
+<span class="lineNum">     116 </span><span class="lineCov">         59 :     container_init(const ndt::type &amp;tp, const char *metadata)</span>
+<span class="lineNum">     117 </span><span class="lineCov">         59 :         : child(tp.extended&lt;ndt::base_dim_type&gt;()-&gt;get_element_type(),</span>
+<span class="lineNum">     118 </span><span class="lineCov">        118 :                 metadata + tp.extended&lt;ndt::base_dim_type&gt;()-&gt;get_element_arrmeta_offset())</span>
+<span class="lineNum">     119 </span>            :     {
+<span class="lineNum">     120 </span><span class="lineCov">         59 :       switch (tp.get_id()) {</span>
+<a name="121"><span class="lineNum">     121 </span>            :       case fixed_dim_id:</a>
+<span class="lineNum">     122 </span><span class="lineCov">         59 :         stride = reinterpret_cast&lt;const size_stride_t *&gt;(metadata)-&gt;stride;</span>
+<span class="lineNum">     123 </span><span class="lineCov">        266 :         closure = [](const container_init *self, char *data, const ContainerType &amp;values) {</span>
+<span class="lineNum">     124 </span><span class="lineCov">        255 :           for (const value_type &amp;value : values) {</span>
+<span class="lineNum">     125 </span><span class="lineCov">        181 :             self-&gt;child.single(data, value);</span>
+<span class="lineNum">     126 </span><span class="lineCov">        181 :             data += self-&gt;stride;</span>
+<span class="lineNum">     127 </span>            :           }
+<span class="lineNum">     128 </span><span class="lineCov">         74 :         };</span>
+<span class="lineNum">     129 </span><span class="lineCov">         59 :         break;</span>
+<span class="lineNum">     130 </span>            :       default:
+<span class="lineNum">     131 </span><span class="lineNoCov">          0 :         throw std::runtime_error(&quot;unsupported&quot;);</span>
+<span class="lineNum">     132 </span>            :       }
+<a name="133"><span class="lineNum">     133 </span><span class="lineCov">         59 :     }</span></a>
+<span class="lineNum">     134 </span>            : 
+<span class="lineNum">     135 </span><span class="lineCov">         74 :     void single(char *data, const ContainerType &amp;values) const { closure(this, data, values); }</span>
+<span class="lineNum">     136 </span>            :   };
+<a name="137"><span class="lineNum">     137 </span>            : </a>
+<span class="lineNum">     138 </span>            :   template &lt;typename ValueType&gt;
+<span class="lineNum">     139 </span><span class="lineCov">        216 :   struct container_init&lt;std::initializer_list&lt;ValueType&gt;, 1&gt; {</span>
+<span class="lineNum">     140 </span>            :     typedef void (*closure_type)(const container_init *, char *, const std::initializer_list&lt;ValueType&gt; &amp;);
+<span class="lineNum">     141 </span>            :     typedef ValueType value_type;
+<span class="lineNum">     142 </span>            : 
+<span class="lineNum">     143 </span>            :     intrusive_ptr&lt;memory_block_data&gt; memblock;
+<span class="lineNum">     144 </span>            :     closure_type closure;
+<a name="145"><span class="lineNum">     145 </span>            :     init&lt;value_type&gt; child;</a>
+<span class="lineNum">     146 </span>            : 
+<span class="lineNum">     147 </span><span class="lineCov">        216 :     container_init(const ndt::type &amp;tp, const char *metadata)</span>
+<span class="lineNum">     148 </span><span class="lineCov">        216 :         : child(tp.extended&lt;ndt::base_dim_type&gt;()-&gt;get_element_type(), metadata + sizeof(size_stride_t))</span>
+<span class="lineNum">     149 </span>            :     {
+<a name="150"><span class="lineNum">     150 </span><span class="lineCov">        216 :       switch (tp.get_id()) {</span></a>
+<span class="lineNum">     151 </span>            :       case fixed_dim_id:
+<span class="lineNum">     152 </span><span class="lineCov">       1042 :         closure = [](const container_init *self, char *data, const std::initializer_list&lt;ValueType&gt; &amp;values) {</span>
+<span class="lineNum">     153 </span><span class="lineCov">        310 :           self-&gt;child.contiguous(data, values.begin(), values.size());</span>
+<span class="lineNum">     154 </span><span class="lineCov">        310 :         };</span>
+<span class="lineNum">     155 </span><span class="lineCov">        211 :         break;</span>
+<a name="156"><span class="lineNum">     156 </span>            :       case var_dim_id:</a>
+<span class="lineNum">     157 </span><span class="lineCov">          5 :         memblock = reinterpret_cast&lt;const ndt::var_dim_type::metadata_type *&gt;(metadata)-&gt;blockref;</span>
+<span class="lineNum">     158 </span><span class="lineCov">         36 :         closure = [](const container_init *self, char *data, const std::initializer_list&lt;ValueType&gt; &amp;values) {</span>
+<span class="lineNum">     159 </span><span class="lineCov">         13 :           reinterpret_cast&lt;ndt::var_dim_type::data_type *&gt;(data)-&gt;begin = self-&gt;memblock-&gt;alloc(values.size());</span>
+<span class="lineNum">     160 </span><span class="lineCov">         13 :           reinterpret_cast&lt;ndt::var_dim_type::data_type *&gt;(data)-&gt;size = values.size();</span>
+<span class="lineNum">     161 </span><span class="lineCov">         13 :           self-&gt;child.contiguous(reinterpret_cast&lt;ndt::var_dim_type::data_type *&gt;(data)-&gt;begin, values.begin(),</span>
+<span class="lineNum">     162 </span>            :                                  values.size());
+<span class="lineNum">     163 </span><span class="lineCov">         13 :         };</span>
+<span class="lineNum">     164 </span><span class="lineCov">          5 :         break;</span>
+<span class="lineNum">     165 </span>            :       default:
+<span class="lineNum">     166 </span><span class="lineNoCov">          0 :         throw std::runtime_error(&quot;unexpected type id&quot;);</span>
+<span class="lineNum">     167 </span>            :       }
+<a name="168"><span class="lineNum">     168 </span><span class="lineCov">        216 :     }</span></a>
+<span class="lineNum">     169 </span>            : 
+<span class="lineNum">     170 </span><span class="lineCov">        323 :     void single(char *data, const std::initializer_list&lt;ValueType&gt; &amp;values) const { closure(this, data, values); }</span>
+<span class="lineNum">     171 </span>            :   };
+<span class="lineNum">     172 </span>            : 
+<span class="lineNum">     173 </span>            :   template &lt;typename ContainerType&gt;
+<span class="lineNum">     174 </span>            :   struct container_init&lt;ContainerType, 1&gt; {
+<span class="lineNum">     175 </span>            :     typedef typename ContainerType::value_type value_type;
+<span class="lineNum">     176 </span>            : 
+<span class="lineNum">     177 </span>            :     void (*func)(const container_init *, char *, const ContainerType &amp;);
+<a name="178"><span class="lineNum">     178 </span>            :     init&lt;value_type&gt; child;</a>
+<span class="lineNum">     179 </span>            : 
+<span class="lineNum">     180 </span><span class="lineCov">         77 :     container_init(const ndt::type &amp;tp, const char *metadata)</span>
+<span class="lineNum">     181 </span><span class="lineCov">         77 :         : child(tp.extended&lt;ndt::base_dim_type&gt;()-&gt;get_element_type(), metadata + sizeof(size_stride_t))</span>
+<span class="lineNum">     182 </span>            :     {
+<a name="183"><span class="lineNum">     183 </span><span class="lineCov">         77 :     }</span></a>
+<span class="lineNum">     184 </span>            : 
+<span class="lineNum">     185 </span><span class="lineCov">         77 :     void single(char *data, const ContainerType &amp;values) const { child.contiguous(data, values.data(), values.size()); }</span>
+<span class="lineNum">     186 </span>            :   };
+<a name="187"><span class="lineNum">     187 </span>            : </a>
+<a name="188"><span class="lineNum">     188 </span>            :   template &lt;typename T&gt;</a>
+<span class="lineNum">     189 </span><span class="lineCov">        275 :   struct init&lt;std::initializer_list&lt;T&gt;&gt; : container_init&lt;std::initializer_list&lt;T&gt;, ndt::traits&lt;T&gt;::ndim + 1&gt; {</span>
+<span class="lineNum">     190 </span><span class="lineCov">        275 :     using container_init&lt;std::initializer_list&lt;T&gt;, ndt::traits&lt;T&gt;::ndim + 1&gt;::container_init;</span>
+<span class="lineNum">     191 </span>            :   };
+<span class="lineNum">     192 </span>            : 
+<a name="193"><span class="lineNum">     193 </span>            :   template &lt;typename T&gt;</a>
+<span class="lineNum">     194 </span>            :   struct init&lt;std::vector&lt;T&gt;&gt; : container_init&lt;std::vector&lt;T&gt;, ndt::traits&lt;T&gt;::ndim + 1&gt; {
+<span class="lineNum">     195 </span><span class="lineCov">         77 :     using container_init&lt;std::vector&lt;T&gt;, ndt::traits&lt;T&gt;::ndim + 1&gt;::container_init;</span>
+<span class="lineNum">     196 </span>            :   };
+<span class="lineNum">     197 </span>            : 
+<span class="lineNum">     198 </span>            : } // namespace dynd::nd
+<span class="lineNum">     199 </span>            : } // namespace dynd
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.10</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

@@ -1,0 +1,187 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - coverage.info.cleaned - include/dynd/types/struct_type.hpp</title>
+  <link rel="stylesheet" type="text/css" href="../../../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../../../index.html">top level</a> - <a href="index.html">include/dynd/types</a> - struct_type.hpp<span style="font-size: 80%;"> (source / <a href="struct_type.hpp.func.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">coverage.info.cleaned</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">7</td>
+            <td class="headerCovTableEntry">8</td>
+            <td class="headerCovTableEntryMed">87.5 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2016-02-19</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">5</td>
+            <td class="headerCovTableEntry">6</td>
+            <td class="headerCovTableEntryMed">83.3 %</td>
+          </tr>
+          <tr><td><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : //</a>
+<span class="lineNum">       2 </span>            : // Copyright (C) 2011-15 DyND Developers
+<span class="lineNum">       3 </span>            : // BSD 2-Clause License, see LICENSE.txt
+<span class="lineNum">       4 </span>            : //
+<span class="lineNum">       5 </span>            : 
+<span class="lineNum">       6 </span>            : #pragma once
+<span class="lineNum">       7 </span>            : 
+<span class="lineNum">       8 </span>            : #include &lt;vector&gt;
+<span class="lineNum">       9 </span>            : #include &lt;string&gt;
+<span class="lineNum">      10 </span>            : 
+<span class="lineNum">      11 </span>            : #include &lt;dynd/type.hpp&gt;
+<span class="lineNum">      12 </span>            : #include &lt;dynd/types/tuple_type.hpp&gt;
+<span class="lineNum">      13 </span>            : #include &lt;dynd/types/pointer_type.hpp&gt;
+<span class="lineNum">      14 </span>            : #include &lt;dynd/types/type_type.hpp&gt;
+<span class="lineNum">      15 </span>            : #include &lt;dynd/types/string_type.hpp&gt;
+<span class="lineNum">      16 </span>            : 
+<span class="lineNum">      17 </span>            : namespace dynd {
+<span class="lineNum">      18 </span>            : namespace ndt {
+<span class="lineNum">      19 </span>            : 
+<span class="lineNum">      20 </span>            :   class DYND_API struct_type : public tuple_type {
+<span class="lineNum">      21 </span>            :     const std::vector&lt;std::string&gt; m_field_names;
+<span class="lineNum">      22 </span>            :     std::map&lt;std::string, nd::callable&gt; m_array_properties;
+<span class="lineNum">      23 </span>            : 
+<span class="lineNum">      24 </span>            :     void create_array_properties();
+<span class="lineNum">      25 </span>            : 
+<span class="lineNum">      26 </span>            :     // Special constructor to break the property parameter cycle in
+<span class="lineNum">      27 </span>            :     // create_array_properties
+<span class="lineNum">      28 </span>            :     struct_type(int, int);
+<a name="29"><span class="lineNum">      29 </span>            : </a>
+<span class="lineNum">      30 </span>            :   protected:
+<span class="lineNum">      31 </span><span class="lineNoCov">          0 :     uintptr_t *get_arrmeta_data_offsets(char *arrmeta) const { return reinterpret_cast&lt;uintptr_t *&gt;(arrmeta); }</span>
+<span class="lineNum">      32 </span>            : 
+<span class="lineNum">      33 </span>            :   public:
+<span class="lineNum">      34 </span>            :     struct_type(const std::vector&lt;std::string&gt; &amp;field_names, const std::vector&lt;type&gt; &amp;field_types,
+<span class="lineNum">      35 </span>            :                 bool variadic = false);
+<span class="lineNum">      36 </span>            : 
+<span class="lineNum">      37 </span>            :     virtual ~struct_type();
+<a name="38"><span class="lineNum">      38 </span>            : </a>
+<a name="39"><span class="lineNum">      39 </span>            :     /** The array of the field names */</a>
+<span class="lineNum">      40 </span><span class="lineCov">        105 :     const std::vector&lt;std::string&gt; &amp;get_field_names() const { return m_field_names; }</span>
+<span class="lineNum">      41 </span><span class="lineCov">       1793 :     const std::string &amp;get_field_name(intptr_t i) const { return m_field_names[i]; }</span>
+<span class="lineNum">      42 </span>            : 
+<span class="lineNum">      43 </span>            :     /**
+<span class="lineNum">      44 </span>            :      * Gets the field index for the given name. Returns -1 if
+<span class="lineNum">      45 </span>            :      * the struct doesn't have a field of the given name.
+<span class="lineNum">      46 </span>            :      *
+<span class="lineNum">      47 </span>            :      * \param field_name  The name of the field.
+<span class="lineNum">      48 </span>            :      *
+<span class="lineNum">      49 </span>            :      * \returns  The field index, or -1 if there is no field
+<span class="lineNum">      50 </span>            :      *           of the given name.
+<span class="lineNum">      51 </span>            :      */
+<span class="lineNum">      52 </span>            :     intptr_t get_field_index(const std::string &amp;field_name) const;
+<span class="lineNum">      53 </span>            : 
+<span class="lineNum">      54 </span>            :     /**
+<span class="lineNum">      55 </span>            :      * Gets the field type for the given name. Raises std::invalid_argument if
+<span class="lineNum">      56 </span>            :      * the struct doesn't have a field of the given name.
+<span class="lineNum">      57 </span>            :      *
+<span class="lineNum">      58 </span>            :      * \param field_name  The name of the field.
+<span class="lineNum">      59 </span>            :      *
+<span class="lineNum">      60 </span>            :      * \returns  The field type.
+<span class="lineNum">      61 </span>            :      */
+<span class="lineNum">      62 </span>            :     const type &amp;get_field_type(const std::string &amp;field_name) const;
+<a name="63"><span class="lineNum">      63 </span>            :     const type &amp;get_field_type(intptr_t i) const;</a>
+<span class="lineNum">      64 </span>            : 
+<span class="lineNum">      65 </span><span class="lineCov">        294 :     inline const uintptr_t *get_data_offsets(const char *arrmeta) const</span>
+<span class="lineNum">      66 </span>            :     {
+<span class="lineNum">      67 </span><span class="lineCov">        294 :       return reinterpret_cast&lt;const uintptr_t *&gt;(arrmeta);</span>
+<span class="lineNum">      68 </span>            :     }
+<span class="lineNum">      69 </span>            : 
+<span class="lineNum">      70 </span>            :     uintptr_t get_data_offset(const char *arrmeta, const std::string &amp;field_name) const;
+<span class="lineNum">      71 </span>            : 
+<span class="lineNum">      72 </span>            :     void print_type(std::ostream &amp;o) const;
+<span class="lineNum">      73 </span>            : 
+<span class="lineNum">      74 </span>            :     void transform_child_types(type_transform_fn_t transform_fn, intptr_t arrmeta_offset, void *extra,
+<span class="lineNum">      75 </span>            :                                type &amp;out_transformed_tp, bool &amp;out_was_transformed) const;
+<span class="lineNum">      76 </span>            :     type get_canonical_type() const;
+<span class="lineNum">      77 </span>            : 
+<span class="lineNum">      78 </span>            :     type at_single(intptr_t i0, const char **inout_arrmeta, const char **inout_data) const;
+<span class="lineNum">      79 </span>            : 
+<span class="lineNum">      80 </span>            :     bool is_lossless_assignment(const type &amp;dst_tp, const type &amp;src_tp) const;
+<span class="lineNum">      81 </span>            : 
+<span class="lineNum">      82 </span>            :     bool operator==(const base_type &amp;rhs) const;
+<span class="lineNum">      83 </span>            : 
+<span class="lineNum">      84 </span>            :     void arrmeta_debug_print(const char *arrmeta, std::ostream &amp;o, const std::string &amp;indent) const;
+<span class="lineNum">      85 </span>            : 
+<span class="lineNum">      86 </span>            :     type apply_linear_index(intptr_t nindices, const irange *indices, size_t current_i, const type &amp;root_tp,
+<span class="lineNum">      87 </span>            :                             bool leading_dimension) const;
+<span class="lineNum">      88 </span>            :     intptr_t apply_linear_index(intptr_t nindices, const irange *indices, const char *arrmeta, const type &amp;result_tp,
+<span class="lineNum">      89 </span>            :                                 char *out_arrmeta, const intrusive_ptr&lt;memory_block_data&gt; &amp;embedded_reference,
+<span class="lineNum">      90 </span>            :                                 size_t current_i, const type &amp;root_tp, bool leading_dimension, char **inout_data,
+<span class="lineNum">      91 </span>            :                                 intrusive_ptr&lt;memory_block_data&gt; &amp;inout_dataref) const;
+<span class="lineNum">      92 </span>            : 
+<span class="lineNum">      93 </span>            :     std::map&lt;std::string, nd::callable&gt; get_dynamic_type_properties() const;
+<span class="lineNum">      94 </span>            :     std::map&lt;std::string, nd::callable&gt; get_dynamic_array_properties() const;
+<span class="lineNum">      95 </span>            : 
+<span class="lineNum">      96 </span>            :     virtual bool match(const char *arrmeta, const type &amp;candidate_tp, const char *candidate_arrmeta,
+<span class="lineNum">      97 </span>            :                        std::map&lt;std::string, type&gt; &amp;tp_vars) const;
+<a name="98"><span class="lineNum">      98 </span>            : </a>
+<span class="lineNum">      99 </span>            :     /** Makes a struct type with the specified fields */
+<span class="lineNum">     100 </span><span class="lineCov">       3822 :     static type make(const std::vector&lt;std::string&gt; &amp;field_names, const std::vector&lt;type&gt; &amp;field_types,</span>
+<span class="lineNum">     101 </span>            :                      bool variadic = false)
+<span class="lineNum">     102 </span>            :     {
+<span class="lineNum">     103 </span><span class="lineCov">       3822 :       return type(new struct_type(field_names, field_types, variadic), false);</span>
+<span class="lineNum">     104 </span>            :     }
+<a name="105"><span class="lineNum">     105 </span>            : </a>
+<span class="lineNum">     106 </span>            :     /** Makes an empty struct type */
+<span class="lineNum">     107 </span><span class="lineCov">       2378 :     static type make(bool variadic = false) { return make(std::vector&lt;std::string&gt;(), std::vector&lt;type&gt;(), variadic); }</span>
+<span class="lineNum">     108 </span>            :   };
+<span class="lineNum">     109 </span>            : 
+<span class="lineNum">     110 </span>            : } // namespace dynd::ndt
+<span class="lineNum">     111 </span>            : } // namespace dynd
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.10</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

@@ -1,0 +1,174 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - coverage.info.cleaned - tests/func/test_registry.cpp</title>
+  <link rel="stylesheet" type="text/css" href="../../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../../index.html">top level</a> - <a href="index.html">tests/func</a> - test_registry.cpp<span style="font-size: 80%;"> (source / <a href="test_registry.cpp.func.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">coverage.info.cleaned</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">59</td>
+            <td class="headerCovTableEntry">59</td>
+            <td class="headerCovTableEntryHi">100.0 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2016-02-19</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">10</td>
+            <td class="headerCovTableEntry">10</td>
+            <td class="headerCovTableEntryHi">100.0 %</td>
+          </tr>
+          <tr><td><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : //</a>
+<span class="lineNum">       2 </span>            : // Copyright (C) 2011-15 DyND Developers
+<span class="lineNum">       3 </span>            : // BSD 2-Clause License, see LICENSE.txt
+<span class="lineNum">       4 </span>            : //
+<span class="lineNum">       5 </span>            : 
+<span class="lineNum">       6 </span>            : #include &lt;iostream&gt;
+<span class="lineNum">       7 </span>            : #include &lt;stdexcept&gt;
+<span class="lineNum">       8 </span>            : #include &lt;algorithm&gt;
+<span class="lineNum">       9 </span>            : #include &lt;cmath&gt;
+<span class="lineNum">      10 </span>            : 
+<span class="lineNum">      11 </span>            : #include &quot;inc_gtest.hpp&quot;
+<span class="lineNum">      12 </span>            : 
+<span class="lineNum">      13 </span>            : #include &lt;dynd/array.hpp&gt;
+<span class="lineNum">      14 </span>            : #include &lt;dynd/callable_registry.hpp&gt;
+<span class="lineNum">      15 </span>            : 
+<span class="lineNum">      16 </span>            : using namespace std;
+<span class="lineNum">      17 </span>            : using namespace dynd;
+<span class="lineNum">      18 </span>            : 
+<span class="lineNum">      19 </span>            : /*
+<span class="lineNum">      20 </span>            : TEST(CallableRegistry, Dispatch)
+<span class="lineNum">      21 </span>            : {
+<span class="lineNum">      22 </span>            :   nd::callable af;
+<span class="lineNum">      23 </span>            :   af = nd::callable_registry[&quot;sin&quot;);
+<span class="lineNum">      24 </span>            :   // These are exact overloads of ``sin``
+<span class="lineNum">      25 </span>            :   EXPECT_DOUBLE_EQ(sin(1.0), af(1.0).as&lt;double&gt;());
+<span class="lineNum">      26 </span>            :   EXPECT_FLOAT_EQ(sin(2.0f), af(2.0f).as&lt;float&gt;());
+<span class="lineNum">      27 </span>            :   // Implicit int -&gt; double conversion
+<span class="lineNum">      28 </span>            :   EXPECT_DOUBLE_EQ(sin(3.0), af(3).as&lt;double&gt;());
+<span class="lineNum">      29 </span>            :   EXPECT_DOUBLE_EQ(sin(4.0), af(4u).as&lt;double&gt;());
+<span class="lineNum">      30 </span>            :   // Bool doesn't implicitly convert to float
+<span class="lineNum">      31 </span>            :   EXPECT_THROW(af(true), type_error);
+<span class="lineNum">      32 </span>            : }
+<a name="33"><span class="lineNum">      33 </span>            : */</a>
+<span class="lineNum">      34 </span>            : 
+<span class="lineNum">      35 </span><span class="lineCov">          5 : TEST(CallableRegistry, Arithmetic)</span>
+<span class="lineNum">      36 </span>            : {
+<span class="lineNum">      37 </span>            :   // Simple sanity checks
+<span class="lineNum">      38 </span><span class="lineCov">          2 :   nd::callable af;</span>
+<span class="lineNum">      39 </span><span class="lineCov">          1 :   af = nd::callable_registry[&quot;add&quot;];</span>
+<span class="lineNum">      40 </span><span class="lineCov">          1 :   EXPECT_EQ(ndt::type(&quot;int32&quot;), af((int8_t)3, (int8_t)4).get_type());</span>
+<span class="lineNum">      41 </span><span class="lineCov">          1 :   EXPECT_EQ(8, af(3, 5).as&lt;int&gt;());</span>
+<span class="lineNum">      42 </span><span class="lineCov">          1 :   EXPECT_EQ(ndt::type(&quot;float32&quot;), af(3.5f, 5.25f).get_type());</span>
+<span class="lineNum">      43 </span><span class="lineCov">          1 :   EXPECT_EQ(8.75, af(3.5f, 5.25f).as&lt;float&gt;());</span>
+<span class="lineNum">      44 </span><span class="lineCov">          1 :   af = nd::callable_registry[&quot;subtract&quot;];</span>
+<span class="lineNum">      45 </span><span class="lineCov">          1 :   EXPECT_EQ(ndt::type(&quot;float64&quot;), af(3.5, 4).get_type());</span>
+<span class="lineNum">      46 </span><span class="lineCov">          1 :   EXPECT_EQ(-0.5, af(3.5, 4).as&lt;double&gt;());</span>
+<span class="lineNum">      47 </span><span class="lineCov">          1 :   af = nd::callable_registry[&quot;multiply&quot;];</span>
+<span class="lineNum">      48 </span><span class="lineCov">          1 :   EXPECT_EQ(ndt::type(&quot;float32&quot;), af(3.5f, (int8_t)4).get_type());</span>
+<span class="lineNum">      49 </span><span class="lineCov">          1 :   EXPECT_EQ(14, af(3.5f, (int8_t)4).as&lt;float&gt;());</span>
+<span class="lineNum">      50 </span><span class="lineCov">          1 :   af = nd::callable_registry[&quot;divide&quot;];</span>
+<span class="lineNum">      51 </span><span class="lineCov">          1 :   EXPECT_EQ(ndt::type(&quot;float64&quot;), af(12.0, (int8_t)4).get_type());</span>
+<span class="lineNum">      52 </span><span class="lineCov">          1 :   EXPECT_EQ(3, af(12.0, (int8_t)4).as&lt;double&gt;());</span>
+<a name="53"><span class="lineNum">      53 </span><span class="lineCov">          1 : }</span></a>
+<span class="lineNum">      54 </span>            : 
+<span class="lineNum">      55 </span><span class="lineCov">          5 : TEST(CallableRegistry, Trig)</span>
+<span class="lineNum">      56 </span>            : {
+<span class="lineNum">      57 </span>            :   // Simple sanity checks
+<span class="lineNum">      58 </span><span class="lineCov">          2 :   nd::callable af;</span>
+<span class="lineNum">      59 </span><span class="lineCov">          1 :   af = nd::callable_registry[&quot;sin&quot;];</span>
+<span class="lineNum">      60 </span><span class="lineCov">          1 :   EXPECT_FLOAT_EQ(sinf(2.0f), af(2.0f).as&lt;float&gt;());</span>
+<span class="lineNum">      61 </span><span class="lineCov">          1 :   EXPECT_DOUBLE_EQ(sin(1.0), af(1.0).as&lt;double&gt;());</span>
+<span class="lineNum">      62 </span><span class="lineCov">          1 :   af = nd::callable_registry[&quot;cos&quot;];</span>
+<span class="lineNum">      63 </span><span class="lineCov">          1 :   EXPECT_FLOAT_EQ(cosf(1.f), af(1.f).as&lt;float&gt;());</span>
+<span class="lineNum">      64 </span><span class="lineCov">          1 :   EXPECT_DOUBLE_EQ(cos(1.0), af(1.0).as&lt;double&gt;());</span>
+<span class="lineNum">      65 </span><span class="lineCov">          1 :   af = nd::callable_registry[&quot;tan&quot;];</span>
+<span class="lineNum">      66 </span><span class="lineCov">          1 :   EXPECT_FLOAT_EQ(tanf(1.f), af(1.f).as&lt;float&gt;());</span>
+<span class="lineNum">      67 </span><span class="lineCov">          1 :   EXPECT_DOUBLE_EQ(tan(1.0), af(1.0).as&lt;double&gt;());</span>
+<span class="lineNum">      68 </span><span class="lineCov">          1 :   af = nd::callable_registry[&quot;exp&quot;];</span>
+<span class="lineNum">      69 </span><span class="lineCov">          1 :   EXPECT_FLOAT_EQ(expf(1.f), af(1.f).as&lt;float&gt;());</span>
+<span class="lineNum">      70 </span><span class="lineCov">          1 :   EXPECT_DOUBLE_EQ(exp(1.0), af(1.0).as&lt;double&gt;());</span>
+<span class="lineNum">      71 </span><span class="lineCov">          1 :   af = nd::callable_registry[&quot;arcsin&quot;];</span>
+<span class="lineNum">      72 </span><span class="lineCov">          1 :   EXPECT_FLOAT_EQ(asinf(0.4f), af(0.4f).as&lt;float&gt;());</span>
+<span class="lineNum">      73 </span><span class="lineCov">          1 :   EXPECT_DOUBLE_EQ(asin(1.0), af(1.0).as&lt;double&gt;());</span>
+<span class="lineNum">      74 </span><span class="lineCov">          1 :   af = nd::callable_registry[&quot;arccos&quot;];</span>
+<span class="lineNum">      75 </span><span class="lineCov">          1 :   EXPECT_FLOAT_EQ(acosf(1.f), af(1.f).as&lt;float&gt;());</span>
+<span class="lineNum">      76 </span><span class="lineCov">          1 :   EXPECT_DOUBLE_EQ(acos(1.0), af(1.0).as&lt;double&gt;());</span>
+<span class="lineNum">      77 </span><span class="lineCov">          1 :   af = nd::callable_registry[&quot;arctan&quot;];</span>
+<span class="lineNum">      78 </span><span class="lineCov">          1 :   EXPECT_FLOAT_EQ(atanf(1.f), af(1.f).as&lt;float&gt;());</span>
+<span class="lineNum">      79 </span><span class="lineCov">          1 :   EXPECT_DOUBLE_EQ(atan(1.0), af(1.0).as&lt;double&gt;());</span>
+<span class="lineNum">      80 </span><span class="lineCov">          1 :   af = nd::callable_registry[&quot;arctan2&quot;];</span>
+<span class="lineNum">      81 </span><span class="lineCov">          1 :   EXPECT_FLOAT_EQ(atan2f(1.f, 2.f), af(1.f, 2.f).as&lt;float&gt;());</span>
+<span class="lineNum">      82 </span><span class="lineCov">          1 :   EXPECT_DOUBLE_EQ(atan2(1.0, 2.0), af(1.0, 2.0).as&lt;double&gt;());</span>
+<span class="lineNum">      83 </span><span class="lineCov">          1 :   af = nd::callable_registry[&quot;hypot&quot;];</span>
+<span class="lineNum">      84 </span><span class="lineCov">          1 :   EXPECT_FLOAT_EQ(5, af(3.f, 4.f).as&lt;float&gt;());</span>
+<span class="lineNum">      85 </span><span class="lineCov">          1 :   EXPECT_DOUBLE_EQ(hypot(3.0, 4.5), af(3.0, 4.5).as&lt;double&gt;());</span>
+<span class="lineNum">      86 </span><span class="lineCov">          1 :   af = nd::callable_registry[&quot;sinh&quot;];</span>
+<span class="lineNum">      87 </span><span class="lineCov">          1 :   EXPECT_FLOAT_EQ(sinhf(2.0f), af(2.0f).as&lt;float&gt;());</span>
+<span class="lineNum">      88 </span><span class="lineCov">          1 :   EXPECT_DOUBLE_EQ(sinh(1.0), af(1.0).as&lt;double&gt;());</span>
+<span class="lineNum">      89 </span><span class="lineCov">          1 :   af = nd::callable_registry[&quot;cosh&quot;];</span>
+<span class="lineNum">      90 </span><span class="lineCov">          1 :   EXPECT_FLOAT_EQ(coshf(1.f), af(1.f).as&lt;float&gt;());</span>
+<span class="lineNum">      91 </span><span class="lineCov">          1 :   EXPECT_DOUBLE_EQ(cosh(1.0), af(1.0).as&lt;double&gt;());</span>
+<span class="lineNum">      92 </span><span class="lineCov">          1 :   af = nd::callable_registry[&quot;tanh&quot;];</span>
+<span class="lineNum">      93 </span><span class="lineCov">          1 :   EXPECT_FLOAT_EQ(tanhf(1.f), af(1.f).as&lt;float&gt;());</span>
+<span class="lineNum">      94 </span><span class="lineCov">          1 :   EXPECT_DOUBLE_EQ(tanh(1.0), af(1.0).as&lt;double&gt;());</span>
+<span class="lineNum">      95 </span><span class="lineCov">          1 :   af = nd::callable_registry[&quot;power&quot;];</span>
+<a name="96"><span class="lineNum">      96 </span><span class="lineCov">          1 :   EXPECT_FLOAT_EQ(powf(1.5f, 2.25f), af(1.5f, 2.25f).as&lt;float&gt;());</span></a>
+<span class="lineNum">      97 </span><span class="lineCov">          1 :   EXPECT_DOUBLE_EQ(pow(1.5, 2.25), af(1.5, 2.25).as&lt;double&gt;());</span>
+<span class="lineNum">      98 </span><span class="lineCov">          4 : }</span>
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.10</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

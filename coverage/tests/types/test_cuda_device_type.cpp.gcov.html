@@ -1,0 +1,159 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - coverage.info.cleaned - tests/types/test_cuda_device_type.cpp</title>
+  <link rel="stylesheet" type="text/css" href="../../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../../index.html">top level</a> - <a href="index.html">tests/types</a> - test_cuda_device_type.cpp<span style="font-size: 80%;"> (source / <a href="test_cuda_device_type.cpp.func.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">coverage.info.cleaned</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">1</td>
+            <td class="headerCovTableEntry">1</td>
+            <td class="headerCovTableEntryHi">100.0 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2016-02-19</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">2</td>
+            <td class="headerCovTableEntry">2</td>
+            <td class="headerCovTableEntryHi">100.0 %</td>
+          </tr>
+          <tr><td><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : //</a>
+<span class="lineNum">       2 </span>            : // Copyright (C) 2011-15 DyND Developers
+<span class="lineNum">       3 </span>            : // BSD 2-Clause License, see LICENSE.txt
+<span class="lineNum">       4 </span>            : //
+<span class="lineNum">       5 </span>            : 
+<span class="lineNum">       6 </span>            : #include &lt;iostream&gt;
+<span class="lineNum">       7 </span>            : #include &lt;stdexcept&gt;
+<span class="lineNum">       8 </span>            : #include &lt;algorithm&gt;
+<span class="lineNum">       9 </span>            : #include &lt;cmath&gt;
+<span class="lineNum">      10 </span>            : 
+<span class="lineNum">      11 </span>            : #include &quot;inc_gtest.hpp&quot;
+<span class="lineNum">      12 </span>            : #include &quot;dynd_assertions.hpp&quot;
+<span class="lineNum">      13 </span>            : 
+<span class="lineNum">      14 </span>            : #include &lt;dynd/types/cuda_device_type.hpp&gt;
+<span class="lineNum">      15 </span>            : #include &lt;dynd/types/cuda_host_type.hpp&gt;
+<span class="lineNum">      16 </span>            : #include &lt;dynd/types/fixed_dim_type.hpp&gt;
+<span class="lineNum">      17 </span>            : #include &lt;dynd/types/fixed_dim_kind_type.hpp&gt;
+<span class="lineNum">      18 </span>            : #include &lt;dynd/types/pointer_type.hpp&gt;
+<span class="lineNum">      19 </span>            : #include &lt;dynd/array.hpp&gt;
+<a name="20"><span class="lineNum">      20 </span>            : </a>
+<span class="lineNum">      21 </span>            : using namespace std;
+<span class="lineNum">      22 </span><span class="lineCov">          3 : using namespace dynd;</span>
+<span class="lineNum">      23 </span>            : 
+<span class="lineNum">      24 </span>            : #ifdef DYND_CUDA
+<span class="lineNum">      25 </span>            : 
+<span class="lineNum">      26 </span>            : TEST(CUDADeviceType, Simple)
+<span class="lineNum">      27 </span>            : {
+<span class="lineNum">      28 </span>            :   ndt::type d = ndt::make_cuda_device(ndt::make_type&lt;int32_t&gt;());
+<span class="lineNum">      29 </span>            :   EXPECT_EQ(cuda_device_id, d.get_id());
+<span class="lineNum">      30 </span>            :   EXPECT_EQ(memory_kind, d.get_kind());
+<span class="lineNum">      31 </span>            :   EXPECT_EQ(ndt::make_type&lt;int32_t&gt;(), d.p(&quot;storage_type&quot;).as&lt;ndt::type&gt;());
+<span class="lineNum">      32 </span>            :   EXPECT_FALSE(d.is_expression());
+<span class="lineNum">      33 </span>            :   EXPECT_EQ(d, ndt::type(&quot;cuda_device[int32]&quot;));
+<span class="lineNum">      34 </span>            :   // Roundtripping through a string
+<span class="lineNum">      35 </span>            :   EXPECT_EQ(d, ndt::type(d.str()));
+<span class="lineNum">      36 </span>            : 
+<span class="lineNum">      37 </span>            :   // A memory type cannot be the element of an array dimension
+<span class="lineNum">      38 </span>            :   EXPECT_THROW(
+<span class="lineNum">      39 </span>            :       ndt::make_fixed_dimsym(ndt::make_cuda_device(ndt::make_type&lt;int32_t&gt;())),
+<span class="lineNum">      40 </span>            :       invalid_argument);
+<span class="lineNum">      41 </span>            : 
+<span class="lineNum">      42 </span>            :   // Only built-in types can be allocated in CUDA global memory
+<span class="lineNum">      43 </span>            :   // Todo: Find a place to throw this exception
+<span class="lineNum">      44 </span>            : //  EXPECT_THROW(ndt::make_cuda_device(ndt::make_pointer&lt;char&gt;()), runtime_error);
+<span class="lineNum">      45 </span>            : }
+<span class="lineNum">      46 </span>            : 
+<span class="lineNum">      47 </span>            : TEST(CUDADeviceType, BuiltIn)
+<span class="lineNum">      48 </span>            : {
+<span class="lineNum">      49 </span>            :   ndt::type d = ndt::make_cuda_device(ndt::make_type&lt;float&gt;());
+<span class="lineNum">      50 </span>            :   EXPECT_EQ(cuda_device_id, d.get_id());
+<span class="lineNum">      51 </span>            :   EXPECT_EQ(memory_kind, d.get_kind());
+<span class="lineNum">      52 </span>            :   EXPECT_EQ(sizeof(float), d.get_data_size());
+<span class="lineNum">      53 </span>            :   // CUDA host type and CUDA device type have the same data alignment
+<span class="lineNum">      54 </span>            :   EXPECT_EQ(ndt::make_cuda_host(ndt::make_type&lt;float&gt;()).get_data_alignment(),
+<span class="lineNum">      55 </span>            :             d.get_data_alignment());
+<span class="lineNum">      56 </span>            :   EXPECT_EQ(d, ndt::type(&quot;cuda_device[float32]&quot;));
+<span class="lineNum">      57 </span>            : }
+<span class="lineNum">      58 </span>            : 
+<span class="lineNum">      59 </span>            : TEST(CUDADeviceType, FixedDim)
+<span class="lineNum">      60 </span>            : {
+<span class="lineNum">      61 </span>            :   ndt::type d =
+<span class="lineNum">      62 </span>            :       ndt::make_cuda_device(ndt::make_fixed_dimsym(ndt::make_type&lt;float&gt;()));
+<span class="lineNum">      63 </span>            :   EXPECT_EQ(cuda_device_id, d.get_id());
+<span class="lineNum">      64 </span>            :   EXPECT_EQ(memory_kind, d.get_kind());
+<span class="lineNum">      65 </span>            :   EXPECT_EQ(d.extended&lt;base_memory_type&gt;()-&gt;get_element_type().get_data_size(),
+<span class="lineNum">      66 </span>            :             d.get_data_size());
+<span class="lineNum">      67 </span>            :   EXPECT_EQ(d, ndt::type(&quot;cuda_device[Fixed * float32]&quot;));
+<span class="lineNum">      68 </span>            : }
+<span class="lineNum">      69 </span>            : 
+<span class="lineNum">      70 </span>            : TEST(CUDADeviceType, IsTypeSubarray)
+<span class="lineNum">      71 </span>            : {
+<span class="lineNum">      72 </span>            :   EXPECT_TRUE(ndt::make_cuda_device(ndt::make_type&lt;int32_t&gt;()).is_type_subarray(
+<span class="lineNum">      73 </span>            :       ndt::make_cuda_device(ndt::make_type&lt;int32_t&gt;())));
+<span class="lineNum">      74 </span>            :   EXPECT_TRUE(ndt::make_cuda_device(ndt::make_type&lt;int32_t&gt;())
+<span class="lineNum">      75 </span>            :                   .is_type_subarray(ndt::make_type&lt;int32_t&gt;()));
+<span class="lineNum">      76 </span>            :   EXPECT_TRUE(
+<span class="lineNum">      77 </span>            :       ndt::make_cuda_device(ndt::make_fixed_dimsym(ndt::make_type&lt;int32_t&gt;()))
+<span class="lineNum">      78 </span>            :           .is_type_subarray(ndt::make_type&lt;int32_t&gt;()));
+<span class="lineNum">      79 </span>            :   EXPECT_FALSE(ndt::make_type&lt;int32_t&gt;().is_type_subarray(
+<span class="lineNum">      80 </span>            :       ndt::make_cuda_device(ndt::make_type&lt;int32_t&gt;())));
+<span class="lineNum">      81 </span>            : }
+<span class="lineNum">      82 </span>            : 
+<span class="lineNum">      83 </span>            : #endif
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.10</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

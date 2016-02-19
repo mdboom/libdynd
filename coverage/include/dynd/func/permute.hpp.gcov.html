@@ -1,0 +1,249 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - coverage.info.cleaned - include/dynd/func/permute.hpp</title>
+  <link rel="stylesheet" type="text/css" href="../../../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../../../index.html">top level</a> - <a href="index.html">include/dynd/func</a> - permute.hpp<span style="font-size: 80%;"> (source / <a href="permute.hpp.func.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">coverage.info.cleaned</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntry">40</td>
+            <td class="headerCovTableEntryLo">0.0 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2016-02-19</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntry">30</td>
+            <td class="headerCovTableEntryLo">0.0 %</td>
+          </tr>
+          <tr><td><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : //</a>
+<span class="lineNum">       2 </span>            : // Copyright (C) 2011-15 DyND Developers
+<span class="lineNum">       3 </span>            : // BSD 2-Clause License, see LICENSE.txt
+<span class="lineNum">       4 </span>            : //
+<span class="lineNum">       5 </span>            : 
+<span class="lineNum">       6 </span>            : #pragma once
+<span class="lineNum">       7 </span>            : 
+<span class="lineNum">       8 </span>            : #include &lt;dynd/callable.hpp&gt;
+<span class="lineNum">       9 </span>            : #include &lt;dynd/kernels/base_kernel.hpp&gt;
+<span class="lineNum">      10 </span>            : #include &lt;dynd/kernels/cuda_launch.hpp&gt;
+<span class="lineNum">      11 </span>            : 
+<span class="lineNum">      12 </span>            : namespace dynd {
+<span class="lineNum">      13 </span>            : namespace kernels {
+<span class="lineNum">      14 </span>            : 
+<span class="lineNum">      15 </span>            :   template &lt;int N, bool with_dst = true&gt;
+<span class="lineNum">      16 </span>            :   struct permute_ck;
+<span class="lineNum">      17 </span>            : 
+<span class="lineNum">      18 </span>            :   template &lt;int N&gt;
+<span class="lineNum">      19 </span>            :   struct permute_ck&lt;N, true&gt; : nd::base_kernel&lt;permute_ck&lt;N, true&gt;, N&gt; {
+<span class="lineNum">      20 </span>            :     typedef permute_ck self_type;
+<span class="lineNum">      21 </span>            : 
+<a name="22"><span class="lineNum">      22 </span>            :     intptr_t perm[N];</a>
+<span class="lineNum">      23 </span>            : 
+<a name="24"><span class="lineNum">      24 </span><span class="lineNoCov">          0 :     DYND_CUDA_HOST_DEVICE permute_ck(const intptr_t *perm) { memcpy(this-&gt;perm, perm, sizeof(this-&gt;perm)); }</span></a>
+<span class="lineNum">      25 </span>            : 
+<span class="lineNum">      26 </span><span class="lineNoCov">          0 :     DYND_CUDA_HOST_DEVICE void single(char *dst, char *const *src)</span>
+<span class="lineNum">      27 </span>            :     {
+<span class="lineNum">      28 </span>            :       char *src_inv_perm[N];
+<span class="lineNum">      29 </span><span class="lineNoCov">          0 :       inv(src_inv_perm, dst, src);</span>
+<span class="lineNum">      30 </span>            : 
+<span class="lineNum">      31 </span><span class="lineNoCov">          0 :       nd::kernel_prefix *child = this-&gt;get_child();</span>
+<span class="lineNum">      32 </span><span class="lineNoCov">          0 :       kernel_single_t single = child-&gt;get_function&lt;kernel_single_t&gt;();</span>
+<span class="lineNum">      33 </span><span class="lineNoCov">          0 :       single(child, NULL, src_inv_perm);</span>
+<a name="34"><span class="lineNum">      34 </span><span class="lineNoCov">          0 :     }</span></a>
+<span class="lineNum">      35 </span>            : 
+<span class="lineNum">      36 </span><span class="lineNoCov">          0 :     DYND_CUDA_HOST_DEVICE void strided(char *dst, intptr_t dst_stride, char *const *src, const intptr_t *src_stride,</span>
+<span class="lineNum">      37 </span>            :                                        size_t count)
+<span class="lineNum">      38 </span>            :     {
+<span class="lineNum">      39 </span>            :       char *src_inv_perm[N];
+<span class="lineNum">      40 </span><span class="lineNoCov">          0 :       inv(src_inv_perm, dst, src);</span>
+<span class="lineNum">      41 </span>            : 
+<span class="lineNum">      42 </span>            :       intptr_t src_stride_inv_perm[N];
+<span class="lineNum">      43 </span><span class="lineNoCov">          0 :       inv(src_stride_inv_perm, dst_stride, src_stride);</span>
+<span class="lineNum">      44 </span>            : 
+<span class="lineNum">      45 </span><span class="lineNoCov">          0 :       nd::kernel_prefix *child = this-&gt;get_child();</span>
+<span class="lineNum">      46 </span><span class="lineNoCov">          0 :       kernel_strided_t strided = child-&gt;get_function&lt;kernel_strided_t&gt;();</span>
+<span class="lineNum">      47 </span><span class="lineNoCov">          0 :       strided(child, NULL, 0, src_inv_perm, src_stride_inv_perm, count);</span>
+<a name="48"><span class="lineNum">      48 </span><span class="lineNoCov">          0 :     }</span></a>
+<span class="lineNum">      49 </span>            : 
+<span class="lineNum">      50 </span><span class="lineNoCov">          0 :     static void instantiate(char *static_data, char *DYND_UNUSED(data), nd::kernel_builder *ckb,</span>
+<span class="lineNum">      51 </span>            :                             const ndt::type &amp;dst_tp, const char *dst_arrmeta, intptr_t nsrc, const ndt::type *src_tp,
+<span class="lineNum">      52 </span>            :                             const char *const *src_arrmeta, kernel_request_t kernreq, intptr_t nkwd,
+<span class="lineNum">      53 </span>            :                             const nd::array *kwds, const std::map&lt;std::string, ndt::type&gt; &amp;tp_vars)
+<span class="lineNum">      54 </span>            :     {
+<span class="lineNum">      55 </span>            :       const std::pair&lt;nd::callable, std::vector&lt;intptr_t&gt;&gt; *data =
+<span class="lineNum">      56 </span><span class="lineNoCov">          0 :           reinterpret_cast&lt;std::pair&lt;nd::callable, std::vector&lt;intptr_t&gt;&gt; *&gt;(static_data);</span>
+<span class="lineNum">      57 </span>            : 
+<span class="lineNum">      58 </span><span class="lineNoCov">          0 :       const nd::base_callable *child = data-&gt;first.get();</span>
+<span class="lineNum">      59 </span>            : 
+<span class="lineNum">      60 </span><span class="lineNoCov">          0 :       const intptr_t *perm = data-&gt;second.data();</span>
+<span class="lineNum">      61 </span>            : 
+<span class="lineNum">      62 </span><span class="lineNoCov">          0 :       ndt::type src_tp_inv[N];</span>
+<span class="lineNum">      63 </span><span class="lineNoCov">          0 :       inv(src_tp_inv, dst_tp, src_tp, perm);</span>
+<span class="lineNum">      64 </span>            : 
+<span class="lineNum">      65 </span>            :       const char *src_arrmeta_inv[N];
+<span class="lineNum">      66 </span><span class="lineNoCov">          0 :       inv(src_arrmeta_inv, dst_arrmeta, src_arrmeta, perm);</span>
+<span class="lineNum">      67 </span>            : 
+<span class="lineNum">      68 </span><span class="lineNoCov">          0 :       ckb-&gt;emplace_back&lt;self_type&gt;(kernreq, detail::make_array_wrapper&lt;N&gt;(perm));</span>
+<span class="lineNum">      69 </span><span class="lineNoCov">          0 :       child-&gt;instantiate(const_cast&lt;char *&gt;(child-&gt;static_data()), NULL, ckb, ndt::make_type&lt;void&gt;(), NULL, nsrc,</span>
+<span class="lineNum">      70 </span>            :                          src_tp_inv, src_arrmeta_inv, kernreq | kernel_request_data_only, nkwd, kwds, tp_vars);
+<span class="lineNum">      71 </span><span class="lineNoCov">          0 :     }</span>
+<a name="72"><span class="lineNum">      72 </span>            : </a>
+<span class="lineNum">      73 </span>            :   private:
+<span class="lineNum">      74 </span><span class="lineNoCov">          0 :     static void inv(ndt::type *src_inv, const ndt::type &amp;dst, const ndt::type *src, const intptr_t *perm)</span>
+<span class="lineNum">      75 </span>            :     {
+<span class="lineNum">      76 </span><span class="lineNoCov">          0 :       for (intptr_t i = 0; i &lt; N; ++i) {</span>
+<span class="lineNum">      77 </span><span class="lineNoCov">          0 :         intptr_t j = perm[i];</span>
+<span class="lineNum">      78 </span><span class="lineNoCov">          0 :         if (j == -1) {</span>
+<span class="lineNum">      79 </span><span class="lineNoCov">          0 :           src_inv[i] = dst;</span>
+<span class="lineNum">      80 </span>            :         }
+<span class="lineNum">      81 </span>            :         else {
+<span class="lineNum">      82 </span><span class="lineNoCov">          0 :           src_inv[i] = src[j];</span>
+<span class="lineNum">      83 </span>            :         }
+<span class="lineNum">      84 </span>            :       }
+<span class="lineNum">      85 </span><span class="lineNoCov">          0 :     }</span>
+<a name="86"><span class="lineNum">      86 </span>            : </a>
+<span class="lineNum">      87 </span>            :     template &lt;typename T&gt;
+<span class="lineNum">      88 </span><span class="lineNoCov">          0 :     DYND_CUDA_HOST_DEVICE static void inv(T *src_inv, const T &amp;dst, const T *src, const intptr_t *perm)</span>
+<span class="lineNum">      89 </span>            :     {
+<span class="lineNum">      90 </span><span class="lineNoCov">          0 :       for (intptr_t i = 0; i &lt; N; ++i) {</span>
+<span class="lineNum">      91 </span><span class="lineNoCov">          0 :         intptr_t j = perm[i];</span>
+<span class="lineNum">      92 </span><span class="lineNoCov">          0 :         if (j == -1) {</span>
+<span class="lineNum">      93 </span><span class="lineNoCov">          0 :           src_inv[i] = dst;</span>
+<span class="lineNum">      94 </span>            :         }
+<span class="lineNum">      95 </span>            :         else {
+<span class="lineNum">      96 </span><span class="lineNoCov">          0 :           src_inv[i] = src[j];</span>
+<span class="lineNum">      97 </span>            :         }
+<span class="lineNum">      98 </span>            :       }
+<span class="lineNum">      99 </span><span class="lineNoCov">          0 :     }</span>
+<span class="lineNum">     100 </span>            : 
+<span class="lineNum">     101 </span>            :     DYND_CUDA_HOST_DEVICE void inv(ndt::type *src_inv, const ndt::type &amp;dst, const ndt::type *src)
+<span class="lineNum">     102 </span>            :     {
+<span class="lineNum">     103 </span>            :       return inv(src_inv, dst, src, perm);
+<span class="lineNum">     104 </span>            :     }
+<a name="105"><span class="lineNum">     105 </span>            : </a>
+<span class="lineNum">     106 </span>            :     template &lt;typename T&gt;
+<span class="lineNum">     107 </span><span class="lineNoCov">          0 :     DYND_CUDA_HOST_DEVICE void inv(T *src_inv, const T &amp;dst, const T *src)</span>
+<span class="lineNum">     108 </span>            :     {
+<span class="lineNum">     109 </span><span class="lineNoCov">          0 :       return inv(src_inv, dst, src, perm);</span>
+<span class="lineNum">     110 </span>            :     }
+<span class="lineNum">     111 </span>            :   };
+<span class="lineNum">     112 </span>            : 
+<span class="lineNum">     113 </span>            :   template &lt;int N&gt;
+<span class="lineNum">     114 </span>            :   struct permute_ck&lt;N, false&gt; : nd::base_kernel&lt;permute_ck&lt;N, false&gt;, N&gt; {
+<span class="lineNum">     115 </span>            :     typedef permute_ck self_type;
+<span class="lineNum">     116 </span>            : 
+<span class="lineNum">     117 </span>            :     intptr_t perm[N];
+<span class="lineNum">     118 </span>            : 
+<span class="lineNum">     119 </span>            :     permute_ck(const intptr_t *perm) { memcpy(this-&gt;perm, perm, sizeof(this-&gt;perm)); }
+<span class="lineNum">     120 </span>            : 
+<span class="lineNum">     121 </span>            :     void single(char *dst, char *const *src)
+<span class="lineNum">     122 </span>            :     {
+<span class="lineNum">     123 </span>            :       char *src_inv_perm[N];
+<span class="lineNum">     124 </span>            :       inv_permute(src_inv_perm, src, perm);
+<span class="lineNum">     125 </span>            : 
+<span class="lineNum">     126 </span>            :       nd::kernel_prefix *child = this-&gt;get_child();
+<span class="lineNum">     127 </span>            :       kernel_single_t single = child-&gt;get_function&lt;kernel_single_t&gt;();
+<span class="lineNum">     128 </span>            :       single(dst, src_inv_perm, child);
+<span class="lineNum">     129 </span>            :     }
+<span class="lineNum">     130 </span>            : 
+<span class="lineNum">     131 </span>            :     static void instantiate(char *static_data, char *DYND_UNUSED(data), nd::kernel_builder *ckb,
+<span class="lineNum">     132 </span>            :                             const ndt::type &amp;dst_tp, const char *dst_arrmeta, intptr_t nsrc, const ndt::type *src_tp,
+<span class="lineNum">     133 </span>            :                             const char *const *src_arrmeta, kernel_request_t kernreq, intptr_t nkwd,
+<span class="lineNum">     134 </span>            :                             const nd::array *kwds, const std::map&lt;std::string, ndt::type&gt; &amp;tp_vars)
+<span class="lineNum">     135 </span>            :     {
+<span class="lineNum">     136 </span>            :       const std::pair&lt;nd::callable, std::vector&lt;intptr_t&gt;&gt; *data =
+<span class="lineNum">     137 </span>            :           reinterpret_cast&lt;std::pair&lt;nd::callable, std::vector&lt;intptr_t&gt;&gt; *&gt;(static_data);
+<span class="lineNum">     138 </span>            : 
+<span class="lineNum">     139 </span>            :       const nd::base_callable *child = data-&gt;first.get();
+<span class="lineNum">     140 </span>            : 
+<span class="lineNum">     141 </span>            :       const intptr_t *perm = data-&gt;second.data();
+<span class="lineNum">     142 </span>            : 
+<span class="lineNum">     143 </span>            :       ndt::type src_tp_inv[N];
+<span class="lineNum">     144 </span>            :       inv_permute(src_tp_inv, src_tp, perm);
+<span class="lineNum">     145 </span>            : 
+<span class="lineNum">     146 </span>            :       const char *src_arrmeta_inv[N];
+<span class="lineNum">     147 </span>            :       inv_permute(src_arrmeta_inv, src_arrmeta, perm);
+<span class="lineNum">     148 </span>            : 
+<span class="lineNum">     149 </span>            :       ckb-&gt;emplace_back&lt;self_type&gt;(kernreq, detail::make_array_wrapper&lt;N&gt;(perm));
+<span class="lineNum">     150 </span>            :       child-&gt;instantiate(const_cast&lt;char *&gt;(child-&gt;static_data()), NULL, ckb, dst_tp, dst_arrmeta, nsrc, src_tp_inv,
+<span class="lineNum">     151 </span>            :                          src_arrmeta_inv, kernreq, nkwd, kwds, tp_vars);
+<span class="lineNum">     152 </span>            :     }
+<span class="lineNum">     153 </span>            : 
+<span class="lineNum">     154 </span>            :   private:
+<span class="lineNum">     155 </span>            :     template &lt;typename T&gt;
+<span class="lineNum">     156 </span>            :     static void inv_permute(T *src_inv, const T *src, const intptr_t *perm)
+<span class="lineNum">     157 </span>            :     {
+<span class="lineNum">     158 </span>            :       for (intptr_t i = 0; i &lt; N; ++i) {
+<span class="lineNum">     159 </span>            :         src_inv[i] = src[perm[i]];
+<span class="lineNum">     160 </span>            :       }
+<span class="lineNum">     161 </span>            :     }
+<span class="lineNum">     162 </span>            :   };
+<span class="lineNum">     163 </span>            : 
+<span class="lineNum">     164 </span>            : } // dynd::kernels
+<span class="lineNum">     165 </span>            : 
+<span class="lineNum">     166 </span>            : namespace nd {
+<span class="lineNum">     167 </span>            :   namespace functional {
+<span class="lineNum">     168 </span>            : 
+<span class="lineNum">     169 </span>            :     DYND_API callable permute(const callable &amp;child, const std::vector&lt;intptr_t&gt; &amp;perm);
+<span class="lineNum">     170 </span>            : 
+<span class="lineNum">     171 </span>            :   } // namespace dynd::nd::functional
+<span class="lineNum">     172 </span>            : } // namespace dynd::nd
+<span class="lineNum">     173 </span>            : } // namespace dynd
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.10</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

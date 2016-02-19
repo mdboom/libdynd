@@ -1,0 +1,430 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - coverage.info.cleaned - src/dynd/types/substitute_typevars.cpp</title>
+  <link rel="stylesheet" type="text/css" href="../../../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../../../index.html">top level</a> - <a href="index.html">src/dynd/types</a> - substitute_typevars.cpp<span style="font-size: 80%;"> (source / <a href="substitute_typevars.cpp.func.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">coverage.info.cleaned</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">98</td>
+            <td class="headerCovTableEntry">166</td>
+            <td class="headerCovTableEntryLo">59.0 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2016-02-19</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">4</td>
+            <td class="headerCovTableEntry">4</td>
+            <td class="headerCovTableEntryHi">100.0 %</td>
+          </tr>
+          <tr><td><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : //</a>
+<span class="lineNum">       2 </span>            : // Copyright (C) 2011-15 DyND Developers
+<span class="lineNum">       3 </span>            : // BSD 2-Clause License, see LICENSE.txt
+<span class="lineNum">       4 </span>            : //
+<span class="lineNum">       5 </span>            : 
+<span class="lineNum">       6 </span>            : #include &lt;dynd/types/substitute_typevars.hpp&gt;
+<span class="lineNum">       7 </span>            : #include &lt;dynd/callable.hpp&gt;
+<span class="lineNum">       8 </span>            : #include &lt;dynd/types/pointer_type.hpp&gt;
+<span class="lineNum">       9 </span>            : #include &lt;dynd/types/option_type.hpp&gt;
+<span class="lineNum">      10 </span>            : #include &lt;dynd/types/base_memory_type.hpp&gt;
+<span class="lineNum">      11 </span>            : #include &lt;dynd/types/fixed_dim_type.hpp&gt;
+<span class="lineNum">      12 </span>            : #include &lt;dynd/types/c_contiguous_type.hpp&gt;
+<span class="lineNum">      13 </span>            : #include &lt;dynd/types/typevar_type.hpp&gt;
+<span class="lineNum">      14 </span>            : #include &lt;dynd/types/typevar_dim_type.hpp&gt;
+<span class="lineNum">      15 </span>            : #include &lt;dynd/types/pow_dimsym_type.hpp&gt;
+<span class="lineNum">      16 </span>            : #include &lt;dynd/types/ellipsis_dim_type.hpp&gt;
+<span class="lineNum">      17 </span>            : #include &lt;dynd/types/dim_fragment_type.hpp&gt;
+<span class="lineNum">      18 </span>            : #include &lt;dynd/types/var_dim_type.hpp&gt;
+<span class="lineNum">      19 </span>            : #include &lt;dynd/types/struct_type.hpp&gt;
+<span class="lineNum">      20 </span>            : #include &lt;dynd/types/tuple_type.hpp&gt;
+<span class="lineNum">      21 </span>            : #include &lt;dynd/types/fixed_dim_kind_type.hpp&gt;
+<span class="lineNum">      22 </span>            : #include &lt;dynd/types/typevar_constructed_type.hpp&gt;
+<span class="lineNum">      23 </span>            : #include &lt;dynd/types/cuda_device_type.hpp&gt;
+<span class="lineNum">      24 </span>            : 
+<span class="lineNum">      25 </span>            : using namespace std;
+<span class="lineNum">      26 </span>            : using namespace dynd;
+<span class="lineNum">      27 </span>            : 
+<span class="lineNum">      28 </span>            : /**
+<a name="29"><span class="lineNum">      29 </span>            :  * Substitutes the field types for contiguous array of types</a>
+<span class="lineNum">      30 </span>            :  */
+<span class="lineNum">      31 </span><span class="lineCov">         17 : static std::vector&lt;ndt::type&gt; substitute_type_array(const nd::array &amp;type_array,</span>
+<span class="lineNum">      32 </span>            :                                                     const std::map&lt;std::string, ndt::type&gt; &amp;typevars, bool concrete)
+<span class="lineNum">      33 </span>            : {
+<span class="lineNum">      34 </span><span class="lineCov">         17 :   intptr_t field_count = type_array.get_dim_size();</span>
+<span class="lineNum">      35 </span><span class="lineCov">         17 :   const ndt::type *field_types = reinterpret_cast&lt;const ndt::type *&gt;(type_array.cdata());</span>
+<span class="lineNum">      36 </span><span class="lineCov">         17 :   std::vector&lt;ndt::type&gt; tmp_field_types(field_count);</span>
+<span class="lineNum">      37 </span>            : 
+<span class="lineNum">      38 </span><span class="lineCov">         51 :   for (intptr_t i = 0; i &lt; field_count; ++i) {</span>
+<span class="lineNum">      39 </span><span class="lineCov">         34 :     tmp_field_types[i] = ndt::substitute(field_types[i], typevars, concrete);</span>
+<span class="lineNum">      40 </span>            :   }
+<span class="lineNum">      41 </span><span class="lineCov">         17 :   return tmp_field_types;</span>
+<a name="42"><span class="lineNum">      42 </span>            : }</a>
+<span class="lineNum">      43 </span>            : 
+<span class="lineNum">      44 </span><span class="lineCov">        394 : ndt::type ndt::detail::internal_substitute(const ndt::type &amp;pattern, const std::map&lt;std::string, ndt::type&gt; &amp;typevars,</span>
+<span class="lineNum">      45 </span>            :                                            bool concrete)
+<span class="lineNum">      46 </span>            : {
+<span class="lineNum">      47 </span>            :   // This function assumes that ``pattern`` is symbolic, so does not
+<span class="lineNum">      48 </span>            :   // have to check types that are always concrete
+<span class="lineNum">      49 </span><span class="lineCov">        394 :   switch (pattern.get_id()) {</span>
+<span class="lineNum">      50 </span>            : #ifdef DYND_CUDA
+<span class="lineNum">      51 </span>            :   case cuda_device_id:
+<span class="lineNum">      52 </span>            :     return ndt::make_cuda_device(
+<span class="lineNum">      53 </span>            :         ndt::substitute(pattern.extended&lt;base_memory_type&gt;()-&gt;get_element_type(), typevars, concrete));
+<span class="lineNum">      54 </span>            : #endif
+<span class="lineNum">      55 </span>            :   case c_contiguous_id:
+<span class="lineNum">      56 </span>            :     return ndt::c_contiguous_type::make(
+<span class="lineNum">      57 </span><span class="lineNoCov">          0 :         ndt::substitute(pattern.extended&lt;c_contiguous_type&gt;()-&gt;get_child_type(), typevars, concrete));</span>
+<span class="lineNum">      58 </span>            :   case pointer_id:
+<span class="lineNum">      59 </span>            :     return ndt::pointer_type::make(
+<span class="lineNum">      60 </span><span class="lineNoCov">          0 :         ndt::substitute(pattern.extended&lt;pointer_type&gt;()-&gt;get_target_type(), typevars, concrete));</span>
+<span class="lineNum">      61 </span>            :   case fixed_dim_id:
+<span class="lineNum">      62 </span><span class="lineCov">         57 :     if (pattern.get_kind() == kind_kind) {</span>
+<span class="lineNum">      63 </span><span class="lineCov">         57 :       if (!concrete) {</span>
+<span class="lineNum">      64 </span>            :         return ndt::make_fixed_dim_kind(
+<span class="lineNum">      65 </span><span class="lineCov">         57 :             ndt::substitute(pattern.extended&lt;base_dim_type&gt;()-&gt;get_element_type(), typevars, concrete));</span>
+<span class="lineNum">      66 </span>            :       }
+<span class="lineNum">      67 </span>            :       else {
+<span class="lineNum">      68 </span>            :         throw invalid_argument(&quot;The dynd pattern type includes a symbolic &quot;
+<span class="lineNum">      69 </span>            :                                &quot;'fixed' dimension, which is not concrete as &quot;
+<span class="lineNum">      70 </span><span class="lineNoCov">          0 :                                &quot;requested&quot;);</span>
+<span class="lineNum">      71 </span>            :       }
+<span class="lineNum">      72 </span>            :     }
+<span class="lineNum">      73 </span>            :     else {
+<span class="lineNum">      74 </span>            :       return ndt::make_fixed_dim(
+<span class="lineNum">      75 </span><span class="lineNoCov">          0 :           pattern.extended&lt;fixed_dim_type&gt;()-&gt;get_fixed_dim_size(),</span>
+<span class="lineNum">      76 </span><span class="lineNoCov">          0 :           ndt::substitute(pattern.extended&lt;fixed_dim_type&gt;()-&gt;get_element_type(), typevars, concrete));</span>
+<span class="lineNum">      77 </span>            :     }
+<span class="lineNum">      78 </span>            :   case var_dim_id:
+<span class="lineNum">      79 </span>            :     return ndt::var_dim_type::make(
+<span class="lineNum">      80 </span><span class="lineNoCov">          0 :         ndt::substitute(pattern.extended&lt;var_dim_type&gt;()-&gt;get_element_type(), typevars, concrete));</span>
+<span class="lineNum">      81 </span>            :   case struct_id:
+<span class="lineNum">      82 </span>            :     return ndt::struct_type::make(
+<span class="lineNum">      83 </span><span class="lineCov">         12 :         pattern.extended&lt;struct_type&gt;()-&gt;get_field_names(),</span>
+<span class="lineNum">      84 </span><span class="lineCov">         24 :         substitute_type_array(pattern.extended&lt;tuple_type&gt;()-&gt;get_field_types(), typevars, concrete));</span>
+<span class="lineNum">      85 </span>            :   case tuple_id:
+<span class="lineNum">      86 </span>            :     return ndt::tuple_type::make(
+<span class="lineNum">      87 </span><span class="lineCov">          5 :         substitute_type_array(pattern.extended&lt;tuple_type&gt;()-&gt;get_field_types(), typevars, concrete));</span>
+<span class="lineNum">      88 </span>            :   case option_id:
+<span class="lineNum">      89 </span>            :     return ndt::make_type&lt;ndt::option_type&gt;(
+<span class="lineNum">      90 </span><span class="lineCov">        131 :         ndt::substitute(pattern.extended&lt;option_type&gt;()-&gt;get_value_type(), typevars, concrete));</span>
+<span class="lineNum">      91 </span>            :   case callable_id:
+<span class="lineNum">      92 </span>            :     return ndt::callable_type::make(
+<span class="lineNum">      93 </span><span class="lineCov">         22 :         substitute(pattern.extended&lt;callable_type&gt;()-&gt;get_return_type(), typevars, concrete),</span>
+<span class="lineNum">      94 </span><span class="lineCov">         22 :         substitute(pattern.extended&lt;callable_type&gt;()-&gt;get_pos_tuple(), typevars, concrete),</span>
+<span class="lineNum">      95 </span><span class="lineCov">         33 :         substitute(pattern.extended&lt;callable_type&gt;()-&gt;get_kwd_struct(), typevars, concrete));</span>
+<span class="lineNum">      96 </span>            :   case typevar_constructed_id: {
+<span class="lineNum">      97 </span>            :     map&lt;std::string, ndt::type&gt;::const_iterator it =
+<span class="lineNum">      98 </span><span class="lineNoCov">          0 :         typevars.find(pattern.extended&lt;typevar_constructed_type&gt;()-&gt;get_name());</span>
+<span class="lineNum">      99 </span><span class="lineNoCov">          0 :     if (it-&gt;second.get_id() == void_id) {</span>
+<span class="lineNum">     100 </span><span class="lineNoCov">          0 :       return substitute(pattern.extended&lt;typevar_constructed_type&gt;()-&gt;get_arg(), typevars, concrete);</span>
+<span class="lineNum">     101 </span>            :     }
+<span class="lineNum">     102 </span>            : #ifdef DYND_CUDA
+<span class="lineNum">     103 </span>            :     if (it-&gt;second.get_id() == cuda_device_id) {
+<span class="lineNum">     104 </span>            :       return ndt::make_cuda_device(
+<span class="lineNum">     105 </span>            :           substitute(pattern.extended&lt;typevar_constructed_type&gt;()-&gt;get_arg(), typevars, concrete));
+<span class="lineNum">     106 </span>            :     }
+<span class="lineNum">     107 </span>            : #endif
+<span class="lineNum">     108 </span>            :   }
+<span class="lineNum">     109 </span>            :   case typevar_id: {
+<span class="lineNum">     110 </span><span class="lineCov">         86 :     map&lt;std::string, ndt::type&gt;::const_iterator it = typevars.find(pattern.extended&lt;typevar_type&gt;()-&gt;get_name());</span>
+<span class="lineNum">     111 </span><span class="lineCov">         86 :     if (it != typevars.end()) {</span>
+<span class="lineNum">     112 </span><span class="lineCov">         84 :       if (it-&gt;second.get_ndim() != 0) {</span>
+<span class="lineNum">     113 </span><span class="lineNoCov">          0 :         stringstream ss;</span>
+<span class="lineNum">     114 </span><span class="lineNoCov">          0 :         ss &lt;&lt; &quot;The substitution for dynd typevar &quot; &lt;&lt; pattern &lt;&lt; &quot;, &quot; &lt;&lt; it-&gt;second</span>
+<span class="lineNum">     115 </span><span class="lineNoCov">          0 :            &lt;&lt; &quot;, is a dimension, expected a dtype&quot;;</span>
+<span class="lineNum">     116 </span><span class="lineNoCov">          0 :         throw invalid_argument(ss.str());</span>
+<span class="lineNum">     117 </span>            :       }
+<span class="lineNum">     118 </span><span class="lineCov">         84 :       if (!concrete || !it-&gt;second.is_symbolic()) {</span>
+<span class="lineNum">     119 </span><span class="lineCov">         83 :         return it-&gt;second;</span>
+<span class="lineNum">     120 </span>            :       }
+<span class="lineNum">     121 </span>            :       else {
+<span class="lineNum">     122 </span><span class="lineCov">          2 :         stringstream ss;</span>
+<span class="lineNum">     123 </span><span class="lineCov">          1 :         ss &lt;&lt; &quot;The substitution for dynd typevar &quot; &lt;&lt; pattern &lt;&lt; &quot;, &quot; &lt;&lt; it-&gt;second &lt;&lt; &quot;, is not concrete as required&quot;;</span>
+<span class="lineNum">     124 </span><span class="lineCov">          1 :         throw invalid_argument(ss.str());</span>
+<span class="lineNum">     125 </span>            :       }
+<span class="lineNum">     126 </span>            :     }
+<span class="lineNum">     127 </span>            :     else {
+<span class="lineNum">     128 </span><span class="lineCov">          2 :       if (concrete) {</span>
+<span class="lineNum">     129 </span><span class="lineCov">          2 :         stringstream ss;</span>
+<span class="lineNum">     130 </span><span class="lineCov">          1 :         ss &lt;&lt; &quot;No substitution type for dynd type var &quot; &lt;&lt; pattern &lt;&lt; &quot; was available&quot;;</span>
+<span class="lineNum">     131 </span><span class="lineCov">          1 :         throw invalid_argument(ss.str());</span>
+<span class="lineNum">     132 </span>            :       }
+<span class="lineNum">     133 </span>            :       else {
+<span class="lineNum">     134 </span><span class="lineCov">          1 :         return pattern;</span>
+<span class="lineNum">     135 </span>            :       }
+<span class="lineNum">     136 </span>            :     }
+<span class="lineNum">     137 </span>            :   }
+<span class="lineNum">     138 </span>            :   case typevar_dim_id: {
+<span class="lineNum">     139 </span><span class="lineCov">         24 :     map&lt;std::string, ndt::type&gt;::const_iterator it = typevars.find(pattern.extended&lt;typevar_dim_type&gt;()-&gt;get_name());</span>
+<span class="lineNum">     140 </span><span class="lineCov">         24 :     if (it != typevars.end()) {</span>
+<span class="lineNum">     141 </span><span class="lineCov">         24 :       if (it-&gt;second.get_ndim() == 0) {</span>
+<span class="lineNum">     142 </span><span class="lineNoCov">          0 :         stringstream ss;</span>
+<span class="lineNum">     143 </span><span class="lineNoCov">          0 :         ss &lt;&lt; &quot;The substitution for dynd typevar &quot; &lt;&lt; pattern &lt;&lt; &quot;, &quot; &lt;&lt; it-&gt;second</span>
+<span class="lineNum">     144 </span><span class="lineNoCov">          0 :            &lt;&lt; &quot;, is a dtype, expected a dimension&quot;;</span>
+<span class="lineNum">     145 </span><span class="lineNoCov">          0 :         throw invalid_argument(ss.str());</span>
+<span class="lineNum">     146 </span>            :       }
+<span class="lineNum">     147 </span><span class="lineCov">         24 :       if (!concrete || !it-&gt;second.is_symbolic()) {</span>
+<span class="lineNum">     148 </span><span class="lineCov">         24 :         switch (it-&gt;second.get_id()) {</span>
+<span class="lineNum">     149 </span>            :         case fixed_dim_id:
+<span class="lineNum">     150 </span><span class="lineCov">         12 :           if (it-&gt;second.get_kind() == kind_kind) {</span>
+<span class="lineNum">     151 </span>            :             return ndt::make_fixed_dim_kind(
+<span class="lineNum">     152 </span><span class="lineCov">          1 :                 ndt::substitute(pattern.extended&lt;typevar_dim_type&gt;()-&gt;get_element_type(), typevars, concrete));</span>
+<span class="lineNum">     153 </span>            :           }
+<span class="lineNum">     154 </span>            :           else {
+<span class="lineNum">     155 </span>            :             return ndt::make_fixed_dim(
+<span class="lineNum">     156 </span><span class="lineCov">         11 :                 it-&gt;second.extended&lt;fixed_dim_type&gt;()-&gt;get_fixed_dim_size(),</span>
+<span class="lineNum">     157 </span><span class="lineCov">         22 :                 ndt::substitute(pattern.extended&lt;typevar_dim_type&gt;()-&gt;get_element_type(), typevars, concrete));</span>
+<span class="lineNum">     158 </span>            :           }
+<span class="lineNum">     159 </span>            :         case var_dim_id:
+<span class="lineNum">     160 </span>            :           return ndt::var_dim_type::make(
+<span class="lineNum">     161 </span><span class="lineCov">         12 :               ndt::substitute(pattern.extended&lt;typevar_dim_type&gt;()-&gt;get_element_type(), typevars, concrete));</span>
+<span class="lineNum">     162 </span>            :         default: {
+<span class="lineNum">     163 </span><span class="lineNoCov">          0 :           stringstream ss;</span>
+<span class="lineNum">     164 </span><span class="lineNoCov">          0 :           ss &lt;&lt; &quot;The substitution for dynd typevar &quot; &lt;&lt; pattern &lt;&lt; &quot;, &quot; &lt;&lt; it-&gt;second</span>
+<span class="lineNum">     165 </span><span class="lineNoCov">          0 :              &lt;&lt; &quot;, is not a substitutable dimension type&quot;;</span>
+<span class="lineNum">     166 </span><span class="lineNoCov">          0 :           throw invalid_argument(ss.str());</span>
+<span class="lineNum">     167 </span>            :         }
+<span class="lineNum">     168 </span>            :         }
+<span class="lineNum">     169 </span>            :       }
+<span class="lineNum">     170 </span>            :       else {
+<span class="lineNum">     171 </span><span class="lineNoCov">          0 :         stringstream ss;</span>
+<span class="lineNum">     172 </span><span class="lineNoCov">          0 :         ss &lt;&lt; &quot;The substitution for dynd typevar &quot; &lt;&lt; pattern &lt;&lt; &quot;, &quot; &lt;&lt; it-&gt;second &lt;&lt; &quot;, is not concrete as required&quot;;</span>
+<span class="lineNum">     173 </span><span class="lineNoCov">          0 :         throw invalid_argument(ss.str());</span>
+<span class="lineNum">     174 </span>            :       }
+<span class="lineNum">     175 </span>            :     }
+<span class="lineNum">     176 </span>            :     else {
+<span class="lineNum">     177 </span><span class="lineNoCov">          0 :       if (concrete) {</span>
+<span class="lineNum">     178 </span><span class="lineNoCov">          0 :         stringstream ss;</span>
+<span class="lineNum">     179 </span><span class="lineNoCov">          0 :         ss &lt;&lt; &quot;No substitution type for dynd typevar &quot; &lt;&lt; pattern &lt;&lt; &quot; was available&quot;;</span>
+<span class="lineNum">     180 </span><span class="lineNoCov">          0 :         throw invalid_argument(ss.str());</span>
+<span class="lineNum">     181 </span>            :       }
+<span class="lineNum">     182 </span>            :       else {
+<span class="lineNum">     183 </span>            :         return ndt::typevar_dim_type::make(
+<span class="lineNum">     184 </span><span class="lineNoCov">          0 :             pattern.extended&lt;typevar_dim_type&gt;()-&gt;get_name(),</span>
+<span class="lineNum">     185 </span><span class="lineNoCov">          0 :             ndt::substitute(pattern.extended&lt;typevar_dim_type&gt;()-&gt;get_element_type(), typevars, concrete));</span>
+<span class="lineNum">     186 </span>            :       }
+<span class="lineNum">     187 </span>            :     }
+<span class="lineNum">     188 </span>            :   }
+<span class="lineNum">     189 </span>            :   case pow_dimsym_id: {
+<span class="lineNum">     190 </span>            :     // Look up to the exponent typevar
+<span class="lineNum">     191 </span><span class="lineCov">         24 :     std::string exponent_name = pattern.extended&lt;pow_dimsym_type&gt;()-&gt;get_exponent();</span>
+<span class="lineNum">     192 </span><span class="lineCov">         12 :     map&lt;std::string, ndt::type&gt;::const_iterator tv_type = typevars.find(exponent_name);</span>
+<span class="lineNum">     193 </span><span class="lineCov">         12 :     intptr_t exponent = -1;</span>
+<span class="lineNum">     194 </span><span class="lineCov">         12 :     if (tv_type != typevars.end()) {</span>
+<span class="lineNum">     195 </span><span class="lineCov">          8 :       if (tv_type-&gt;second.get_id() == fixed_dim_id) {</span>
+<span class="lineNum">     196 </span><span class="lineCov">          7 :         exponent = tv_type-&gt;second.extended&lt;fixed_dim_type&gt;()-&gt;get_fixed_dim_size();</span>
+<span class="lineNum">     197 </span>            :       }
+<span class="lineNum">     198 </span><span class="lineCov">          1 :       else if (tv_type-&gt;second.get_id() == typevar_dim_id) {</span>
+<span class="lineNum">     199 </span>            :         // If it's a typevar, substitute the new name in
+<span class="lineNum">     200 </span><span class="lineCov">          1 :         exponent_name = tv_type-&gt;second.extended&lt;typevar_dim_type&gt;()-&gt;get_name();</span>
+<span class="lineNum">     201 </span><span class="lineCov">          1 :         if (concrete) {</span>
+<span class="lineNum">     202 </span><span class="lineNoCov">          0 :           stringstream ss;</span>
+<span class="lineNum">     203 </span><span class="lineNoCov">          0 :           ss &lt;&lt; &quot;The substitution for dynd typevar &quot; &lt;&lt; exponent_name &lt;&lt; &quot;, &quot; &lt;&lt; tv_type-&gt;second</span>
+<span class="lineNum">     204 </span><span class="lineNoCov">          0 :              &lt;&lt; &quot;, is not concrete as required&quot;;</span>
+<span class="lineNum">     205 </span><span class="lineNoCov">          0 :           throw invalid_argument(ss.str());</span>
+<span class="lineNum">     206 </span>            :         }
+<span class="lineNum">     207 </span>            :       }
+<span class="lineNum">     208 </span>            :       else {
+<span class="lineNum">     209 </span><span class="lineNoCov">          0 :         stringstream ss;</span>
+<span class="lineNum">     210 </span><span class="lineNoCov">          0 :         ss &lt;&lt; &quot;The substitution for dynd typevar &quot; &lt;&lt; exponent_name &lt;&lt; &quot;, &quot; &lt;&lt; tv_type-&gt;second</span>
+<span class="lineNum">     211 </span><span class="lineNoCov">          0 :            &lt;&lt; &quot;, is not a fixed_dim integer as required&quot;;</span>
+<span class="lineNum">     212 </span><span class="lineNoCov">          0 :         throw invalid_argument(ss.str());</span>
+<span class="lineNum">     213 </span>            :       }
+<span class="lineNum">     214 </span>            :     }
+<span class="lineNum">     215 </span>            :     // If the exponent is zero, just substitute the rest of the type
+<span class="lineNum">     216 </span><span class="lineCov">         12 :     if (exponent == 0) {</span>
+<span class="lineNum">     217 </span><span class="lineNoCov">          0 :       return ndt::substitute(pattern.extended&lt;pow_dimsym_type&gt;()-&gt;get_element_type(), typevars, concrete);</span>
+<span class="lineNum">     218 </span>            :     }
+<span class="lineNum">     219 </span>            :     // Get the base type
+<span class="lineNum">     220 </span><span class="lineCov">         24 :     ndt::type base_tp = pattern.extended&lt;pow_dimsym_type&gt;()-&gt;get_base_type();</span>
+<span class="lineNum">     221 </span><span class="lineCov">         12 :     if (base_tp.get_id() == typevar_dim_id) {</span>
+<span class="lineNum">     222 </span>            :       map&lt;std::string, ndt::type&gt;::const_iterator btv_type =
+<span class="lineNum">     223 </span><span class="lineCov">         12 :           typevars.find(base_tp.extended&lt;typevar_dim_type&gt;()-&gt;get_name());</span>
+<span class="lineNum">     224 </span><span class="lineCov">         12 :       if (btv_type == typevars.end()) {</span>
+<span class="lineNum">     225 </span>            :         // We haven't seen this typevar yet, check if concrete
+<span class="lineNum">     226 </span>            :         // is required
+<span class="lineNum">     227 </span><span class="lineNoCov">          0 :         if (concrete) {</span>
+<span class="lineNum">     228 </span><span class="lineNoCov">          0 :           stringstream ss;</span>
+<span class="lineNum">     229 </span><span class="lineNoCov">          0 :           ss &lt;&lt; &quot;No substitution type for dynd typevar &quot; &lt;&lt; base_tp &lt;&lt; &quot; was available&quot;;</span>
+<span class="lineNum">     230 </span><span class="lineNoCov">          0 :           throw invalid_argument(ss.str());</span>
+<span class="lineNum">     231 </span>            :         }
+<span class="lineNum">     232 </span>            :       }
+<span class="lineNum">     233 </span><span class="lineCov">         12 :       else if (btv_type-&gt;second.get_ndim() &gt; 0 &amp;&amp; btv_type-&gt;second.get_id() != dim_fragment_id) {</span>
+<span class="lineNum">     234 </span>            :         // Swap in for the base type
+<span class="lineNum">     235 </span><span class="lineCov">         12 :         base_tp = btv_type-&gt;second;</span>
+<span class="lineNum">     236 </span>            :       }
+<span class="lineNum">     237 </span>            :       else {
+<span class="lineNum">     238 </span><span class="lineNoCov">          0 :         stringstream ss;</span>
+<span class="lineNum">     239 </span><span class="lineNoCov">          0 :         ss &lt;&lt; &quot;The substitution for dynd typevar &quot; &lt;&lt; base_tp &lt;&lt; &quot;, &quot; &lt;&lt; btv_type-&gt;second</span>
+<span class="lineNum">     240 </span><span class="lineNoCov">          0 :            &lt;&lt; &quot;, is not a substitutable dimension type&quot;;</span>
+<span class="lineNum">     241 </span><span class="lineNoCov">          0 :         throw invalid_argument(ss.str());</span>
+<span class="lineNum">     242 </span>            :       }
+<span class="lineNum">     243 </span>            :     }
+<span class="lineNum">     244 </span>            :     // Substitute the element type, then apply the exponent
+<span class="lineNum">     245 </span><span class="lineCov">         24 :     ndt::type result = ndt::substitute(pattern.extended&lt;pow_dimsym_type&gt;()-&gt;get_element_type(), typevars, concrete);</span>
+<span class="lineNum">     246 </span><span class="lineCov">         12 :     if (exponent == 0) {</span>
+<span class="lineNum">     247 </span><span class="lineNoCov">          0 :       return result;</span>
+<span class="lineNum">     248 </span>            :     }
+<span class="lineNum">     249 </span><span class="lineCov">         12 :     else if (exponent &lt; 0) {</span>
+<span class="lineNum">     250 </span><span class="lineCov">          5 :       return ndt::make_pow_dimsym(base_tp, exponent_name, result);</span>
+<span class="lineNum">     251 </span>            :     }
+<span class="lineNum">     252 </span>            :     else {
+<span class="lineNum">     253 </span><span class="lineCov">          7 :       switch (base_tp.get_id()) {</span>
+<span class="lineNum">     254 </span>            :       case fixed_dim_id: {
+<span class="lineNum">     255 </span><span class="lineCov">          4 :         if (base_tp.get_kind() == kind_kind) {</span>
+<span class="lineNum">     256 </span><span class="lineCov">          2 :           if (concrete) {</span>
+<span class="lineNum">     257 </span><span class="lineCov">          2 :             stringstream ss;</span>
+<span class="lineNum">     258 </span><span class="lineCov">          1 :             ss &lt;&lt; &quot;The base for a dimensional power type, 'Fixed ** &quot; &lt;&lt; exponent &lt;&lt; &quot;', is not concrete as required&quot;;</span>
+<span class="lineNum">     259 </span><span class="lineCov">          1 :             throw invalid_argument(ss.str());</span>
+<span class="lineNum">     260 </span>            :           }
+<span class="lineNum">     261 </span><span class="lineCov">          4 :           for (intptr_t i = 0; i &lt; exponent; ++i) {</span>
+<span class="lineNum">     262 </span><span class="lineCov">          3 :             result = ndt::make_fixed_dim_kind(result);</span>
+<span class="lineNum">     263 </span>            :           }
+<span class="lineNum">     264 </span><span class="lineCov">          1 :           return result;</span>
+<span class="lineNum">     265 </span>            :         }
+<span class="lineNum">     266 </span>            :         else {
+<span class="lineNum">     267 </span><span class="lineCov">          2 :           intptr_t dim_size = base_tp.extended&lt;fixed_dim_type&gt;()-&gt;get_fixed_dim_size();</span>
+<span class="lineNum">     268 </span><span class="lineCov">          8 :           for (intptr_t i = 0; i &lt; exponent; ++i) {</span>
+<span class="lineNum">     269 </span><span class="lineCov">          6 :             result = ndt::make_fixed_dim(dim_size, result);</span>
+<span class="lineNum">     270 </span>            :           }
+<span class="lineNum">     271 </span><span class="lineCov">          2 :           return result;</span>
+<span class="lineNum">     272 </span>            :         }
+<span class="lineNum">     273 </span>            :       }
+<span class="lineNum">     274 </span>            :       case var_dim_id:
+<span class="lineNum">     275 </span><span class="lineCov">          8 :         for (intptr_t i = 0; i &lt; exponent; ++i) {</span>
+<span class="lineNum">     276 </span><span class="lineCov">          6 :           result = ndt::var_dim_type::make(result);</span>
+<span class="lineNum">     277 </span>            :         }
+<span class="lineNum">     278 </span><span class="lineCov">          2 :         return result;</span>
+<span class="lineNum">     279 </span>            :       case typevar_dim_id: {
+<span class="lineNum">     280 </span><span class="lineCov">          1 :         const std::string &amp;tvname = base_tp.extended&lt;typevar_dim_type&gt;()-&gt;get_name();</span>
+<span class="lineNum">     281 </span><span class="lineCov">          4 :         for (intptr_t i = 0; i &lt; exponent; ++i) {</span>
+<span class="lineNum">     282 </span><span class="lineCov">          3 :           result = ndt::typevar_dim_type::make(tvname, result);</span>
+<span class="lineNum">     283 </span>            :         }
+<span class="lineNum">     284 </span><span class="lineCov">          1 :         return result;</span>
+<span class="lineNum">     285 </span>            :       }
+<span class="lineNum">     286 </span>            :       default: {
+<span class="lineNum">     287 </span><span class="lineNoCov">          0 :         stringstream ss;</span>
+<span class="lineNum">     288 </span><span class="lineNoCov">          0 :         ss &lt;&lt; &quot;Cannot substitute &quot; &lt;&lt; base_tp &lt;&lt; &quot; as the base of a dynd dimensional power type&quot;;</span>
+<span class="lineNum">     289 </span><span class="lineNoCov">          0 :         throw invalid_argument(ss.str());</span>
+<span class="lineNum">     290 </span>            :       }
+<span class="lineNum">     291 </span>            :       }
+<span class="lineNum">     292 </span>            :     }
+<span class="lineNum">     293 </span>            :   }
+<span class="lineNum">     294 </span>            :   case ellipsis_dim_id: {
+<span class="lineNum">     295 </span><span class="lineCov">         18 :     const std::string &amp;name = pattern.extended&lt;ellipsis_dim_type&gt;()-&gt;get_name();</span>
+<span class="lineNum">     296 </span><span class="lineCov">         18 :     if (!name.empty()) {</span>
+<span class="lineNum">     297 </span><span class="lineCov">         18 :       map&lt;std::string, ndt::type&gt;::const_iterator it = typevars.find(pattern.extended&lt;typevar_dim_type&gt;()-&gt;get_name());</span>
+<span class="lineNum">     298 </span><span class="lineCov">         18 :       if (it != typevars.end()) {</span>
+<span class="lineNum">     299 </span><span class="lineCov">         16 :         if (it-&gt;second.get_id() == dim_fragment_id) {</span>
+<span class="lineNum">     300 </span><span class="lineCov">         16 :           return it-&gt;second.extended&lt;dim_fragment_type&gt;()-&gt;apply_to_dtype(</span>
+<span class="lineNum">     301 </span><span class="lineCov">         32 :               ndt::substitute(pattern.extended&lt;ellipsis_dim_type&gt;()-&gt;get_element_type(), typevars, concrete));</span>
+<span class="lineNum">     302 </span>            :         }
+<span class="lineNum">     303 </span>            :         else {
+<span class="lineNum">     304 </span><span class="lineNoCov">          0 :           stringstream ss;</span>
+<span class="lineNum">     305 </span><span class="lineNoCov">          0 :           ss &lt;&lt; &quot;The substitution for dynd typevar &quot; &lt;&lt; pattern &lt;&lt; &quot;, &quot; &lt;&lt; it-&gt;second</span>
+<span class="lineNum">     306 </span><span class="lineNoCov">          0 :              &lt;&lt; &quot;, is not a dim fragment as required&quot;;</span>
+<span class="lineNum">     307 </span><span class="lineNoCov">          0 :           throw invalid_argument(ss.str());</span>
+<span class="lineNum">     308 </span>            :         }
+<span class="lineNum">     309 </span>            :       }
+<span class="lineNum">     310 </span>            :       else {
+<span class="lineNum">     311 </span><span class="lineCov">          2 :         if (concrete) {</span>
+<span class="lineNum">     312 </span><span class="lineCov">          2 :           stringstream ss;</span>
+<span class="lineNum">     313 </span><span class="lineCov">          1 :           ss &lt;&lt; &quot;No substitution type for dynd typevar &quot; &lt;&lt; pattern &lt;&lt; &quot; was available&quot;;</span>
+<span class="lineNum">     314 </span><span class="lineCov">          1 :           throw invalid_argument(ss.str());</span>
+<span class="lineNum">     315 </span>            :         }
+<span class="lineNum">     316 </span>            :         else {
+<span class="lineNum">     317 </span>            :           return ndt::make_ellipsis_dim(
+<span class="lineNum">     318 </span><span class="lineCov">          1 :               pattern.extended&lt;ellipsis_dim_type&gt;()-&gt;get_name(),</span>
+<span class="lineNum">     319 </span><span class="lineCov">          2 :               ndt::substitute(pattern.extended&lt;ellipsis_dim_type&gt;()-&gt;get_element_type(), typevars, concrete));</span>
+<span class="lineNum">     320 </span>            :         }
+<span class="lineNum">     321 </span>            :       }
+<span class="lineNum">     322 </span>            :     }
+<span class="lineNum">     323 </span>            :     else {
+<span class="lineNum">     324 </span><span class="lineNoCov">          0 :       throw invalid_argument(&quot;Cannot substitute into an unnamed ellipsis typevar&quot;);</span>
+<span class="lineNum">     325 </span>            :     }
+<span class="lineNum">     326 </span>            :   }
+<span class="lineNum">     327 </span>            :   case any_kind_id: {
+<span class="lineNum">     328 </span><span class="lineNoCov">          0 :     if (concrete) {</span>
+<span class="lineNum">     329 </span><span class="lineNoCov">          0 :       stringstream ss;</span>
+<span class="lineNum">     330 </span><span class="lineNoCov">          0 :       ss &lt;&lt; &quot;The dynd type &quot; &lt;&lt; pattern &lt;&lt; &quot; is not concrete as required&quot;;</span>
+<span class="lineNum">     331 </span><span class="lineNoCov">          0 :       throw invalid_argument(ss.str());</span>
+<span class="lineNum">     332 </span>            :     }
+<span class="lineNum">     333 </span>            :     else {
+<span class="lineNum">     334 </span><span class="lineNoCov">          0 :       return pattern;</span>
+<span class="lineNum">     335 </span>            :     }
+<span class="lineNum">     336 </span>            :   }
+<span class="lineNum">     337 </span>            :   case scalar_kind_id: {
+<span class="lineNum">     338 </span><span class="lineCov">         38 :     if (concrete) {</span>
+<span class="lineNum">     339 </span><span class="lineNoCov">          0 :       stringstream ss;</span>
+<span class="lineNum">     340 </span><span class="lineNoCov">          0 :       ss &lt;&lt; &quot;The dynd type &quot; &lt;&lt; pattern &lt;&lt; &quot; is not concrete as required&quot;;</span>
+<span class="lineNum">     341 </span><span class="lineNoCov">          0 :       throw invalid_argument(ss.str());</span>
+<span class="lineNum">     342 </span>            :     }
+<span class="lineNum">     343 </span>            :     else {
+<span class="lineNum">     344 </span><span class="lineCov">         38 :       return pattern;</span>
+<span class="lineNum">     345 </span>            :     }
+<span class="lineNum">     346 </span>            :   }
+<span class="lineNum">     347 </span>            :   default:
+<span class="lineNum">     348 </span><span class="lineNoCov">          0 :     break;</span>
+<span class="lineNum">     349 </span>            :   }
+<span class="lineNum">     350 </span>            : 
+<span class="lineNum">     351 </span><span class="lineNoCov">          0 :   stringstream ss;</span>
+<a name="352"><span class="lineNum">     352 </span><span class="lineNoCov">          0 :   ss &lt;&lt; &quot;Unsupported dynd type \&quot;&quot; &lt;&lt; pattern &lt;&lt; &quot;\&quot; encountered for substituting typevars&quot;;</span></a>
+<span class="lineNum">     353 </span><span class="lineNoCov">          0 :   throw invalid_argument(ss.str());</span>
+<span class="lineNum">     354 </span><span class="lineCov">          3 : }</span>
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.10</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

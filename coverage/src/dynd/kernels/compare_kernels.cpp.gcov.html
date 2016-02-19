@@ -1,0 +1,148 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - coverage.info.cleaned - src/dynd/kernels/compare_kernels.cpp</title>
+  <link rel="stylesheet" type="text/css" href="../../../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../../../index.html">top level</a> - <a href="index.html">src/dynd/kernels</a> - compare_kernels.cpp<span style="font-size: 80%;"> (source / <a href="compare_kernels.cpp.func.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">coverage.info.cleaned</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">39</td>
+            <td class="headerCovTableEntry">39</td>
+            <td class="headerCovTableEntryHi">100.0 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2016-02-19</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">4</td>
+            <td class="headerCovTableEntry">4</td>
+            <td class="headerCovTableEntryHi">100.0 %</td>
+          </tr>
+          <tr><td><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : //</a>
+<span class="lineNum">       2 </span>            : // Copyright (C) 2011-15 DyND Developers
+<span class="lineNum">       3 </span>            : // BSD 2-Clause License, see LICENSE.txt
+<span class="lineNum">       4 </span>            : //
+<span class="lineNum">       5 </span>            : 
+<span class="lineNum">       6 </span>            : #include &lt;dynd/func/comparison.hpp&gt;
+<span class="lineNum">       7 </span>            : #include &lt;dynd/kernels/compare_kernels.hpp&gt;
+<span class="lineNum">       8 </span>            : 
+<span class="lineNum">       9 </span>            : using namespace std;
+<a name="10"><span class="lineNum">      10 </span>            : using namespace dynd;</a>
+<span class="lineNum">      11 </span>            : 
+<span class="lineNum">      12 </span><span class="lineCov">         28 : void nd::equal_kernel&lt;tuple_id, tuple_id&gt;::instantiate(char *DYND_UNUSED(static_data), char *DYND_UNUSED(data),</span>
+<span class="lineNum">      13 </span>            :                                                        kernel_builder *ckb, const ndt::type &amp;dst_tp,
+<span class="lineNum">      14 </span>            :                                                        const char *dst_arrmeta, intptr_t nsrc, const ndt::type *src_tp,
+<span class="lineNum">      15 </span>            :                                                        const char *const *src_arrmeta, kernel_request_t kernreq,
+<span class="lineNum">      16 </span>            :                                                        intptr_t nkwd, const nd::array *kwds,
+<span class="lineNum">      17 </span>            :                                                        const std::map&lt;std::string, ndt::type&gt; &amp;tp_vars)
+<span class="lineNum">      18 </span>            : {
+<span class="lineNum">      19 </span><span class="lineCov">         28 :   intptr_t self_offset = ckb-&gt;size();</span>
+<span class="lineNum">      20 </span><span class="lineCov">         28 :   size_t field_count = src_tp[0].extended&lt;ndt::tuple_type&gt;()-&gt;get_field_count();</span>
+<span class="lineNum">      21 </span>            : 
+<span class="lineNum">      22 </span><span class="lineCov">         84 :   ckb-&gt;emplace_back&lt;equal_kernel&gt;(kernreq, field_count,</span>
+<span class="lineNum">      23 </span><span class="lineCov">         28 :                                   src_tp[0].extended&lt;ndt::tuple_type&gt;()-&gt;get_data_offsets(src_arrmeta[0]),</span>
+<span class="lineNum">      24 </span><span class="lineCov">         56 :                                   src_tp[1].extended&lt;ndt::tuple_type&gt;()-&gt;get_data_offsets(src_arrmeta[1]));</span>
+<span class="lineNum">      25 </span><span class="lineCov">         28 :   ckb-&gt;emplace_back(field_count * sizeof(size_t));</span>
+<span class="lineNum">      26 </span>            : 
+<span class="lineNum">      27 </span><span class="lineCov">         28 :   equal_kernel *self = ckb-&gt;get_at&lt;equal_kernel&gt;(self_offset);</span>
+<span class="lineNum">      28 </span><span class="lineCov">         28 :   const std::vector&lt;uintptr_t&gt; &amp;arrmeta_offsets = src_tp[0].extended&lt;ndt::tuple_type&gt;()-&gt;get_arrmeta_offsets();</span>
+<span class="lineNum">      29 </span><span class="lineCov">         97 :   for (size_t i = 0; i != field_count; ++i) {</span>
+<span class="lineNum">      30 </span><span class="lineCov">         69 :     self = ckb-&gt;get_at&lt;equal_kernel&gt;(self_offset);</span>
+<span class="lineNum">      31 </span><span class="lineCov">         69 :     size_t *field_kernel_offsets = self-&gt;get_offsets();</span>
+<span class="lineNum">      32 </span><span class="lineCov">         69 :     field_kernel_offsets[i] = ckb-&gt;size() - self_offset;</span>
+<span class="lineNum">      33 </span><span class="lineCov">         69 :     ndt::type child_src_tp[2] = {src_tp[0].extended&lt;ndt::tuple_type&gt;()-&gt;get_field_type(i),</span>
+<span class="lineNum">      34 </span><span class="lineCov">        207 :                                  src_tp[1].extended&lt;ndt::tuple_type&gt;()-&gt;get_field_type(i)};</span>
+<span class="lineNum">      35 </span><span class="lineCov">         69 :     const char *child_src_arrmeta[2] = {src_arrmeta[0] + arrmeta_offsets[i], src_arrmeta[1] + arrmeta_offsets[i]};</span>
+<span class="lineNum">      36 </span><span class="lineCov">         69 :     equal::get()-&gt;instantiate(equal::get()-&gt;static_data(), NULL, ckb, dst_tp, dst_arrmeta, nsrc, child_src_tp,</span>
+<span class="lineNum">      37 </span><span class="lineCov">         69 :                               child_src_arrmeta, kernreq | kernel_request_data_only, nkwd, kwds, tp_vars);</span>
+<span class="lineNum">      38 </span>            :   }
+<a name="39"><span class="lineNum">      39 </span><span class="lineCov">         28 : }</span></a>
+<span class="lineNum">      40 </span>            : 
+<span class="lineNum">      41 </span><span class="lineCov">         16 : void nd::not_equal_kernel&lt;tuple_id, tuple_id&gt;::instantiate(</span>
+<span class="lineNum">      42 </span>            :     char *DYND_UNUSED(static_data), char *DYND_UNUSED(data), kernel_builder *ckb, const ndt::type &amp;dst_tp,
+<span class="lineNum">      43 </span>            :     const char *dst_arrmeta, intptr_t nsrc, const ndt::type *src_tp, const char *const *src_arrmeta,
+<span class="lineNum">      44 </span>            :     kernel_request_t kernreq, intptr_t nkwd, const nd::array *kwds, const std::map&lt;std::string, ndt::type&gt; &amp;tp_vars)
+<span class="lineNum">      45 </span>            : {
+<span class="lineNum">      46 </span><span class="lineCov">         16 :   intptr_t self_offset = ckb-&gt;size();</span>
+<span class="lineNum">      47 </span><span class="lineCov">         16 :   auto bsd = src_tp-&gt;extended&lt;ndt::tuple_type&gt;();</span>
+<span class="lineNum">      48 </span><span class="lineCov">         16 :   size_t field_count = bsd-&gt;get_field_count();</span>
+<span class="lineNum">      49 </span>            : 
+<span class="lineNum">      50 </span><span class="lineCov">         32 :   ckb-&gt;emplace_back&lt;not_equal_kernel&gt;(kernreq, field_count, bsd-&gt;get_data_offsets(src_arrmeta[0]),</span>
+<span class="lineNum">      51 </span><span class="lineCov">         32 :                                       bsd-&gt;get_data_offsets(src_arrmeta[1]));</span>
+<span class="lineNum">      52 </span><span class="lineCov">         16 :   ckb-&gt;emplace_back(field_count * sizeof(size_t));</span>
+<span class="lineNum">      53 </span>            : 
+<span class="lineNum">      54 </span><span class="lineCov">         16 :   not_equal_kernel *e = ckb-&gt;get_at&lt;not_equal_kernel&gt;(self_offset);</span>
+<span class="lineNum">      55 </span>            :   size_t *field_kernel_offsets;
+<span class="lineNum">      56 </span><span class="lineCov">         16 :   const std::vector&lt;uintptr_t&gt; &amp;arrmeta_offsets = bsd-&gt;get_arrmeta_offsets();</span>
+<span class="lineNum">      57 </span><span class="lineCov">         64 :   for (size_t i = 0; i != field_count; ++i) {</span>
+<span class="lineNum">      58 </span><span class="lineCov">         48 :     const ndt::type &amp;ft = bsd-&gt;get_field_type(i);</span>
+<span class="lineNum">      59 </span>            :     // Reserve space for the child, and save the offset to this
+<span class="lineNum">      60 </span>            :     // field comparison kernel. Have to re-get
+<span class="lineNum">      61 </span>            :     // the pointer because creating the field comparison kernel may
+<span class="lineNum">      62 </span>            :     // move the memory.
+<span class="lineNum">      63 </span><span class="lineCov">         48 :     e = reinterpret_cast&lt;kernel_builder *&gt;(ckb)-&gt;get_at&lt;not_equal_kernel&gt;(self_offset);</span>
+<span class="lineNum">      64 </span><span class="lineCov">         48 :     field_kernel_offsets = reinterpret_cast&lt;size_t *&gt;(e + 1);</span>
+<span class="lineNum">      65 </span><span class="lineCov">         48 :     field_kernel_offsets[i] = ckb-&gt;size() - self_offset;</span>
+<span class="lineNum">      66 </span><span class="lineCov">         48 :     const char *field_arrmeta = src_arrmeta[0] + arrmeta_offsets[i];</span>
+<span class="lineNum">      67 </span><span class="lineCov">         96 :     ndt::type child_src_tp[2] = {ft, ft};</span>
+<span class="lineNum">      68 </span><span class="lineCov">         48 :     const char *child_src_arrmeta[2] = {field_arrmeta, field_arrmeta};</span>
+<span class="lineNum">      69 </span><span class="lineCov">         48 :     not_equal::get()-&gt;instantiate(not_equal::get()-&gt;static_data(), NULL, ckb, dst_tp, dst_arrmeta, nsrc, child_src_tp,</span>
+<a name="70"><span class="lineNum">      70 </span><span class="lineCov">         48 :                                   child_src_arrmeta, kernreq | kernel_request_data_only, nkwd, kwds, tp_vars);</span></a>
+<span class="lineNum">      71 </span>            :   }
+<span class="lineNum">      72 </span><span class="lineCov">         19 : }</span>
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.10</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

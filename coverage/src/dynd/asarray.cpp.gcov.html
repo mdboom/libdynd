@@ -1,0 +1,115 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - coverage.info.cleaned - src/dynd/asarray.cpp</title>
+  <link rel="stylesheet" type="text/css" href="../../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../../index.html">top level</a> - <a href="index.html">src/dynd</a> - asarray.cpp<span style="font-size: 80%;"> (source / <a href="asarray.cpp.func.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">coverage.info.cleaned</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">12</td>
+            <td class="headerCovTableEntry">14</td>
+            <td class="headerCovTableEntryMed">85.7 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2016-02-19</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">3</td>
+            <td class="headerCovTableEntry">3</td>
+            <td class="headerCovTableEntryHi">100.0 %</td>
+          </tr>
+          <tr><td><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : //</a>
+<span class="lineNum">       2 </span>            : // Copyright (C) 2011-15 DyND Developers
+<span class="lineNum">       3 </span>            : // BSD 2-Clause License, see LICENSE.txt
+<span class="lineNum">       4 </span>            : //
+<span class="lineNum">       5 </span>            : 
+<span class="lineNum">       6 </span>            : #include &lt;dynd/asarray.hpp&gt;
+<span class="lineNum">       7 </span>            : #include &lt;dynd/types/substitute_shape.hpp&gt;
+<span class="lineNum">       8 </span>            : 
+<span class="lineNum">       9 </span>            : using namespace std;
+<a name="10"><span class="lineNum">      10 </span>            : using namespace dynd;</a>
+<span class="lineNum">      11 </span>            : 
+<span class="lineNum">      12 </span><span class="lineCov">          4 : nd::array nd::asarray(const nd::array &amp;a, const ndt::type &amp;tp)</span>
+<span class="lineNum">      13 </span>            : {
+<span class="lineNum">      14 </span>            :   // TODO: This could attempt to do some more sophisticated views like
+<span class="lineNum">      15 </span>            :   //       &quot;var * int&quot; viewed as &quot;Fixed * int&quot;. It's probably not reasonable to
+<span class="lineNum">      16 </span>            :   //       actually use nd::view here, because of nd::view's ability to view POD
+<span class="lineNum">      17 </span>            :   //       data as a different type.
+<span class="lineNum">      18 </span><span class="lineCov">          4 :   nd::array result;</span>
+<span class="lineNum">      19 </span><span class="lineCov">          4 :   if (tp.match(a.get_type())) {</span>
+<span class="lineNum">      20 </span>            :     // It already matches, just pass along the array
+<span class="lineNum">      21 </span><span class="lineCov">          2 :     result = a;</span>
+<span class="lineNum">      22 </span>            :   }
+<span class="lineNum">      23 </span><span class="lineCov">          2 :   else if ((tp.get_flags() &amp; type_flag_symbolic) == 0) {</span>
+<span class="lineNum">      24 </span>            :     // The requested type is concrete, so can make an empty one easily
+<span class="lineNum">      25 </span><span class="lineNoCov">          0 :     result = nd::empty(tp);</span>
+<span class="lineNum">      26 </span><span class="lineNoCov">          0 :     result.vals() = a;</span>
+<span class="lineNum">      27 </span>            :   }
+<span class="lineNum">      28 </span>            :   else {
+<span class="lineNum">      29 </span>            :     // The requested type is symbolic, so need to fill in missing bits from the
+<span class="lineNum">      30 </span>            :     // input to make it concrete
+<span class="lineNum">      31 </span><span class="lineCov">          2 :     intptr_t ndim = a.get_ndim();</span>
+<span class="lineNum">      32 </span><span class="lineCov">          4 :     dimvector shape(ndim);</span>
+<span class="lineNum">      33 </span><span class="lineCov">          2 :     a.get_shape(shape.get());</span>
+<span class="lineNum">      34 </span><span class="lineCov">          2 :     result = nd::empty(ndt::substitute_shape(tp, ndim, shape.get()));</span>
+<span class="lineNum">      35 </span><span class="lineCov">          2 :     result.vals() = a;</span>
+<span class="lineNum">      36 </span>            :   }
+<a name="37"><span class="lineNum">      37 </span>            : </a>
+<span class="lineNum">      38 </span><span class="lineCov">          4 :   return result;</span>
+<span class="lineNum">      39 </span><span class="lineCov">          3 : }</span>
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.10</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

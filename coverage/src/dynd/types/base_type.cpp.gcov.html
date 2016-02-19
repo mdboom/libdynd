@@ -1,0 +1,362 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - coverage.info.cleaned - src/dynd/types/base_type.cpp</title>
+  <link rel="stylesheet" type="text/css" href="../../../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../../../index.html">top level</a> - <a href="index.html">src/dynd/types</a> - base_type.cpp<span style="font-size: 80%;"> (source / <a href="base_type.cpp.func.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">coverage.info.cleaned</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">30</td>
+            <td class="headerCovTableEntry">104</td>
+            <td class="headerCovTableEntryLo">28.8 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2016-02-19</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">16</td>
+            <td class="headerCovTableEntry">41</td>
+            <td class="headerCovTableEntryLo">39.0 %</td>
+          </tr>
+          <tr><td><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : //</a>
+<span class="lineNum">       2 </span>            : // Copyright (C) 2011-15 DyND Developers
+<span class="lineNum">       3 </span>            : // BSD 2-Clause License, see LICENSE.txt
+<span class="lineNum">       4 </span>            : //
+<span class="lineNum">       5 </span>            : 
+<span class="lineNum">       6 </span>            : #include &lt;dynd/callable.hpp&gt;
+<span class="lineNum">       7 </span>            : #include &lt;dynd/type.hpp&gt;
+<span class="lineNum">       8 </span>            : 
+<span class="lineNum">       9 </span>            : using namespace std;
+<span class="lineNum">      10 </span>            : using namespace dynd;
+<a name="11"><span class="lineNum">      11 </span>            : </a>
+<span class="lineNum">      12 </span>            : // Default destructor for the extended type does nothing
+<a name="13"><span class="lineNum">      13 </span><span class="lineCov">      35041 : ndt::base_type::~base_type() {}</span></a>
+<span class="lineNum">      14 </span>            : 
+<span class="lineNum">      15 </span><span class="lineNoCov">          0 : bool ndt::base_type::is_type_subarray(const type &amp;subarray_tp) const</span>
+<span class="lineNum">      16 </span>            : {
+<span class="lineNum">      17 </span>            :   // The default implementation is to check by-value equality.
+<span class="lineNum">      18 </span>            :   // Dimension or wrapper types should override this.
+<span class="lineNum">      19 </span><span class="lineNoCov">          0 :   return !subarray_tp.is_builtin() &amp;&amp; (*this) == (*subarray_tp.extended());</span>
+<a name="20"><span class="lineNum">      20 </span>            : }</a>
+<span class="lineNum">      21 </span>            : 
+<span class="lineNum">      22 </span><span class="lineNoCov">          0 : void ndt::base_type::print_data(ostream &amp;DYND_UNUSED(o), const char *DYND_UNUSED(arrmeta),</span>
+<span class="lineNum">      23 </span>            :                                 const char *DYND_UNUSED(data)) const
+<span class="lineNum">      24 </span>            : {
+<span class="lineNum">      25 </span><span class="lineNoCov">          0 :   stringstream ss;</span>
+<span class="lineNum">      26 </span><span class="lineNoCov">          0 :   ss &lt;&lt; &quot;cannot print data of type \&quot;&quot;;</span>
+<span class="lineNum">      27 </span><span class="lineNoCov">          0 :   print_type(ss);</span>
+<span class="lineNum">      28 </span><span class="lineNoCov">          0 :   ss &lt;&lt; &quot;\&quot;&quot;;</span>
+<span class="lineNum">      29 </span>            : 
+<span class="lineNum">      30 </span><span class="lineNoCov">          0 :   throw std::runtime_error(ss.str());</span>
+<a name="31"><span class="lineNum">      31 </span>            : }</a>
+<span class="lineNum">      32 </span>            : 
+<a name="33"><span class="lineNum">      33 </span><span class="lineCov">       4170 : bool ndt::base_type::is_expression() const { return false; }</span></a>
+<span class="lineNum">      34 </span>            : 
+<a name="35"><span class="lineNum">      35 </span><span class="lineNoCov">          0 : bool ndt::base_type::is_unique_data_owner(const char *DYND_UNUSED(arrmeta)) const { return true; }</span></a>
+<span class="lineNum">      36 </span>            : 
+<span class="lineNum">      37 </span><span class="lineNoCov">          0 : void ndt::base_type::transform_child_types(type_transform_fn_t DYND_UNUSED(transform_fn),</span>
+<span class="lineNum">      38 </span>            :                                            intptr_t DYND_UNUSED(arrmeta_offset), void *DYND_UNUSED(self),
+<span class="lineNum">      39 </span>            :                                            type &amp;out_transformed_type, bool &amp;DYND_UNUSED(out_was_transformed)) const
+<span class="lineNum">      40 </span>            : {
+<span class="lineNum">      41 </span>            :   // Default to behavior with no child types
+<span class="lineNum">      42 </span><span class="lineNoCov">          0 :   out_transformed_type = type(this, true);</span>
+<a name="43"><span class="lineNum">      43 </span><span class="lineNoCov">          0 : }</span></a>
+<span class="lineNum">      44 </span>            : 
+<span class="lineNum">      45 </span><span class="lineNoCov">          0 : ndt::type ndt::base_type::get_canonical_type() const</span>
+<span class="lineNum">      46 </span>            : {
+<span class="lineNum">      47 </span>            :   // Default to no transformation of the type
+<span class="lineNum">      48 </span><span class="lineNoCov">          0 :   return type(this, true);</span>
+<a name="49"><span class="lineNum">      49 </span>            : }</a>
+<span class="lineNum">      50 </span>            : 
+<span class="lineNum">      51 </span><span class="lineNoCov">          0 : void ndt::base_type::set_from_utf8_string(const char *DYND_UNUSED(arrmeta), char *DYND_UNUSED(data),</span>
+<span class="lineNum">      52 </span>            :                                           const char *DYND_UNUSED(utf8_begin), const char *DYND_UNUSED(utf8_end),
+<span class="lineNum">      53 </span>            :                                           const eval::eval_context *DYND_UNUSED(ectx)) const
+<span class="lineNum">      54 </span>            : {
+<span class="lineNum">      55 </span><span class="lineNoCov">          0 :   stringstream ss;</span>
+<span class="lineNum">      56 </span><span class="lineNoCov">          0 :   ss &lt;&lt; &quot;Cannot set a dynd value with type &quot; &lt;&lt; type(this, true) &lt;&lt; &quot; from a string&quot;;</span>
+<span class="lineNum">      57 </span><span class="lineNoCov">          0 :   throw type_error(ss.str());</span>
+<a name="58"><span class="lineNum">      58 </span>            : }</a>
+<span class="lineNum">      59 </span>            : 
+<span class="lineNum">      60 </span><span class="lineCov">        282 : ndt::type ndt::base_type::apply_linear_index(intptr_t nindices, const irange *DYND_UNUSED(indices), size_t current_i,</span>
+<span class="lineNum">      61 </span>            :                                              const type &amp;DYND_UNUSED(root_tp),
+<span class="lineNum">      62 </span>            :                                              bool DYND_UNUSED(leading_dimension)) const
+<span class="lineNum">      63 </span>            : {
+<span class="lineNum">      64 </span>            :   // Default to scalar behavior
+<span class="lineNum">      65 </span><span class="lineCov">        282 :   if (nindices == 0) {</span>
+<span class="lineNum">      66 </span><span class="lineCov">        564 :     return type(this, true);</span>
+<span class="lineNum">      67 </span>            :   }
+<span class="lineNum">      68 </span>            :   else {
+<span class="lineNum">      69 </span><span class="lineNoCov">          0 :     throw too_many_indices(type(this, true), current_i + nindices, current_i);</span>
+<span class="lineNum">      70 </span>            :   }
+<a name="71"><span class="lineNum">      71 </span>            : }</a>
+<span class="lineNum">      72 </span>            : 
+<span class="lineNum">      73 </span><span class="lineCov">        278 : intptr_t ndt::base_type::apply_linear_index(intptr_t nindices, const irange *DYND_UNUSED(indices), const char *arrmeta,</span>
+<span class="lineNum">      74 </span>            :                                             const type &amp;DYND_UNUSED(result_tp), char *out_arrmeta,
+<span class="lineNum">      75 </span>            :                                             const intrusive_ptr&lt;memory_block_data&gt; &amp;embedded_reference,
+<span class="lineNum">      76 </span>            :                                             size_t current_i, const type &amp;DYND_UNUSED(root_tp),
+<span class="lineNum">      77 </span>            :                                             bool DYND_UNUSED(leading_dimension), char **DYND_UNUSED(inout_data),
+<span class="lineNum">      78 </span>            :                                             intrusive_ptr&lt;memory_block_data&gt; &amp;DYND_UNUSED(inout_dataref)) const
+<span class="lineNum">      79 </span>            : {
+<span class="lineNum">      80 </span>            :   // Default to scalar behavior
+<span class="lineNum">      81 </span><span class="lineCov">        278 :   if (nindices == 0) {</span>
+<span class="lineNum">      82 </span>            :     // Copy any arrmeta verbatim
+<span class="lineNum">      83 </span><span class="lineCov">        278 :     arrmeta_copy_construct(out_arrmeta, arrmeta, embedded_reference);</span>
+<span class="lineNum">      84 </span><span class="lineCov">        556 :     return 0;</span>
+<span class="lineNum">      85 </span>            :   }
+<span class="lineNum">      86 </span>            :   else {
+<span class="lineNum">      87 </span><span class="lineNoCov">          0 :     throw too_many_indices(type(this, true), current_i + nindices, current_i);</span>
+<span class="lineNum">      88 </span>            :   }
+<a name="89"><span class="lineNum">      89 </span>            : }</a>
+<span class="lineNum">      90 </span>            : 
+<span class="lineNum">      91 </span><span class="lineNoCov">          0 : ndt::type ndt::base_type::at_single(intptr_t DYND_UNUSED(i0), const char **DYND_UNUSED(inout_arrmeta),</span>
+<span class="lineNum">      92 </span>            :                                     const char **DYND_UNUSED(inout_data)) const
+<span class="lineNum">      93 </span>            : {
+<span class="lineNum">      94 </span>            :   // Default to scalar behavior
+<span class="lineNum">      95 </span><span class="lineNoCov">          0 :   throw too_many_indices(type(this, true), 1, 0);</span>
+<a name="96"><span class="lineNum">      96 </span>            : }</a>
+<span class="lineNum">      97 </span>            : 
+<span class="lineNum">      98 </span><span class="lineCov">       2151 : ndt::type ndt::base_type::get_type_at_dimension(char **DYND_UNUSED(inout_arrmeta), intptr_t i,</span>
+<span class="lineNum">      99 </span>            :                                                 intptr_t total_ndim) const
+<span class="lineNum">     100 </span>            : {
+<span class="lineNum">     101 </span>            :   // Default to heterogeneous dimension/scalar behavior
+<span class="lineNum">     102 </span><span class="lineCov">       2151 :   if (i == 0) {</span>
+<span class="lineNum">     103 </span><span class="lineCov">       4302 :     return type(this, true);</span>
+<span class="lineNum">     104 </span>            :   }
+<span class="lineNum">     105 </span>            :   else {
+<span class="lineNum">     106 </span><span class="lineNoCov">          0 :     throw too_many_indices(type(this, true), total_ndim + i, total_ndim);</span>
+<span class="lineNum">     107 </span>            :   }
+<a name="108"><span class="lineNum">     108 </span>            : }</a>
+<span class="lineNum">     109 </span>            : 
+<span class="lineNum">     110 </span><span class="lineNoCov">          0 : void ndt::base_type::get_shape(intptr_t DYND_UNUSED(ndim), intptr_t DYND_UNUSED(i), intptr_t *DYND_UNUSED(out_shape),</span>
+<span class="lineNum">     111 </span>            :                                const char *DYND_UNUSED(arrmeta), const char *DYND_UNUSED(data)) const
+<span class="lineNum">     112 </span>            : {
+<span class="lineNum">     113 </span>            :   // Default to scalar behavior
+<span class="lineNum">     114 </span><span class="lineNoCov">          0 :   stringstream ss;</span>
+<span class="lineNum">     115 </span><span class="lineNoCov">          0 :   ss &lt;&lt; &quot;requested too many dimensions from type &quot; &lt;&lt; type(this, true);</span>
+<span class="lineNum">     116 </span><span class="lineNoCov">          0 :   throw runtime_error(ss.str());</span>
+<a name="117"><span class="lineNum">     117 </span>            : }</a>
+<span class="lineNum">     118 </span>            : 
+<span class="lineNum">     119 </span><span class="lineCov">          5 : void ndt::base_type::get_strides(size_t DYND_UNUSED(i), intptr_t *DYND_UNUSED(out_strides),</span>
+<span class="lineNum">     120 </span>            :                                  const char *DYND_UNUSED(arrmeta)) const
+<span class="lineNum">     121 </span>            : {
+<span class="lineNum">     122 </span>            :   // Default to scalar behavior
+<a name="123"><span class="lineNum">     123 </span><span class="lineCov">          5 : }</span></a>
+<span class="lineNum">     124 </span>            : 
+<a name="125"><span class="lineNum">     125 </span><span class="lineNoCov">          0 : bool ndt::base_type::is_c_contiguous(const char *DYND_UNUSED(arrmeta)) const { return false; }</span></a>
+<span class="lineNum">     126 </span>            : 
+<span class="lineNum">     127 </span><span class="lineNoCov">          0 : axis_order_classification_t ndt::base_type::classify_axis_order(const char *DYND_UNUSED(arrmeta)) const</span>
+<span class="lineNum">     128 </span>            : {
+<span class="lineNum">     129 </span>            :   // Scalar types have no axis order
+<span class="lineNum">     130 </span><span class="lineNoCov">          0 :   return axis_order_none;</span>
+<a name="131"><span class="lineNum">     131 </span>            : }</a>
+<span class="lineNum">     132 </span>            : 
+<span class="lineNum">     133 </span><span class="lineNoCov">          0 : bool ndt::base_type::is_lossless_assignment(const type &amp;dst_tp, const type &amp;src_tp) const</span>
+<span class="lineNum">     134 </span>            : {
+<span class="lineNum">     135 </span>            :   // Default to just an equality check
+<span class="lineNum">     136 </span><span class="lineNoCov">          0 :   return dst_tp == src_tp;</span>
+<a name="137"><span class="lineNum">     137 </span>            : }</a>
+<span class="lineNum">     138 </span>            : 
+<span class="lineNum">     139 </span><span class="lineCov">       2260 : size_t ndt::base_type::get_default_data_size() const { return get_data_size(); }</span>
+<a name="140"><span class="lineNum">     140 </span>            : </a>
+<span class="lineNum">     141 </span>            : // TODO: Make this a pure virtual function eventually
+<a name="142"><span class="lineNum">     142 </span><span class="lineCov">         86 : void ndt::base_type::arrmeta_default_construct(char *DYND_UNUSED(arrmeta), bool DYND_UNUSED(blockref_alloc)) const {}</span></a>
+<span class="lineNum">     143 </span>            : 
+<span class="lineNum">     144 </span><span class="lineCov">         80 : void ndt::base_type::arrmeta_copy_construct(</span>
+<span class="lineNum">     145 </span>            :     char *DYND_UNUSED(dst_arrmeta), const char *DYND_UNUSED(src_arrmeta),
+<span class="lineNum">     146 </span>            :     const intrusive_ptr&lt;memory_block_data&gt; &amp;DYND_UNUSED(embedded_reference)) const
+<span class="lineNum">     147 </span>            : {
+<a name="148"><span class="lineNum">     148 </span><span class="lineCov">         80 : }</span></a>
+<span class="lineNum">     149 </span>            : 
+<span class="lineNum">     150 </span><span class="lineNoCov">          0 : void ndt::base_type::arrmeta_reset_buffers(char *DYND_UNUSED(arrmeta)) const</span>
+<span class="lineNum">     151 </span>            : {
+<span class="lineNum">     152 </span>            :   // By default there are no buffers to reset
+<a name="153"><span class="lineNum">     153 </span><span class="lineNoCov">          0 : }</span></a>
+<span class="lineNum">     154 </span>            : 
+<span class="lineNum">     155 </span><span class="lineCov">         60 : void ndt::base_type::arrmeta_finalize_buffers(char *DYND_UNUSED(arrmeta)) const</span>
+<span class="lineNum">     156 </span>            : {
+<span class="lineNum">     157 </span>            :   // By default there are no buffers to finalize
+<span class="lineNum">     158 </span><span class="lineCov">         60 : }</span>
+<a name="159"><span class="lineNum">     159 </span>            : </a>
+<span class="lineNum">     160 </span>            : // TODO: Make this a pure virtual function eventually
+<span class="lineNum">     161 </span><span class="lineCov">        332 : void ndt::base_type::arrmeta_destruct(char *DYND_UNUSED(arrmeta)) const {}</span>
+<a name="162"><span class="lineNum">     162 </span>            : </a>
+<span class="lineNum">     163 </span>            : // TODO: Make this a pure virtual function eventually
+<span class="lineNum">     164 </span><span class="lineNoCov">          0 : void ndt::base_type::arrmeta_debug_print(const char *DYND_UNUSED(arrmeta), std::ostream &amp;DYND_UNUSED(o),</span>
+<span class="lineNum">     165 </span>            :                                          const std::string &amp;DYND_UNUSED(indent)) const
+<span class="lineNum">     166 </span>            : {
+<span class="lineNum">     167 </span><span class="lineNoCov">          0 :   stringstream ss;</span>
+<span class="lineNum">     168 </span><span class="lineNoCov">          0 :   ss &lt;&lt; &quot;TODO: arrmeta_debug_print for &quot; &lt;&lt; type(this, true) &lt;&lt; &quot; is not implemented&quot;;</span>
+<span class="lineNum">     169 </span><span class="lineNoCov">          0 :   throw std::runtime_error(ss.str());</span>
+<a name="170"><span class="lineNum">     170 </span>            : }</a>
+<span class="lineNum">     171 </span>            : 
+<span class="lineNum">     172 </span><span class="lineNoCov">          0 : void ndt::base_type::data_construct(const char *DYND_UNUSED(arrmeta), char *DYND_UNUSED(data)) const</span>
+<span class="lineNum">     173 </span>            : {
+<span class="lineNum">     174 </span><span class="lineNoCov">          0 :   stringstream ss;</span>
+<span class="lineNum">     175 </span><span class="lineNoCov">          0 :   ss &lt;&lt; &quot;TODO: data_construct for &quot; &lt;&lt; type(this, true) &lt;&lt; &quot; is not implemented&quot;;</span>
+<span class="lineNum">     176 </span><span class="lineNoCov">          0 :   throw runtime_error(ss.str());</span>
+<a name="177"><span class="lineNum">     177 </span>            : }</a>
+<span class="lineNum">     178 </span>            : 
+<span class="lineNum">     179 </span><span class="lineNoCov">          0 : void ndt::base_type::data_destruct(const char *DYND_UNUSED(arrmeta), char *DYND_UNUSED(data)) const</span>
+<span class="lineNum">     180 </span>            : {
+<span class="lineNum">     181 </span><span class="lineNoCov">          0 :   stringstream ss;</span>
+<span class="lineNum">     182 </span><span class="lineNoCov">          0 :   ss &lt;&lt; &quot;TODO: data_destruct for &quot; &lt;&lt; type(this, true) &lt;&lt; &quot; is not implemented&quot;;</span>
+<span class="lineNum">     183 </span><span class="lineNoCov">          0 :   throw runtime_error(ss.str());</span>
+<a name="184"><span class="lineNum">     184 </span>            : }</a>
+<span class="lineNum">     185 </span>            : 
+<span class="lineNum">     186 </span><span class="lineNoCov">          0 : void ndt::base_type::data_destruct_strided(const char *DYND_UNUSED(arrmeta), char *DYND_UNUSED(data),</span>
+<span class="lineNum">     187 </span>            :                                            intptr_t DYND_UNUSED(stride), size_t DYND_UNUSED(count)) const
+<span class="lineNum">     188 </span>            : {
+<span class="lineNum">     189 </span><span class="lineNoCov">          0 :   stringstream ss;</span>
+<span class="lineNum">     190 </span><span class="lineNoCov">          0 :   ss &lt;&lt; &quot;TODO: data_destruct_strided for &quot; &lt;&lt; type(this, true) &lt;&lt; &quot; is not implemented&quot;;</span>
+<span class="lineNum">     191 </span><span class="lineNoCov">          0 :   throw runtime_error(ss.str());</span>
+<a name="192"><span class="lineNum">     192 </span>            : }</a>
+<span class="lineNum">     193 </span>            : 
+<span class="lineNum">     194 </span><span class="lineNoCov">          0 : size_t ndt::base_type::get_iterdata_size(intptr_t DYND_UNUSED(ndim)) const</span>
+<span class="lineNum">     195 </span>            : {
+<span class="lineNum">     196 </span><span class="lineNoCov">          0 :   stringstream ss;</span>
+<span class="lineNum">     197 </span><span class="lineNoCov">          0 :   ss &lt;&lt; &quot;get_iterdata_size: dynd type &quot; &lt;&lt; type(this, true) &lt;&lt; &quot; is not uniformly iterable&quot;;</span>
+<span class="lineNum">     198 </span><span class="lineNoCov">          0 :   throw std::runtime_error(ss.str());</span>
+<a name="199"><span class="lineNum">     199 </span>            : }</a>
+<span class="lineNum">     200 </span>            : 
+<span class="lineNum">     201 </span><span class="lineNoCov">          0 : size_t ndt::base_type::iterdata_construct(iterdata_common *DYND_UNUSED(iterdata),</span>
+<span class="lineNum">     202 </span>            :                                           const char **DYND_UNUSED(inout_arrmeta), intptr_t DYND_UNUSED(ndim),
+<span class="lineNum">     203 </span>            :                                           const intptr_t *DYND_UNUSED(shape), type &amp;DYND_UNUSED(out_uniform_tp)) const
+<span class="lineNum">     204 </span>            : {
+<span class="lineNum">     205 </span><span class="lineNoCov">          0 :   stringstream ss;</span>
+<span class="lineNum">     206 </span><span class="lineNoCov">          0 :   ss &lt;&lt; &quot;iterdata_default_construct: dynd type &quot; &lt;&lt; type(this, true) &lt;&lt; &quot; is not uniformly iterable&quot;;</span>
+<span class="lineNum">     207 </span><span class="lineNoCov">          0 :   throw std::runtime_error(ss.str());</span>
+<a name="208"><span class="lineNum">     208 </span>            : }</a>
+<span class="lineNum">     209 </span>            : 
+<span class="lineNum">     210 </span><span class="lineNoCov">          0 : size_t ndt::base_type::iterdata_destruct(iterdata_common *DYND_UNUSED(iterdata), intptr_t DYND_UNUSED(ndim)) const</span>
+<span class="lineNum">     211 </span>            : {
+<span class="lineNum">     212 </span><span class="lineNoCov">          0 :   stringstream ss;</span>
+<span class="lineNum">     213 </span><span class="lineNoCov">          0 :   ss &lt;&lt; &quot;iterdata_destruct: dynd type &quot; &lt;&lt; type(this, true) &lt;&lt; &quot; is not uniformly iterable&quot;;</span>
+<span class="lineNum">     214 </span><span class="lineNoCov">          0 :   throw std::runtime_error(ss.str());</span>
+<a name="215"><span class="lineNum">     215 </span>            : }</a>
+<span class="lineNum">     216 </span>            : 
+<span class="lineNum">     217 </span><span class="lineCov">          4 : bool ndt::base_type::match(const char *DYND_UNUSED(arrmeta), const type &amp;candidate_tp,</span>
+<span class="lineNum">     218 </span>            :                            const char *DYND_UNUSED(candidate_arrmeta),
+<span class="lineNum">     219 </span>            :                            std::map&lt;std::string, type&gt; &amp;DYND_UNUSED(tp_vars)) const
+<span class="lineNum">     220 </span>            : {
+<span class="lineNum">     221 </span>            :   // The default match implementation is equality, pattern types
+<span class="lineNum">     222 </span>            :   // must override this virtual function.
+<span class="lineNum">     223 </span><span class="lineCov">          4 :   if (candidate_tp.is_builtin()) {</span>
+<span class="lineNum">     224 </span><span class="lineCov">          2 :     return false;</span>
+<span class="lineNum">     225 </span>            :   }
+<span class="lineNum">     226 </span>            : 
+<span class="lineNum">     227 </span><span class="lineCov">          2 :   return *this == *candidate_tp.extended();</span>
+<a name="228"><span class="lineNum">     228 </span>            : }</a>
+<span class="lineNum">     229 </span>            : 
+<span class="lineNum">     230 </span><span class="lineNoCov">          0 : void ndt::base_type::foreach_leading(const char *DYND_UNUSED(arrmeta), char *DYND_UNUSED(data),</span>
+<span class="lineNum">     231 </span>            :                                      foreach_fn_t DYND_UNUSED(callback), void *DYND_UNUSED(callback_data)) const
+<span class="lineNum">     232 </span>            : {
+<span class="lineNum">     233 </span>            :   // Default to scalar behavior
+<span class="lineNum">     234 </span><span class="lineNoCov">          0 :   stringstream ss;</span>
+<span class="lineNum">     235 </span><span class="lineNoCov">          0 :   ss &lt;&lt; &quot;dynd type &quot; &lt;&lt; type(this, true) &lt;&lt; &quot; is a scalar, foreach_leading cannot process&quot;;</span>
+<span class="lineNum">     236 </span><span class="lineNoCov">          0 :   throw std::runtime_error(ss.str());</span>
+<a name="237"><span class="lineNum">     237 </span>            : }</a>
+<span class="lineNum">     238 </span>            : 
+<span class="lineNum">     239 </span><span class="lineNoCov">          0 : std::map&lt;std::string, nd::callable&gt; ndt::base_type::get_dynamic_type_properties() const</span>
+<span class="lineNum">     240 </span>            : {
+<span class="lineNum">     241 </span><span class="lineNoCov">          0 :   return std::map&lt;std::string, nd::callable&gt;();</span>
+<a name="242"><span class="lineNum">     242 </span>            : }</a>
+<span class="lineNum">     243 </span>            : 
+<span class="lineNum">     244 </span><span class="lineNoCov">          0 : std::map&lt;std::string, nd::callable&gt; ndt::base_type::get_dynamic_type_functions() const</span>
+<span class="lineNum">     245 </span>            : {
+<span class="lineNum">     246 </span><span class="lineNoCov">          0 :   return std::map&lt;std::string, nd::callable&gt;();</span>
+<a name="247"><span class="lineNum">     247 </span>            : }</a>
+<span class="lineNum">     248 </span>            : 
+<span class="lineNum">     249 </span><span class="lineCov">        370 : std::map&lt;std::string, nd::callable&gt; ndt::base_type::get_dynamic_array_properties() const</span>
+<span class="lineNum">     250 </span>            : {
+<span class="lineNum">     251 </span><span class="lineCov">        370 :   return std::map&lt;std::string, nd::callable&gt;();</span>
+<a name="252"><span class="lineNum">     252 </span>            : }</a>
+<span class="lineNum">     253 </span>            : 
+<span class="lineNum">     254 </span><span class="lineCov">        335 : std::map&lt;std::string, nd::callable&gt; ndt::base_type::get_dynamic_array_functions() const</span>
+<span class="lineNum">     255 </span>            : {
+<span class="lineNum">     256 </span><span class="lineCov">        335 :   return std::map&lt;std::string, nd::callable&gt;();</span>
+<a name="257"><span class="lineNum">     257 </span>            : }</a>
+<span class="lineNum">     258 </span>            : 
+<span class="lineNum">     259 </span><span class="lineNoCov">          0 : bool ndt::base_type::adapt_type(const type &amp;DYND_UNUSED(operand_tp), const std::string &amp;DYND_UNUSED(op),</span>
+<span class="lineNum">     260 </span>            :                                 nd::callable &amp;DYND_UNUSED(out_forward), nd::callable &amp;DYND_UNUSED(out_reverse)) const
+<span class="lineNum">     261 </span>            : {
+<span class="lineNum">     262 </span><span class="lineNoCov">          0 :   return false;</span>
+<a name="263"><span class="lineNum">     263 </span>            : }</a>
+<span class="lineNum">     264 </span>            : 
+<span class="lineNum">     265 </span><span class="lineNoCov">          0 : bool ndt::base_type::reverse_adapt_type(const type &amp;DYND_UNUSED(value_tp), const std::string &amp;DYND_UNUSED(op),</span>
+<span class="lineNum">     266 </span>            :                                         nd::callable &amp;DYND_UNUSED(out_forward),
+<span class="lineNum">     267 </span>            :                                         nd::callable &amp;DYND_UNUSED(out_reverse)) const
+<span class="lineNum">     268 </span>            : {
+<span class="lineNum">     269 </span><span class="lineNoCov">          0 :   return false;</span>
+<span class="lineNum">     270 </span>            : }
+<span class="lineNum">     271 </span>            : 
+<span class="lineNum">     272 </span>            : // Some information about the builtin types
+<span class="lineNum">     273 </span>            : 
+<span class="lineNum">     274 </span>            : DYND_API uint8_t ndt::detail::builtin_data_sizes[builtin_id_count] = {
+<span class="lineNum">     275 </span>            :     0, sizeof(bool1), sizeof(int8), sizeof(int16), sizeof(int32), sizeof(int64), sizeof(int128), sizeof(uint8),
+<span class="lineNum">     276 </span>            :     sizeof(uint16), sizeof(uint32), sizeof(uint64), sizeof(uint128), sizeof(float16), sizeof(float32), sizeof(float64),
+<span class="lineNum">     277 </span>            :     sizeof(float128), sizeof(dynd::complex&lt;float&gt;), sizeof(dynd::complex&lt;double&gt;), 0};
+<span class="lineNum">     278 </span>            : 
+<span class="lineNum">     279 </span>            : DYND_API uint8_t ndt::detail::builtin_kinds[builtin_id_count] = {
+<span class="lineNum">     280 </span>            :     void_kind, bool_kind, sint_kind, sint_kind, sint_kind, sint_kind, sint_kind,    uint_kind,    uint_kind, uint_kind,
+<span class="lineNum">     281 </span>            :     uint_kind, uint_kind, real_kind, real_kind, real_kind, real_kind, complex_kind, complex_kind, void_kind};
+<span class="lineNum">     282 </span>            : 
+<span class="lineNum">     283 </span>            : DYND_API uint8_t ndt::detail::builtin_data_alignments[builtin_id_count] = {
+<a name="284"><span class="lineNum">     284 </span>            :     1, 1, alignof(int8), alignof(int16), alignof(int32), alignof(int64), alignof(int128), alignof(uint8),</a>
+<span class="lineNum">     285 </span>            :     alignof(uint16), alignof(uint32), alignof(uint64), alignof(uint128), alignof(float16), alignof(float32),
+<span class="lineNum">     286 </span><span class="lineCov">          3 :     alignof(float64), alignof(float128), alignof(dynd::complex&lt;float&gt;), alignof(dynd::complex&lt;double&gt;), 1};</span>
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.10</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

@@ -1,0 +1,171 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - coverage.info.cleaned - src/dynd/memblock/array_memory_block.cpp</title>
+  <link rel="stylesheet" type="text/css" href="../../../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../../../index.html">top level</a> - <a href="index.html">src/dynd/memblock</a> - array_memory_block.cpp<span style="font-size: 80%;"> (source / <a href="array_memory_block.cpp.func.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">coverage.info.cleaned</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">36</td>
+            <td class="headerCovTableEntry">43</td>
+            <td class="headerCovTableEntryMed">83.7 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2016-02-19</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">6</td>
+            <td class="headerCovTableEntry">7</td>
+            <td class="headerCovTableEntryMed">85.7 %</td>
+          </tr>
+          <tr><td><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : //</a>
+<span class="lineNum">       2 </span>            : // Copyright (C) 2011-15 DyND Developers
+<span class="lineNum">       3 </span>            : // BSD 2-Clause License, see LICENSE.txt
+<span class="lineNum">       4 </span>            : //
+<span class="lineNum">       5 </span>            : 
+<span class="lineNum">       6 </span>            : #include &lt;dynd/memblock/array_memory_block.hpp&gt;
+<span class="lineNum">       7 </span>            : #include &lt;dynd/types/base_memory_type.hpp&gt;
+<span class="lineNum">       8 </span>            : #include &lt;dynd/array.hpp&gt;
+<span class="lineNum">       9 </span>            : #include &lt;dynd/exceptions.hpp&gt;
+<span class="lineNum">      10 </span>            : #include &lt;dynd/shape_tools.hpp&gt;
+<span class="lineNum">      11 </span>            : 
+<span class="lineNum">      12 </span>            : using namespace std;
+<span class="lineNum">      13 </span>            : using namespace dynd;
+<span class="lineNum">      14 </span>            : 
+<span class="lineNum">      15 </span>            : namespace dynd {
+<a name="16"><span class="lineNum">      16 </span>            : namespace detail {</a>
+<span class="lineNum">      17 </span>            : 
+<span class="lineNum">      18 </span><span class="lineCov">     203187 :   void free_array_memory_block(memory_block_data *memblock)</span>
+<span class="lineNum">      19 </span>            :   {
+<span class="lineNum">      20 </span><span class="lineCov">     203187 :     array_preamble *preamble = reinterpret_cast&lt;array_preamble *&gt;(memblock);</span>
+<span class="lineNum">      21 </span><span class="lineCov">     203187 :     preamble-&gt;~array_preamble();</span>
+<span class="lineNum">      22 </span>            : 
+<span class="lineNum">      23 </span>            :     // Finally free the memory block itself
+<span class="lineNum">      24 </span><span class="lineCov">     203187 :     delete[] reinterpret_cast&lt;char *&gt;(memblock);</span>
+<span class="lineNum">      25 </span><span class="lineCov">     203187 :   }</span>
+<span class="lineNum">      26 </span>            : }
+<a name="27"><span class="lineNum">      27 </span>            : } // namespace dynd::detail</a>
+<span class="lineNum">      28 </span>            : 
+<span class="lineNum">      29 </span><span class="lineCov">     196216 : intrusive_ptr&lt;memory_block_data&gt; dynd::make_array_memory_block(size_t arrmeta_size)</span>
+<span class="lineNum">      30 </span>            : {
+<span class="lineNum">      31 </span><span class="lineCov">     196216 :   char *result = new char[sizeof(array_preamble) + arrmeta_size];</span>
+<span class="lineNum">      32 </span><span class="lineCov">     196216 :   if (result == 0) {</span>
+<span class="lineNum">      33 </span><span class="lineNoCov">          0 :     throw bad_alloc();</span>
+<span class="lineNum">      34 </span>            :   }
+<span class="lineNum">      35 </span>            :   // Zero out all the arrmeta to start
+<span class="lineNum">      36 </span><span class="lineCov">     196216 :   memset(result, 0, sizeof(array_preamble) + arrmeta_size);</span>
+<span class="lineNum">      37 </span><span class="lineCov">     196216 :   return intrusive_ptr&lt;memory_block_data&gt;(new (result) memory_block_data(1, array_memory_block_type), false);</span>
+<a name="38"><span class="lineNum">      38 </span>            : }</a>
+<span class="lineNum">      39 </span>            : 
+<span class="lineNum">      40 </span><span class="lineCov">       6971 : intrusive_ptr&lt;memory_block_data&gt; dynd::make_array_memory_block(size_t arrmeta_size, size_t extra_size,</span>
+<span class="lineNum">      41 </span>            :                                                                size_t extra_alignment, char **out_extra_ptr)
+<span class="lineNum">      42 </span>            : {
+<span class="lineNum">      43 </span><span class="lineCov">       6971 :   size_t extra_offset = inc_to_alignment(sizeof(array_preamble) + arrmeta_size, extra_alignment);</span>
+<span class="lineNum">      44 </span><span class="lineCov">       6971 :   char *result = new char[extra_offset + extra_size];</span>
+<span class="lineNum">      45 </span><span class="lineCov">       6971 :   if (result == 0) {</span>
+<span class="lineNum">      46 </span><span class="lineNoCov">          0 :     throw bad_alloc();</span>
+<span class="lineNum">      47 </span>            :   }
+<span class="lineNum">      48 </span>            :   // Zero out all the arrmeta to start
+<span class="lineNum">      49 </span><span class="lineCov">       6971 :   memset(result, 0, sizeof(array_preamble) + arrmeta_size);</span>
+<span class="lineNum">      50 </span>            :   // Return a pointer to the extra allocated memory
+<span class="lineNum">      51 </span><span class="lineCov">       6971 :   *out_extra_ptr = result + extra_offset;</span>
+<span class="lineNum">      52 </span><span class="lineCov">       6971 :   return intrusive_ptr&lt;memory_block_data&gt;(new (result) memory_block_data(1, array_memory_block_type), false);</span>
+<a name="53"><span class="lineNum">      53 </span>            : }</a>
+<span class="lineNum">      54 </span>            : 
+<span class="lineNum">      55 </span><span class="lineCov">         15 : intrusive_ptr&lt;memory_block_data&gt; dynd::shallow_copy_array_memory_block(const intrusive_ptr&lt;memory_block_data&gt; &amp;ndo)</span>
+<span class="lineNum">      56 </span>            : {
+<span class="lineNum">      57 </span>            :   // Allocate the new memory block.
+<span class="lineNum">      58 </span><span class="lineCov">         15 :   const array_preamble *preamble = reinterpret_cast&lt;const array_preamble *&gt;(ndo.get());</span>
+<span class="lineNum">      59 </span><span class="lineCov">         15 :   size_t arrmeta_size = 0;</span>
+<span class="lineNum">      60 </span><span class="lineCov">         15 :   if (!preamble-&gt;tp.is_builtin()) {</span>
+<span class="lineNum">      61 </span><span class="lineCov">         15 :     arrmeta_size = preamble-&gt;tp-&gt;get_arrmeta_size();</span>
+<span class="lineNum">      62 </span>            :   }
+<span class="lineNum">      63 </span><span class="lineCov">         15 :   intrusive_ptr&lt;memory_block_data&gt; result = make_array_memory_block(arrmeta_size);</span>
+<span class="lineNum">      64 </span><span class="lineCov">         15 :   array_preamble *result_preamble = reinterpret_cast&lt;array_preamble *&gt;(result.get());</span>
+<span class="lineNum">      65 </span>            : 
+<span class="lineNum">      66 </span>            :   // Clone the data pointer
+<span class="lineNum">      67 </span><span class="lineCov">         15 :   result_preamble-&gt;data = preamble-&gt;data;</span>
+<span class="lineNum">      68 </span><span class="lineCov">         15 :   result_preamble-&gt;owner = preamble-&gt;owner;</span>
+<span class="lineNum">      69 </span><span class="lineCov">         15 :   if (!result_preamble-&gt;owner) {</span>
+<span class="lineNum">      70 </span><span class="lineCov">         15 :     result_preamble-&gt;owner = ndo.get();</span>
+<span class="lineNum">      71 </span>            :   }
+<span class="lineNum">      72 </span>            : 
+<span class="lineNum">      73 </span>            :   // Copy the flags
+<span class="lineNum">      74 </span><span class="lineCov">         15 :   result_preamble-&gt;flags = preamble-&gt;flags;</span>
+<span class="lineNum">      75 </span>            : 
+<span class="lineNum">      76 </span>            :   // Clone the type
+<span class="lineNum">      77 </span><span class="lineCov">         15 :   result_preamble-&gt;tp = preamble-&gt;tp;</span>
+<span class="lineNum">      78 </span><span class="lineCov">         15 :   if (!preamble-&gt;tp.is_builtin()) {</span>
+<span class="lineNum">      79 </span><span class="lineCov">         30 :     preamble-&gt;tp.extended()-&gt;arrmeta_copy_construct(reinterpret_cast&lt;char *&gt;(result.get()) + sizeof(array_preamble),</span>
+<span class="lineNum">      80 </span><span class="lineCov">         15 :                                                     reinterpret_cast&lt;const char *&gt;(ndo.get()) + sizeof(array_preamble),</span>
+<span class="lineNum">      81 </span><span class="lineCov">         30 :                                                     ndo);</span>
+<span class="lineNum">      82 </span>            :   }
+<span class="lineNum">      83 </span>            : 
+<span class="lineNum">      84 </span><span class="lineCov">         15 :   return result;</span>
+<a name="85"><span class="lineNum">      85 </span>            : }</a>
+<span class="lineNum">      86 </span>            : 
+<span class="lineNum">      87 </span><span class="lineNoCov">          0 : void dynd::array_memory_block_debug_print(const memory_block_data *memblock, std::ostream &amp;o, const std::string &amp;indent)</span>
+<span class="lineNum">      88 </span>            : {
+<span class="lineNum">      89 </span><span class="lineNoCov">          0 :   const array_preamble *preamble = reinterpret_cast&lt;const array_preamble *&gt;(memblock);</span>
+<span class="lineNum">      90 </span><span class="lineNoCov">          0 :   if (!preamble-&gt;tp.is_null()) {</span>
+<span class="lineNum">      91 </span><span class="lineNoCov">          0 :     o &lt;&lt; indent &lt;&lt; &quot; type: &quot; &lt;&lt; preamble-&gt;tp &lt;&lt; &quot;\n&quot;;</span>
+<span class="lineNum">      92 </span>            :   } else {
+<a name="93"><span class="lineNum">      93 </span><span class="lineNoCov">          0 :     o &lt;&lt; indent &lt;&lt; &quot; uninitialized nd::array\n&quot;;</span></a>
+<span class="lineNum">      94 </span>            :   }
+<span class="lineNum">      95 </span><span class="lineCov">          3 : }</span>
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.10</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

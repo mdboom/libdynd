@@ -1,0 +1,158 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - coverage.info.cleaned - src/dynd/func/elwise.cpp</title>
+  <link rel="stylesheet" type="text/css" href="../../../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../../../index.html">top level</a> - <a href="index.html">src/dynd/func</a> - elwise.cpp<span style="font-size: 80%;"> (source / <a href="elwise.cpp.func.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">coverage.info.cleaned</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">17</td>
+            <td class="headerCovTableEntry">26</td>
+            <td class="headerCovTableEntryLo">65.4 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2016-02-19</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">5</td>
+            <td class="headerCovTableEntry">5</td>
+            <td class="headerCovTableEntryHi">100.0 %</td>
+          </tr>
+          <tr><td><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : //</a>
+<span class="lineNum">       2 </span>            : // Copyright (C) 2011-15 DyND Developers
+<span class="lineNum">       3 </span>            : // BSD 2-Clause License, see LICENSE.txt
+<span class="lineNum">       4 </span>            : //
+<span class="lineNum">       5 </span>            : 
+<span class="lineNum">       6 </span>            : #include &lt;dynd/func/elwise.hpp&gt;
+<span class="lineNum">       7 </span>            : #include &lt;dynd/kernels/elwise.hpp&gt;
+<span class="lineNum">       8 </span>            : #include &lt;dynd/types/dim_fragment_type.hpp&gt;
+<span class="lineNum">       9 </span>            : #include &lt;dynd/types/typevar_constructed_type.hpp&gt;
+<span class="lineNum">      10 </span>            : 
+<span class="lineNum">      11 </span>            : using namespace std;
+<a name="12"><span class="lineNum">      12 </span>            : using namespace dynd;</a>
+<span class="lineNum">      13 </span>            : 
+<span class="lineNum">      14 </span><span class="lineCov">        335 : ndt::type nd::functional::elwise_make_type(const ndt::callable_type *child_tp)</span>
+<span class="lineNum">      15 </span>            : {
+<span class="lineNum">      16 </span><span class="lineCov">        335 :   const std::vector&lt;ndt::type&gt; &amp;param_types = child_tp-&gt;get_pos_types();</span>
+<span class="lineNum">      17 </span><span class="lineCov">        670 :   std::vector&lt;ndt::type&gt; out_param_types;</span>
+<span class="lineNum">      18 </span><span class="lineCov">        670 :   std::string dimsname(&quot;Dims&quot;);</span>
+<span class="lineNum">      19 </span>            : 
+<span class="lineNum">      20 </span><span class="lineCov">        913 :   for (const ndt::type &amp;t : param_types) {</span>
+<span class="lineNum">      21 </span><span class="lineCov">        578 :     if (t.get_kind() == memory_kind) {</span>
+<span class="lineNum">      22 </span><span class="lineNoCov">          0 :       out_param_types.push_back(ndt::make_ellipsis_dim(dimsname, t.without_memory_type()));</span>
+<span class="lineNum">      23 </span>            :     }
+<span class="lineNum">      24 </span><span class="lineCov">        578 :     else if (t.get_id() == typevar_constructed_id) {</span>
+<span class="lineNum">      25 </span><span class="lineNoCov">          0 :       out_param_types.push_back(ndt::typevar_constructed_type::make(</span>
+<span class="lineNum">      26 </span><span class="lineNoCov">          0 :           t.extended&lt;ndt::typevar_constructed_type&gt;()-&gt;get_name(),</span>
+<span class="lineNum">      27 </span><span class="lineNoCov">          0 :           ndt::make_ellipsis_dim(dimsname, t.extended&lt;ndt::typevar_constructed_type&gt;()-&gt;get_arg())));</span>
+<span class="lineNum">      28 </span>            :     }
+<span class="lineNum">      29 </span>            :     else {
+<span class="lineNum">      30 </span><span class="lineCov">        578 :       out_param_types.push_back(ndt::make_ellipsis_dim(dimsname, t));</span>
+<span class="lineNum">      31 </span>            :     }
+<span class="lineNum">      32 </span>            :   }
+<span class="lineNum">      33 </span>            : 
+<span class="lineNum">      34 </span><span class="lineCov">        670 :   ndt::type kwd_tp = child_tp-&gt;get_kwd_struct();</span>
+<span class="lineNum">      35 </span>            :   /*
+<span class="lineNum">      36 </span>            :     if (true) {
+<span class="lineNum">      37 </span>            :       intptr_t old_field_count =
+<span class="lineNum">      38 </span>            :           kwd_tp.extended&lt;base_struct_type&gt;()-&gt;get_field_count();
+<span class="lineNum">      39 </span>            :       nd::array names =
+<span class="lineNum">      40 </span>            :           nd::empty(ndt::make_fixed_dim(old_field_count + 2,
+<span class="lineNum">      41 </span>            :     ndt::make_string()));
+<span class="lineNum">      42 </span>            :       nd::array fields =
+<span class="lineNum">      43 </span>            :           nd::empty(ndt::make_fixed_dim(old_field_count + 2, ndt::make_type()));
+<span class="lineNum">      44 </span>            :       for (intptr_t i = 0; i &lt; old_field_count; ++i) {
+<span class="lineNum">      45 </span>            :         names(i)
+<span class="lineNum">      46 </span>            :             .val_assign(kwd_tp.extended&lt;base_struct_type&gt;()-&gt;get_field_name(i));
+<span class="lineNum">      47 </span>            :         fields(i)
+<span class="lineNum">      48 </span>            :             .val_assign(kwd_tp.extended&lt;base_struct_type&gt;()-&gt;get_field_type(i));
+<span class="lineNum">      49 </span>            :       }
+<span class="lineNum">      50 </span>            :       names(old_field_count).val_assign(&quot;threads&quot;);
+<span class="lineNum">      51 </span>            :       fields(old_field_count)
+<span class="lineNum">      52 </span>            :           .val_assign(ndt::make_option(ndt::make_type&lt;int&gt;()));
+<span class="lineNum">      53 </span>            :       names(old_field_count + 1).val_assign(&quot;blocks&quot;);
+<span class="lineNum">      54 </span>            :       fields(old_field_count + 1)
+<span class="lineNum">      55 </span>            :           .val_assign(ndt::make_option(ndt::make_type&lt;int&gt;()));
+<span class="lineNum">      56 </span>            :       kwd_tp = ndt::struct_type::make(names, fields);
+<span class="lineNum">      57 </span>            :     }
+<span class="lineNum">      58 </span>            :   */
+<span class="lineNum">      59 </span>            : 
+<span class="lineNum">      60 </span><span class="lineCov">        670 :   ndt::type ret_tp = child_tp-&gt;get_return_type();</span>
+<span class="lineNum">      61 </span><span class="lineCov">        335 :   if (ret_tp.get_kind() == memory_kind) {</span>
+<span class="lineNum">      62 </span><span class="lineNoCov">          0 :     ret_tp = ret_tp.extended&lt;ndt::base_memory_type&gt;()-&gt;with_replaced_storage_type(</span>
+<span class="lineNum">      63 </span><span class="lineNoCov">          0 :         ndt::make_ellipsis_dim(dimsname, ret_tp.without_memory_type()));</span>
+<span class="lineNum">      64 </span>            :   }
+<span class="lineNum">      65 </span><span class="lineCov">        335 :   else if (ret_tp.get_id() == typevar_constructed_id) {</span>
+<span class="lineNum">      66 </span><span class="lineNoCov">          0 :     ret_tp = ndt::typevar_constructed_type::make(</span>
+<span class="lineNum">      67 </span><span class="lineNoCov">          0 :         ret_tp.extended&lt;ndt::typevar_constructed_type&gt;()-&gt;get_name(),</span>
+<span class="lineNum">      68 </span><span class="lineNoCov">          0 :         ndt::make_ellipsis_dim(dimsname, ret_tp.extended&lt;ndt::typevar_constructed_type&gt;()-&gt;get_arg()));</span>
+<span class="lineNum">      69 </span>            :   }
+<span class="lineNum">      70 </span>            :   else {
+<span class="lineNum">      71 </span><span class="lineCov">        335 :     ret_tp = ndt::make_ellipsis_dim(dimsname, ret_tp);</span>
+<span class="lineNum">      72 </span>            :   }
+<span class="lineNum">      73 </span>            : 
+<span class="lineNum">      74 </span><span class="lineCov">        670 :   return ndt::callable_type::make(ret_tp, ndt::tuple_type::make(out_param_types), kwd_tp);</span>
+<a name="75"><span class="lineNum">      75 </span>            : }</a>
+<span class="lineNum">      76 </span>            : 
+<span class="lineNum">      77 </span><span class="lineCov">        625 : nd::callable nd::functional::elwise(const ndt::type &amp;self_tp, const callable &amp;child)</span>
+<span class="lineNum">      78 </span>            : {
+<span class="lineNum">      79 </span><span class="lineCov">        625 :   return callable::make&lt;elwise_virtual_ck&gt;(self_tp, child);</span>
+<a name="80"><span class="lineNum">      80 </span>            : }</a>
+<span class="lineNum">      81 </span>            : 
+<span class="lineNum">      82 </span><span class="lineCov">        338 : nd::callable nd::functional::elwise(const callable &amp;child) { return elwise(elwise_make_type(child.get_type()), child); }</span>
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.10</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

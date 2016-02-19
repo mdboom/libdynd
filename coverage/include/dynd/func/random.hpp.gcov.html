@@ -1,0 +1,248 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - coverage.info.cleaned - include/dynd/func/random.hpp</title>
+  <link rel="stylesheet" type="text/css" href="../../../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../../../index.html">top level</a> - <a href="index.html">include/dynd/func</a> - random.hpp<span style="font-size: 80%;"> (source / <a href="random.hpp.func.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">coverage.info.cleaned</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">1</td>
+            <td class="headerCovTableEntry">1</td>
+            <td class="headerCovTableEntryHi">100.0 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2016-02-19</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">1</td>
+            <td class="headerCovTableEntry">1</td>
+            <td class="headerCovTableEntryHi">100.0 %</td>
+          </tr>
+          <tr><td><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : #pragma once</a>
+<span class="lineNum">       2 </span>            : 
+<span class="lineNum">       3 </span>            : #include &lt;chrono&gt;
+<span class="lineNum">       4 </span>            : #include &lt;memory&gt;
+<span class="lineNum">       5 </span>            : #include &lt;random&gt;
+<span class="lineNum">       6 </span>            : 
+<span class="lineNum">       7 </span>            : #include &lt;dynd/callable.hpp&gt;
+<span class="lineNum">       8 </span>            : 
+<span class="lineNum">       9 </span>            : namespace dynd {
+<span class="lineNum">      10 </span>            : namespace nd {
+<span class="lineNum">      11 </span>            :   namespace random {
+<span class="lineNum">      12 </span>            : 
+<span class="lineNum">      13 </span>            :     extern DYND_API struct DYND_API uniform : declfunc&lt;uniform&gt; {
+<span class="lineNum">      14 </span>            :       static callable make();
+<span class="lineNum">      15 </span>            :     } uniform;
+<span class="lineNum">      16 </span>            : 
+<a name="17"><span class="lineNum">      17 </span>            :   } // namespace dynd::nd::random</a>
+<span class="lineNum">      18 </span>            : 
+<span class="lineNum">      19 </span><span class="lineCov">          2 :   inline array rand(const ndt::type &amp;tp) { return random::uniform({}, {{&quot;dst_tp&quot;, tp}}); }</span>
+<span class="lineNum">      20 </span>            : 
+<span class="lineNum">      21 </span>            :   inline array rand(intptr_t dim0, const ndt::type &amp;tp) { return rand(ndt::make_fixed_dim(dim0, tp)); }
+<span class="lineNum">      22 </span>            : 
+<span class="lineNum">      23 </span>            :   inline array rand(intptr_t dim0, intptr_t dim1, const ndt::type &amp;tp)
+<span class="lineNum">      24 </span>            :   {
+<span class="lineNum">      25 </span>            :     return rand(ndt::make_fixed_dim(dim0, ndt::make_fixed_dim(dim1, tp)));
+<span class="lineNum">      26 </span>            :   }
+<span class="lineNum">      27 </span>            : 
+<span class="lineNum">      28 </span>            :   inline array rand(intptr_t dim0, intptr_t dim1, intptr_t dim2, const ndt::type &amp;tp)
+<span class="lineNum">      29 </span>            :   {
+<span class="lineNum">      30 </span>            :     return rand(ndt::make_fixed_dim(dim0, ndt::make_fixed_dim(dim1, ndt::make_fixed_dim(dim2, tp))));
+<span class="lineNum">      31 </span>            :   }
+<span class="lineNum">      32 </span>            : 
+<span class="lineNum">      33 </span>            : } // namespace dynd::nd
+<span class="lineNum">      34 </span>            : } // namespace dynd
+<span class="lineNum">      35 </span>            : 
+<span class="lineNum">      36 </span>            : /*
+<span class="lineNum">      37 </span>            : 
+<span class="lineNum">      38 </span>            : #ifdef DYND_CUDA
+<span class="lineNum">      39 </span>            :       template &lt;kernel_request_t kernreq&gt;
+<span class="lineNum">      40 </span>            :       static typename std::enable_if&lt;kernreq == kernel_request_cuda_device,
+<span class="lineNum">      41 </span>            :                                      callable&gt;::type
+<span class="lineNum">      42 </span>            :       make();
+<span class="lineNum">      43 </span>            : #endif
+<span class="lineNum">      44 </span>            : 
+<span class="lineNum">      45 </span>            : #ifdef __CUDACC__
+<span class="lineNum">      46 </span>            : 
+<span class="lineNum">      47 </span>            :   template &lt;typename S&gt;
+<span class="lineNum">      48 </span>            :   struct uniform_complex_ck&lt;kernel_request_cuda_device, S, complex&lt;double&gt;&gt;
+<span class="lineNum">      49 </span>            :       : base_kernel&lt;
+<span class="lineNum">      50 </span>            :             uniform_complex_ck&lt;kernel_request_cuda_device, S, complex&lt;double&gt;&gt;,
+<span class="lineNum">      51 </span>            :             kernel_request_cuda_device, 0&gt; {
+<span class="lineNum">      52 </span>            :     typedef uniform_complex_ck self_type;
+<span class="lineNum">      53 </span>            : 
+<span class="lineNum">      54 </span>            :     S *s;
+<span class="lineNum">      55 </span>            : 
+<span class="lineNum">      56 </span>            :     __device__ uniform_complex_ck(S *s) : s(s) {}
+<span class="lineNum">      57 </span>            : 
+<span class="lineNum">      58 </span>            :     __device__ void single(char *dst, char *const *DYND_UNUSED(src))
+<span class="lineNum">      59 </span>            :     {
+<span class="lineNum">      60 </span>            :       *reinterpret_cast&lt;complex&lt;double&gt; *&gt;(dst) =
+<span class="lineNum">      61 </span>            :           complex&lt;double&gt;(curand_uniform_double(s), curand_uniform_double(s));
+<span class="lineNum">      62 </span>            :     }
+<span class="lineNum">      63 </span>            : 
+<span class="lineNum">      64 </span>            :     static ndt::type make_type()
+<span class="lineNum">      65 </span>            :     {
+<span class="lineNum">      66 </span>            :       typedef dynd::complex&lt;double&gt; R;
+<span class="lineNum">      67 </span>            : 
+<span class="lineNum">      68 </span>            :       std::map&lt;nd::string, ndt::type&gt; tp_vars;
+<span class="lineNum">      69 </span>            :       tp_vars[&quot;R&quot;] = ndt::make_type&lt;R&gt;();
+<span class="lineNum">      70 </span>            : 
+<span class="lineNum">      71 </span>            :       return ndt::substitute(ndt::type(&quot;(a: ?R, b: ?R) -&gt; cuda_device[R]&quot;),
+<span class="lineNum">      72 </span>            :                              tp_vars, true);
+<span class="lineNum">      73 </span>            :     }
+<span class="lineNum">      74 </span>            : 
+<span class="lineNum">      75 </span>            :     static intptr_t instantiate(
+<span class="lineNum">      76 </span>            :         const callable_type_data *self,
+<span class="lineNum">      77 </span>            :         const ndt::callable_type *DYND_UNUSED(self_tp),
+<span class="lineNum">      78 </span>            :         const char *DYND_UNUSED(static_data), size_t DYND_UNUSED(data_size),
+<span class="lineNum">      79 </span>            :         char *DYND_UNUSED(data), void *ckb, intptr_t ckb_offset,
+<span class="lineNum">      80 </span>            :         const ndt::type &amp;DYND_UNUSED(dst_tp),
+<span class="lineNum">      81 </span>            :         const char *DYND_UNUSED(dst_arrmeta), intptr_t DYND_UNUSED(nsrc),
+<span class="lineNum">      82 </span>            :         const ndt::type *DYND_UNUSED(src_tp),
+<span class="lineNum">      83 </span>            :         const char *const *DYND_UNUSED(src_arrmeta), kernel_request_t kernreq,
+<span class="lineNum">      84 </span>            :         const eval::eval_context *DYND_UNUSED(ectx), const nd::array &amp;kwds,
+<span class="lineNum">      85 </span>            :         const std::map&lt;nd::string, ndt::type&gt; &amp;DYND_UNUSED(tp_vars))
+<span class="lineNum">      86 </span>            :     {
+<span class="lineNum">      87 </span>            :       if ((kernreq &amp; kernel_request_memory) == kernel_request_host) {
+<span class="lineNum">      88 </span>            :         typedef cuda_launch_ck&lt;0&gt; self_type;
+<span class="lineNum">      89 </span>            :         self_type *self = self_type::make(ckb, kernreq, ckb_offset, 1, 1);
+<span class="lineNum">      90 </span>            :         ckb = &amp;self-&gt;ckb;
+<span class="lineNum">      91 </span>            :         kernreq |= kernel_request_cuda_device;
+<span class="lineNum">      92 </span>            :         ckb_offset = 0;
+<span class="lineNum">      93 </span>            :       }
+<span class="lineNum">      94 </span>            : 
+<span class="lineNum">      95 </span>            :       self_type::make(ckb, kernreq, ckb_offset, *self-&gt;get_data_as&lt;S *&gt;());
+<span class="lineNum">      96 </span>            :       return ckb_offset;
+<span class="lineNum">      97 </span>            :     }
+<span class="lineNum">      98 </span>            :   };
+<span class="lineNum">      99 </span>            : 
+<span class="lineNum">     100 </span>            : #endif
+<span class="lineNum">     101 </span>            : 
+<span class="lineNum">     102 </span>            : 
+<span class="lineNum">     103 </span>            : #ifdef __CUDACC__
+<span class="lineNum">     104 </span>            : 
+<span class="lineNum">     105 </span>            :   template &lt;typename S&gt;
+<span class="lineNum">     106 </span>            :   struct uniform_real_ck&lt;kernel_request_cuda_device, S, double&gt;
+<span class="lineNum">     107 </span>            :       : base_kernel&lt;uniform_real_ck&lt;kernel_request_cuda_device, S, double&gt;,
+<span class="lineNum">     108 </span>            :                     kernel_request_cuda_device, 0&gt; {
+<span class="lineNum">     109 </span>            :     typedef uniform_real_ck self_type;
+<span class="lineNum">     110 </span>            : 
+<span class="lineNum">     111 </span>            :     S *s;
+<span class="lineNum">     112 </span>            : 
+<span class="lineNum">     113 </span>            :     __device__ uniform_real_ck(S *s) : s(s) {}
+<span class="lineNum">     114 </span>            : 
+<span class="lineNum">     115 </span>            :     __device__ void single(char *dst, char *const *DYND_UNUSED(src))
+<span class="lineNum">     116 </span>            :     {
+<span class="lineNum">     117 </span>            :       *reinterpret_cast&lt;double *&gt;(dst) = curand_uniform_double(s);
+<span class="lineNum">     118 </span>            :     }
+<span class="lineNum">     119 </span>            : 
+<span class="lineNum">     120 </span>            :     __device__ void strided(char *dst, intptr_t dst_stride,
+<span class="lineNum">     121 </span>            :                             char *const *DYND_UNUSED(src),
+<span class="lineNum">     122 </span>            :                             const intptr_t *DYND_UNUSED(src_stride),
+<span class="lineNum">     123 </span>            :                             size_t count)
+<span class="lineNum">     124 </span>            :     {
+<span class="lineNum">     125 </span>            :       dst += DYND_THREAD_ID(0) * dst_stride;
+<span class="lineNum">     126 </span>            : 
+<span class="lineNum">     127 </span>            :       for (size_t i = DYND_THREAD_ID(0); i &lt; count; i += DYND_THREAD_COUNT(0)) {
+<span class="lineNum">     128 </span>            :         *reinterpret_cast&lt;double *&gt;(dst) =
+<span class="lineNum">     129 </span>            :             curand_uniform_double(s + DYND_THREAD_ID(0));
+<span class="lineNum">     130 </span>            :         dst += DYND_THREAD_COUNT(0) * dst_stride;
+<span class="lineNum">     131 </span>            :       }
+<span class="lineNum">     132 </span>            :     }
+<span class="lineNum">     133 </span>            : 
+<span class="lineNum">     134 </span>            :     static ndt::type make_type()
+<span class="lineNum">     135 </span>            :     {
+<span class="lineNum">     136 </span>            :       typedef double R;
+<span class="lineNum">     137 </span>            : 
+<span class="lineNum">     138 </span>            :       std::map&lt;nd::string, ndt::type&gt; tp_vars;
+<span class="lineNum">     139 </span>            :       tp_vars[&quot;R&quot;] = ndt::make_type&lt;R&gt;();
+<span class="lineNum">     140 </span>            : 
+<span class="lineNum">     141 </span>            :       return ndt::substitute(ndt::type(&quot;(a: ?R, b: ?R) -&gt; cuda_device[R]&quot;),
+<span class="lineNum">     142 </span>            :                              tp_vars, true);
+<span class="lineNum">     143 </span>            :     }
+<span class="lineNum">     144 </span>            : 
+<span class="lineNum">     145 </span>            :     static intptr_t instantiate(
+<span class="lineNum">     146 </span>            :         const callable_type_data *self,
+<span class="lineNum">     147 </span>            :         const ndt::callable_type *DYND_UNUSED(self_tp),
+<span class="lineNum">     148 </span>            :         const char *DYND_UNUSED(static_data), size_t DYND_UNUSED(data_size),
+<span class="lineNum">     149 </span>            :         char *DYND_UNUSED(data), void *ckb, intptr_t ckb_offset,
+<span class="lineNum">     150 </span>            :         const ndt::type &amp;DYND_UNUSED(dst_tp),
+<span class="lineNum">     151 </span>            :         const char *DYND_UNUSED(dst_arrmeta), intptr_t DYND_UNUSED(nsrc),
+<span class="lineNum">     152 </span>            :         const ndt::type *DYND_UNUSED(src_tp),
+<span class="lineNum">     153 </span>            :         const char *const *DYND_UNUSED(src_arrmeta), kernel_request_t kernreq,
+<span class="lineNum">     154 </span>            :         const eval::eval_context *DYND_UNUSED(ectx), const nd::array &amp;kwds,
+<span class="lineNum">     155 </span>            :         const std::map&lt;nd::string, ndt::type&gt; &amp;DYND_UNUSED(tp_vars))
+<span class="lineNum">     156 </span>            :     {
+<span class="lineNum">     157 </span>            :       if ((kernreq &amp; kernel_request_memory) == kernel_request_host) {
+<span class="lineNum">     158 </span>            :         typedef cuda_launch_ck&lt;0&gt; self_type;
+<span class="lineNum">     159 </span>            :         self_type *self = self_type::make(ckb, kernreq, ckb_offset, 1, 1);
+<span class="lineNum">     160 </span>            :         ckb = &amp;self-&gt;ckb;
+<span class="lineNum">     161 </span>            :         kernreq |= kernel_request_cuda_device;
+<span class="lineNum">     162 </span>            :         ckb_offset = 0;
+<span class="lineNum">     163 </span>            :       }
+<span class="lineNum">     164 </span>            : 
+<span class="lineNum">     165 </span>            :       self_type::make(ckb, kernreq, ckb_offset, *self-&gt;get_data_as&lt;S *&gt;());
+<span class="lineNum">     166 </span>            :       return ckb_offset;
+<span class="lineNum">     167 </span>            :     }
+<span class="lineNum">     168 </span>            :   };
+<span class="lineNum">     169 </span>            : 
+<span class="lineNum">     170 </span>            : #endif
+<span class="lineNum">     171 </span>            : 
+<span class="lineNum">     172 </span>            : */
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.10</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

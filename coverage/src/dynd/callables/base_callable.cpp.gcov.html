@@ -1,0 +1,173 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - coverage.info.cleaned - src/dynd/callables/base_callable.cpp</title>
+  <link rel="stylesheet" type="text/css" href="../../../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../../../index.html">top level</a> - <a href="index.html">src/dynd/callables</a> - base_callable.cpp<span style="font-size: 80%;"> (source / <a href="base_callable.cpp.func.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">coverage.info.cleaned</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">30</td>
+            <td class="headerCovTableEntry">42</td>
+            <td class="headerCovTableEntryLo">71.4 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2016-02-19</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">5</td>
+            <td class="headerCovTableEntry">6</td>
+            <td class="headerCovTableEntryMed">83.3 %</td>
+          </tr>
+          <tr><td><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : //</a>
+<span class="lineNum">       2 </span>            : // Copyright (C) 2011-15 DyND Developers
+<span class="lineNum">       3 </span>            : // BSD 2-Clause License, see LICENSE.txt
+<span class="lineNum">       4 </span>            : //
+<span class="lineNum">       5 </span>            : 
+<span class="lineNum">       6 </span>            : #include &lt;memory&gt;
+<span class="lineNum">       7 </span>            : 
+<span class="lineNum">       8 </span>            : #include &lt;dynd/callables/base_callable.hpp&gt;
+<span class="lineNum">       9 </span>            : 
+<span class="lineNum">      10 </span>            : using namespace std;
+<a name="11"><span class="lineNum">      11 </span>            : using namespace dynd;</a>
+<span class="lineNum">      12 </span>            : 
+<span class="lineNum">      13 </span><span class="lineCov">        816 : nd::array nd::base_callable::call(ndt::type &amp;dst_tp, intptr_t nsrc, const ndt::type *src_tp,</span>
+<span class="lineNum">      14 </span>            :                                   const char *const *src_arrmeta, char *const *src_data, intptr_t nkwd,
+<span class="lineNum">      15 </span>            :                                   const array *kwds, const std::map&lt;std::string, ndt::type&gt; &amp;tp_vars)
+<span class="lineNum">      16 </span>            : {
+<span class="lineNum">      17 </span>            :   // Allocate, then initialize, the data
+<span class="lineNum">      18 </span><span class="lineCov">        816 :   char *data = data_init(static_data(), dst_tp, nsrc, src_tp, nkwd, kwds, tp_vars);</span>
+<span class="lineNum">      19 </span>            : 
+<span class="lineNum">      20 </span>            :   // Resolve the destination type
+<span class="lineNum">      21 </span><span class="lineCov">        816 :   if (dst_tp.is_symbolic()) {</span>
+<span class="lineNum">      22 </span><span class="lineNoCov">          0 :     if (resolve_dst_type == NULL) {</span>
+<span class="lineNum">      23 </span><span class="lineNoCov">          0 :       throw std::runtime_error(&quot;dst_tp is symbolic, but resolve_dst_type is NULL&quot;);</span>
+<span class="lineNum">      24 </span>            :     }
+<span class="lineNum">      25 </span>            : 
+<span class="lineNum">      26 </span><span class="lineNoCov">          0 :     resolve_dst_type(static_data(), data, dst_tp, nsrc, src_tp, nkwd, kwds, tp_vars);</span>
+<span class="lineNum">      27 </span>            :   }
+<span class="lineNum">      28 </span>            : 
+<span class="lineNum">      29 </span>            :   // Allocate the destination array
+<span class="lineNum">      30 </span><span class="lineCov">        816 :   array dst = empty(dst_tp);</span>
+<span class="lineNum">      31 </span>            : 
+<span class="lineNum">      32 </span>            :   // Generate and evaluate the ckernel
+<span class="lineNum">      33 </span><span class="lineCov">       1632 :   kernel_builder ckb;</span>
+<span class="lineNum">      34 </span><span class="lineCov">        816 :   instantiate(static_data(), data, &amp;ckb, dst_tp, dst.get()-&gt;metadata(), nsrc, src_tp, src_arrmeta,</span>
+<span class="lineNum">      35 </span><span class="lineCov">        816 :               kernel_request_single, nkwd, kwds, tp_vars);</span>
+<span class="lineNum">      36 </span><span class="lineCov">        816 :   kernel_single_t fn = ckb.get()-&gt;get_function&lt;kernel_single_t&gt;();</span>
+<span class="lineNum">      37 </span><span class="lineCov">        816 :   fn(ckb.get(), dst.data(), src_data);</span>
+<span class="lineNum">      38 </span>            : 
+<span class="lineNum">      39 </span><span class="lineCov">       1618 :   return dst;</span>
+<a name="40"><span class="lineNum">      40 </span>            : }</a>
+<span class="lineNum">      41 </span>            : 
+<span class="lineNum">      42 </span><span class="lineCov">       1897 : nd::array nd::base_callable::call(ndt::type &amp;dst_tp, intptr_t nsrc, const ndt::type *src_tp,</span>
+<span class="lineNum">      43 </span>            :                                   const char *const *src_arrmeta, const array *src_data, intptr_t nkwd,
+<span class="lineNum">      44 </span>            :                                   const array *kwds, const std::map&lt;std::string, ndt::type&gt; &amp;tp_vars)
+<span class="lineNum">      45 </span>            : {
+<span class="lineNum">      46 </span>            :   // Allocate, then initialize, the data
+<span class="lineNum">      47 </span><span class="lineCov">       1897 :   char *data = data_init(static_data(), dst_tp, nsrc, src_tp, nkwd, kwds, tp_vars);</span>
+<span class="lineNum">      48 </span>            : 
+<span class="lineNum">      49 </span>            :   // Resolve the destination type
+<span class="lineNum">      50 </span><span class="lineCov">       1891 :   if (dst_tp.is_symbolic()) {</span>
+<span class="lineNum">      51 </span><span class="lineCov">        996 :     if (resolve_dst_type == NULL) {</span>
+<span class="lineNum">      52 </span><span class="lineNoCov">          0 :       throw std::runtime_error(&quot;dst_tp is symbolic, but resolve_dst_type is NULL&quot;);</span>
+<span class="lineNum">      53 </span>            :     }
+<span class="lineNum">      54 </span>            : 
+<span class="lineNum">      55 </span><span class="lineCov">        996 :     resolve_dst_type(static_data(), data, dst_tp, nsrc, src_tp, nkwd, kwds, tp_vars);</span>
+<span class="lineNum">      56 </span>            :   }
+<span class="lineNum">      57 </span>            : 
+<span class="lineNum">      58 </span>            :   // Allocate the destination array
+<span class="lineNum">      59 </span><span class="lineCov">       1890 :   array dst = empty(dst_tp);</span>
+<span class="lineNum">      60 </span>            : 
+<span class="lineNum">      61 </span>            :   // Generate and evaluate the ckernel
+<span class="lineNum">      62 </span><span class="lineCov">       3780 :   kernel_builder ckb;</span>
+<span class="lineNum">      63 </span><span class="lineCov">       1890 :   instantiate(static_data(), data, &amp;ckb, dst_tp, dst.get()-&gt;metadata(), nsrc, src_tp, src_arrmeta, kernel_request_call,</span>
+<span class="lineNum">      64 </span><span class="lineCov">       1890 :               nkwd, kwds, tp_vars);</span>
+<span class="lineNum">      65 </span><span class="lineCov">       1890 :   kernel_call_t fn = ckb.get()-&gt;get_function&lt;kernel_call_t&gt;();</span>
+<span class="lineNum">      66 </span><span class="lineCov">       1890 :   fn(ckb.get(), &amp;dst, src_data);</span>
+<span class="lineNum">      67 </span>            : 
+<span class="lineNum">      68 </span><span class="lineCov">       3780 :   return dst;</span>
+<a name="69"><span class="lineNum">      69 </span>            : }</a>
+<span class="lineNum">      70 </span>            : 
+<span class="lineNum">      71 </span><span class="lineNoCov">          0 : void nd::base_callable::call(const ndt::type &amp;dst_tp, const char *dst_arrmeta, char *dst_data, intptr_t nsrc,</span>
+<span class="lineNum">      72 </span>            :                              const ndt::type *src_tp, const char *const *src_arrmeta, char *const *src_data,
+<span class="lineNum">      73 </span>            :                              intptr_t nkwd, const array *kwds, const std::map&lt;std::string, ndt::type&gt; &amp;tp_vars)
+<span class="lineNum">      74 </span>            : {
+<span class="lineNum">      75 </span><span class="lineNoCov">          0 :   char *data = data_init(static_data(), dst_tp, nsrc, src_tp, nkwd, kwds, tp_vars);</span>
+<span class="lineNum">      76 </span>            : 
+<span class="lineNum">      77 </span>            :   // Generate and evaluate the ckernel
+<span class="lineNum">      78 </span><span class="lineNoCov">          0 :   kernel_builder ckb;</span>
+<span class="lineNum">      79 </span><span class="lineNoCov">          0 :   instantiate(static_data(), data, &amp;ckb, dst_tp, dst_arrmeta, nsrc, src_tp, src_arrmeta, kernel_request_single, nkwd,</span>
+<span class="lineNum">      80 </span><span class="lineNoCov">          0 :               kwds, tp_vars);</span>
+<span class="lineNum">      81 </span><span class="lineNoCov">          0 :   kernel_single_t fn = ckb.get()-&gt;get_function&lt;kernel_single_t&gt;();</span>
+<span class="lineNum">      82 </span><span class="lineNoCov">          0 :   fn(ckb.get(), dst_data, src_data);</span>
+<a name="83"><span class="lineNum">      83 </span><span class="lineNoCov">          0 : }</span></a>
+<span class="lineNum">      84 </span>            : 
+<span class="lineNum">      85 </span><span class="lineCov">        996 : void nd::base_callable::call(const ndt::type &amp;dst_tp, const char *dst_arrmeta, array *dst, intptr_t nsrc,</span>
+<span class="lineNum">      86 </span>            :                              const ndt::type *src_tp, const char *const *src_arrmeta, const array *src, intptr_t nkwd,
+<span class="lineNum">      87 </span>            :                              const array *kwds, const std::map&lt;std::string, ndt::type&gt; &amp;tp_vars)
+<span class="lineNum">      88 </span>            : {
+<span class="lineNum">      89 </span><span class="lineCov">        996 :   char *data = data_init(static_data(), dst_tp, nsrc, src_tp, nkwd, kwds, tp_vars);</span>
+<span class="lineNum">      90 </span>            : 
+<span class="lineNum">      91 </span>            :   // Generate and evaluate the ckernel
+<span class="lineNum">      92 </span><span class="lineCov">       1992 :   kernel_builder ckb;</span>
+<span class="lineNum">      93 </span><span class="lineCov">        996 :   instantiate(static_data(), data, &amp;ckb, dst_tp, dst_arrmeta, nsrc, src_tp, src_arrmeta, kernel_request_call, nkwd,</span>
+<span class="lineNum">      94 </span><span class="lineCov">        996 :               kwds, tp_vars);</span>
+<a name="95"><span class="lineNum">      95 </span><span class="lineCov">        995 :   kernel_call_t fn = ckb.get()-&gt;get_function&lt;kernel_call_t&gt;();</span></a>
+<span class="lineNum">      96 </span><span class="lineCov">        995 :   fn(ckb.get(), dst, src);</span>
+<span class="lineNum">      97 </span><span class="lineCov">        936 : }</span>
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.10</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

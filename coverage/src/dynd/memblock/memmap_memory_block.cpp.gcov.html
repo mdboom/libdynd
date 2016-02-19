@@ -1,0 +1,317 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - coverage.info.cleaned - src/dynd/memblock/memmap_memory_block.cpp</title>
+  <link rel="stylesheet" type="text/css" href="../../../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../../../index.html">top level</a> - <a href="index.html">src/dynd/memblock</a> - memmap_memory_block.cpp<span style="font-size: 80%;"> (source / <a href="memmap_memory_block.cpp.func.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">coverage.info.cleaned</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">1</td>
+            <td class="headerCovTableEntry">64</td>
+            <td class="headerCovTableEntryLo">1.6 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2016-02-19</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">2</td>
+            <td class="headerCovTableEntry">8</td>
+            <td class="headerCovTableEntryLo">25.0 %</td>
+          </tr>
+          <tr><td><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : //</a>
+<span class="lineNum">       2 </span>            : // Copyright (C) 2011-15 DyND Developers
+<span class="lineNum">       3 </span>            : // BSD 2-Clause License, see LICENSE.txt
+<span class="lineNum">       4 </span>            : //
+<span class="lineNum">       5 </span>            : 
+<span class="lineNum">       6 </span>            : #include &lt;stdexcept&gt;
+<span class="lineNum">       7 </span>            : #include &lt;vector&gt;
+<span class="lineNum">       8 </span>            : #include &lt;cstdlib&gt;
+<span class="lineNum">       9 </span>            : #include &lt;algorithm&gt;
+<span class="lineNum">      10 </span>            : #include &lt;limits&gt;
+<span class="lineNum">      11 </span>            : 
+<span class="lineNum">      12 </span>            : #ifdef _WIN32
+<span class="lineNum">      13 </span>            : #ifndef NOMINMAX
+<span class="lineNum">      14 </span>            : #define NOMINMAX
+<span class="lineNum">      15 </span>            : #endif
+<span class="lineNum">      16 </span>            : #include &lt;Windows.h&gt;
+<span class="lineNum">      17 </span>            : #else
+<span class="lineNum">      18 </span>            : #include &lt;sys/mman.h&gt;
+<span class="lineNum">      19 </span>            : #include &lt;sys/stat.h&gt;
+<span class="lineNum">      20 </span>            : #include &lt;fcntl.h&gt;
+<span class="lineNum">      21 </span>            : #include &lt;unistd.h&gt;
+<span class="lineNum">      22 </span>            : #endif
+<span class="lineNum">      23 </span>            : 
+<span class="lineNum">      24 </span>            : #include &lt;dynd/array.hpp&gt;
+<span class="lineNum">      25 </span>            : #include &lt;dynd/memblock/memmap_memory_block.hpp&gt;
+<span class="lineNum">      26 </span>            : 
+<span class="lineNum">      27 </span>            : using namespace std;
+<span class="lineNum">      28 </span>            : using namespace dynd;
+<span class="lineNum">      29 </span>            : 
+<span class="lineNum">      30 </span>            : #ifdef WIN32
+<span class="lineNum">      31 </span>            : static intptr_t get_file_size(HANDLE hFile)
+<span class="lineNum">      32 </span>            : {
+<span class="lineNum">      33 </span>            :   DWORD fsLow = 0, fsHigh = 0;
+<span class="lineNum">      34 </span>            :   fsLow = GetFileSize(hFile, &amp;fsHigh);
+<span class="lineNum">      35 </span>            :   uint64_t fs = fsLow + (static_cast&lt;uint64_t&gt;(fsHigh) &lt;&lt; 32);
+<span class="lineNum">      36 </span>            : #ifdef _WIN64
+<span class="lineNum">      37 </span>            :   if (fs &gt; (uint64_t)std::numeric_limits&lt;intptr_t&gt;::max()) {
+<span class="lineNum">      38 </span>            :     throw runtime_error(&quot;On 32-bit systems, maximum file size is 2GB&quot;);
+<span class="lineNum">      39 </span>            :   }
+<span class="lineNum">      40 </span>            : #endif
+<span class="lineNum">      41 </span>            :   return static_cast&lt;intptr_t&gt;(fs);
+<span class="lineNum">      42 </span>            : }
+<a name="43"><span class="lineNum">      43 </span>            : #endif</a>
+<span class="lineNum">      44 </span>            : 
+<span class="lineNum">      45 </span><span class="lineNoCov">          0 : static void clip_begin_end(intptr_t size, intptr_t &amp;begin, intptr_t &amp;end)</span>
+<span class="lineNum">      46 </span>            : {
+<span class="lineNum">      47 </span><span class="lineNoCov">          0 :   if (begin &lt; 0) {</span>
+<span class="lineNum">      48 </span><span class="lineNoCov">          0 :     begin += size;</span>
+<span class="lineNum">      49 </span><span class="lineNoCov">          0 :     if (begin &lt; 0) {</span>
+<span class="lineNum">      50 </span><span class="lineNoCov">          0 :       begin = 0;</span>
+<span class="lineNum">      51 </span>            :     }
+<span class="lineNum">      52 </span><span class="lineNoCov">          0 :   } else if (begin &gt;= size) {</span>
+<span class="lineNum">      53 </span><span class="lineNoCov">          0 :     begin = size;</span>
+<span class="lineNum">      54 </span>            :   }
+<span class="lineNum">      55 </span>            :   // Handle the end offset
+<span class="lineNum">      56 </span><span class="lineNoCov">          0 :   if (end &lt; 0) {</span>
+<span class="lineNum">      57 </span><span class="lineNoCov">          0 :     end += size;</span>
+<span class="lineNum">      58 </span><span class="lineNoCov">          0 :     if (end &lt;= begin) {</span>
+<span class="lineNum">      59 </span><span class="lineNoCov">          0 :       end = begin;</span>
+<span class="lineNum">      60 </span>            :     }
+<span class="lineNum">      61 </span><span class="lineNoCov">          0 :   } else if (end &lt;= begin) {</span>
+<span class="lineNum">      62 </span><span class="lineNoCov">          0 :     end = begin;</span>
+<span class="lineNum">      63 </span><span class="lineNoCov">          0 :   } else if (end &gt;= size) {</span>
+<span class="lineNum">      64 </span><span class="lineNoCov">          0 :     end = size;</span>
+<span class="lineNum">      65 </span>            :   }
+<span class="lineNum">      66 </span><span class="lineNoCov">          0 : }</span>
+<span class="lineNum">      67 </span>            : 
+<span class="lineNum">      68 </span>            : namespace {
+<span class="lineNum">      69 </span>            : struct memmap_memory_block {
+<span class="lineNum">      70 </span>            :   /** Every memory block object needs this at the front */
+<span class="lineNum">      71 </span>            :   memory_block_data m_mbd;
+<span class="lineNum">      72 </span>            :   // Parameters used to construct the memory block
+<span class="lineNum">      73 </span>            :   std::string m_filename;
+<span class="lineNum">      74 </span>            :   uint32_t m_access;
+<span class="lineNum">      75 </span>            :   intptr_t m_begin, m_end;
+<span class="lineNum">      76 </span>            : // Handle to the mapped memory
+<span class="lineNum">      77 </span>            : #ifdef WIN32
+<span class="lineNum">      78 </span>            :   HANDLE m_hFile, m_hMapFile;
+<span class="lineNum">      79 </span>            : #else
+<span class="lineNum">      80 </span>            :   int m_fd;
+<span class="lineNum">      81 </span>            : #endif
+<span class="lineNum">      82 </span>            :   // Pointer to the mapped memory
+<span class="lineNum">      83 </span>            :   char *m_mapPointer;
+<span class="lineNum">      84 </span>            :   // Offset to the actual data requested (memory mapping has strict
+<span class="lineNum">      85 </span>            :   // alignment requirements)
+<a name="86"><span class="lineNum">      86 </span>            :   intptr_t m_mapOffset;</a>
+<span class="lineNum">      87 </span>            : 
+<span class="lineNum">      88 </span><span class="lineNoCov">          0 :   memmap_memory_block(const std::string &amp;filename, uint32_t access, char **out_pointer, intptr_t *out_size,</span>
+<span class="lineNum">      89 </span>            :                       intptr_t begin, intptr_t end)
+<span class="lineNum">      90 </span><span class="lineNoCov">          0 :       : m_mbd(1, memmap_memory_block_type), m_filename(filename), m_access(access), m_begin(begin), m_end(end)</span>
+<span class="lineNum">      91 </span>            :   {
+<span class="lineNum">      92 </span><span class="lineNoCov">          0 :     bool readwrite = ((access &amp; nd::write_access_flag) == nd::write_access_flag);</span>
+<span class="lineNum">      93 </span>            : #ifdef WIN32
+<span class="lineNum">      94 </span>            :     // TODO: This function isn't quite exception-safe, use a smart pointer for the handles to fix.
+<span class="lineNum">      95 </span>            : 
+<span class="lineNum">      96 </span>            :     // Get the system granularity
+<span class="lineNum">      97 </span>            :     DWORD sysGran;
+<span class="lineNum">      98 </span>            :     SYSTEM_INFO sysInfo;
+<span class="lineNum">      99 </span>            :     GetSystemInfo(&amp;sysInfo);
+<span class="lineNum">     100 </span>            :     sysGran = sysInfo.dwAllocationGranularity;
+<span class="lineNum">     101 </span>            : 
+<span class="lineNum">     102 </span>            :     // Open the file using the windows API
+<span class="lineNum">     103 </span>            :     m_hFile = CreateFile(m_filename.c_str(), GENERIC_READ | (readwrite ? GENERIC_WRITE : 0), FILE_SHARE_READ, NULL,
+<span class="lineNum">     104 </span>            :                          OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+<span class="lineNum">     105 </span>            :     if (m_hFile == NULL) {
+<span class="lineNum">     106 </span>            :       stringstream ss;
+<span class="lineNum">     107 </span>            :       ss &lt;&lt; &quot;failed to open file \&quot;&quot; &lt;&lt; m_filename &lt;&lt; &quot;\&quot; for memory mapping&quot;;
+<span class="lineNum">     108 </span>            :       throw runtime_error(ss.str());
+<span class="lineNum">     109 </span>            :     }
+<span class="lineNum">     110 </span>            : 
+<span class="lineNum">     111 </span>            :     intptr_t filesize = get_file_size(m_hFile);
+<span class="lineNum">     112 </span>            :     // Handle the begin offset, following Python
+<span class="lineNum">     113 </span>            :     // semantics of bytes[begin:end]
+<span class="lineNum">     114 </span>            :     clip_begin_end(filesize, begin, end);
+<span class="lineNum">     115 </span>            :     m_begin = begin;
+<span class="lineNum">     116 </span>            :     m_end = end;
+<span class="lineNum">     117 </span>            : 
+<span class="lineNum">     118 </span>            :     // Calculate where to to do the file mapping. It needs to be
+<span class="lineNum">     119 </span>            :     // on a boundary based on the system allocation granularity
+<span class="lineNum">     120 </span>            :     intptr_t mapbegin = (begin / sysGran) * sysGran;
+<span class="lineNum">     121 </span>            :     m_mapOffset = begin - mapbegin;
+<span class="lineNum">     122 </span>            :     intptr_t mapsize = end - mapbegin;
+<span class="lineNum">     123 </span>            : 
+<span class="lineNum">     124 </span>            :     m_hMapFile = CreateFileMapping(m_hFile, NULL, readwrite ? PAGE_READWRITE : PAGE_READONLY,
+<span class="lineNum">     125 </span>            : #ifdef _WIN64
+<span class="lineNum">     126 </span>            :                                    (uint32_t)(((uint64_t)end) &gt;&gt; 32),
+<span class="lineNum">     127 </span>            : #else
+<span class="lineNum">     128 </span>            :                                    0,
+<span class="lineNum">     129 </span>            : #endif
+<span class="lineNum">     130 </span>            :                                    (uint32_t)end, NULL);
+<span class="lineNum">     131 </span>            :     if (m_hMapFile == NULL) {
+<span class="lineNum">     132 </span>            :       CloseHandle(m_hFile);
+<span class="lineNum">     133 </span>            :       stringstream ss;
+<span class="lineNum">     134 </span>            :       ss &lt;&lt; &quot;failure mapping file \&quot;&quot; &lt;&lt; m_filename &lt;&lt; &quot;\&quot; for memory mapping&quot;;
+<span class="lineNum">     135 </span>            :       throw runtime_error(ss.str());
+<span class="lineNum">     136 </span>            :     }
+<span class="lineNum">     137 </span>            : 
+<span class="lineNum">     138 </span>            :     // Create the mapped memory
+<span class="lineNum">     139 </span>            :     m_mapPointer = (char *)MapViewOfFile(m_hMapFile, FILE_MAP_READ | (readwrite ? FILE_MAP_WRITE : 0),
+<span class="lineNum">     140 </span>            : #ifdef _WIN64
+<span class="lineNum">     141 </span>            :                                          (uint32_t)(((uint64_t)mapbegin) &gt;&gt; 32),
+<span class="lineNum">     142 </span>            : #else
+<span class="lineNum">     143 </span>            :                                          0,
+<span class="lineNum">     144 </span>            : #endif
+<span class="lineNum">     145 </span>            :                                          (uint32_t)mapbegin, mapsize);
+<span class="lineNum">     146 </span>            :     if (m_mapPointer == NULL) {
+<span class="lineNum">     147 </span>            :       CloseHandle(m_hMapFile);
+<span class="lineNum">     148 </span>            :       CloseHandle(m_hFile);
+<span class="lineNum">     149 </span>            :       stringstream ss;
+<span class="lineNum">     150 </span>            :       ss &lt;&lt; &quot;failure mapping view of file \&quot;&quot; &lt;&lt; m_filename &lt;&lt; &quot;\&quot; for memory mapping&quot;;
+<span class="lineNum">     151 </span>            :       throw runtime_error(ss.str());
+<span class="lineNum">     152 </span>            :     }
+<span class="lineNum">     153 </span>            :     *out_pointer = m_mapPointer + m_mapOffset;
+<span class="lineNum">     154 </span>            :     *out_size = end - begin;
+<span class="lineNum">     155 </span>            : #else // Finished win32 implementation, now posix
+<span class="lineNum">     156 </span><span class="lineNoCov">          0 :     m_fd = open(m_filename.c_str(), readwrite ? O_RDWR : O_RDONLY);</span>
+<span class="lineNum">     157 </span><span class="lineNoCov">          0 :     if (m_fd == -1) {</span>
+<span class="lineNum">     158 </span><span class="lineNoCov">          0 :       stringstream ss;</span>
+<span class="lineNum">     159 </span><span class="lineNoCov">          0 :       ss &lt;&lt; &quot;failed to open file \&quot;&quot; &lt;&lt; m_filename &lt;&lt; &quot;\&quot; for memory mapping&quot;;</span>
+<span class="lineNum">     160 </span><span class="lineNoCov">          0 :       throw runtime_error(ss.str());</span>
+<span class="lineNum">     161 </span>            :     }
+<span class="lineNum">     162 </span>            : #ifdef __APPLE__
+<span class="lineNum">     163 </span>            :     // [From the Python mmap code] Issue #11277:
+<span class="lineNum">     164 </span>            :     // fsync(2) is not enough on OS X - a special, OS X specific
+<span class="lineNum">     165 </span>            :     // fcntl(2) is necessary to force DISKSYNC and get around
+<span class="lineNum">     166 </span>            :     // mmap(2) bug
+<span class="lineNum">     167 </span>            :     (void)fcntl(m_fd, F_FULLFSYNC);
+<span class="lineNum">     168 </span>            : #endif
+<span class="lineNum">     169 </span>            :     struct stat st;
+<span class="lineNum">     170 </span><span class="lineNoCov">          0 :     if (fstat(m_fd, &amp;st) == -1) {</span>
+<span class="lineNum">     171 </span><span class="lineNoCov">          0 :       stringstream ss;</span>
+<span class="lineNum">     172 </span><span class="lineNoCov">          0 :       ss &lt;&lt; &quot;failed to stat file \&quot;&quot; &lt;&lt; m_filename &lt;&lt; &quot;\&quot; for memory mapping&quot;;</span>
+<span class="lineNum">     173 </span><span class="lineNoCov">          0 :       throw runtime_error(ss.str());</span>
+<span class="lineNum">     174 </span>            :     }
+<span class="lineNum">     175 </span><span class="lineNoCov">          0 :     intptr_t filesize = st.st_size;</span>
+<span class="lineNum">     176 </span>            : 
+<span class="lineNum">     177 </span>            :     // Handle the begin offset, following Python
+<span class="lineNum">     178 </span>            :     // semantics of bytes[begin:end]
+<span class="lineNum">     179 </span><span class="lineNoCov">          0 :     clip_begin_end(filesize, begin, end);</span>
+<span class="lineNum">     180 </span><span class="lineNoCov">          0 :     m_begin = begin;</span>
+<span class="lineNum">     181 </span><span class="lineNoCov">          0 :     m_end = end;</span>
+<span class="lineNum">     182 </span>            : 
+<span class="lineNum">     183 </span><span class="lineNoCov">          0 :     intptr_t pageSize = sysconf(_SC_PAGE_SIZE);</span>
+<span class="lineNum">     184 </span><span class="lineNoCov">          0 :     intptr_t mapbegin = (begin / pageSize) * pageSize;</span>
+<span class="lineNum">     185 </span><span class="lineNoCov">          0 :     m_mapOffset = begin - mapbegin;</span>
+<span class="lineNum">     186 </span><span class="lineNoCov">          0 :     intptr_t mapsize = end - mapbegin;</span>
+<span class="lineNum">     187 </span>            : 
+<span class="lineNum">     188 </span><span class="lineNoCov">          0 :     m_mapPointer = (char *)mmap(NULL, mapsize, PROT_READ | (readwrite ? PROT_WRITE : 0), MAP_SHARED, m_fd, mapbegin);</span>
+<span class="lineNum">     189 </span><span class="lineNoCov">          0 :     if (m_mapPointer == (char *)MAP_FAILED) {</span>
+<span class="lineNum">     190 </span><span class="lineNoCov">          0 :       close(m_fd);</span>
+<span class="lineNum">     191 </span><span class="lineNoCov">          0 :       stringstream ss;</span>
+<span class="lineNum">     192 </span><span class="lineNoCov">          0 :       ss &lt;&lt; &quot;failed to mmap file \&quot;&quot; &lt;&lt; m_filename &lt;&lt; &quot;\&quot; for memory mapping&quot;;</span>
+<span class="lineNum">     193 </span><span class="lineNoCov">          0 :       throw runtime_error(ss.str());</span>
+<span class="lineNum">     194 </span>            :     }
+<span class="lineNum">     195 </span>            : 
+<span class="lineNum">     196 </span><span class="lineNoCov">          0 :     *out_pointer = m_mapPointer + m_mapOffset;</span>
+<span class="lineNum">     197 </span><span class="lineNoCov">          0 :     *out_size = end - begin;</span>
+<span class="lineNum">     198 </span>            : #endif
+<a name="199"><span class="lineNum">     199 </span><span class="lineNoCov">          0 :   }</span></a>
+<span class="lineNum">     200 </span>            : 
+<span class="lineNum">     201 </span><span class="lineNoCov">          0 :   ~memmap_memory_block()</span>
+<span class="lineNum">     202 </span><span class="lineNoCov">          0 :   {</span>
+<span class="lineNum">     203 </span>            : #ifdef WIN32
+<span class="lineNum">     204 </span>            :     UnmapViewOfFile(m_mapPointer);
+<span class="lineNum">     205 </span>            :     CloseHandle(m_hMapFile);
+<span class="lineNum">     206 </span>            :     CloseHandle(m_hFile);
+<span class="lineNum">     207 </span>            : #else
+<span class="lineNum">     208 </span><span class="lineNoCov">          0 :     intptr_t mapsize = m_end - m_begin + m_mapOffset;</span>
+<span class="lineNum">     209 </span><span class="lineNoCov">          0 :     munmap((void *)m_mapPointer, mapsize);</span>
+<span class="lineNum">     210 </span><span class="lineNoCov">          0 :     close(m_fd);</span>
+<span class="lineNum">     211 </span>            : #endif
+<span class="lineNum">     212 </span><span class="lineNoCov">          0 :   }</span>
+<span class="lineNum">     213 </span>            : };
+<a name="214"><span class="lineNum">     214 </span>            : } // anonymous namespace</a>
+<span class="lineNum">     215 </span>            : 
+<span class="lineNum">     216 </span><span class="lineNoCov">          0 : intrusive_ptr&lt;memory_block_data&gt; dynd::make_memmap_memory_block(const std::string &amp;filename, uint32_t access, char **out_pointer,</span>
+<span class="lineNum">     217 </span>            :                                              intptr_t *out_size, intptr_t begin, intptr_t end)
+<span class="lineNum">     218 </span>            : {
+<span class="lineNum">     219 </span><span class="lineNoCov">          0 :   memmap_memory_block *pmb = new memmap_memory_block(filename, access, out_pointer, out_size, begin, end);</span>
+<span class="lineNum">     220 </span><span class="lineNoCov">          0 :   return intrusive_ptr&lt;memory_block_data&gt;(reinterpret_cast&lt;memory_block_data *&gt;(pmb), false);</span>
+<span class="lineNum">     221 </span>            : }
+<span class="lineNum">     222 </span>            : 
+<span class="lineNum">     223 </span>            : namespace dynd {
+<a name="224"><span class="lineNum">     224 </span>            : namespace detail {</a>
+<span class="lineNum">     225 </span>            : 
+<span class="lineNum">     226 </span><span class="lineNoCov">          0 :   void free_memmap_memory_block(memory_block_data *memblock)</span>
+<span class="lineNum">     227 </span>            :   {
+<span class="lineNum">     228 </span><span class="lineNoCov">          0 :     memmap_memory_block *emb = reinterpret_cast&lt;memmap_memory_block *&gt;(memblock);</span>
+<span class="lineNum">     229 </span><span class="lineNoCov">          0 :     delete emb;</span>
+<span class="lineNum">     230 </span><span class="lineNoCov">          0 :   }</span>
+<span class="lineNum">     231 </span>            : }
+<a name="232"><span class="lineNum">     232 </span>            : } // namespace dynd::detail</a>
+<span class="lineNum">     233 </span>            : 
+<span class="lineNum">     234 </span><span class="lineNoCov">          0 : void dynd::memmap_memory_block_debug_print(const memory_block_data *memblock, std::ostream &amp;o,</span>
+<span class="lineNum">     235 </span>            :                                            const std::string &amp;indent)
+<span class="lineNum">     236 </span>            : {
+<span class="lineNum">     237 </span><span class="lineNoCov">          0 :   const memmap_memory_block *emb = reinterpret_cast&lt;const memmap_memory_block *&gt;(memblock);</span>
+<span class="lineNum">     238 </span><span class="lineNoCov">          0 :   o &lt;&lt; indent &lt;&lt; &quot; filename: &quot; &lt;&lt; emb-&gt;m_filename &lt;&lt; &quot;\n&quot;;</span>
+<a name="239"><span class="lineNum">     239 </span><span class="lineNoCov">          0 :   o &lt;&lt; indent &lt;&lt; &quot; begin: &quot; &lt;&lt; emb-&gt;m_begin &lt;&lt; &quot;\n&quot;;</span></a>
+<span class="lineNum">     240 </span><span class="lineNoCov">          0 :   o &lt;&lt; indent &lt;&lt; &quot; end: &quot; &lt;&lt; emb-&gt;m_end &lt;&lt; &quot;\n&quot;;</span>
+<span class="lineNum">     241 </span><span class="lineCov">          3 : }</span>
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.10</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

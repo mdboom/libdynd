@@ -1,0 +1,146 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - coverage.info.cleaned - src/dynd/types/type_id.cpp</title>
+  <link rel="stylesheet" type="text/css" href="../../../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../../../index.html">top level</a> - <a href="index.html">src/dynd/types</a> - type_id.cpp<span style="font-size: 80%;"> (source / <a href="type_id.cpp.func.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">coverage.info.cleaned</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">14</td>
+            <td class="headerCovTableEntry">30</td>
+            <td class="headerCovTableEntryLo">46.7 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2016-02-19</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">4</td>
+            <td class="headerCovTableEntry">4</td>
+            <td class="headerCovTableEntryHi">100.0 %</td>
+          </tr>
+          <tr><td><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : //</a>
+<span class="lineNum">       2 </span>            : // Copyright (C) 2011-15 DyND Developers
+<span class="lineNum">       3 </span>            : // BSD 2-Clause License, see LICENSE.txt
+<span class="lineNum">       4 </span>            : //
+<span class="lineNum">       5 </span>            : 
+<span class="lineNum">       6 </span>            : #include &lt;dynd/type_registry.hpp&gt;
+<span class="lineNum">       7 </span>            : #include &lt;dynd/types/type_id.hpp&gt;
+<span class="lineNum">       8 </span>            : 
+<span class="lineNum">       9 </span>            : using namespace std;
+<a name="10"><span class="lineNum">      10 </span>            : using namespace dynd;</a>
+<span class="lineNum">      11 </span>            : 
+<span class="lineNum">      12 </span><span class="lineCov">         10 : std::ostream &amp;dynd::operator&lt;&lt;(std::ostream &amp;o, type_kind_t kind)</span>
+<span class="lineNum">      13 </span>            : {
+<span class="lineNum">      14 </span><span class="lineCov">         10 :   switch (kind) {</span>
+<span class="lineNum">      15 </span>            :   case bool_kind:
+<span class="lineNum">      16 </span><span class="lineCov">          2 :     return (o &lt;&lt; &quot;Bool&quot;);</span>
+<span class="lineNum">      17 </span>            :   case sint_kind:
+<span class="lineNum">      18 </span><span class="lineCov">          2 :     return (o &lt;&lt; &quot;SInt&quot;);</span>
+<span class="lineNum">      19 </span>            :   case uint_kind:
+<span class="lineNum">      20 </span><span class="lineCov">          2 :     return (o &lt;&lt; &quot;UInt&quot;);</span>
+<span class="lineNum">      21 </span>            :   case real_kind:
+<span class="lineNum">      22 </span><span class="lineCov">          2 :     return (o &lt;&lt; &quot;Real&quot;);</span>
+<span class="lineNum">      23 </span>            :   case complex_kind:
+<span class="lineNum">      24 </span><span class="lineCov">          2 :     return (o &lt;&lt; &quot;Complex&quot;);</span>
+<span class="lineNum">      25 </span>            :   case string_kind:
+<span class="lineNum">      26 </span><span class="lineNoCov">          0 :     return (o &lt;&lt; &quot;String&quot;);</span>
+<span class="lineNum">      27 </span>            :   case bytes_kind:
+<span class="lineNum">      28 </span><span class="lineNoCov">          0 :     return (o &lt;&lt; &quot;Bytes&quot;);</span>
+<span class="lineNum">      29 </span>            :   case void_kind:
+<span class="lineNum">      30 </span><span class="lineNoCov">          0 :     return (o &lt;&lt; &quot;Void&quot;);</span>
+<span class="lineNum">      31 </span>            :   case datetime_kind:
+<span class="lineNum">      32 </span><span class="lineNoCov">          0 :     return (o &lt;&lt; &quot;Datetime&quot;);</span>
+<span class="lineNum">      33 </span>            :   case type_kind:
+<span class="lineNum">      34 </span><span class="lineNoCov">          0 :     return (o &lt;&lt; &quot;Type&quot;);</span>
+<span class="lineNum">      35 </span>            :   case dim_kind:
+<span class="lineNum">      36 </span><span class="lineNoCov">          0 :     return (o &lt;&lt; &quot;Dim&quot;);</span>
+<span class="lineNum">      37 </span>            :   case struct_kind:
+<span class="lineNum">      38 </span><span class="lineNoCov">          0 :     return (o &lt;&lt; &quot;Struct&quot;);</span>
+<span class="lineNum">      39 </span>            :   case tuple_kind:
+<span class="lineNum">      40 </span><span class="lineNoCov">          0 :     return (o &lt;&lt; &quot;Tuple&quot;);</span>
+<span class="lineNum">      41 </span>            :   case expr_kind:
+<span class="lineNum">      42 </span><span class="lineNoCov">          0 :     return (o &lt;&lt; &quot;Expr&quot;);</span>
+<span class="lineNum">      43 </span>            :   case option_kind:
+<span class="lineNum">      44 </span><span class="lineNoCov">          0 :     return (o &lt;&lt; &quot;Option&quot;);</span>
+<span class="lineNum">      45 </span>            :   case memory_kind:
+<span class="lineNum">      46 </span><span class="lineNoCov">          0 :     return (o &lt;&lt; &quot;Memory&quot;);</span>
+<span class="lineNum">      47 </span>            :   case function_kind:
+<span class="lineNum">      48 </span><span class="lineNoCov">          0 :     return (o &lt;&lt; &quot;Function&quot;);</span>
+<span class="lineNum">      49 </span>            :   case kind_kind:
+<span class="lineNum">      50 </span><span class="lineNoCov">          0 :     return (o &lt;&lt; &quot;Kind&quot;);</span>
+<span class="lineNum">      51 </span>            :   case pattern_kind:
+<span class="lineNum">      52 </span><span class="lineNoCov">          0 :     return (o &lt;&lt; &quot;Pattern&quot;);</span>
+<span class="lineNum">      53 </span>            :   case custom_kind:
+<span class="lineNum">      54 </span><span class="lineNoCov">          0 :     return (o &lt;&lt; &quot;Custom&quot;);</span>
+<span class="lineNum">      55 </span>            :   default:
+<span class="lineNum">      56 </span><span class="lineNoCov">          0 :     return (o &lt;&lt; &quot;(unknown kind &quot; &lt;&lt; (int)kind &lt;&lt; &quot;)&quot;);</span>
+<span class="lineNum">      57 </span>            :   }
+<a name="58"><span class="lineNum">      58 </span>            : }</a>
+<span class="lineNum">      59 </span>            : 
+<span class="lineNum">      60 </span><span class="lineCov">         62 : bool dynd::is_base_id_of(type_id_t base_id, type_id_t id)</span>
+<span class="lineNum">      61 </span>            : {
+<span class="lineNum">      62 </span><span class="lineCov">         62 :   const ndt::type_info &amp;tp_info = ndt::type_registry[id];</span>
+<span class="lineNum">      63 </span><span class="lineCov">        149 :   for (size_t i = 0; i &lt; tp_info.nbases; ++i) {</span>
+<span class="lineNum">      64 </span><span class="lineCov">        105 :     if (tp_info.bases[i] == base_id) {</span>
+<span class="lineNum">      65 </span><span class="lineCov">         18 :       return true;</span>
+<span class="lineNum">      66 </span>            :     }
+<span class="lineNum">      67 </span>            :   }
+<a name="68"><span class="lineNum">      68 </span>            : </a>
+<span class="lineNum">      69 </span><span class="lineCov">         44 :   return false;</span>
+<span class="lineNum">      70 </span><span class="lineCov">          3 : }</span>
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.10</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

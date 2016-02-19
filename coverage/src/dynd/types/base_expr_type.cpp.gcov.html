@@ -1,0 +1,128 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - coverage.info.cleaned - src/dynd/types/base_expr_type.cpp</title>
+  <link rel="stylesheet" type="text/css" href="../../../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../../../index.html">top level</a> - <a href="index.html">src/dynd/types</a> - base_expr_type.cpp<span style="font-size: 80%;"> (source / <a href="base_expr_type.cpp.func.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">coverage.info.cleaned</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">2</td>
+            <td class="headerCovTableEntry">24</td>
+            <td class="headerCovTableEntryLo">8.3 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2016-02-19</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">3</td>
+            <td class="headerCovTableEntry">11</td>
+            <td class="headerCovTableEntryLo">27.3 %</td>
+          </tr>
+          <tr><td><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : //</a>
+<span class="lineNum">       2 </span>            : // Copyright (C) 2011-15 DyND Developers
+<span class="lineNum">       3 </span>            : // BSD 2-Clause License, see LICENSE.txt
+<span class="lineNum">       4 </span>            : //
+<span class="lineNum">       5 </span>            : 
+<span class="lineNum">       6 </span>            : #include &lt;algorithm&gt;
+<span class="lineNum">       7 </span>            : 
+<span class="lineNum">       8 </span>            : #include &lt;dynd/type.hpp&gt;
+<span class="lineNum">       9 </span>            : 
+<span class="lineNum">      10 </span>            : using namespace std;
+<a name="11"><span class="lineNum">      11 </span>            : using namespace dynd;</a>
+<span class="lineNum">      12 </span>            : 
+<a name="13"><span class="lineNum">      13 </span><span class="lineCov">         25 : ndt::base_expr_type::~base_expr_type() {}</span></a>
+<span class="lineNum">      14 </span>            : 
+<a name="15"><span class="lineNum">      15 </span><span class="lineNoCov">          0 : bool ndt::base_expr_type::is_expression() const { return true; }</span></a>
+<span class="lineNum">      16 </span>            : 
+<a name="17"><span class="lineNum">      17 </span><span class="lineNoCov">          0 : ndt::type ndt::base_expr_type::get_canonical_type() const { return get_value_type(); }</span></a>
+<span class="lineNum">      18 </span>            : 
+<span class="lineNum">      19 </span><span class="lineNoCov">          0 : void ndt::base_expr_type::arrmeta_default_construct(char *arrmeta, bool blockref_alloc) const</span>
+<span class="lineNum">      20 </span>            : {
+<span class="lineNum">      21 </span><span class="lineNoCov">          0 :   const type &amp;dt = get_operand_type();</span>
+<span class="lineNum">      22 </span><span class="lineNoCov">          0 :   if (!dt.is_builtin()) {</span>
+<span class="lineNum">      23 </span><span class="lineNoCov">          0 :     dt.extended()-&gt;arrmeta_default_construct(arrmeta, blockref_alloc);</span>
+<span class="lineNum">      24 </span>            :   }
+<a name="25"><span class="lineNum">      25 </span><span class="lineNoCov">          0 : }</span></a>
+<span class="lineNum">      26 </span>            : 
+<span class="lineNum">      27 </span><span class="lineNoCov">          0 : void ndt::base_expr_type::arrmeta_copy_construct(char *dst_arrmeta, const char *src_arrmeta,</span>
+<span class="lineNum">      28 </span>            :                                                  const intrusive_ptr&lt;memory_block_data&gt; &amp;embedded_reference) const
+<span class="lineNum">      29 </span>            : {
+<span class="lineNum">      30 </span><span class="lineNoCov">          0 :   const type &amp;dt = get_operand_type();</span>
+<span class="lineNum">      31 </span><span class="lineNoCov">          0 :   if (!dt.is_builtin()) {</span>
+<span class="lineNum">      32 </span><span class="lineNoCov">          0 :     dt.extended()-&gt;arrmeta_copy_construct(dst_arrmeta, src_arrmeta, embedded_reference);</span>
+<span class="lineNum">      33 </span>            :   }
+<a name="34"><span class="lineNum">      34 </span><span class="lineNoCov">          0 : }</span></a>
+<span class="lineNum">      35 </span>            : 
+<span class="lineNum">      36 </span><span class="lineNoCov">          0 : void ndt::base_expr_type::arrmeta_destruct(char *arrmeta) const</span>
+<span class="lineNum">      37 </span>            : {
+<span class="lineNum">      38 </span><span class="lineNoCov">          0 :   const type &amp;dt = get_operand_type();</span>
+<span class="lineNum">      39 </span><span class="lineNoCov">          0 :   if (!dt.is_builtin()) {</span>
+<span class="lineNum">      40 </span><span class="lineNoCov">          0 :     dt.extended()-&gt;arrmeta_destruct(arrmeta);</span>
+<span class="lineNum">      41 </span>            :   }
+<a name="42"><span class="lineNum">      42 </span><span class="lineNoCov">          0 : }</span></a>
+<span class="lineNum">      43 </span>            : 
+<span class="lineNum">      44 </span><span class="lineNoCov">          0 : void ndt::base_expr_type::arrmeta_debug_print(const char *arrmeta, std::ostream &amp;o, const std::string &amp;indent) const</span>
+<span class="lineNum">      45 </span>            : {
+<span class="lineNum">      46 </span><span class="lineNoCov">          0 :   const type &amp;dt = get_operand_type();</span>
+<span class="lineNum">      47 </span><span class="lineNoCov">          0 :   if (!dt.is_builtin()) {</span>
+<span class="lineNum">      48 </span><span class="lineNoCov">          0 :     dt.extended()-&gt;arrmeta_debug_print(arrmeta, o, indent);</span>
+<span class="lineNum">      49 </span>            :   }
+<a name="50"><span class="lineNum">      50 </span><span class="lineNoCov">          0 : }</span></a>
+<span class="lineNum">      51 </span>            : 
+<span class="lineNum">      52 </span><span class="lineCov">          3 : size_t ndt::base_expr_type::get_iterdata_size(intptr_t DYND_UNUSED(ndim)) const { return 0; }</span>
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.10</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

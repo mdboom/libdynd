@@ -1,0 +1,49 @@
+#!/usr/bin/env bash
+
+if [ "$1" == "-lflag" ]; then
+    echo @DYND_LINK_FLAG@
+    exit 0
+fi
+
+if [ "$1" == "-libname" ]; then
+    echo @DYND_LIB_FILE@
+    exit 0
+fi
+
+if [ "$1" == "-libpath" ]; then
+    # This script should be in .../bin relative to .../lib.
+    # Note this isn't robust against symbolic links, etc.
+    DIR=`dirname $0`
+    echo `dirname ${DIR}`/lib@LIB_SUFFIX@/@DYND_STATIC_LIB_DIR@@DYND_LIB_FILE@
+    exit 0
+fi
+
+if [ "$1" == "-includedir" ]; then
+    # This script should be in .../bin relative to .../include.
+    # Note this isn't robust against symbolic links, etc.
+    DIR=`dirname $0`
+    echo `dirname ${DIR}`/include
+    exit 0
+fi
+
+if [ "$1" == "-version" ]; then
+    echo @DYND_VERSION_STRING@
+    exit 0
+fi
+
+if [ "$1" == "-cuda" ]; then
+    echo @DYND_CUDA@
+    exit 0
+fi
+
+echo Usage: $0 OPTION
+echo Print information for linking libdynd.
+echo
+echo Options:
+echo   -lflag       Prints the linker option to link libdynd.
+echo   -libname     Prints the name of the libdynd library.
+echo   -libpath     Prints the full path of the libdynd library.
+echo   -includedir  Prints the directory with the libdynd include files.
+echo   -version     Prints the version of libdynd.
+echo   -cuda        Prints whether libdynd was built with cuda support ON or OFF.
+exit 1

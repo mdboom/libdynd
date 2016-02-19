@@ -1,0 +1,126 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - coverage.info.cleaned - include/dynd/kernels/reduction_kernel_prefix.hpp</title>
+  <link rel="stylesheet" type="text/css" href="../../../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../../../index.html">top level</a> - <a href="index.html">include/dynd/kernels</a> - reduction_kernel_prefix.hpp<span style="font-size: 80%;"> (source / <a href="reduction_kernel_prefix.hpp.func.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">coverage.info.cleaned</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">12</td>
+            <td class="headerCovTableEntry">15</td>
+            <td class="headerCovTableEntryMed">80.0 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2016-02-19</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">8</td>
+            <td class="headerCovTableEntry">10</td>
+            <td class="headerCovTableEntryMed">80.0 %</td>
+          </tr>
+          <tr><td><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : //</a>
+<span class="lineNum">       2 </span>            : // Copyright (C) 2011-15 DyND Developers
+<span class="lineNum">       3 </span>            : // BSD 2-Clause License, see LICENSE.txt
+<span class="lineNum">       4 </span>            : //
+<span class="lineNum">       5 </span>            : 
+<span class="lineNum">       6 </span>            : #pragma once
+<span class="lineNum">       7 </span>            : 
+<span class="lineNum">       8 </span>            : #include &lt;dynd/kernels/kernel_prefix.hpp&gt;
+<span class="lineNum">       9 </span>            : 
+<span class="lineNum">      10 </span>            : namespace dynd {
+<span class="lineNum">      11 </span>            : namespace nd {
+<a name="12"><span class="lineNum">      12 </span>            :   namespace functional {</a>
+<span class="lineNum">      13 </span>            : 
+<span class="lineNum">      14 </span><span class="lineCov">         53 :     struct DYND_API reduction_kernel_prefix : kernel_prefix {</span>
+<span class="lineNum">      15 </span>            :       // This function pointer is for all the calls of the function
+<span class="lineNum">      16 </span>            :       // on a given destination data address after the &quot;first call&quot;.
+<span class="lineNum">      17 </span>            :       kernel_strided_t followup_call_function;
+<a name="18"><span class="lineNum">      18 </span>            : </a>
+<span class="lineNum">      19 </span>            :       template &lt;typename T&gt;
+<span class="lineNum">      20 </span><span class="lineNoCov">          0 :       T get_first_call_function() const</span>
+<span class="lineNum">      21 </span>            :       {
+<span class="lineNum">      22 </span><span class="lineNoCov">          0 :         return get_function&lt;T&gt;();</span>
+<span class="lineNum">      23 </span>            :       }
+<a name="24"><span class="lineNum">      24 </span>            : </a>
+<span class="lineNum">      25 </span>            :       template &lt;typename T&gt;
+<span class="lineNum">      26 </span><span class="lineCov">        103 :       void set_first_call_function(T fnptr)</span>
+<span class="lineNum">      27 </span>            :       {
+<span class="lineNum">      28 </span><span class="lineCov">        103 :         function = reinterpret_cast&lt;void *&gt;(fnptr);</span>
+<a name="29"><span class="lineNum">      29 </span><span class="lineCov">        103 :       }</span></a>
+<span class="lineNum">      30 </span>            : 
+<a name="31"><span class="lineNum">      31 </span><span class="lineNoCov">          0 :       kernel_strided_t get_followup_call_function() const { return followup_call_function; }</span></a>
+<span class="lineNum">      32 </span>            : 
+<a name="33"><span class="lineNum">      33 </span><span class="lineCov">        103 :       void set_followup_call_function(kernel_strided_t fnptr) { followup_call_function = fnptr; }</span></a>
+<span class="lineNum">      34 </span>            : 
+<a name="35"><span class="lineNum">      35 </span><span class="lineCov">         32 :       void single_first(char *dst, char *const *src) { (*reinterpret_cast&lt;kernel_single_t&gt;(function))(this, dst, src); }</span></a>
+<span class="lineNum">      36 </span>            : 
+<span class="lineNum">      37 </span><span class="lineCov">          6 :       void strided_first(char *dst, intptr_t dst_stride, char *const *src, const intptr_t *src_stride, size_t count)</span>
+<span class="lineNum">      38 </span>            :       {
+<span class="lineNum">      39 </span><span class="lineCov">          6 :         (*reinterpret_cast&lt;kernel_strided_t&gt;(function))(this, dst, dst_stride, src, src_stride, count);</span>
+<a name="40"><span class="lineNum">      40 </span><span class="lineCov">          6 :       }</span></a>
+<span class="lineNum">      41 </span>            : 
+<span class="lineNum">      42 </span><span class="lineCov">         32 :       void strided_followup(char *dst, intptr_t dst_stride, char *const *src, const intptr_t *src_stride, size_t count)</span>
+<span class="lineNum">      43 </span>            :       {
+<span class="lineNum">      44 </span><span class="lineCov">         32 :         (*reinterpret_cast&lt;kernel_strided_t&gt;(followup_call_function))(this, dst, dst_stride, src, src_stride, count);</span>
+<span class="lineNum">      45 </span><span class="lineCov">         32 :       }</span>
+<span class="lineNum">      46 </span>            :     };
+<span class="lineNum">      47 </span>            : 
+<span class="lineNum">      48 </span>            :   } // namespace dynd::nd::functional
+<span class="lineNum">      49 </span>            : } // namespace dynd::nd
+<span class="lineNum">      50 </span>            : } // namespace dynd
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.10</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

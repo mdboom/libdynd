@@ -1,0 +1,433 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - coverage.info.cleaned - tests/dynd_assertions.hpp</title>
+  <link rel="stylesheet" type="text/css" href="../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../index.html">top level</a> - <a href="index.html">tests</a> - dynd_assertions.hpp<span style="font-size: 80%;"> (source / <a href="dynd_assertions.hpp.func.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">coverage.info.cleaned</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">37</td>
+            <td class="headerCovTableEntry">108</td>
+            <td class="headerCovTableEntryLo">34.3 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2016-02-19</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">11</td>
+            <td class="headerCovTableEntry">12</td>
+            <td class="headerCovTableEntryHi">91.7 %</td>
+          </tr>
+          <tr><td><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : //</a>
+<span class="lineNum">       2 </span>            : // Copyright (C) 2011-15 DyND Developers
+<span class="lineNum">       3 </span>            : // BSD 2-Clause License, see LICENSE.txt
+<span class="lineNum">       4 </span>            : //
+<span class="lineNum">       5 </span>            : 
+<span class="lineNum">       6 </span>            : #pragma once
+<span class="lineNum">       7 </span>            : 
+<span class="lineNum">       8 </span>            : #include &quot;inc_gtest.hpp&quot;
+<span class="lineNum">       9 </span>            : 
+<span class="lineNum">      10 </span>            : #include &lt;memory&gt;
+<span class="lineNum">      11 </span>            : 
+<span class="lineNum">      12 </span>            : #include &lt;dynd/json_parser.hpp&gt;
+<span class="lineNum">      13 </span>            : #include &lt;dynd/types/struct_type.hpp&gt;
+<span class="lineNum">      14 </span>            : #include &lt;dynd/type_promotion.hpp&gt;
+<span class="lineNum">      15 </span>            : 
+<span class="lineNum">      16 </span>            : #include &lt;dynd/callable.hpp&gt;
+<a name="17"><span class="lineNum">      17 </span>            : #include &lt;dynd/func/elwise.hpp&gt;</a>
+<span class="lineNum">      18 </span>            : 
+<span class="lineNum">      19 </span><span class="lineNoCov">          0 : inline std::string ShapeFormatter(const std::vector&lt;intptr_t&gt; &amp;shape)</span>
+<span class="lineNum">      20 </span>            : {
+<span class="lineNum">      21 </span><span class="lineNoCov">          0 :   std::stringstream ss;</span>
+<span class="lineNum">      22 </span><span class="lineNoCov">          0 :   ss &lt;&lt; &quot;(&quot;;</span>
+<span class="lineNum">      23 </span><span class="lineNoCov">          0 :   for (size_t i = 0, i_end = shape.size(); i != i_end; ++i) {</span>
+<span class="lineNum">      24 </span><span class="lineNoCov">          0 :     ss &lt;&lt; shape[i];</span>
+<span class="lineNum">      25 </span><span class="lineNoCov">          0 :     if (i != i_end - 1) {</span>
+<span class="lineNum">      26 </span><span class="lineNoCov">          0 :       ss &lt;&lt; &quot;, &quot;;</span>
+<span class="lineNum">      27 </span>            :     }
+<span class="lineNum">      28 </span>            :   }
+<span class="lineNum">      29 </span><span class="lineNoCov">          0 :   ss &lt;&lt; &quot;)&quot;;</span>
+<span class="lineNum">      30 </span><span class="lineNoCov">          0 :   return ss.str();</span>
+<a name="31"><span class="lineNum">      31 </span>            : }</a>
+<span class="lineNum">      32 </span>            : 
+<span class="lineNum">      33 </span><span class="lineCov">        316 : inline ::testing::AssertionResult CompareDyNDArrays(const char *expr1, const char *expr2, const dynd::nd::array &amp;val1,</span>
+<span class="lineNum">      34 </span>            :                                                     const dynd::nd::array &amp;val2)
+<span class="lineNum">      35 </span>            : {
+<span class="lineNum">      36 </span>            :   using namespace dynd;
+<span class="lineNum">      37 </span>            : 
+<span class="lineNum">      38 </span><span class="lineCov">        316 :   if (val1.get_type().get_id() == cuda_device_id &amp;&amp; val2.get_type().get_id() == cuda_device_id) {</span>
+<span class="lineNum">      39 </span><span class="lineNoCov">          0 :     return CompareDyNDArrays(expr1, expr2, val1.to_host(), val2.to_host());</span>
+<span class="lineNum">      40 </span>            :   }
+<span class="lineNum">      41 </span>            : 
+<span class="lineNum">      42 </span><span class="lineCov">        316 :   if (val1.equals_exact(val2)) {</span>
+<span class="lineNum">      43 </span><span class="lineCov">        316 :     return ::testing::AssertionSuccess();</span>
+<span class="lineNum">      44 </span>            :   }
+<span class="lineNum">      45 </span>            :   else {
+<span class="lineNum">      46 </span><span class="lineNoCov">          0 :     if (val1.get_type() != val2.get_type()) {</span>
+<span class="lineNum">      47 </span><span class="lineNoCov">          0 :       return ::testing::AssertionFailure() &lt;&lt; &quot;The types of &quot; &lt;&lt; expr1 &lt;&lt; &quot; and &quot; &lt;&lt; expr2 &lt;&lt; &quot; do not match\n&quot; &lt;&lt; expr1</span>
+<span class="lineNum">      48 </span><span class="lineNoCov">          0 :                                            &lt;&lt; &quot; has type &quot; &lt;&lt; val1.get_type() &lt;&lt; &quot;,\n&quot; &lt;&lt; expr2 &lt;&lt; &quot; has type &quot;</span>
+<span class="lineNum">      49 </span><span class="lineNoCov">          0 :                                            &lt;&lt; val2.get_type() &lt;&lt; &quot;.&quot;;</span>
+<span class="lineNum">      50 </span>            :     }
+<span class="lineNum">      51 </span><span class="lineNoCov">          0 :     else if (val1.get_shape() != val2.get_shape()) {</span>
+<span class="lineNum">      52 </span><span class="lineNoCov">          0 :       return ::testing::AssertionFailure() &lt;&lt; &quot;The shapes of &quot; &lt;&lt; expr1 &lt;&lt; &quot; and &quot; &lt;&lt; expr2 &lt;&lt; &quot; do not match\n&quot;</span>
+<span class="lineNum">      53 </span><span class="lineNoCov">          0 :                                            &lt;&lt; expr1 &lt;&lt; &quot; has shape &quot; &lt;&lt; ShapeFormatter(val1.get_shape()) &lt;&lt; &quot;,\n&quot;</span>
+<span class="lineNum">      54 </span><span class="lineNoCov">          0 :                                            &lt;&lt; expr2 &lt;&lt; &quot; has shape &quot; &lt;&lt; ShapeFormatter(val2.get_shape()) &lt;&lt; &quot;.&quot;;</span>
+<span class="lineNum">      55 </span>            :     }
+<span class="lineNum">      56 </span><span class="lineNoCov">          0 :     else if (val1.get_type().get_id() == struct_id) {</span>
+<span class="lineNum">      57 </span><span class="lineNoCov">          0 :       const ndt::struct_type *bsd = val1.get_type().extended&lt;ndt::struct_type&gt;();</span>
+<span class="lineNum">      58 </span><span class="lineNoCov">          0 :       intptr_t field_count = bsd-&gt;get_field_count();</span>
+<span class="lineNum">      59 </span><span class="lineNoCov">          0 :       for (intptr_t i = 0; i &lt; field_count; ++i) {</span>
+<span class="lineNum">      60 </span><span class="lineNoCov">          0 :         nd::array field1 = val1(i), field2 = val2(i);</span>
+<span class="lineNum">      61 </span><span class="lineNoCov">          0 :         if (!field1.equals_exact(field2)) {</span>
+<span class="lineNum">      62 </span><span class="lineNoCov">          0 :           return ::testing::AssertionFailure()</span>
+<span class="lineNum">      63 </span><span class="lineNoCov">          0 :                  &lt;&lt; &quot;The values of &quot; &lt;&lt; expr1 &lt;&lt; &quot; and &quot; &lt;&lt; expr2 &lt;&lt; &quot; do not match at field index &quot; &lt;&lt; i &lt;&lt; &quot;, name \&quot;&quot;</span>
+<span class="lineNum">      64 </span><span class="lineNoCov">          0 :                  &lt;&lt; bsd-&gt;get_field_name(i) &lt;&lt; &quot;\&quot;\n&quot; &lt;&lt; expr1 &lt;&lt; &quot; has field value &quot; &lt;&lt; field1 &lt;&lt; &quot;,\n&quot; &lt;&lt; expr2</span>
+<span class="lineNum">      65 </span><span class="lineNoCov">          0 :                  &lt;&lt; &quot; has field value &quot; &lt;&lt; field2 &lt;&lt; &quot;.&quot;;</span>
+<span class="lineNum">      66 </span>            :         }
+<span class="lineNum">      67 </span>            :       }
+<span class="lineNum">      68 </span><span class="lineNoCov">          0 :       return ::testing::AssertionFailure() &lt;&lt; &quot;DYND ASSERTION INTERNAL ERROR: One of the struct fields &quot;</span>
+<span class="lineNum">      69 </span><span class="lineNoCov">          0 :                                               &quot;should have compared unequal&quot;;</span>
+<span class="lineNum">      70 </span>            :     }
+<span class="lineNum">      71 </span><span class="lineNoCov">          0 :     else if (val1.get_type().get_id() == tuple_id) {</span>
+<span class="lineNum">      72 </span><span class="lineNoCov">          0 :       const ndt::tuple_type *bsd = val1.get_type().extended&lt;ndt::tuple_type&gt;();</span>
+<span class="lineNum">      73 </span><span class="lineNoCov">          0 :       intptr_t field_count = bsd-&gt;get_field_count();</span>
+<span class="lineNum">      74 </span><span class="lineNoCov">          0 :       for (intptr_t i = 0; i &lt; field_count; ++i) {</span>
+<span class="lineNum">      75 </span><span class="lineNoCov">          0 :         nd::array field1 = val1(i), field2 = val2(i);</span>
+<span class="lineNum">      76 </span><span class="lineNoCov">          0 :         if (!field1.equals_exact(field2)) {</span>
+<span class="lineNum">      77 </span><span class="lineNoCov">          0 :           return ::testing::AssertionFailure()</span>
+<span class="lineNum">      78 </span><span class="lineNoCov">          0 :                  &lt;&lt; &quot;The values of &quot; &lt;&lt; expr1 &lt;&lt; &quot; and &quot; &lt;&lt; expr2 &lt;&lt; &quot; do not match at field index &quot; &lt;&lt; i &lt;&lt; &quot;\&quot;\n&quot;</span>
+<span class="lineNum">      79 </span><span class="lineNoCov">          0 :                  &lt;&lt; expr1 &lt;&lt; &quot; has field value &quot; &lt;&lt; field1 &lt;&lt; &quot;,\n&quot; &lt;&lt; expr2 &lt;&lt; &quot; has field value &quot; &lt;&lt; field2 &lt;&lt; &quot;.&quot;;</span>
+<span class="lineNum">      80 </span>            :         }
+<span class="lineNum">      81 </span>            :       }
+<span class="lineNum">      82 </span><span class="lineNoCov">          0 :       return ::testing::AssertionFailure() &lt;&lt; &quot;DYND ASSERTION INTERNAL ERROR: One of the tuple fields &quot;</span>
+<span class="lineNum">      83 </span><span class="lineNoCov">          0 :                                               &quot;should have compared unequal&quot;;</span>
+<span class="lineNum">      84 </span>            :     }
+<span class="lineNum">      85 </span><span class="lineNoCov">          0 :     else if (val1.get_ndim() &gt; 0) {</span>
+<span class="lineNum">      86 </span><span class="lineNoCov">          0 :       intptr_t dim_size = val1.get_dim_size();</span>
+<span class="lineNum">      87 </span><span class="lineNoCov">          0 :       for (intptr_t i = 0; i &lt; dim_size; ++i) {</span>
+<span class="lineNum">      88 </span><span class="lineNoCov">          0 :         nd::array sub1 = val1(i), sub2 = val2(i);</span>
+<span class="lineNum">      89 </span><span class="lineNoCov">          0 :         if (!sub1.equals_exact(sub2)) {</span>
+<span class="lineNum">      90 </span><span class="lineNoCov">          0 :           return ::testing::AssertionFailure()</span>
+<span class="lineNum">      91 </span><span class="lineNoCov">          0 :                  &lt;&lt; &quot;The values of &quot; &lt;&lt; expr1 &lt;&lt; &quot; and &quot; &lt;&lt; expr2 &lt;&lt; &quot; do not match at index &quot; &lt;&lt; i &lt;&lt; &quot;\&quot;\n&quot; &lt;&lt; expr1</span>
+<span class="lineNum">      92 </span><span class="lineNoCov">          0 :                  &lt;&lt; &quot; has subarray value &quot; &lt;&lt; sub1 &lt;&lt; &quot;,\n&quot; &lt;&lt; expr2 &lt;&lt; &quot; has subarray value &quot; &lt;&lt; sub2 &lt;&lt; &quot;.&quot;;</span>
+<span class="lineNum">      93 </span>            :         }
+<span class="lineNum">      94 </span>            :       }
+<span class="lineNum">      95 </span><span class="lineNoCov">          0 :       return ::testing::AssertionFailure() &lt;&lt; &quot;DYND ASSERTION INTERNAL ERROR: One of the subarrays &quot;</span>
+<span class="lineNum">      96 </span><span class="lineNoCov">          0 :                                               &quot;should have compared unequal\n&quot;</span>
+<span class="lineNum">      97 </span><span class="lineNoCov">          0 :                                            &lt;&lt; expr1 &lt;&lt; &quot; has value &quot; &lt;&lt; val1 &lt;&lt; &quot;,\n&quot; &lt;&lt; expr2 &lt;&lt; &quot; has value &quot; &lt;&lt; val2</span>
+<span class="lineNum">      98 </span><span class="lineNoCov">          0 :                                            &lt;&lt; &quot;.&quot;;</span>
+<span class="lineNum">      99 </span>            :     }
+<span class="lineNum">     100 </span>            :     else {
+<span class="lineNum">     101 </span><span class="lineNoCov">          0 :       return ::testing::AssertionFailure() &lt;&lt; &quot;The values of &quot; &lt;&lt; expr1 &lt;&lt; &quot; and &quot; &lt;&lt; expr2 &lt;&lt; &quot; do not match\n&quot;</span>
+<span class="lineNum">     102 </span><span class="lineNoCov">          0 :                                            &lt;&lt; expr1 &lt;&lt; &quot; has value &quot; &lt;&lt; val1 &lt;&lt; &quot;,\n&quot; &lt;&lt; expr2 &lt;&lt; &quot; has value &quot; &lt;&lt; val2</span>
+<span class="lineNum">     103 </span><span class="lineNoCov">          0 :                                            &lt;&lt; &quot;.&quot;;</span>
+<span class="lineNum">     104 </span>            :     }
+<span class="lineNum">     105 </span>            :   }
+<a name="106"><span class="lineNum">     106 </span>            : }</a>
+<span class="lineNum">     107 </span>            : 
+<span class="lineNum">     108 </span><span class="lineCov">          7 : inline ::testing::AssertionResult CompareDyNDArrayValues(const char *expr1, const char *expr2,</span>
+<span class="lineNum">     109 </span>            :                                                          const dynd::nd::array &amp;val1, const dynd::nd::array &amp;val2)
+<span class="lineNum">     110 </span>            : {
+<span class="lineNum">     111 </span>            :   using namespace dynd;
+<span class="lineNum">     112 </span><span class="lineCov">         14 :   ndt::type common_tp;</span>
+<span class="lineNum">     113 </span>            :   try {
+<span class="lineNum">     114 </span><span class="lineCov">          7 :     common_tp = promote_types_arithmetic(val1.get_type(), val2.get_type());</span>
+<span class="lineNum">     115 </span>            :   }
+<span class="lineNum">     116 </span><span class="lineNoCov">          0 :   catch (const type_error &amp;) {</span>
+<span class="lineNum">     117 </span><span class="lineNoCov">          0 :     return ::testing::AssertionFailure() &lt;&lt; &quot;The types of &quot; &lt;&lt; expr1 &lt;&lt; &quot; and &quot; &lt;&lt; expr2</span>
+<span class="lineNum">     118 </span><span class="lineNoCov">          0 :                                          &lt;&lt; &quot; do not have mutually promotable types\n&quot; &lt;&lt; expr1 &lt;&lt; &quot; has type &quot;</span>
+<span class="lineNum">     119 </span><span class="lineNoCov">          0 :                                          &lt;&lt; val1.get_type() &lt;&lt; &quot;,\n&quot; &lt;&lt; expr2 &lt;&lt; &quot; has type &quot; &lt;&lt; val2.get_type() &lt;&lt; &quot;.&quot;;</span>
+<span class="lineNum">     120 </span>            :   }
+<span class="lineNum">     121 </span><span class="lineCov">         14 :   nd::array v1 = nd::empty(common_tp), v2 = nd::empty(common_tp);</span>
+<span class="lineNum">     122 </span><span class="lineCov">          7 :   v1.vals() = val1;</span>
+<span class="lineNum">     123 </span><span class="lineCov">          7 :   v2.vals() = val2;</span>
+<span class="lineNum">     124 </span><span class="lineCov">          7 :   return CompareDyNDArrays(expr1, expr2, v1, v2);</span>
+<a name="125"><span class="lineNum">     125 </span>            : }</a>
+<span class="lineNum">     126 </span>            : 
+<span class="lineNum">     127 </span><span class="lineCov">         36 : inline ::testing::AssertionResult CompareDyNDArrayToJSON(const char *expr1, const char *expr2, const char *json,</span>
+<span class="lineNum">     128 </span>            :                                                          const dynd::nd::array &amp;b)
+<span class="lineNum">     129 </span>            : {
+<span class="lineNum">     130 </span>            :   using namespace dynd;
+<span class="lineNum">     131 </span><span class="lineCov">         72 :   nd::array a(nd::empty(b.get_type()));</span>
+<span class="lineNum">     132 </span><span class="lineCov">         36 :   parse_json(a, json);</span>
+<span class="lineNum">     133 </span><span class="lineCov">         72 :   return CompareDyNDArrays(expr1, expr2, a, b);</span>
+<a name="134"><span class="lineNum">     134 </span>            : }</a>
+<span class="lineNum">     135 </span>            : 
+<span class="lineNum">     136 </span><span class="lineCov">         95 : inline ::testing::AssertionResult MatchNdtTypes(const char *expr1, const char *expr2, const dynd::ndt::type &amp;pattern,</span>
+<span class="lineNum">     137 </span>            :                                                 const dynd::ndt::type &amp;candidate)
+<span class="lineNum">     138 </span>            : {
+<span class="lineNum">     139 </span><span class="lineCov">         95 :   if (pattern.match(candidate)) {</span>
+<span class="lineNum">     140 </span><span class="lineCov">         95 :     return ::testing::AssertionSuccess();</span>
+<span class="lineNum">     141 </span>            :   }
+<span class="lineNum">     142 </span>            :   else {
+<span class="lineNum">     143 </span><span class="lineNoCov">          0 :     return ::testing::AssertionFailure() &lt;&lt; &quot;The type of candidate &quot; &lt;&lt; expr2 &lt;&lt; &quot; does not match pattern &quot; &lt;&lt; expr1</span>
+<span class="lineNum">     144 </span><span class="lineNoCov">          0 :                                          &lt;&lt; &quot;\n&quot; &lt;&lt; expr1 &lt;&lt; &quot; has value &quot; &lt;&lt; pattern &lt;&lt; &quot;,\n&quot; &lt;&lt; expr2 &lt;&lt; &quot; has value &quot;</span>
+<span class="lineNum">     145 </span><span class="lineNoCov">          0 :                                          &lt;&lt; candidate &lt;&lt; &quot;.&quot;;</span>
+<span class="lineNum">     146 </span>            :   }
+<span class="lineNum">     147 </span>            : }
+<span class="lineNum">     148 </span>            : 
+<span class="lineNum">     149 </span>            : inline ::testing::AssertionResult MatchNdtTypes(const char *expr1, const char *expr2, const char *pattern,
+<span class="lineNum">     150 </span>            :                                                 const dynd::ndt::type &amp;candidate)
+<span class="lineNum">     151 </span>            : {
+<span class="lineNum">     152 </span>            :   return MatchNdtTypes(expr1, expr2, dynd::ndt::type(pattern), candidate);
+<span class="lineNum">     153 </span>            : }
+<span class="lineNum">     154 </span>            : 
+<span class="lineNum">     155 </span>            : inline ::testing::AssertionResult MatchNdtTypes(const char *expr1, const char *expr2, const dynd::ndt::type &amp;pattern,
+<span class="lineNum">     156 </span>            :                                                 const char *candidate)
+<span class="lineNum">     157 </span>            : {
+<span class="lineNum">     158 </span>            :   return MatchNdtTypes(expr1, expr2, pattern, dynd::ndt::type(candidate));
+<a name="159"><span class="lineNum">     159 </span>            : }</a>
+<span class="lineNum">     160 </span>            : 
+<span class="lineNum">     161 </span><span class="lineCov">         95 : inline ::testing::AssertionResult MatchNdtTypes(const char *expr1, const char *expr2, const char *pattern,</span>
+<span class="lineNum">     162 </span>            :                                                 const char *candidate)
+<span class="lineNum">     163 </span>            : {
+<span class="lineNum">     164 </span><span class="lineCov">         95 :   return MatchNdtTypes(expr1, expr2, dynd::ndt::type(pattern), dynd::ndt::type(candidate));</span>
+<a name="165"><span class="lineNum">     165 </span>            : }</a>
+<span class="lineNum">     166 </span>            : 
+<span class="lineNum">     167 </span><span class="lineCov">        147 : inline ::testing::AssertionResult ExpectAllTrue(const char *DYND_UNUSED(expr1), const dynd::nd::array actual)</span>
+<span class="lineNum">     168 </span>            : {
+<span class="lineNum">     169 </span><span class="lineCov">        147 :   if (actual.as&lt;bool&gt;()) {</span>
+<span class="lineNum">     170 </span><span class="lineCov">        147 :     return ::testing::AssertionSuccess();</span>
+<span class="lineNum">     171 </span>            :   }
+<span class="lineNum">     172 </span>            : 
+<span class="lineNum">     173 </span><span class="lineNoCov">          0 :   return ::testing::AssertionFailure();</span>
+<a name="174"><span class="lineNum">     174 </span>            : }</a>
+<span class="lineNum">     175 </span>            : 
+<span class="lineNum">     176 </span><span class="lineCov">        104 : inline ::testing::AssertionResult ExpectAllFalse(const char *DYND_UNUSED(expr1), const dynd::nd::array actual)</span>
+<span class="lineNum">     177 </span>            : {
+<span class="lineNum">     178 </span><span class="lineCov">        104 :   if (!actual.as&lt;bool&gt;()) {</span>
+<span class="lineNum">     179 </span><span class="lineCov">        104 :     return ::testing::AssertionSuccess();</span>
+<span class="lineNum">     180 </span>            :   }
+<span class="lineNum">     181 </span>            : 
+<span class="lineNum">     182 </span><span class="lineNoCov">          0 :   return ::testing::AssertionFailure();</span>
+<span class="lineNum">     183 </span>            : }
+<span class="lineNum">     184 </span>            : 
+<span class="lineNum">     185 </span>            : /**
+<span class="lineNum">     186 </span>            :  * Macro to compare two arrays which should
+<span class="lineNum">     187 </span>            :  * be exactly equal
+<span class="lineNum">     188 </span>            :  *
+<span class="lineNum">     189 </span>            :  * nd::array a = {1, 2, 3};-
+<span class="lineNum">     190 </span>            :  * int bvals[3] = {1, 2, 3}
+<span class="lineNum">     191 </span>            :  * nd::array b = bvals;
+<span class="lineNum">     192 </span>            :  * EXPECT_ARRAY_EQ(b, a);
+<span class="lineNum">     193 </span>            :  */
+<span class="lineNum">     194 </span>            : #define EXPECT_ARRAY_EQ(expected, actual) EXPECT_PRED_FORMAT2(CompareDyNDArrays, expected, actual)
+<span class="lineNum">     195 </span>            : 
+<span class="lineNum">     196 </span>            : #define EXPECT_ARRAY_VALS_EQ(expected, actual) EXPECT_PRED_FORMAT2(CompareDyNDArrayValues, expected, actual)
+<span class="lineNum">     197 </span>            : 
+<span class="lineNum">     198 </span>            : #define EXPECT_ALL_TRUE(ACTUAL) EXPECT_PRED_FORMAT1(ExpectAllTrue, ACTUAL)
+<span class="lineNum">     199 </span>            : #define EXPECT_ALL_FALSE(ACTUAL) EXPECT_PRED_FORMAT1(ExpectAllFalse, ACTUAL)
+<span class="lineNum">     200 </span>            : 
+<span class="lineNum">     201 </span>            : /**
+<span class="lineNum">     202 </span>            :  * Macro to compare an array's values to those
+<span class="lineNum">     203 </span>            :  * provided in a JSON string, parsed using a
+<span class="lineNum">     204 </span>            :  * type matching that of the array.
+<span class="lineNum">     205 </span>            :  *
+<span class="lineNum">     206 </span>            :  * nd::array a = {1, 2, 3};
+<span class="lineNum">     207 </span>            :  * EXPECT_JSON_EQ_ARR(&quot;[1, 2, 3]&quot;, a);
+<span class="lineNum">     208 </span>            :  */
+<span class="lineNum">     209 </span>            : #define EXPECT_JSON_EQ_ARR(expected, actual) EXPECT_PRED_FORMAT2(CompareDyNDArrayToJSON, expected, actual)
+<span class="lineNum">     210 </span>            : 
+<span class="lineNum">     211 </span>            : /**
+<span class="lineNum">     212 </span>            :  * Macro to validate that a candidate type matches against
+<span class="lineNum">     213 </span>            :  * the provided pattern.
+<span class="lineNum">     214 </span>            :  *
+<span class="lineNum">     215 </span>            :  * EXPECT_TYPE_MATCH(&quot;Fixed * T&quot;, &quot;10 * int32&quot;);
+<span class="lineNum">     216 </span>            :  */
+<span class="lineNum">     217 </span>            : #define EXPECT_TYPE_MATCH(pattern, candidate) EXPECT_PRED_FORMAT2(MatchNdtTypes, pattern, candidate)
+<span class="lineNum">     218 </span>            : 
+<span class="lineNum">     219 </span>            : inline float rel_error(float expected, float actual)
+<span class="lineNum">     220 </span>            : {
+<span class="lineNum">     221 </span>            :   if ((expected == 0.0f) &amp;&amp; (actual == 0.0f)) {
+<span class="lineNum">     222 </span>            :     return 0.0f;
+<span class="lineNum">     223 </span>            :   }
+<span class="lineNum">     224 </span>            : 
+<span class="lineNum">     225 </span>            :   return fabs(1.0f - actual / expected);
+<span class="lineNum">     226 </span>            : }
+<span class="lineNum">     227 </span>            : 
+<span class="lineNum">     228 </span>            : inline float rel_error(dynd::complex&lt;float&gt; expected, dynd::complex&lt;float&gt; actual)
+<span class="lineNum">     229 </span>            : {
+<span class="lineNum">     230 </span>            :   if (expected == 0.0f) {
+<span class="lineNum">     231 </span>            :     if (actual == 0.0f) {
+<span class="lineNum">     232 </span>            :       return 0.0f;
+<span class="lineNum">     233 </span>            :     }
+<span class="lineNum">     234 </span>            :     else {
+<span class="lineNum">     235 </span>            :       return fabs(abs(expected - actual));
+<span class="lineNum">     236 </span>            :     }
+<span class="lineNum">     237 </span>            :   }
+<span class="lineNum">     238 </span>            : 
+<span class="lineNum">     239 </span>            :   return fabs(abs(expected - actual) / abs(expected));
+<a name="240"><span class="lineNum">     240 </span>            : }</a>
+<span class="lineNum">     241 </span>            : 
+<span class="lineNum">     242 </span><span class="lineCov">      25589 : inline double rel_error(double expected, double actual)</span>
+<span class="lineNum">     243 </span>            : {
+<span class="lineNum">     244 </span><span class="lineCov">      25589 :   if ((expected == 0.0) &amp;&amp; (actual == 0.0)) {</span>
+<span class="lineNum">     245 </span><span class="lineCov">         24 :     return 0.0;</span>
+<span class="lineNum">     246 </span>            :   }
+<span class="lineNum">     247 </span>            : 
+<span class="lineNum">     248 </span><span class="lineCov">      25565 :   return fabs(1.0 - actual / expected);</span>
+<a name="249"><span class="lineNum">     249 </span>            : }</a>
+<span class="lineNum">     250 </span>            : 
+<span class="lineNum">     251 </span><span class="lineCov">        324 : inline double rel_error(dynd::complex&lt;double&gt; expected, dynd::complex&lt;double&gt; actual)</span>
+<span class="lineNum">     252 </span>            : {
+<span class="lineNum">     253 </span><span class="lineCov">        324 :   if (expected == 0.0) {</span>
+<span class="lineNum">     254 </span><span class="lineNoCov">          0 :     if (actual == 0.0) {</span>
+<span class="lineNum">     255 </span><span class="lineNoCov">          0 :       return 0.0;</span>
+<span class="lineNum">     256 </span>            :     }
+<span class="lineNum">     257 </span>            :     else {
+<span class="lineNum">     258 </span><span class="lineNoCov">          0 :       return fabs(abs(expected - actual));</span>
+<span class="lineNum">     259 </span>            :     }
+<span class="lineNum">     260 </span>            :   }
+<span class="lineNum">     261 </span>            : 
+<span class="lineNum">     262 </span><span class="lineCov">        324 :   return fabs(abs(expected - actual) / abs(expected));</span>
+<span class="lineNum">     263 </span>            : }
+<span class="lineNum">     264 </span>            : 
+<span class="lineNum">     265 </span>            : template &lt;typename T&gt;
+<span class="lineNum">     266 </span>            : ::testing::AssertionResult
+<span class="lineNum">     267 </span>            : AssertRelErrorLE(const char *DYND_UNUSED(expected_expr), const char *DYND_UNUSED(actual_expr),
+<span class="lineNum">     268 </span>            :                  const char *DYND_UNUSED(rel_error_max_expr), T expected, T actual, float rel_error_max)
+<span class="lineNum">     269 </span>            : {
+<span class="lineNum">     270 </span>            :   float rel_error_val = rel_error(expected, actual);
+<span class="lineNum">     271 </span>            : 
+<span class="lineNum">     272 </span>            :   if (rel_error_val &lt;= rel_error_max) {
+<span class="lineNum">     273 </span>            :     return ::testing::AssertionSuccess();
+<span class="lineNum">     274 </span>            :   }
+<span class="lineNum">     275 </span>            : 
+<span class="lineNum">     276 </span>            :   return ::testing::AssertionFailure() &lt;&lt; &quot;Expected: rel_error(&quot; &lt;&lt; expected &lt;&lt; &quot;, &quot; &lt;&lt; actual
+<span class="lineNum">     277 </span>            :                                        &lt;&lt; &quot;) &lt;= &quot; &lt;&lt; rel_error_max &lt;&lt; &quot;\n&quot;
+<span class="lineNum">     278 </span>            :                                        &lt;&lt; &quot;  Actual: &quot; &lt;&lt; rel_error_val &lt;&lt; &quot; vs &quot; &lt;&lt; rel_error_max;
+<span class="lineNum">     279 </span>            : }
+<span class="lineNum">     280 </span>            : 
+<a name="281"><span class="lineNum">     281 </span>            : template &lt;typename T&gt;</a>
+<span class="lineNum">     282 </span>            : ::testing::AssertionResult
+<span class="lineNum">     283 </span><span class="lineCov">      25913 : AssertRelErrorLE(const char *DYND_UNUSED(expected_expr), const char *DYND_UNUSED(actual_expr),</span>
+<span class="lineNum">     284 </span>            :                  const char *DYND_UNUSED(rel_error_max_expr), T expected, T actual, double rel_error_max)
+<span class="lineNum">     285 </span>            : {
+<span class="lineNum">     286 </span><span class="lineCov">      25913 :   double rel_error_val = rel_error(expected, actual);</span>
+<span class="lineNum">     287 </span>            : 
+<span class="lineNum">     288 </span><span class="lineCov">      25913 :   if (rel_error_val &lt;= rel_error_max) {</span>
+<span class="lineNum">     289 </span><span class="lineCov">      25913 :     return ::testing::AssertionSuccess();</span>
+<span class="lineNum">     290 </span>            :   }
+<span class="lineNum">     291 </span>            : 
+<span class="lineNum">     292 </span><span class="lineNoCov">          0 :   return ::testing::AssertionFailure() &lt;&lt; &quot;Expected: rel_error(&quot; &lt;&lt; expected &lt;&lt; &quot;, &quot; &lt;&lt; actual</span>
+<span class="lineNum">     293 </span><span class="lineNoCov">          0 :                                        &lt;&lt; &quot;) &lt;= &quot; &lt;&lt; rel_error_max &lt;&lt; &quot;\n&quot;</span>
+<span class="lineNum">     294 </span><span class="lineNoCov">          0 :                                        &lt;&lt; &quot;  Actual: &quot; &lt;&lt; rel_error_val &lt;&lt; &quot; vs &quot; &lt;&lt; rel_error_max;</span>
+<span class="lineNum">     295 </span>            : }
+<span class="lineNum">     296 </span>            : 
+<span class="lineNum">     297 </span>            : inline ::testing::AssertionResult AssertRelErrorLE(const char *expected_expr, const char *actual_expr,
+<span class="lineNum">     298 </span>            :                                                    const char *rel_error_max_expr, float expected,
+<span class="lineNum">     299 </span>            :                                                    dynd::complex&lt;float&gt; actual, float rel_error_max)
+<span class="lineNum">     300 </span>            : {
+<span class="lineNum">     301 </span>            :   return AssertRelErrorLE(expected_expr, actual_expr, rel_error_max_expr, dynd::complex&lt;float&gt;(expected), actual,
+<span class="lineNum">     302 </span>            :                           rel_error_max);
+<span class="lineNum">     303 </span>            : }
+<span class="lineNum">     304 </span>            : 
+<span class="lineNum">     305 </span>            : inline ::testing::AssertionResult AssertRelErrorLE(const char *expected_expr, const char *actual_expr,
+<span class="lineNum">     306 </span>            :                                                    const char *rel_error_max_expr, double expected,
+<span class="lineNum">     307 </span>            :                                                    dynd::complex&lt;double&gt; actual, double rel_error_max)
+<span class="lineNum">     308 </span>            : {
+<span class="lineNum">     309 </span>            :   return AssertRelErrorLE(expected_expr, actual_expr, rel_error_max_expr, dynd::complex&lt;double&gt;(expected), actual,
+<span class="lineNum">     310 </span>            :                           rel_error_max);
+<span class="lineNum">     311 </span>            : }
+<span class="lineNum">     312 </span>            : 
+<span class="lineNum">     313 </span>            : #define EXPECT_EQ_RELERR(expected, actual, rel_error_max)                                                              \
+<span class="lineNum">     314 </span>            :   ASSERT_PRED_FORMAT3(AssertRelErrorLE, expected, actual, rel_error_max)
+<span class="lineNum">     315 </span>            : 
+<span class="lineNum">     316 </span>            : template &lt;typename T&gt;
+<span class="lineNum">     317 </span>            : struct test_class {
+<span class="lineNum">     318 </span>            :   double rel_error_max;
+<span class="lineNum">     319 </span>            :   bool flag;
+<span class="lineNum">     320 </span>            : 
+<span class="lineNum">     321 </span>            :   test_class(double rel_error_max) : rel_error_max(rel_error_max) { flag = true; }
+<span class="lineNum">     322 </span>            : 
+<span class="lineNum">     323 </span>            :   void operator()(T a, T b)
+<span class="lineNum">     324 </span>            :   {
+<span class="lineNum">     325 </span>            :     if (rel_error(a, b) &gt; rel_error_max) {
+<span class="lineNum">     326 </span>            :       flag = false;
+<span class="lineNum">     327 </span>            :     }
+<span class="lineNum">     328 </span>            :   }
+<span class="lineNum">     329 </span>            : };
+<span class="lineNum">     330 </span>            : 
+<span class="lineNum">     331 </span>            : inline ::testing::AssertionResult AssertArrayNear(const char *expected_expr, const char *actual_expr,
+<span class="lineNum">     332 </span>            :                                                   const char *rel_error_max_expr, const dynd::nd::array &amp;expected,
+<span class="lineNum">     333 </span>            :                                                   const dynd::nd::array &amp;actual, double rel_error_max)
+<span class="lineNum">     334 </span>            : {
+<span class="lineNum">     335 </span>            :   const dynd::ndt::type &amp;expected_tp = expected.get_type();
+<span class="lineNum">     336 </span>            :   const dynd::ndt::type &amp;actual_tp = actual.get_type();
+<span class="lineNum">     337 </span>            :   if (expected_tp.get_id() == dynd::cuda_device_id &amp;&amp; actual_tp.get_id() == dynd::cuda_device_id) {
+<span class="lineNum">     338 </span>            :     return AssertArrayNear(expected_expr, actual_expr, rel_error_max_expr, expected.to_host(), actual.to_host(),
+<span class="lineNum">     339 </span>            :                            rel_error_max);
+<span class="lineNum">     340 </span>            :   }
+<span class="lineNum">     341 </span>            : 
+<span class="lineNum">     342 </span>            :   std::unique_ptr&lt;test_class&lt;dynd::complex&lt;double&gt;&gt;&gt; c(new test_class&lt;dynd::complex&lt;double&gt;&gt;(rel_error_max));
+<span class="lineNum">     343 </span>            : 
+<span class="lineNum">     344 </span>            :   dynd::nd::callable af = dynd::nd::functional::elwise(dynd::nd::functional::apply(c.get()));
+<span class="lineNum">     345 </span>            :   af(expected, actual);
+<span class="lineNum">     346 </span>            : 
+<span class="lineNum">     347 </span>            :   bool res = c-&gt;flag;
+<span class="lineNum">     348 </span>            : 
+<span class="lineNum">     349 </span>            :   if (res) {
+<span class="lineNum">     350 </span>            :     return ::testing::AssertionSuccess();
+<span class="lineNum">     351 </span>            :   }
+<span class="lineNum">     352 </span>            : 
+<span class="lineNum">     353 </span>            :   return ::testing::AssertionFailure() &lt;&lt; &quot;the values do not match&quot;;
+<span class="lineNum">     354 </span>            : }
+<span class="lineNum">     355 </span>            : 
+<span class="lineNum">     356 </span>            : #define EXPECT_ARRAY_NEAR(EXPECTED, ACTUAL, REL_ERROR_MAX)                                                             \
+<span class="lineNum">     357 </span>            :   ASSERT_PRED_FORMAT3(AssertArrayNear, EXPECTED, ACTUAL, REL_ERROR_MAX)
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.10</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

@@ -1,0 +1,245 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - coverage.info.cleaned - include/dynd/kernels/forward_na_kernel.hpp</title>
+  <link rel="stylesheet" type="text/css" href="../../../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../../../index.html">top level</a> - <a href="index.html">include/dynd/kernels</a> - forward_na_kernel.hpp<span style="font-size: 80%;"> (source / <a href="forward_na_kernel.hpp.func.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">coverage.info.cleaned</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">69</td>
+            <td class="headerCovTableEntry">70</td>
+            <td class="headerCovTableEntryHi">98.6 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2016-02-19</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">26</td>
+            <td class="headerCovTableEntry">26</td>
+            <td class="headerCovTableEntryHi">100.0 %</td>
+          </tr>
+          <tr><td><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : //</a>
+<span class="lineNum">       2 </span>            : // Copyright (C) 2011-15 DyND Developers
+<span class="lineNum">       3 </span>            : // BSD 2-Clause License, see LICENSE.txt
+<span class="lineNum">       4 </span>            : //
+<span class="lineNum">       5 </span>            : 
+<span class="lineNum">       6 </span>            : #pragma once
+<span class="lineNum">       7 </span>            : 
+<span class="lineNum">       8 </span>            : #include &lt;dynd/option.hpp&gt;
+<span class="lineNum">       9 </span>            : #include &lt;dynd/types/option_type.hpp&gt;
+<span class="lineNum">      10 </span>            : 
+<span class="lineNum">      11 </span>            : namespace dynd {
+<span class="lineNum">      12 </span>            : namespace nd {
+<span class="lineNum">      13 </span>            : 
+<span class="lineNum">      14 </span>            :   template &lt;int... I&gt;
+<span class="lineNum">      15 </span>            :   struct forward_na_kernel;
+<span class="lineNum">      16 </span>            : 
+<span class="lineNum">      17 </span>            :   template &lt;int I&gt;
+<span class="lineNum">      18 </span>            :   struct forward_na_kernel&lt;I&gt; : base_kernel&lt;forward_na_kernel&lt;I&gt;, 2&gt; {
+<span class="lineNum">      19 </span>            :     struct static_data_type {
+<span class="lineNum">      20 </span>            :       callable child;
+<a name="21"><span class="lineNum">      21 </span>            :     };</a>
+<span class="lineNum">      22 </span>            : 
+<a name="23"><span class="lineNum">      23 </span><span class="lineCov">         72 :     constexpr size_t size() const { return sizeof(forward_na_kernel) + 2 * sizeof(size_t); }</span></a>
+<span class="lineNum">      24 </span>            : 
+<span class="lineNum">      25 </span><span class="lineCov">         72 :     void single(char *res, char *const *args)</span>
+<span class="lineNum">      26 </span>            :     {
+<span class="lineNum">      27 </span>            :       // Check if args[I] is not available
+<span class="lineNum">      28 </span><span class="lineCov">         72 :       bool1 is_na;</span>
+<span class="lineNum">      29 </span><span class="lineCov">         72 :       this-&gt;get_child()-&gt;single(reinterpret_cast&lt;char *&gt;(&amp;is_na), args + I);</span>
+<span class="lineNum">      30 </span>            : 
+<span class="lineNum">      31 </span><span class="lineCov">         72 :       if (is_na) {</span>
+<span class="lineNum">      32 </span>            :         // assign_na
+<span class="lineNum">      33 </span><span class="lineCov">         36 :         this-&gt;template get_child&lt;1&gt;()-&gt;single(res, nullptr);</span>
+<span class="lineNum">      34 </span>            :       }
+<span class="lineNum">      35 </span>            :       else {
+<span class="lineNum">      36 </span>            :         // call the actual child
+<span class="lineNum">      37 </span><span class="lineCov">         36 :         this-&gt;template get_child&lt;2&gt;()-&gt;single(res, args);</span>
+<span class="lineNum">      38 </span>            :       }
+<a name="39"><span class="lineNum">      39 </span><span class="lineCov">         72 :     }</span></a>
+<span class="lineNum">      40 </span>            : 
+<span class="lineNum">      41 </span><span class="lineCov">         24 :     static void resolve_dst_type(char *static_data, char *data, ndt::type &amp;dst_tp, intptr_t nsrc,</span>
+<span class="lineNum">      42 </span>            :                                  const ndt::type *src_tp, intptr_t nkwd, const array *kwds,
+<span class="lineNum">      43 </span>            :                                  const std::map&lt;std::string, ndt::type&gt; &amp;tp_vars)
+<span class="lineNum">      44 </span>            :     {
+<span class="lineNum">      45 </span><span class="lineCov">         24 :       callable &amp;child = reinterpret_cast&lt;static_data_type *&gt;(static_data)-&gt;child;</span>
+<span class="lineNum">      46 </span>            : 
+<span class="lineNum">      47 </span><span class="lineCov">         48 :       ndt::type child_src_tp[2];</span>
+<span class="lineNum">      48 </span><span class="lineCov">         24 :       child_src_tp[I] = src_tp[I].extended&lt;ndt::option_type&gt;()-&gt;get_value_type();</span>
+<span class="lineNum">      49 </span><span class="lineCov">         24 :       child_src_tp[1 - I] = src_tp[1 - I];</span>
+<span class="lineNum">      50 </span>            : 
+<span class="lineNum">      51 </span><span class="lineCov">         24 :       const ndt::type &amp;child_dst_tp = child.get_ret_type();</span>
+<span class="lineNum">      52 </span><span class="lineCov">         24 :       if (child_dst_tp.is_symbolic()) {</span>
+<span class="lineNum">      53 </span><span class="lineCov">         24 :         child-&gt;resolve_dst_type(child-&gt;static_data(), data, dst_tp, nsrc, child_src_tp, nkwd, kwds, tp_vars);</span>
+<span class="lineNum">      54 </span>            :       }
+<span class="lineNum">      55 </span>            :       else {
+<span class="lineNum">      56 </span><span class="lineNoCov">          0 :         dst_tp = child_dst_tp;</span>
+<span class="lineNum">      57 </span>            :       }
+<span class="lineNum">      58 </span><span class="lineCov">         24 :       dst_tp = ndt::make_type&lt;ndt::option_type&gt;(dst_tp);</span>
+<a name="59"><span class="lineNum">      59 </span><span class="lineCov">         24 :     }</span></a>
+<span class="lineNum">      60 </span>            : 
+<span class="lineNum">      61 </span><span class="lineCov">         24 :     static void instantiate(char *static_data, char *data, kernel_builder *ckb, const ndt::type &amp;dst_tp,</span>
+<span class="lineNum">      62 </span>            :                             const char *dst_arrmeta, intptr_t nsrc, const ndt::type *src_tp,
+<span class="lineNum">      63 </span>            :                             const char *const *src_arrmeta, kernel_request_t kernreq, intptr_t nkwd, const array *kwds,
+<span class="lineNum">      64 </span>            :                             const std::map&lt;std::string, ndt::type&gt; &amp;tp_vars)
+<span class="lineNum">      65 </span>            :     {
+<span class="lineNum">      66 </span><span class="lineCov">         24 :       callable &amp;child = reinterpret_cast&lt;static_data_type *&gt;(static_data)-&gt;child;</span>
+<span class="lineNum">      67 </span>            : 
+<span class="lineNum">      68 </span><span class="lineCov">         24 :       size_t self_offset = ckb-&gt;size();</span>
+<span class="lineNum">      69 </span>            :       size_t child_offsets[2];
+<span class="lineNum">      70 </span>            : 
+<span class="lineNum">      71 </span><span class="lineCov">         24 :       ckb-&gt;emplace_back&lt;forward_na_kernel&gt;(kernreq);</span>
+<span class="lineNum">      72 </span><span class="lineCov">         24 :       ckb-&gt;emplace_back(2 * sizeof(size_t));</span>
+<span class="lineNum">      73 </span>            : 
+<span class="lineNum">      74 </span><span class="lineCov">         24 :       is_na::get()-&gt;instantiate(is_na::get()-&gt;static_data(), data, ckb, dst_tp, dst_arrmeta, nsrc, src_tp + I,</span>
+<span class="lineNum">      75 </span>            :                                 src_arrmeta + I, kernel_request_single, nkwd, kwds, tp_vars);
+<span class="lineNum">      76 </span>            : 
+<span class="lineNum">      77 </span><span class="lineCov">         48 :       ndt::type child_src_tp[2];</span>
+<span class="lineNum">      78 </span><span class="lineCov">         24 :       child_src_tp[I] = src_tp[I].extended&lt;ndt::option_type&gt;()-&gt;get_value_type();</span>
+<span class="lineNum">      79 </span><span class="lineCov">         24 :       child_src_tp[1 - I] = src_tp[1 - I];</span>
+<span class="lineNum">      80 </span>            : 
+<span class="lineNum">      81 </span><span class="lineCov">         24 :       child_offsets[0] = ckb-&gt;size() - self_offset;</span>
+<span class="lineNum">      82 </span><span class="lineCov">         24 :       assign_na::get()-&gt;instantiate(assign_na::get()-&gt;static_data(), data, ckb,</span>
+<span class="lineNum">      83 </span>            :                                     ndt::make_type&lt;ndt::option_type&gt;(ndt::make_type&lt;bool1&gt;()), nullptr, 0, nullptr,
+<span class="lineNum">      84 </span>            :                                     nullptr, kernel_request_single, nkwd, kwds, tp_vars);
+<span class="lineNum">      85 </span>            : 
+<span class="lineNum">      86 </span><span class="lineCov">         24 :       child_offsets[1] = ckb-&gt;size() - self_offset;</span>
+<span class="lineNum">      87 </span><span class="lineCov">         24 :       child-&gt;instantiate(child-&gt;static_data(), data, ckb, dst_tp.extended&lt;ndt::option_type&gt;()-&gt;get_value_type(),</span>
+<span class="lineNum">      88 </span>            :                          dst_arrmeta, nsrc, child_src_tp, src_arrmeta, kernel_request_single, nkwd, kwds, tp_vars);
+<span class="lineNum">      89 </span>            : 
+<span class="lineNum">      90 </span><span class="lineCov">         24 :       memcpy(ckb-&gt;get_at&lt;forward_na_kernel&gt;(self_offset)-&gt;get_offsets(), child_offsets, 2 * sizeof(size_t));</span>
+<span class="lineNum">      91 </span><span class="lineCov">         24 :     }</span>
+<span class="lineNum">      92 </span>            :   };
+<span class="lineNum">      93 </span>            : 
+<span class="lineNum">      94 </span>            :   template &lt;typename FuncType, bool Src0IsOption, bool Src1IsOption&gt;
+<span class="lineNum">      95 </span>            :   struct option_comparison_kernel;
+<span class="lineNum">      96 </span>            : 
+<span class="lineNum">      97 </span>            :   template &lt;typename FuncType&gt;
+<span class="lineNum">      98 </span>            :   struct option_comparison_kernel&lt;FuncType, true, true&gt;
+<span class="lineNum">      99 </span>            :       : base_kernel&lt;option_comparison_kernel&lt;FuncType, true, true&gt;, 2&gt; {
+<span class="lineNum">     100 </span>            :     intptr_t is_na_rhs_offset;
+<span class="lineNum">     101 </span>            :     intptr_t comp_offset;
+<a name="102"><span class="lineNum">     102 </span>            :     intptr_t assign_na_offset;</a>
+<span class="lineNum">     103 </span>            : 
+<span class="lineNum">     104 </span><span class="lineCov">         40 :     void single(char *dst, char *const *src)</span>
+<span class="lineNum">     105 </span>            :     {
+<span class="lineNum">     106 </span><span class="lineCov">         40 :       auto is_na_lhs = this-&gt;get_child();</span>
+<span class="lineNum">     107 </span><span class="lineCov">         40 :       auto is_na_rhs = this-&gt;get_child(is_na_rhs_offset);</span>
+<span class="lineNum">     108 </span>            :       bool child_dst_lhs;
+<span class="lineNum">     109 </span>            :       bool child_dst_rhs;
+<span class="lineNum">     110 </span><span class="lineCov">         40 :       is_na_lhs-&gt;single(reinterpret_cast&lt;char *&gt;(&amp;child_dst_lhs), &amp;src[0]);</span>
+<span class="lineNum">     111 </span><span class="lineCov">         40 :       is_na_rhs-&gt;single(reinterpret_cast&lt;char *&gt;(&amp;child_dst_rhs), &amp;src[1]);</span>
+<span class="lineNum">     112 </span><span class="lineCov">         40 :       if (!child_dst_lhs &amp;&amp; !child_dst_rhs) {</span>
+<span class="lineNum">     113 </span><span class="lineCov">         22 :         this-&gt;get_child(comp_offset)-&gt;single(dst, src);</span>
+<span class="lineNum">     114 </span>            :       }
+<span class="lineNum">     115 </span>            :       else {
+<span class="lineNum">     116 </span><span class="lineCov">         18 :         this-&gt;get_child(assign_na_offset)-&gt;single(dst, nullptr);</span>
+<span class="lineNum">     117 </span>            :       }
+<a name="118"><span class="lineNum">     118 </span><span class="lineCov">         40 :     }</span></a>
+<span class="lineNum">     119 </span>            : 
+<span class="lineNum">     120 </span><span class="lineCov">         16 :     static void instantiate(char *DYND_UNUSED(static_data), char *data, kernel_builder *ckb, const ndt::type &amp;dst_tp,</span>
+<span class="lineNum">     121 </span>            :                             const char *dst_arrmeta, intptr_t nsrc, const ndt::type *src_tp,
+<span class="lineNum">     122 </span>            :                             const char *const *src_arrmeta, kernel_request_t kernreq, intptr_t nkwd, const array *kwds,
+<span class="lineNum">     123 </span>            :                             const std::map&lt;std::string, ndt::type&gt; &amp;tp_vars)
+<span class="lineNum">     124 </span>            :     {
+<span class="lineNum">     125 </span><span class="lineCov">         16 :       intptr_t ckb_offset = ckb-&gt;size();</span>
+<span class="lineNum">     126 </span><span class="lineCov">         16 :       intptr_t option_comp_offset = ckb_offset;</span>
+<span class="lineNum">     127 </span><span class="lineCov">         16 :       ckb-&gt;emplace_back&lt;option_comparison_kernel&gt;(kernreq);</span>
+<span class="lineNum">     128 </span><span class="lineCov">         16 :       ckb_offset = ckb-&gt;size();</span>
+<span class="lineNum">     129 </span>            : 
+<span class="lineNum">     130 </span><span class="lineCov">         32 :       auto is_na_lhs = is_na::get();</span>
+<span class="lineNum">     131 </span><span class="lineCov">         16 :       is_na_lhs.get()-&gt;instantiate(is_na_lhs.get()-&gt;static_data(), data, ckb, dst_tp, dst_arrmeta, nsrc, &amp;src_tp[0],</span>
+<span class="lineNum">     132 </span>            :                                    &amp;src_arrmeta[0], kernel_request_single, nkwd, kwds, tp_vars);
+<span class="lineNum">     133 </span><span class="lineCov">         16 :       ckb_offset = ckb-&gt;size();</span>
+<span class="lineNum">     134 </span><span class="lineCov">         16 :       option_comparison_kernel *self = ckb-&gt;get_at&lt;option_comparison_kernel&gt;(option_comp_offset);</span>
+<span class="lineNum">     135 </span><span class="lineCov">         16 :       self-&gt;is_na_rhs_offset = ckb_offset - option_comp_offset;</span>
+<span class="lineNum">     136 </span>            : 
+<span class="lineNum">     137 </span><span class="lineCov">         32 :       auto is_na_rhs = is_na::get();</span>
+<span class="lineNum">     138 </span><span class="lineCov">         16 :       is_na_rhs.get()-&gt;instantiate(is_na_rhs.get()-&gt;static_data(), data, ckb, dst_tp, dst_arrmeta, nsrc, &amp;src_tp[1],</span>
+<span class="lineNum">     139 </span>            :                                    &amp;src_arrmeta[1], kernel_request_single, nkwd, kwds, tp_vars);
+<span class="lineNum">     140 </span><span class="lineCov">         16 :       ckb_offset = ckb-&gt;size();</span>
+<span class="lineNum">     141 </span><span class="lineCov">         16 :       self = ckb-&gt;get_at&lt;option_comparison_kernel&gt;(option_comp_offset);</span>
+<span class="lineNum">     142 </span><span class="lineCov">         16 :       self-&gt;comp_offset = ckb_offset - option_comp_offset;</span>
+<span class="lineNum">     143 </span><span class="lineCov">         32 :       auto cmp = FuncType::get();</span>
+<span class="lineNum">     144 </span><span class="lineCov">         16 :       const ndt::type child_src_tp[2] = {src_tp[0].extended&lt;ndt::option_type&gt;()-&gt;get_value_type(),</span>
+<span class="lineNum">     145 </span><span class="lineCov">         48 :                                          src_tp[1].extended&lt;ndt::option_type&gt;()-&gt;get_value_type()};</span>
+<span class="lineNum">     146 </span><span class="lineCov">         16 :       cmp.get()-&gt;instantiate(cmp.get()-&gt;static_data(), data, ckb, dst_tp.extended&lt;ndt::option_type&gt;()-&gt;get_value_type(),</span>
+<span class="lineNum">     147 </span>            :                              dst_arrmeta, nsrc, child_src_tp, src_arrmeta, kernel_request_single, nkwd, kwds, tp_vars);
+<span class="lineNum">     148 </span><span class="lineCov">         16 :       ckb_offset = ckb-&gt;size();</span>
+<span class="lineNum">     149 </span><span class="lineCov">         16 :       self = ckb-&gt;get_at&lt;option_comparison_kernel&gt;(option_comp_offset);</span>
+<span class="lineNum">     150 </span><span class="lineCov">         16 :       self-&gt;assign_na_offset = ckb_offset - option_comp_offset;</span>
+<span class="lineNum">     151 </span><span class="lineCov">         32 :       auto assign_na = nd::assign_na::get();</span>
+<span class="lineNum">     152 </span><span class="lineCov">         16 :       assign_na.get()-&gt;instantiate(assign_na.get()-&gt;static_data(), data, ckb,</span>
+<span class="lineNum">     153 </span>            :                                    ndt::make_type&lt;ndt::option_type&gt;(ndt::make_type&lt;bool1&gt;()), nullptr, 0, nullptr,
+<span class="lineNum">     154 </span>            :                                    nullptr, kernel_request_single, nkwd, kwds, tp_vars);
+<span class="lineNum">     155 </span><span class="lineCov">         16 :       ckb_offset = ckb-&gt;size();</span>
+<span class="lineNum">     156 </span><span class="lineCov">         16 :     }</span>
+<span class="lineNum">     157 </span>            :   };
+<span class="lineNum">     158 </span>            : 
+<span class="lineNum">     159 </span>            : } // namespace dynd::nd
+<span class="lineNum">     160 </span>            : 
+<span class="lineNum">     161 </span>            : namespace ndt {
+<span class="lineNum">     162 </span>            : 
+<a name="163"><span class="lineNum">     163 </span>            :   template &lt;typename FuncType&gt;</a>
+<span class="lineNum">     164 </span>            :   struct traits&lt;nd::option_comparison_kernel&lt;FuncType, true, true&gt;&gt; {
+<span class="lineNum">     165 </span><span class="lineCov">          6 :     static type equivalent() { return type(&quot;(?Scalar, ?Scalar) -&gt; ?bool&quot;); }</span>
+<span class="lineNum">     166 </span>            :   };
+<span class="lineNum">     167 </span>            : 
+<span class="lineNum">     168 </span>            : } // namespace dynd::ndt
+<span class="lineNum">     169 </span>            : } // namespace dynd
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.10</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

@@ -1,0 +1,669 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - coverage.info.cleaned - tests/array/test_array.cpp</title>
+  <link rel="stylesheet" type="text/css" href="../../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../../index.html">top level</a> - <a href="index.html">tests/array</a> - test_array.cpp<span style="font-size: 80%;"> (source / <a href="test_array.cpp.func.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">coverage.info.cleaned</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">438</td>
+            <td class="headerCovTableEntry">438</td>
+            <td class="headerCovTableEntryHi">100.0 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2016-02-19</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">84</td>
+            <td class="headerCovTableEntry">85</td>
+            <td class="headerCovTableEntryHi">98.8 %</td>
+          </tr>
+          <tr><td><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : //</a>
+<span class="lineNum">       2 </span>            : // Copyright (C) 2011-15 DyND Developers
+<span class="lineNum">       3 </span>            : // BSD 2-Clause License, see LICENSE.txt
+<span class="lineNum">       4 </span>            : //
+<span class="lineNum">       5 </span>            : 
+<span class="lineNum">       6 </span>            : #include &lt;iostream&gt;
+<span class="lineNum">       7 </span>            : #include &lt;stdexcept&gt;
+<span class="lineNum">       8 </span>            : #include &lt;algorithm&gt;
+<span class="lineNum">       9 </span>            : #include &lt;cmath&gt;
+<span class="lineNum">      10 </span>            : 
+<span class="lineNum">      11 </span>            : #include &quot;inc_gtest.hpp&quot;
+<span class="lineNum">      12 </span>            : #include &quot;../test_memory.hpp&quot;
+<span class="lineNum">      13 </span>            : #include &quot;dynd_assertions.hpp&quot;
+<span class="lineNum">      14 </span>            : 
+<span class="lineNum">      15 </span>            : #include &lt;dynd/array.hpp&gt;
+<span class="lineNum">      16 </span>            : #include &lt;dynd/types/fixed_bytes_type.hpp&gt;
+<span class="lineNum">      17 </span>            : #include &lt;dynd/types/string_type.hpp&gt;
+<span class="lineNum">      18 </span>            : 
+<span class="lineNum">      19 </span>            : using namespace std;
+<span class="lineNum">      20 </span>            : using namespace dynd;
+<a name="21"><span class="lineNum">      21 </span>            : </a>
+<span class="lineNum">      22 </span>            : template &lt;typename T&gt;
+<span class="lineNum">      23 </span><span class="lineCov">         10 : class Array : public Memory&lt;T&gt; {</span>
+<a name="24"><span class="lineNum">      24 </span>            : };</a>
+<span class="lineNum">      25 </span>            : 
+<a name="26"><span class="lineNum">      26 </span><span class="lineCov">          1 : TYPED_TEST_CASE_P(Array);</span></a>
+<span class="lineNum">      27 </span>            : 
+<span class="lineNum">      28 </span><span class="lineCov">          5 : TEST(Array, NullConstructor)</span>
+<span class="lineNum">      29 </span>            : {
+<span class="lineNum">      30 </span><span class="lineCov">          2 :   nd::array a;</span>
+<span class="lineNum">      31 </span>            : 
+<span class="lineNum">      32 </span>            :   // Default-constructed nd::array is NULL and will crash if access is attempted
+<span class="lineNum">      33 </span><span class="lineCov">          1 :   EXPECT_EQ(NULL, a.get());</span>
+<a name="34"><span class="lineNum">      34 </span><span class="lineCov">          1 : }</span></a>
+<span class="lineNum">      35 </span>            : 
+<span class="lineNum">      36 </span><span class="lineCov">          5 : TEST(Array, FromValueConstructor)</span>
+<span class="lineNum">      37 </span>            : {
+<span class="lineNum">      38 </span><span class="lineCov">          2 :   nd::array a;</span>
+<span class="lineNum">      39 </span>            :   // Bool
+<span class="lineNum">      40 </span><span class="lineCov">          1 :   a = nd::array(true);</span>
+<span class="lineNum">      41 </span><span class="lineCov">          1 :   EXPECT_EQ(ndt::make_type&lt;bool1&gt;(), a.get_type());</span>
+<span class="lineNum">      42 </span><span class="lineCov">          1 :   EXPECT_EQ((uint32_t)nd::read_access_flag | nd::immutable_access_flag, a.get_access_flags());</span>
+<span class="lineNum">      43 </span><span class="lineCov">          1 :   a = nd::array(bool1(true));</span>
+<span class="lineNum">      44 </span><span class="lineCov">          1 :   EXPECT_EQ(ndt::make_type&lt;bool1&gt;(), a.get_type());</span>
+<span class="lineNum">      45 </span><span class="lineCov">          1 :   EXPECT_EQ((uint32_t)nd::read_access_flag | nd::immutable_access_flag, a.get_access_flags());</span>
+<span class="lineNum">      46 </span>            :   // Signed int
+<span class="lineNum">      47 </span><span class="lineCov">          1 :   a = nd::array((int8_t)1);</span>
+<span class="lineNum">      48 </span><span class="lineCov">          1 :   EXPECT_EQ(ndt::make_type&lt;int8_t&gt;(), a.get_type());</span>
+<span class="lineNum">      49 </span><span class="lineCov">          1 :   EXPECT_EQ((uint32_t)nd::read_access_flag | nd::immutable_access_flag, a.get_access_flags());</span>
+<span class="lineNum">      50 </span><span class="lineCov">          1 :   a = nd::array((int16_t)1);</span>
+<span class="lineNum">      51 </span><span class="lineCov">          1 :   EXPECT_EQ(ndt::make_type&lt;int16_t&gt;(), a.get_type());</span>
+<span class="lineNum">      52 </span><span class="lineCov">          1 :   EXPECT_EQ((uint32_t)nd::read_access_flag | nd::immutable_access_flag, a.get_access_flags());</span>
+<span class="lineNum">      53 </span><span class="lineCov">          1 :   a = nd::array((int32_t)1);</span>
+<span class="lineNum">      54 </span><span class="lineCov">          1 :   EXPECT_EQ(ndt::make_type&lt;int32_t&gt;(), a.get_type());</span>
+<span class="lineNum">      55 </span><span class="lineCov">          1 :   EXPECT_EQ((uint32_t)nd::read_access_flag | nd::immutable_access_flag, a.get_access_flags());</span>
+<span class="lineNum">      56 </span><span class="lineCov">          1 :   a = nd::array((int64_t)1);</span>
+<span class="lineNum">      57 </span><span class="lineCov">          1 :   EXPECT_EQ(ndt::make_type&lt;int64_t&gt;(), a.get_type());</span>
+<span class="lineNum">      58 </span><span class="lineCov">          1 :   EXPECT_EQ((uint32_t)nd::read_access_flag | nd::immutable_access_flag, a.get_access_flags());</span>
+<span class="lineNum">      59 </span>            :   // Unsigned int
+<span class="lineNum">      60 </span><span class="lineCov">          1 :   a = nd::array((uint8_t)1);</span>
+<span class="lineNum">      61 </span><span class="lineCov">          1 :   EXPECT_EQ(ndt::make_type&lt;uint8_t&gt;(), a.get_type());</span>
+<span class="lineNum">      62 </span><span class="lineCov">          1 :   EXPECT_EQ((uint32_t)nd::read_access_flag | nd::immutable_access_flag, a.get_access_flags());</span>
+<span class="lineNum">      63 </span><span class="lineCov">          1 :   a = nd::array((uint16_t)1);</span>
+<span class="lineNum">      64 </span><span class="lineCov">          1 :   EXPECT_EQ(ndt::make_type&lt;uint16_t&gt;(), a.get_type());</span>
+<span class="lineNum">      65 </span><span class="lineCov">          1 :   EXPECT_EQ((uint32_t)nd::read_access_flag | nd::immutable_access_flag, a.get_access_flags());</span>
+<span class="lineNum">      66 </span><span class="lineCov">          1 :   a = nd::array((uint32_t)1);</span>
+<span class="lineNum">      67 </span><span class="lineCov">          1 :   EXPECT_EQ(ndt::make_type&lt;uint32_t&gt;(), a.get_type());</span>
+<span class="lineNum">      68 </span><span class="lineCov">          1 :   EXPECT_EQ((uint32_t)nd::read_access_flag | nd::immutable_access_flag, a.get_access_flags());</span>
+<span class="lineNum">      69 </span><span class="lineCov">          1 :   a = nd::array((uint64_t)1);</span>
+<span class="lineNum">      70 </span><span class="lineCov">          1 :   EXPECT_EQ(ndt::make_type&lt;uint64_t&gt;(), a.get_type());</span>
+<span class="lineNum">      71 </span><span class="lineCov">          1 :   EXPECT_EQ((uint32_t)nd::read_access_flag | nd::immutable_access_flag, a.get_access_flags());</span>
+<span class="lineNum">      72 </span>            :   // Floating point
+<span class="lineNum">      73 </span><span class="lineCov">          1 :   a = nd::array(1.0f);</span>
+<span class="lineNum">      74 </span><span class="lineCov">          1 :   EXPECT_EQ(ndt::make_type&lt;float&gt;(), a.get_type());</span>
+<span class="lineNum">      75 </span><span class="lineCov">          1 :   EXPECT_EQ((uint32_t)nd::read_access_flag | nd::immutable_access_flag, a.get_access_flags());</span>
+<span class="lineNum">      76 </span><span class="lineCov">          1 :   a = nd::array(1.0);</span>
+<span class="lineNum">      77 </span><span class="lineCov">          1 :   EXPECT_EQ(ndt::make_type&lt;double&gt;(), a.get_type());</span>
+<span class="lineNum">      78 </span><span class="lineCov">          1 :   EXPECT_EQ((uint32_t)nd::read_access_flag | nd::immutable_access_flag, a.get_access_flags());</span>
+<span class="lineNum">      79 </span>            :   // Complex
+<span class="lineNum">      80 </span><span class="lineCov">          1 :   a = nd::array(dynd::complex&lt;float&gt;(1, 1));</span>
+<span class="lineNum">      81 </span><span class="lineCov">          1 :   EXPECT_EQ(ndt::make_type&lt;dynd::complex&lt;float&gt;&gt;(), a.get_type());</span>
+<span class="lineNum">      82 </span><span class="lineCov">          1 :   EXPECT_EQ((uint32_t)nd::read_access_flag | nd::immutable_access_flag, a.get_access_flags());</span>
+<span class="lineNum">      83 </span><span class="lineCov">          1 :   a = nd::array(dynd::complex&lt;double&gt;(1, 1));</span>
+<span class="lineNum">      84 </span><span class="lineCov">          1 :   EXPECT_EQ(ndt::make_type&lt;dynd::complex&lt;double&gt;&gt;(), a.get_type());</span>
+<span class="lineNum">      85 </span><span class="lineCov">          1 :   EXPECT_EQ((uint32_t)nd::read_access_flag | nd::immutable_access_flag, a.get_access_flags());</span>
+<a name="86"><span class="lineNum">      86 </span><span class="lineCov">          1 : }</span></a>
+<span class="lineNum">      87 </span>            : 
+<span class="lineNum">      88 </span><span class="lineCov">          5 : TYPED_TEST_P(Array, ScalarConstructor)</span>
+<span class="lineNum">      89 </span>            : {
+<span class="lineNum">      90 </span><span class="lineCov">          2 :   nd::array a;</span>
+<span class="lineNum">      91 </span>            :   // Scalar nd::array
+<span class="lineNum">      92 </span><span class="lineCov">          1 :   a = nd::empty(TestFixture::MakeType(ndt::make_type&lt;float&gt;()));</span>
+<span class="lineNum">      93 </span><span class="lineCov">          1 :   EXPECT_EQ(TestFixture::MakeType(ndt::make_type&lt;float&gt;()), a.get_type());</span>
+<span class="lineNum">      94 </span><span class="lineCov">          1 :   EXPECT_EQ(ndt::make_type&lt;float&gt;(), a.get_type().get_canonical_type());</span>
+<span class="lineNum">      95 </span><span class="lineCov">          1 :   EXPECT_EQ(nd::readwrite_access_flags, a.get_access_flags());</span>
+<span class="lineNum">      96 </span><span class="lineCov">          1 :   EXPECT_TRUE(a.is_scalar());</span>
+<a name="97"><span class="lineNum">      97 </span><span class="lineCov">          1 : }</span></a>
+<span class="lineNum">      98 </span>            : 
+<span class="lineNum">      99 </span><span class="lineCov">          5 : TYPED_TEST_P(Array, OneDimConstructor)</span>
+<span class="lineNum">     100 </span>            : {
+<span class="lineNum">     101 </span>            :   // One-dimensional strided nd::array with one element
+<span class="lineNum">     102 </span><span class="lineCov">          2 :   nd::array a = nd::empty(TestFixture::MakeType(ndt::make_fixed_dim(1, ndt::make_type&lt;float&gt;())));</span>
+<span class="lineNum">     103 </span><span class="lineCov">          1 :   EXPECT_EQ(TestFixture::MakeType(ndt::make_fixed_dim(1, ndt::make_type&lt;float&gt;())), a.get_type());</span>
+<span class="lineNum">     104 </span><span class="lineCov">          1 :   EXPECT_EQ(ndt::make_fixed_dim(1, ndt::make_type&lt;float&gt;()), a.get_type().get_canonical_type());</span>
+<span class="lineNum">     105 </span><span class="lineCov">          1 :   EXPECT_FALSE(a.is_scalar());</span>
+<span class="lineNum">     106 </span><span class="lineCov">          1 :   EXPECT_EQ(1u, a.get_shape().size());</span>
+<span class="lineNum">     107 </span><span class="lineCov">          1 :   EXPECT_EQ(1, a.get_shape()[0]);</span>
+<span class="lineNum">     108 </span><span class="lineCov">          1 :   EXPECT_EQ(1, a.get_dim_size(0));</span>
+<span class="lineNum">     109 </span><span class="lineCov">          1 :   EXPECT_EQ(1u, a.get_strides().size());</span>
+<span class="lineNum">     110 </span><span class="lineCov">          1 :   EXPECT_EQ(0, a.get_strides()[0]);</span>
+<span class="lineNum">     111 </span>            : 
+<span class="lineNum">     112 </span>            :   // One-dimensional nd::array
+<span class="lineNum">     113 </span><span class="lineCov">          1 :   a = nd::empty(TestFixture::MakeType(ndt::make_fixed_dim(3, ndt::make_type&lt;float&gt;())));</span>
+<span class="lineNum">     114 </span><span class="lineCov">          1 :   EXPECT_EQ(TestFixture::MakeType(ndt::make_fixed_dim(3, ndt::make_type&lt;float&gt;())), a.get_type());</span>
+<span class="lineNum">     115 </span><span class="lineCov">          1 :   EXPECT_EQ(ndt::make_fixed_dim(3, ndt::make_type&lt;float&gt;()), a.get_type().get_canonical_type());</span>
+<span class="lineNum">     116 </span><span class="lineCov">          1 :   EXPECT_FALSE(a.is_scalar());</span>
+<span class="lineNum">     117 </span><span class="lineCov">          1 :   EXPECT_EQ(1u, a.get_shape().size());</span>
+<span class="lineNum">     118 </span><span class="lineCov">          1 :   EXPECT_EQ(3, a.get_shape()[0]);</span>
+<span class="lineNum">     119 </span><span class="lineCov">          1 :   EXPECT_EQ(3, a.get_dim_size(0));</span>
+<span class="lineNum">     120 </span><span class="lineCov">          1 :   EXPECT_EQ(1u, a.get_strides().size());</span>
+<span class="lineNum">     121 </span><span class="lineCov">          1 :   EXPECT_EQ(sizeof(float), (unsigned)a.get_strides()[0]);</span>
+<a name="122"><span class="lineNum">     122 </span><span class="lineCov">          1 : }</span></a>
+<span class="lineNum">     123 </span>            : 
+<span class="lineNum">     124 </span><span class="lineCov">          5 : TYPED_TEST_P(Array, TwoDimConstructor)</span>
+<span class="lineNum">     125 </span>            : {
+<span class="lineNum">     126 </span>            :   // Two-dimensional nd::array with a size-one dimension
+<span class="lineNum">     127 </span>            :   nd::array a =
+<span class="lineNum">     128 </span><span class="lineCov">          2 :       nd::empty(TestFixture::MakeType(ndt::make_fixed_dim(3, ndt::make_fixed_dim(1, ndt::make_type&lt;float&gt;()))));</span>
+<span class="lineNum">     129 </span><span class="lineCov">          1 :   EXPECT_EQ(TestFixture::MakeType(ndt::make_fixed_dim(3, ndt::make_fixed_dim(1, ndt::make_type&lt;float&gt;()))),</span>
+<span class="lineNum">     130 </span>            :             a.get_type());
+<span class="lineNum">     131 </span><span class="lineCov">          1 :   EXPECT_EQ(ndt::make_fixed_dim(3, ndt::make_fixed_dim(1, ndt::make_type&lt;float&gt;())), a.get_type().get_canonical_type());</span>
+<span class="lineNum">     132 </span><span class="lineCov">          1 :   EXPECT_FALSE(a.is_scalar());</span>
+<span class="lineNum">     133 </span><span class="lineCov">          1 :   EXPECT_EQ(2u, a.get_shape().size());</span>
+<span class="lineNum">     134 </span><span class="lineCov">          1 :   EXPECT_EQ(3, a.get_shape()[0]);</span>
+<span class="lineNum">     135 </span><span class="lineCov">          1 :   EXPECT_EQ(3, a.get_dim_size(0));</span>
+<span class="lineNum">     136 </span><span class="lineCov">          1 :   EXPECT_EQ(1, a.get_shape()[1]);</span>
+<span class="lineNum">     137 </span><span class="lineCov">          1 :   EXPECT_EQ(1, a.get_dim_size(1));</span>
+<span class="lineNum">     138 </span><span class="lineCov">          1 :   EXPECT_EQ(2u, a.get_strides().size());</span>
+<span class="lineNum">     139 </span><span class="lineCov">          1 :   EXPECT_EQ(sizeof(float), (unsigned)a.get_strides()[0]);</span>
+<span class="lineNum">     140 </span><span class="lineCov">          1 :   EXPECT_EQ(0, a.get_strides()[1]);</span>
+<span class="lineNum">     141 </span>            : 
+<span class="lineNum">     142 </span>            :   // Two-dimensional nd::array with a size-one dimension
+<span class="lineNum">     143 </span><span class="lineCov">          1 :   a = nd::empty(TestFixture::MakeType(ndt::make_fixed_dim(1, ndt::make_fixed_dim(3, ndt::make_type&lt;float&gt;()))));</span>
+<span class="lineNum">     144 </span><span class="lineCov">          1 :   EXPECT_EQ(TestFixture::MakeType(ndt::make_fixed_dim(1, ndt::make_fixed_dim(3, ndt::make_type&lt;float&gt;()))),</span>
+<span class="lineNum">     145 </span>            :             a.get_type());
+<span class="lineNum">     146 </span><span class="lineCov">          1 :   EXPECT_EQ(ndt::make_fixed_dim(1, ndt::make_fixed_dim(3, ndt::make_type&lt;float&gt;())), a.get_type().get_canonical_type());</span>
+<span class="lineNum">     147 </span><span class="lineCov">          1 :   EXPECT_FALSE(a.is_scalar());</span>
+<span class="lineNum">     148 </span><span class="lineCov">          1 :   EXPECT_EQ(2u, a.get_shape().size());</span>
+<span class="lineNum">     149 </span><span class="lineCov">          1 :   EXPECT_EQ(1, a.get_shape()[0]);</span>
+<span class="lineNum">     150 </span><span class="lineCov">          1 :   EXPECT_EQ(1, a.get_dim_size(0));</span>
+<span class="lineNum">     151 </span><span class="lineCov">          1 :   EXPECT_EQ(3, a.get_shape()[1]);</span>
+<span class="lineNum">     152 </span><span class="lineCov">          1 :   EXPECT_EQ(3, a.get_dim_size(1));</span>
+<span class="lineNum">     153 </span><span class="lineCov">          1 :   EXPECT_EQ(2u, a.get_strides().size());</span>
+<span class="lineNum">     154 </span><span class="lineCov">          1 :   EXPECT_EQ(0, a.get_strides()[0]);</span>
+<span class="lineNum">     155 </span><span class="lineCov">          1 :   EXPECT_EQ(sizeof(float), (unsigned)a.get_strides()[1]);</span>
+<span class="lineNum">     156 </span>            : 
+<span class="lineNum">     157 </span>            :   // Two-dimensional nd::array
+<span class="lineNum">     158 </span><span class="lineCov">          1 :   a = nd::empty(TestFixture::MakeType(ndt::make_fixed_dim(3, ndt::make_fixed_dim(5, ndt::make_type&lt;float&gt;()))));</span>
+<span class="lineNum">     159 </span><span class="lineCov">          1 :   EXPECT_EQ(TestFixture::MakeType(ndt::make_fixed_dim(3, ndt::make_fixed_dim(5, ndt::make_type&lt;float&gt;()))),</span>
+<span class="lineNum">     160 </span>            :             a.get_type());
+<span class="lineNum">     161 </span><span class="lineCov">          1 :   EXPECT_EQ(ndt::make_fixed_dim(3, ndt::make_fixed_dim(5, ndt::make_type&lt;float&gt;())), a.get_type().get_canonical_type());</span>
+<span class="lineNum">     162 </span><span class="lineCov">          1 :   EXPECT_FALSE(a.is_scalar());</span>
+<span class="lineNum">     163 </span><span class="lineCov">          1 :   EXPECT_EQ(2u, a.get_shape().size());</span>
+<span class="lineNum">     164 </span><span class="lineCov">          1 :   EXPECT_EQ(3, a.get_shape()[0]);</span>
+<span class="lineNum">     165 </span><span class="lineCov">          1 :   EXPECT_EQ(3, a.get_dim_size(0));</span>
+<span class="lineNum">     166 </span><span class="lineCov">          1 :   EXPECT_EQ(5, a.get_shape()[1]);</span>
+<span class="lineNum">     167 </span><span class="lineCov">          1 :   EXPECT_EQ(5, a.get_dim_size(1));</span>
+<span class="lineNum">     168 </span><span class="lineCov">          1 :   EXPECT_EQ(2u, a.get_strides().size());</span>
+<span class="lineNum">     169 </span><span class="lineCov">          1 :   EXPECT_EQ(5 * sizeof(float), (unsigned)a.get_strides()[0]);</span>
+<span class="lineNum">     170 </span><span class="lineCov">          1 :   EXPECT_EQ(sizeof(float), (unsigned)a.get_strides()[1]);</span>
+<a name="171"><span class="lineNum">     171 </span><span class="lineCov">          1 : }</span></a>
+<span class="lineNum">     172 </span>            : 
+<span class="lineNum">     173 </span><span class="lineCov">          5 : TYPED_TEST_P(Array, ThreeDimConstructor)</span>
+<span class="lineNum">     174 </span>            : {
+<span class="lineNum">     175 </span>            :   // Three-dimensional nd::array with size-one dimension
+<span class="lineNum">     176 </span>            :   nd::array a = nd::empty(TestFixture::MakeType(
+<span class="lineNum">     177 </span><span class="lineCov">          2 :       ndt::make_fixed_dim(1, ndt::make_fixed_dim(5, ndt::make_fixed_dim(4, ndt::make_type&lt;float&gt;())))));</span>
+<span class="lineNum">     178 </span><span class="lineCov">          1 :   EXPECT_EQ(TestFixture::MakeType(</span>
+<span class="lineNum">     179 </span>            :                 ndt::make_fixed_dim(1, ndt::make_fixed_dim(5, ndt::make_fixed_dim(4, ndt::make_type&lt;float&gt;())))),
+<span class="lineNum">     180 </span>            :             a.get_type());
+<span class="lineNum">     181 </span><span class="lineCov">          1 :   EXPECT_EQ(ndt::make_fixed_dim(1, ndt::make_fixed_dim(5, ndt::make_fixed_dim(4, ndt::make_type&lt;float&gt;()))),</span>
+<span class="lineNum">     182 </span>            :             a.get_type().get_canonical_type());
+<span class="lineNum">     183 </span><span class="lineCov">          1 :   EXPECT_FALSE(a.is_scalar());</span>
+<span class="lineNum">     184 </span><span class="lineCov">          1 :   EXPECT_EQ(3u, a.get_shape().size());</span>
+<span class="lineNum">     185 </span><span class="lineCov">          1 :   EXPECT_EQ(1, a.get_shape()[0]);</span>
+<span class="lineNum">     186 </span><span class="lineCov">          1 :   EXPECT_EQ(1, a.get_dim_size(0));</span>
+<span class="lineNum">     187 </span><span class="lineCov">          1 :   EXPECT_EQ(5, a.get_shape()[1]);</span>
+<span class="lineNum">     188 </span><span class="lineCov">          1 :   EXPECT_EQ(5, a.get_dim_size(1));</span>
+<span class="lineNum">     189 </span><span class="lineCov">          1 :   EXPECT_EQ(4, a.get_shape()[2]);</span>
+<span class="lineNum">     190 </span><span class="lineCov">          1 :   EXPECT_EQ(4, a.get_dim_size(2));</span>
+<span class="lineNum">     191 </span><span class="lineCov">          1 :   EXPECT_EQ(3u, a.get_strides().size());</span>
+<span class="lineNum">     192 </span><span class="lineCov">          1 :   EXPECT_EQ(0, a.get_strides()[0]);</span>
+<span class="lineNum">     193 </span><span class="lineCov">          1 :   EXPECT_EQ(4 * sizeof(float), (unsigned)a.get_strides()[1]);</span>
+<span class="lineNum">     194 </span><span class="lineCov">          1 :   EXPECT_EQ(sizeof(float), (unsigned)a.get_strides()[2]);</span>
+<span class="lineNum">     195 </span>            : 
+<span class="lineNum">     196 </span>            :   // Three-dimensional nd::array with size-one dimension
+<span class="lineNum">     197 </span><span class="lineCov">          1 :   a = nd::empty(TestFixture::MakeType(</span>
+<span class="lineNum">     198 </span>            :       ndt::make_fixed_dim(3, ndt::make_fixed_dim(1, ndt::make_fixed_dim(4, ndt::make_type&lt;float&gt;())))));
+<span class="lineNum">     199 </span><span class="lineCov">          1 :   EXPECT_EQ(TestFixture::MakeType(</span>
+<span class="lineNum">     200 </span>            :                 ndt::make_fixed_dim(3, ndt::make_fixed_dim(1, ndt::make_fixed_dim(4, ndt::make_type&lt;float&gt;())))),
+<span class="lineNum">     201 </span>            :             a.get_type());
+<span class="lineNum">     202 </span><span class="lineCov">          1 :   EXPECT_EQ(ndt::make_fixed_dim(3, ndt::make_fixed_dim(1, ndt::make_fixed_dim(4, ndt::make_type&lt;float&gt;()))),</span>
+<span class="lineNum">     203 </span>            :             a.get_type().get_canonical_type());
+<span class="lineNum">     204 </span><span class="lineCov">          1 :   EXPECT_FALSE(a.is_scalar());</span>
+<span class="lineNum">     205 </span><span class="lineCov">          1 :   EXPECT_EQ(3u, a.get_shape().size());</span>
+<span class="lineNum">     206 </span><span class="lineCov">          1 :   EXPECT_EQ(3, a.get_shape()[0]);</span>
+<span class="lineNum">     207 </span><span class="lineCov">          1 :   EXPECT_EQ(3, a.get_dim_size(0));</span>
+<span class="lineNum">     208 </span><span class="lineCov">          1 :   EXPECT_EQ(1, a.get_shape()[1]);</span>
+<span class="lineNum">     209 </span><span class="lineCov">          1 :   EXPECT_EQ(1, a.get_dim_size(1));</span>
+<span class="lineNum">     210 </span><span class="lineCov">          1 :   EXPECT_EQ(4, a.get_shape()[2]);</span>
+<span class="lineNum">     211 </span><span class="lineCov">          1 :   EXPECT_EQ(4, a.get_dim_size(2));</span>
+<span class="lineNum">     212 </span><span class="lineCov">          1 :   EXPECT_EQ(3u, a.get_strides().size());</span>
+<span class="lineNum">     213 </span><span class="lineCov">          1 :   EXPECT_EQ(4 * sizeof(float), (unsigned)a.get_strides()[0]);</span>
+<span class="lineNum">     214 </span><span class="lineCov">          1 :   EXPECT_EQ(0, a.get_strides()[1]);</span>
+<span class="lineNum">     215 </span><span class="lineCov">          1 :   EXPECT_EQ(sizeof(float), (unsigned)a.get_strides()[2]);</span>
+<span class="lineNum">     216 </span>            : 
+<span class="lineNum">     217 </span>            :   // Three-dimensional nd::array with size-one dimension
+<span class="lineNum">     218 </span><span class="lineCov">          1 :   a = nd::empty(TestFixture::MakeType(</span>
+<span class="lineNum">     219 </span>            :       ndt::make_fixed_dim(3, ndt::make_fixed_dim(5, ndt::make_fixed_dim(1, ndt::make_type&lt;float&gt;())))));
+<span class="lineNum">     220 </span><span class="lineCov">          1 :   EXPECT_EQ(TestFixture::MakeType(</span>
+<span class="lineNum">     221 </span>            :                 ndt::make_fixed_dim(3, ndt::make_fixed_dim(5, ndt::make_fixed_dim(1, ndt::make_type&lt;float&gt;())))),
+<span class="lineNum">     222 </span>            :             a.get_type());
+<span class="lineNum">     223 </span><span class="lineCov">          1 :   EXPECT_EQ(ndt::make_fixed_dim(3, ndt::make_fixed_dim(5, ndt::make_fixed_dim(1, ndt::make_type&lt;float&gt;()))),</span>
+<span class="lineNum">     224 </span>            :             a.get_type().get_canonical_type());
+<span class="lineNum">     225 </span><span class="lineCov">          1 :   EXPECT_FALSE(a.is_scalar());</span>
+<span class="lineNum">     226 </span><span class="lineCov">          1 :   EXPECT_EQ(3u, a.get_shape().size());</span>
+<span class="lineNum">     227 </span><span class="lineCov">          1 :   EXPECT_EQ(3, a.get_shape()[0]);</span>
+<span class="lineNum">     228 </span><span class="lineCov">          1 :   EXPECT_EQ(3, a.get_dim_size(0));</span>
+<span class="lineNum">     229 </span><span class="lineCov">          1 :   EXPECT_EQ(5, a.get_shape()[1]);</span>
+<span class="lineNum">     230 </span><span class="lineCov">          1 :   EXPECT_EQ(5, a.get_dim_size(1));</span>
+<span class="lineNum">     231 </span><span class="lineCov">          1 :   EXPECT_EQ(1, a.get_shape()[2]);</span>
+<span class="lineNum">     232 </span><span class="lineCov">          1 :   EXPECT_EQ(1, a.get_dim_size(2));</span>
+<span class="lineNum">     233 </span><span class="lineCov">          1 :   EXPECT_EQ(3u, a.get_strides().size());</span>
+<span class="lineNum">     234 </span><span class="lineCov">          1 :   EXPECT_EQ(5 * sizeof(float), (unsigned)a.get_strides()[0]);</span>
+<span class="lineNum">     235 </span><span class="lineCov">          1 :   EXPECT_EQ(sizeof(float), (unsigned)a.get_strides()[1]);</span>
+<span class="lineNum">     236 </span><span class="lineCov">          1 :   EXPECT_EQ(0, a.get_strides()[2]);</span>
+<span class="lineNum">     237 </span>            : 
+<span class="lineNum">     238 </span>            :   // Three-dimensional nd::array
+<span class="lineNum">     239 </span><span class="lineCov">          1 :   a = nd::empty(TestFixture::MakeType(</span>
+<span class="lineNum">     240 </span>            :       ndt::make_fixed_dim(3, ndt::make_fixed_dim(5, ndt::make_fixed_dim(4, ndt::make_type&lt;float&gt;())))));
+<span class="lineNum">     241 </span><span class="lineCov">          1 :   EXPECT_EQ(TestFixture::MakeType(</span>
+<span class="lineNum">     242 </span>            :                 ndt::make_fixed_dim(3, ndt::make_fixed_dim(5, ndt::make_fixed_dim(4, ndt::make_type&lt;float&gt;())))),
+<span class="lineNum">     243 </span>            :             a.get_type());
+<span class="lineNum">     244 </span><span class="lineCov">          1 :   EXPECT_EQ(ndt::make_fixed_dim(3, ndt::make_fixed_dim(5, ndt::make_fixed_dim(4, ndt::make_type&lt;float&gt;()))),</span>
+<span class="lineNum">     245 </span>            :             a.get_type().get_canonical_type());
+<span class="lineNum">     246 </span><span class="lineCov">          1 :   EXPECT_FALSE(a.is_scalar());</span>
+<span class="lineNum">     247 </span><span class="lineCov">          1 :   EXPECT_EQ(3u, a.get_shape().size());</span>
+<span class="lineNum">     248 </span><span class="lineCov">          1 :   EXPECT_EQ(3, a.get_shape()[0]);</span>
+<span class="lineNum">     249 </span><span class="lineCov">          1 :   EXPECT_EQ(3, a.get_dim_size(0));</span>
+<span class="lineNum">     250 </span><span class="lineCov">          1 :   EXPECT_EQ(5, a.get_shape()[1]);</span>
+<span class="lineNum">     251 </span><span class="lineCov">          1 :   EXPECT_EQ(5, a.get_dim_size(1));</span>
+<span class="lineNum">     252 </span><span class="lineCov">          1 :   EXPECT_EQ(4, a.get_shape()[2]);</span>
+<span class="lineNum">     253 </span><span class="lineCov">          1 :   EXPECT_EQ(4, a.get_dim_size(2));</span>
+<span class="lineNum">     254 </span><span class="lineCov">          1 :   EXPECT_EQ(3u, a.get_strides().size());</span>
+<span class="lineNum">     255 </span><span class="lineCov">          1 :   EXPECT_EQ(5 * 4 * sizeof(float), (unsigned)a.get_strides()[0]);</span>
+<span class="lineNum">     256 </span><span class="lineCov">          1 :   EXPECT_EQ(4 * sizeof(float), (unsigned)a.get_strides()[1]);</span>
+<span class="lineNum">     257 </span><span class="lineCov">          1 :   EXPECT_EQ(sizeof(float), (unsigned)a.get_strides()[2]);</span>
+<a name="258"><span class="lineNum">     258 </span><span class="lineCov">          1 : }</span></a>
+<span class="lineNum">     259 </span>            : 
+<span class="lineNum">     260 </span><span class="lineCov">          5 : TEST(Array, IntScalarConstructor)</span>
+<span class="lineNum">     261 </span>            : {
+<span class="lineNum">     262 </span><span class="lineCov">          2 :   stringstream ss;</span>
+<span class="lineNum">     263 </span>            : 
+<span class="lineNum">     264 </span><span class="lineCov">          2 :   nd::array a = 3;</span>
+<span class="lineNum">     265 </span><span class="lineCov">          1 :   EXPECT_TRUE(a.is_scalar());</span>
+<span class="lineNum">     266 </span><span class="lineCov">          1 :   EXPECT_EQ(ndt::make_type&lt;int&gt;(), a.get_type());</span>
+<span class="lineNum">     267 </span><span class="lineCov">          1 :   ss.str(&quot;&quot;);</span>
+<span class="lineNum">     268 </span><span class="lineCov">          1 :   ss &lt;&lt; a;</span>
+<span class="lineNum">     269 </span><span class="lineCov">          1 :   EXPECT_EQ(&quot;array(3,\n      type=\&quot;int32\&quot;)&quot;, ss.str());</span>
+<span class="lineNum">     270 </span>            : 
+<span class="lineNum">     271 </span><span class="lineCov">          1 :   a = (int8_t)1;</span>
+<span class="lineNum">     272 </span><span class="lineCov">          1 :   EXPECT_TRUE(a.is_scalar());</span>
+<span class="lineNum">     273 </span><span class="lineCov">          1 :   EXPECT_EQ(ndt::make_type&lt;int8_t&gt;(), a.get_type());</span>
+<span class="lineNum">     274 </span><span class="lineCov">          1 :   ss.str(&quot;&quot;);</span>
+<span class="lineNum">     275 </span><span class="lineCov">          1 :   ss &lt;&lt; a;</span>
+<span class="lineNum">     276 </span><span class="lineCov">          1 :   EXPECT_EQ(&quot;array(1,\n      type=\&quot;int8\&quot;)&quot;, ss.str());</span>
+<span class="lineNum">     277 </span>            : 
+<span class="lineNum">     278 </span><span class="lineCov">          1 :   a = (int16_t)2;</span>
+<span class="lineNum">     279 </span><span class="lineCov">          1 :   EXPECT_TRUE(a.is_scalar());</span>
+<span class="lineNum">     280 </span><span class="lineCov">          1 :   EXPECT_EQ(ndt::make_type&lt;int16_t&gt;(), a.get_type());</span>
+<span class="lineNum">     281 </span><span class="lineCov">          1 :   ss.str(&quot;&quot;);</span>
+<span class="lineNum">     282 </span><span class="lineCov">          1 :   ss &lt;&lt; a;</span>
+<span class="lineNum">     283 </span><span class="lineCov">          1 :   EXPECT_EQ(&quot;array(2,\n      type=\&quot;int16\&quot;)&quot;, ss.str());</span>
+<span class="lineNum">     284 </span>            : 
+<span class="lineNum">     285 </span><span class="lineCov">          1 :   a = (int32_t)3;</span>
+<span class="lineNum">     286 </span><span class="lineCov">          1 :   EXPECT_TRUE(a.is_scalar());</span>
+<span class="lineNum">     287 </span><span class="lineCov">          1 :   EXPECT_EQ(ndt::make_type&lt;int32_t&gt;(), a.get_type());</span>
+<span class="lineNum">     288 </span><span class="lineCov">          1 :   ss.str(&quot;&quot;);</span>
+<span class="lineNum">     289 </span><span class="lineCov">          1 :   ss &lt;&lt; a;</span>
+<span class="lineNum">     290 </span><span class="lineCov">          1 :   EXPECT_EQ(&quot;array(3,\n      type=\&quot;int32\&quot;)&quot;, ss.str());</span>
+<span class="lineNum">     291 </span>            : 
+<span class="lineNum">     292 </span><span class="lineCov">          1 :   a = (int64_t)4;</span>
+<span class="lineNum">     293 </span><span class="lineCov">          1 :   EXPECT_TRUE(a.is_scalar());</span>
+<span class="lineNum">     294 </span><span class="lineCov">          1 :   EXPECT_EQ(ndt::make_type&lt;int64_t&gt;(), a.get_type());</span>
+<span class="lineNum">     295 </span><span class="lineCov">          1 :   ss.str(&quot;&quot;);</span>
+<span class="lineNum">     296 </span><span class="lineCov">          1 :   ss &lt;&lt; a;</span>
+<span class="lineNum">     297 </span><span class="lineCov">          1 :   EXPECT_EQ(&quot;array(4,\n      type=\&quot;int64\&quot;)&quot;, ss.str());</span>
+<a name="298"><span class="lineNum">     298 </span><span class="lineCov">          1 : }</span></a>
+<span class="lineNum">     299 </span>            : 
+<span class="lineNum">     300 </span><span class="lineCov">          5 : TEST(Array, UIntScalarConstructor)</span>
+<span class="lineNum">     301 </span>            : {
+<span class="lineNum">     302 </span><span class="lineCov">          2 :   stringstream ss;</span>
+<span class="lineNum">     303 </span>            : 
+<span class="lineNum">     304 </span><span class="lineCov">          2 :   nd::array a = (uint8_t)5;</span>
+<span class="lineNum">     305 </span><span class="lineCov">          1 :   EXPECT_TRUE(a.is_scalar());</span>
+<span class="lineNum">     306 </span><span class="lineCov">          1 :   EXPECT_EQ(ndt::make_type&lt;uint8_t&gt;(), a.get_type());</span>
+<span class="lineNum">     307 </span><span class="lineCov">          1 :   ss.str(&quot;&quot;);</span>
+<span class="lineNum">     308 </span><span class="lineCov">          1 :   ss &lt;&lt; a;</span>
+<span class="lineNum">     309 </span><span class="lineCov">          1 :   EXPECT_EQ(&quot;array(5,\n      type=\&quot;uint8\&quot;)&quot;, ss.str());</span>
+<span class="lineNum">     310 </span>            : 
+<span class="lineNum">     311 </span><span class="lineCov">          1 :   a = (uint16_t)6;</span>
+<span class="lineNum">     312 </span><span class="lineCov">          1 :   EXPECT_TRUE(a.is_scalar());</span>
+<span class="lineNum">     313 </span><span class="lineCov">          1 :   EXPECT_EQ(ndt::make_type&lt;uint16_t&gt;(), a.get_type());</span>
+<span class="lineNum">     314 </span><span class="lineCov">          1 :   ss.str(&quot;&quot;);</span>
+<span class="lineNum">     315 </span><span class="lineCov">          1 :   ss &lt;&lt; a;</span>
+<span class="lineNum">     316 </span><span class="lineCov">          1 :   EXPECT_EQ(&quot;array(6,\n      type=\&quot;uint16\&quot;)&quot;, ss.str());</span>
+<span class="lineNum">     317 </span>            : 
+<span class="lineNum">     318 </span><span class="lineCov">          1 :   a = (uint32_t)7;</span>
+<span class="lineNum">     319 </span><span class="lineCov">          1 :   EXPECT_TRUE(a.is_scalar());</span>
+<span class="lineNum">     320 </span><span class="lineCov">          1 :   EXPECT_EQ(ndt::make_type&lt;uint32_t&gt;(), a.get_type());</span>
+<span class="lineNum">     321 </span><span class="lineCov">          1 :   ss.str(&quot;&quot;);</span>
+<span class="lineNum">     322 </span><span class="lineCov">          1 :   ss &lt;&lt; a;</span>
+<span class="lineNum">     323 </span><span class="lineCov">          1 :   EXPECT_EQ(&quot;array(7,\n      type=\&quot;uint32\&quot;)&quot;, ss.str());</span>
+<span class="lineNum">     324 </span>            : 
+<span class="lineNum">     325 </span><span class="lineCov">          1 :   a = (uint64_t)8;</span>
+<span class="lineNum">     326 </span><span class="lineCov">          1 :   EXPECT_TRUE(a.is_scalar());</span>
+<span class="lineNum">     327 </span><span class="lineCov">          1 :   EXPECT_EQ(ndt::make_type&lt;uint64_t&gt;(), a.get_type());</span>
+<span class="lineNum">     328 </span><span class="lineCov">          1 :   ss.str(&quot;&quot;);</span>
+<span class="lineNum">     329 </span><span class="lineCov">          1 :   ss &lt;&lt; a;</span>
+<span class="lineNum">     330 </span><span class="lineCov">          1 :   EXPECT_EQ(&quot;array(8,\n      type=\&quot;uint64\&quot;)&quot;, ss.str());</span>
+<a name="331"><span class="lineNum">     331 </span><span class="lineCov">          1 : }</span></a>
+<span class="lineNum">     332 </span>            : 
+<span class="lineNum">     333 </span><span class="lineCov">          5 : TEST(Array, FloatScalarConstructor)</span>
+<span class="lineNum">     334 </span>            : {
+<span class="lineNum">     335 </span><span class="lineCov">          2 :   stringstream ss;</span>
+<span class="lineNum">     336 </span>            : 
+<span class="lineNum">     337 </span><span class="lineCov">          2 :   nd::array a = 3.25f;</span>
+<span class="lineNum">     338 </span><span class="lineCov">          1 :   EXPECT_TRUE(a.is_scalar());</span>
+<span class="lineNum">     339 </span><span class="lineCov">          1 :   EXPECT_EQ(ndt::make_type&lt;float&gt;(), a.get_type());</span>
+<span class="lineNum">     340 </span><span class="lineCov">          1 :   ss.str(&quot;&quot;);</span>
+<span class="lineNum">     341 </span><span class="lineCov">          1 :   ss &lt;&lt; a;</span>
+<span class="lineNum">     342 </span><span class="lineCov">          1 :   EXPECT_EQ(&quot;array(3.25,\n      type=\&quot;float32\&quot;)&quot;, ss.str());</span>
+<span class="lineNum">     343 </span>            : 
+<span class="lineNum">     344 </span><span class="lineCov">          1 :   a = 3.5;</span>
+<span class="lineNum">     345 </span><span class="lineCov">          1 :   EXPECT_TRUE(a.is_scalar());</span>
+<span class="lineNum">     346 </span><span class="lineCov">          1 :   EXPECT_EQ(ndt::make_type&lt;double&gt;(), a.get_type());</span>
+<span class="lineNum">     347 </span><span class="lineCov">          1 :   ss.str(&quot;&quot;);</span>
+<span class="lineNum">     348 </span><span class="lineCov">          1 :   ss &lt;&lt; a;</span>
+<span class="lineNum">     349 </span><span class="lineCov">          1 :   EXPECT_EQ(&quot;array(3.5,\n      type=\&quot;float64\&quot;)&quot;, ss.str());</span>
+<span class="lineNum">     350 </span>            : 
+<span class="lineNum">     351 </span><span class="lineCov">          1 :   a = dynd::complex&lt;float&gt;(3.14f, 1.0f);</span>
+<span class="lineNum">     352 </span><span class="lineCov">          1 :   EXPECT_TRUE(a.is_scalar());</span>
+<span class="lineNum">     353 </span><span class="lineCov">          1 :   EXPECT_EQ(ndt::make_type&lt;dynd::complex&lt;float&gt;&gt;(), a.get_type());</span>
+<span class="lineNum">     354 </span>            : 
+<span class="lineNum">     355 </span><span class="lineCov">          1 :   a = dynd::complex&lt;double&gt;(3.14, 1.0);</span>
+<span class="lineNum">     356 </span><span class="lineCov">          1 :   EXPECT_TRUE(a.is_scalar());</span>
+<span class="lineNum">     357 </span><span class="lineCov">          1 :   EXPECT_EQ(ndt::make_type&lt;dynd::complex&lt;double&gt;&gt;(), a.get_type());</span>
+<a name="358"><span class="lineNum">     358 </span><span class="lineCov">          1 : }</span></a>
+<span class="lineNum">     359 </span>            : 
+<span class="lineNum">     360 </span><span class="lineCov">          5 : TEST(Array, StdVectorConstructor)</span>
+<span class="lineNum">     361 </span>            : {
+<span class="lineNum">     362 </span><span class="lineCov">          2 :   nd::array a;</span>
+<span class="lineNum">     363 </span><span class="lineCov">          2 :   std::vector&lt;float&gt; v;</span>
+<span class="lineNum">     364 </span>            : 
+<span class="lineNum">     365 </span>            :   // Empty vector
+<span class="lineNum">     366 </span><span class="lineCov">          1 :   a = v;</span>
+<span class="lineNum">     367 </span><span class="lineCov">          1 :   EXPECT_EQ(ndt::make_fixed_dim(0, ndt::make_type&lt;float&gt;()), a.get_type());</span>
+<span class="lineNum">     368 </span><span class="lineCov">          1 :   EXPECT_EQ(1, a.get_type().get_ndim());</span>
+<span class="lineNum">     369 </span><span class="lineCov">          1 :   EXPECT_EQ(1u, a.get_shape().size());</span>
+<span class="lineNum">     370 </span><span class="lineCov">          1 :   EXPECT_EQ(0, a.get_shape()[0]);</span>
+<span class="lineNum">     371 </span><span class="lineCov">          1 :   EXPECT_EQ(0, a.get_dim_size(0));</span>
+<span class="lineNum">     372 </span><span class="lineCov">          1 :   EXPECT_EQ(1u, a.get_strides().size());</span>
+<span class="lineNum">     373 </span><span class="lineCov">          1 :   EXPECT_EQ(0, a.get_strides()[0]);</span>
+<span class="lineNum">     374 </span>            : 
+<span class="lineNum">     375 </span>            :   // Size-10 vector
+<span class="lineNum">     376 </span><span class="lineCov">         11 :   for (int i = 0; i &lt; 10; ++i) {</span>
+<span class="lineNum">     377 </span><span class="lineCov">         10 :     v.push_back(i / 0.5f);</span>
+<span class="lineNum">     378 </span>            :   }
+<span class="lineNum">     379 </span><span class="lineCov">          1 :   a = v;</span>
+<span class="lineNum">     380 </span><span class="lineCov">          1 :   EXPECT_EQ(ndt::make_fixed_dim(10, ndt::make_type&lt;float&gt;()), a.get_type());</span>
+<span class="lineNum">     381 </span><span class="lineCov">          1 :   EXPECT_EQ(1, a.get_type().get_ndim());</span>
+<span class="lineNum">     382 </span><span class="lineCov">          1 :   EXPECT_EQ(1u, a.get_shape().size());</span>
+<span class="lineNum">     383 </span><span class="lineCov">          1 :   EXPECT_EQ(10, a.get_shape()[0]);</span>
+<span class="lineNum">     384 </span><span class="lineCov">          1 :   EXPECT_EQ(10, a.get_dim_size(0));</span>
+<span class="lineNum">     385 </span><span class="lineCov">          1 :   EXPECT_EQ(1u, a.get_strides().size());</span>
+<span class="lineNum">     386 </span><span class="lineCov">          1 :   EXPECT_EQ((int)sizeof(float), a.get_strides()[0]);</span>
+<span class="lineNum">     387 </span><span class="lineCov">         11 :   for (int i = 0; i &lt; 10; ++i) {</span>
+<span class="lineNum">     388 </span><span class="lineCov">         10 :     EXPECT_EQ(i / 0.5f, a(i).as&lt;float&gt;());</span>
+<span class="lineNum">     389 </span>            :   }
+<a name="390"><span class="lineNum">     390 </span><span class="lineCov">          1 : }</span></a>
+<span class="lineNum">     391 </span>            : 
+<span class="lineNum">     392 </span><span class="lineCov">          5 : TEST(Array, StdVectorStringConstructor)</span>
+<span class="lineNum">     393 </span>            : {
+<span class="lineNum">     394 </span><span class="lineCov">          2 :   nd::array a;</span>
+<span class="lineNum">     395 </span><span class="lineCov">          2 :   std::vector&lt;std::string&gt; v;</span>
+<span class="lineNum">     396 </span>            : 
+<span class="lineNum">     397 </span>            :   // Empty vector
+<span class="lineNum">     398 </span><span class="lineCov">          1 :   a = v;</span>
+<span class="lineNum">     399 </span><span class="lineCov">          1 :   EXPECT_EQ(ndt::type(&quot;0 * string&quot;), a.get_type());</span>
+<span class="lineNum">     400 </span><span class="lineCov">          1 :   EXPECT_EQ(1, a.get_type().get_ndim());</span>
+<span class="lineNum">     401 </span><span class="lineCov">          1 :   EXPECT_EQ(1u, a.get_shape().size());</span>
+<span class="lineNum">     402 </span><span class="lineCov">          1 :   EXPECT_EQ(0, a.get_shape()[0]);</span>
+<span class="lineNum">     403 </span><span class="lineCov">          1 :   EXPECT_EQ(0, a.get_dim_size(0));</span>
+<span class="lineNum">     404 </span><span class="lineCov">          1 :   EXPECT_EQ(1u, a.get_strides().size());</span>
+<span class="lineNum">     405 </span><span class="lineCov">          1 :   EXPECT_EQ(0, a.get_strides()[0]);</span>
+<span class="lineNum">     406 </span>            : 
+<span class="lineNum">     407 </span>            :   // Size-5 vector
+<span class="lineNum">     408 </span><span class="lineCov">          1 :   v.push_back(&quot;this&quot;);</span>
+<span class="lineNum">     409 </span><span class="lineCov">          1 :   v.push_back(&quot;is a test of&quot;);</span>
+<span class="lineNum">     410 </span><span class="lineCov">          1 :   v.push_back(&quot;string&quot;);</span>
+<span class="lineNum">     411 </span><span class="lineCov">          1 :   v.push_back(&quot;vectors&quot;);</span>
+<span class="lineNum">     412 </span><span class="lineCov">          1 :   v.push_back(&quot;testing testing testing testing testing testing testing testing testing&quot;);</span>
+<span class="lineNum">     413 </span><span class="lineCov">          1 :   a = v;</span>
+<span class="lineNum">     414 </span><span class="lineCov">          1 :   EXPECT_EQ(ndt::type(&quot;5 * string&quot;), a.get_type());</span>
+<span class="lineNum">     415 </span><span class="lineCov">          1 :   EXPECT_EQ(1, a.get_type().get_ndim());</span>
+<span class="lineNum">     416 </span><span class="lineCov">          1 :   EXPECT_EQ(1u, a.get_shape().size());</span>
+<span class="lineNum">     417 </span><span class="lineCov">          1 :   EXPECT_EQ(5, a.get_shape()[0]);</span>
+<span class="lineNum">     418 </span><span class="lineCov">          1 :   EXPECT_EQ(5, a.get_dim_size(0));</span>
+<span class="lineNum">     419 </span><span class="lineCov">          1 :   EXPECT_EQ(1u, a.get_strides().size());</span>
+<span class="lineNum">     420 </span><span class="lineCov">          1 :   EXPECT_EQ((intptr_t)a.get_type().at(0).get_data_size(), a.get_strides()[0]);</span>
+<span class="lineNum">     421 </span><span class="lineCov">          6 :   for (int i = 0; i &lt; 5; ++i) {</span>
+<span class="lineNum">     422 </span><span class="lineCov">          5 :     EXPECT_EQ(v[i], a(i).as&lt;std::string&gt;());</span>
+<span class="lineNum">     423 </span>            :   }
+<a name="424"><span class="lineNum">     424 </span><span class="lineCov">          1 : }</span></a>
+<span class="lineNum">     425 </span>            : 
+<span class="lineNum">     426 </span><span class="lineCov">          5 : TYPED_TEST_P(Array, AsScalar)</span>
+<span class="lineNum">     427 </span>            : {
+<span class="lineNum">     428 </span><span class="lineCov">          2 :   nd::array a;</span>
+<span class="lineNum">     429 </span>            : 
+<span class="lineNum">     430 </span><span class="lineCov">          1 :   a = nd::empty(TestFixture::MakeType(ndt::make_type&lt;float&gt;()));</span>
+<span class="lineNum">     431 </span><span class="lineCov">          1 :   a.assign(3.14f);</span>
+<span class="lineNum">     432 </span><span class="lineCov">          1 :   EXPECT_EQ(3.14f, a.as&lt;float&gt;());</span>
+<span class="lineNum">     433 </span><span class="lineCov">          1 :   EXPECT_EQ(3.14f, a.as&lt;double&gt;());</span>
+<span class="lineNum">     434 </span><span class="lineCov">          1 :   if (!TestFixture::IsTypeID(cuda_device_id)) {</span>
+<span class="lineNum">     435 </span><span class="lineCov">          2 :     EXPECT_THROW(a.as&lt;int64_t&gt;(), runtime_error);</span>
+<span class="lineNum">     436 </span>            :   }
+<span class="lineNum">     437 </span><span class="lineCov">          1 :   EXPECT_EQ(3, a.as&lt;int64_t&gt;(assign_error_overflow));</span>
+<span class="lineNum">     438 </span><span class="lineCov">          1 :   if (!TestFixture::IsTypeID(cuda_device_id)) {</span>
+<span class="lineNum">     439 </span><span class="lineCov">          2 :     EXPECT_THROW(a.as&lt;bool1&gt;(), runtime_error);</span>
+<span class="lineNum">     440 </span><span class="lineCov">          2 :     EXPECT_THROW(a.as&lt;bool1&gt;(assign_error_overflow), runtime_error);</span>
+<span class="lineNum">     441 </span>            :   }
+<span class="lineNum">     442 </span><span class="lineCov">          1 :   EXPECT_EQ(true, a.as&lt;bool1&gt;(assign_error_nocheck));</span>
+<span class="lineNum">     443 </span><span class="lineCov">          1 :   if (!TestFixture::IsTypeID(cuda_device_id)) {</span>
+<span class="lineNum">     444 </span><span class="lineCov">          2 :     EXPECT_THROW(a.as&lt;bool&gt;(), runtime_error);</span>
+<span class="lineNum">     445 </span><span class="lineCov">          2 :     EXPECT_THROW(a.as&lt;bool&gt;(assign_error_overflow), runtime_error);</span>
+<span class="lineNum">     446 </span>            :   }
+<span class="lineNum">     447 </span><span class="lineCov">          1 :   EXPECT_EQ(true, a.as&lt;bool&gt;(assign_error_nocheck));</span>
+<span class="lineNum">     448 </span>            : 
+<span class="lineNum">     449 </span><span class="lineCov">          1 :   a = nd::empty(TestFixture::MakeType(ndt::make_type&lt;double&gt;()));</span>
+<span class="lineNum">     450 </span><span class="lineCov">          1 :   a.assign(3.141592653589);</span>
+<span class="lineNum">     451 </span><span class="lineCov">          1 :   EXPECT_EQ(3.141592653589, a.as&lt;double&gt;());</span>
+<span class="lineNum">     452 </span><span class="lineCov">          1 :   if (!TestFixture::IsTypeID(cuda_device_id)) {</span>
+<span class="lineNum">     453 </span><span class="lineCov">          2 :     EXPECT_THROW(a.as&lt;float&gt;(assign_error_inexact), runtime_error);</span>
+<span class="lineNum">     454 </span>            :   }
+<span class="lineNum">     455 </span><span class="lineCov">          1 :   EXPECT_EQ(3.141592653589f, a.as&lt;float&gt;());</span>
+<a name="456"><span class="lineNum">     456 </span><span class="lineCov">          1 : }</span></a>
+<span class="lineNum">     457 </span>            : 
+<span class="lineNum">     458 </span><span class="lineCov">          5 : TEST(Array, InitFromInitializerLists)</span>
+<span class="lineNum">     459 </span>            : {
+<span class="lineNum">     460 </span><span class="lineCov">          2 :   nd::array a = {1, 2, 3, 4, 5};</span>
+<span class="lineNum">     461 </span><span class="lineCov">          1 :   EXPECT_EQ(ndt::make_type&lt;int&gt;(), a.get_dtype());</span>
+<span class="lineNum">     462 </span><span class="lineCov">          1 :   ASSERT_EQ(1, a.get_ndim());</span>
+<span class="lineNum">     463 </span><span class="lineCov">          1 :   ASSERT_EQ(5, a.get_shape()[0]);</span>
+<span class="lineNum">     464 </span><span class="lineCov">          1 :   ASSERT_EQ(5, a.get_dim_size(0));</span>
+<span class="lineNum">     465 </span><span class="lineCov">          1 :   EXPECT_EQ((int)sizeof(int), a.get_strides()[0]);</span>
+<span class="lineNum">     466 </span><span class="lineCov">          1 :   const int *ptr_i = (const int *)a.cdata();</span>
+<span class="lineNum">     467 </span><span class="lineCov">          1 :   EXPECT_EQ(1, ptr_i[0]);</span>
+<span class="lineNum">     468 </span><span class="lineCov">          1 :   EXPECT_EQ(2, ptr_i[1]);</span>
+<span class="lineNum">     469 </span><span class="lineCov">          1 :   EXPECT_EQ(3, ptr_i[2]);</span>
+<span class="lineNum">     470 </span><span class="lineCov">          1 :   EXPECT_EQ(4, ptr_i[3]);</span>
+<span class="lineNum">     471 </span><span class="lineCov">          1 :   EXPECT_EQ(5, ptr_i[4]);</span>
+<span class="lineNum">     472 </span>            : 
+<span class="lineNum">     473 </span>            : #ifndef DYND_NESTED_INIT_LIST_BUG
+<span class="lineNum">     474 </span><span class="lineCov">          2 :   nd::array b = {{1., 2., 3.}, {4., 5., 6.25}};</span>
+<span class="lineNum">     475 </span><span class="lineCov">          1 :   EXPECT_EQ(ndt::make_type&lt;double&gt;(), b.get_dtype());</span>
+<span class="lineNum">     476 </span><span class="lineCov">          1 :   ASSERT_EQ(2, b.get_ndim());</span>
+<span class="lineNum">     477 </span><span class="lineCov">          1 :   ASSERT_EQ(2, b.get_shape()[0]);</span>
+<span class="lineNum">     478 </span><span class="lineCov">          1 :   ASSERT_EQ(2, b.get_dim_size(0));</span>
+<span class="lineNum">     479 </span><span class="lineCov">          1 :   ASSERT_EQ(3, b.get_shape()[1]);</span>
+<span class="lineNum">     480 </span><span class="lineCov">          1 :   ASSERT_EQ(3, b.get_dim_size(1));</span>
+<span class="lineNum">     481 </span><span class="lineCov">          1 :   EXPECT_EQ(3 * (int)sizeof(double), b.get_strides()[0]);</span>
+<span class="lineNum">     482 </span><span class="lineCov">          1 :   EXPECT_EQ((int)sizeof(double), b.get_strides()[1]);</span>
+<span class="lineNum">     483 </span><span class="lineCov">          1 :   const double *ptr_d = (const double *)b.cdata();</span>
+<span class="lineNum">     484 </span><span class="lineCov">          1 :   EXPECT_EQ(1, ptr_d[0]);</span>
+<span class="lineNum">     485 </span><span class="lineCov">          1 :   EXPECT_EQ(2, ptr_d[1]);</span>
+<span class="lineNum">     486 </span><span class="lineCov">          1 :   EXPECT_EQ(3, ptr_d[2]);</span>
+<span class="lineNum">     487 </span><span class="lineCov">          1 :   EXPECT_EQ(4, ptr_d[3]);</span>
+<span class="lineNum">     488 </span><span class="lineCov">          1 :   EXPECT_EQ(5, ptr_d[4]);</span>
+<span class="lineNum">     489 </span><span class="lineCov">          1 :   EXPECT_EQ(6.25, ptr_d[5]);</span>
+<span class="lineNum">     490 </span>            : 
+<span class="lineNum">     491 </span>            :   // Testing assignment operator with initializer list (and 3D nested list)
+<span class="lineNum">     492 </span><span class="lineCov">          1 :   a = {{{1LL, 2LL}, {-1LL, -2LL}}, {{4LL, 5LL}, {6LL, 1LL}}};</span>
+<span class="lineNum">     493 </span><span class="lineCov">          1 :   EXPECT_EQ(ndt::make_type&lt;long long&gt;(), a.get_dtype());</span>
+<span class="lineNum">     494 </span><span class="lineCov">          1 :   ASSERT_EQ(3, a.get_ndim());</span>
+<span class="lineNum">     495 </span><span class="lineCov">          1 :   ASSERT_EQ(2, a.get_shape()[0]);</span>
+<span class="lineNum">     496 </span><span class="lineCov">          1 :   ASSERT_EQ(2, a.get_dim_size(0));</span>
+<span class="lineNum">     497 </span><span class="lineCov">          1 :   ASSERT_EQ(2, a.get_shape()[1]);</span>
+<span class="lineNum">     498 </span><span class="lineCov">          1 :   ASSERT_EQ(2, a.get_dim_size(1));</span>
+<span class="lineNum">     499 </span><span class="lineCov">          1 :   ASSERT_EQ(2, a.get_shape()[2]);</span>
+<span class="lineNum">     500 </span><span class="lineCov">          1 :   ASSERT_EQ(2, a.get_dim_size(2));</span>
+<span class="lineNum">     501 </span><span class="lineCov">          1 :   EXPECT_EQ(4 * (int)sizeof(long long), a.get_strides()[0]);</span>
+<span class="lineNum">     502 </span><span class="lineCov">          1 :   EXPECT_EQ(2 * (int)sizeof(long long), a.get_strides()[1]);</span>
+<span class="lineNum">     503 </span><span class="lineCov">          1 :   EXPECT_EQ((int)sizeof(long long), a.get_strides()[2]);</span>
+<span class="lineNum">     504 </span><span class="lineCov">          1 :   const long long *ptr_ll = (const long long *)a.cdata();</span>
+<span class="lineNum">     505 </span><span class="lineCov">          1 :   EXPECT_EQ(1, ptr_ll[0]);</span>
+<span class="lineNum">     506 </span><span class="lineCov">          1 :   EXPECT_EQ(2, ptr_ll[1]);</span>
+<span class="lineNum">     507 </span><span class="lineCov">          1 :   EXPECT_EQ(-1, ptr_ll[2]);</span>
+<span class="lineNum">     508 </span><span class="lineCov">          1 :   EXPECT_EQ(-2, ptr_ll[3]);</span>
+<span class="lineNum">     509 </span><span class="lineCov">          1 :   EXPECT_EQ(4, ptr_ll[4]);</span>
+<span class="lineNum">     510 </span><span class="lineCov">          1 :   EXPECT_EQ(5, ptr_ll[5]);</span>
+<span class="lineNum">     511 </span><span class="lineCov">          1 :   EXPECT_EQ(6, ptr_ll[6]);</span>
+<span class="lineNum">     512 </span><span class="lineCov">          1 :   EXPECT_EQ(1, ptr_ll[7]);</span>
+<span class="lineNum">     513 </span>            : 
+<span class="lineNum">     514 </span>            : // If the shape is jagged, should throw an error
+<span class="lineNum">     515 </span>            : //  EXPECT_THROW((a = {{1, 2, 3}, {1, 2}}), runtime_error);
+<span class="lineNum">     516 </span>            : // EXPECT_THROW((a = {{{1}, {2}, {3}}, {{1}, {2}, {3, 4}}}), runtime_error);
+<span class="lineNum">     517 </span>            : #endif // DYND_NESTED_INIT_LIST_BUG
+<a name="518"><span class="lineNum">     518 </span>            : }</a>
+<span class="lineNum">     519 </span>            : 
+<span class="lineNum">     520 </span><span class="lineCov">          5 : TEST(Array, InitFromNestedCArray)</span>
+<span class="lineNum">     521 </span>            : {
+<span class="lineNum">     522 </span><span class="lineCov">          1 :   int i0[2][3] = {{1, 2, 3}, {4, 5, 6}};</span>
+<span class="lineNum">     523 </span><span class="lineCov">          2 :   nd::array a = i0;</span>
+<span class="lineNum">     524 </span><span class="lineCov">          1 :   EXPECT_EQ(ndt::type(&quot;2 * 3 * int&quot;), a.get_type());</span>
+<span class="lineNum">     525 </span><span class="lineCov">          1 :   EXPECT_JSON_EQ_ARR(&quot;[[1,2,3], [4,5,6]]&quot;, a);</span>
+<span class="lineNum">     526 </span>            : 
+<span class="lineNum">     527 </span><span class="lineCov">          1 :   float i1[2][2][3] = {{{1, 2, 3}, {1.5f, 2.5f, 3.5f}}, {{-10, 0, -3.1f}, {9, 8, 7}}};</span>
+<span class="lineNum">     528 </span><span class="lineCov">          1 :   a = i1;</span>
+<span class="lineNum">     529 </span><span class="lineCov">          1 :   EXPECT_EQ(ndt::type(&quot;2 * 2 * 3 * float32&quot;), a.get_type());</span>
+<span class="lineNum">     530 </span><span class="lineCov">          1 :   EXPECT_JSON_EQ_ARR(&quot;[[[1,2,3], [1.5,2.5,3.5]], [[-10,0,-3.1], [9,8,7]]]&quot;, a);</span>
+<a name="531"><span class="lineNum">     531 </span><span class="lineCov">          1 : }</span></a>
+<span class="lineNum">     532 </span>            : 
+<span class="lineNum">     533 </span><span class="lineCov">          5 : TEST(Array, Storage)</span>
+<span class="lineNum">     534 </span>            : {
+<span class="lineNum">     535 </span><span class="lineCov">          1 :   int i0[2][3] = {{1, 2, 3}, {4, 5, 6}};</span>
+<span class="lineNum">     536 </span><span class="lineCov">          2 :   nd::array a = i0;</span>
+<span class="lineNum">     537 </span>            : 
+<span class="lineNum">     538 </span><span class="lineCov">          2 :   nd::array b = a.storage();</span>
+<span class="lineNum">     539 </span><span class="lineCov">          1 :   EXPECT_EQ(ndt::make_fixed_dim(2, ndt::make_fixed_dim(3, ndt::make_type&lt;int&gt;())), a.get_type());</span>
+<span class="lineNum">     540 </span><span class="lineCov">          1 :   EXPECT_EQ(ndt::make_fixed_dim(2, ndt::make_fixed_dim(3, ndt::make_fixed_bytes(4, 4))), b.get_type());</span>
+<span class="lineNum">     541 </span><span class="lineCov">          1 :   EXPECT_EQ(a.cdata(), b.cdata());</span>
+<span class="lineNum">     542 </span><span class="lineCov">          1 :   EXPECT_EQ(a.get_shape(), b.get_shape());</span>
+<span class="lineNum">     543 </span><span class="lineCov">          1 :   EXPECT_EQ(a.get_strides(), b.get_strides());</span>
+<a name="544"><span class="lineNum">     544 </span><span class="lineCov">          1 : }</span></a>
+<span class="lineNum">     545 </span>            : 
+<span class="lineNum">     546 </span><span class="lineCov">          5 : TEST(Array, SimplePrint)</span>
+<span class="lineNum">     547 </span>            : {
+<span class="lineNum">     548 </span><span class="lineCov">          1 :   int vals[3] = {1, 2, 3};</span>
+<span class="lineNum">     549 </span><span class="lineCov">          2 :   nd::array a = vals;</span>
+<span class="lineNum">     550 </span><span class="lineCov">          2 :   stringstream ss;</span>
+<span class="lineNum">     551 </span><span class="lineCov">          1 :   ss &lt;&lt; a;</span>
+<span class="lineNum">     552 </span><span class="lineCov">          1 :   EXPECT_EQ(&quot;array([1, 2, 3],\n      type=\&quot;3 * int32\&quot;)&quot;, ss.str());</span>
+<a name="553"><span class="lineNum">     553 </span><span class="lineCov">          1 : }</span></a>
+<span class="lineNum">     554 </span>            : 
+<span class="lineNum">     555 </span><span class="lineCov">          5 : TEST(Array, SimplePrintEmpty)</span>
+<span class="lineNum">     556 </span>            : {
+<span class="lineNum">     557 </span><span class="lineCov">          2 :   std::vector&lt;float&gt; v;</span>
+<span class="lineNum">     558 </span><span class="lineCov">          2 :   nd::array a = v;</span>
+<span class="lineNum">     559 </span><span class="lineCov">          2 :   stringstream ss;</span>
+<span class="lineNum">     560 </span><span class="lineCov">          1 :   ss &lt;&lt; a;</span>
+<span class="lineNum">     561 </span><span class="lineCov">          1 :   EXPECT_EQ(&quot;array([],\n      type=\&quot;0 * float32\&quot;)&quot;, ss.str());</span>
+<a name="562"><span class="lineNum">     562 </span><span class="lineCov">          1 : }</span></a>
+<span class="lineNum">     563 </span>            : 
+<span class="lineNum">     564 </span><span class="lineCov">          5 : TEST(Array, PrintBoolScalar)</span>
+<span class="lineNum">     565 </span>            : {
+<span class="lineNum">     566 </span><span class="lineCov">          2 :   nd::array a(true);</span>
+<span class="lineNum">     567 </span><span class="lineCov">          2 :   stringstream ss;</span>
+<span class="lineNum">     568 </span><span class="lineCov">          1 :   ss &lt;&lt; a;</span>
+<span class="lineNum">     569 </span><span class="lineCov">          1 :   EXPECT_EQ(&quot;array(True,\n      type=\&quot;bool\&quot;)&quot;, ss.str());</span>
+<a name="570"><span class="lineNum">     570 </span><span class="lineCov">          1 : }</span></a>
+<span class="lineNum">     571 </span>            : 
+<span class="lineNum">     572 </span><span class="lineCov">          5 : TEST(Array, PrintBoolVector)</span>
+<span class="lineNum">     573 </span>            : {
+<span class="lineNum">     574 </span><span class="lineCov">          2 :   nd::array a = nd::empty(3, &quot;bool&quot;);</span>
+<span class="lineNum">     575 </span><span class="lineCov">          1 :   a.vals() = true;</span>
+<span class="lineNum">     576 </span><span class="lineCov">          2 :   stringstream ss;</span>
+<span class="lineNum">     577 </span><span class="lineCov">          1 :   ss &lt;&lt; a;</span>
+<span class="lineNum">     578 </span><span class="lineCov">          1 :   EXPECT_EQ(&quot;array([True, True, True],\n      type=\&quot;3 * bool\&quot;)&quot;, ss.str());</span>
+<a name="579"><span class="lineNum">     579 </span><span class="lineCov">          1 : }</span></a>
+<span class="lineNum">     580 </span>            : 
+<span class="lineNum">     581 </span><span class="lineCov">          5 : TEST(Array, CArrayConstructor)</span>
+<span class="lineNum">     582 </span>            : {
+<span class="lineNum">     583 </span><span class="lineCov">          1 :   int values[10] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};</span>
+<span class="lineNum">     584 </span><span class="lineCov">          1 :   EXPECT_ARRAY_EQ((nd::array{0, 1, 2, 3, 4, 5, 6, 7, 8, 9}), values);</span>
+<span class="lineNum">     585 </span><span class="lineCov">          1 : }</span>
+<span class="lineNum">     586 </span>            : 
+<span class="lineNum">     587 </span><span class="lineCov">          1 : REGISTER_TYPED_TEST_CASE_P(Array, ScalarConstructor, OneDimConstructor, TwoDimConstructor, ThreeDimConstructor,</span>
+<a name="588"><span class="lineNum">     588 </span>            :                            AsScalar);</a>
+<span class="lineNum">     589 </span>            : 
+<span class="lineNum">     590 </span><span class="lineCov">          3 : INSTANTIATE_TYPED_TEST_CASE_P(Default, Array, DefaultMemory);</span>
+<span class="lineNum">     591 </span>            : #ifdef DYND_CUDA
+<span class="lineNum">     592 </span>            : INSTANTIATE_TYPED_TEST_CASE_P(CUDA, Array, CUDAMemory);
+<span class="lineNum">     593 </span>            : #endif // DYND_CUDA
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.10</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

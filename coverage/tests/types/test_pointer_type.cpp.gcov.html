@@ -1,0 +1,138 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - coverage.info.cleaned - tests/types/test_pointer_type.cpp</title>
+  <link rel="stylesheet" type="text/css" href="../../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../../index.html">top level</a> - <a href="index.html">tests/types</a> - test_pointer_type.cpp<span style="font-size: 80%;"> (source / <a href="test_pointer_type.cpp.func.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">coverage.info.cleaned</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">34</td>
+            <td class="headerCovTableEntry">34</td>
+            <td class="headerCovTableEntryHi">100.0 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2016-02-19</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">14</td>
+            <td class="headerCovTableEntry">14</td>
+            <td class="headerCovTableEntryHi">100.0 %</td>
+          </tr>
+          <tr><td><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : //</a>
+<span class="lineNum">       2 </span>            : // Copyright (C) 2011-15 DyND Developers
+<span class="lineNum">       3 </span>            : // BSD 2-Clause License, see LICENSE.txt
+<span class="lineNum">       4 </span>            : //
+<span class="lineNum">       5 </span>            : 
+<span class="lineNum">       6 </span>            : #include &lt;iostream&gt;
+<span class="lineNum">       7 </span>            : #include &lt;sstream&gt;
+<span class="lineNum">       8 </span>            : #include &lt;stdexcept&gt;
+<span class="lineNum">       9 </span>            : #include &quot;inc_gtest.hpp&quot;
+<span class="lineNum">      10 </span>            : 
+<span class="lineNum">      11 </span>            : #include &lt;dynd/types/pointer_type.hpp&gt;
+<span class="lineNum">      12 </span>            : #include &lt;dynd/array.hpp&gt;
+<span class="lineNum">      13 </span>            : #include &lt;dynd/callable.hpp&gt;
+<span class="lineNum">      14 </span>            : 
+<span class="lineNum">      15 </span>            : using namespace std;
+<a name="16"><span class="lineNum">      16 </span>            : using namespace dynd;</a>
+<span class="lineNum">      17 </span>            : 
+<span class="lineNum">      18 </span><span class="lineCov">          5 : TEST(PointerType, PointerToBuiltIn)</span>
+<span class="lineNum">      19 </span>            : {
+<span class="lineNum">      20 </span><span class="lineCov">          2 :   ndt::type d;</span>
+<span class="lineNum">      21 </span>            : 
+<span class="lineNum">      22 </span><span class="lineCov">          1 :   d = ndt::pointer_type::make(ndt::make_type&lt;char&gt;());</span>
+<span class="lineNum">      23 </span><span class="lineCov">          1 :   EXPECT_EQ(pointer_id, d.get_id());</span>
+<span class="lineNum">      24 </span><span class="lineCov">          1 :   EXPECT_EQ(any_kind_id, d.get_base_id());</span>
+<span class="lineNum">      25 </span><span class="lineCov">          1 :   EXPECT_EQ(sizeof(void *), d.get_data_size());</span>
+<span class="lineNum">      26 </span><span class="lineCov">          1 :   EXPECT_EQ(sizeof(void *), d.get_data_alignment());</span>
+<span class="lineNum">      27 </span><span class="lineCov">          1 :   EXPECT_NE(0u, d.get_flags() &amp; type_flag_blockref);</span>
+<span class="lineNum">      28 </span><span class="lineCov">          1 :   EXPECT_EQ(ndt::make_type&lt;char&gt;(), d.value_type());</span>
+<span class="lineNum">      29 </span><span class="lineCov">          1 :   EXPECT_EQ(ndt::make_type&lt;char&gt;(), d.p(&quot;target_type&quot;).as&lt;ndt::type&gt;());</span>
+<span class="lineNum">      30 </span><span class="lineCov">          1 :   EXPECT_EQ(ndt::pointer_type::make(ndt::make_type&lt;void&gt;()), d.operand_type());</span>
+<span class="lineNum">      31 </span><span class="lineCov">          1 :   EXPECT_EQ(ndt::pointer_type::make(ndt::make_type&lt;void&gt;()), d.storage_type());</span>
+<span class="lineNum">      32 </span>            :   // As a special case, the pointer_type says it isn't an expression type,
+<span class="lineNum">      33 </span>            :   // even though it is derived from base_expr_type
+<span class="lineNum">      34 </span><span class="lineCov">          1 :   EXPECT_FALSE(d.is_expression());</span>
+<span class="lineNum">      35 </span>            :   // Roundtripping through a string
+<span class="lineNum">      36 </span><span class="lineCov">          1 :   EXPECT_EQ(d, ndt::type(d.str()));</span>
+<a name="37"><span class="lineNum">      37 </span><span class="lineCov">          1 : }</span></a>
+<span class="lineNum">      38 </span>            : 
+<span class="lineNum">      39 </span><span class="lineCov">          5 : TEST(PointerType, IsTypeSubarray)</span>
+<span class="lineNum">      40 </span>            : {
+<span class="lineNum">      41 </span><span class="lineCov">          1 :   EXPECT_TRUE(ndt::type(&quot;pointer[int32]&quot;).is_type_subarray(ndt::type(&quot;pointer[int32]&quot;)));</span>
+<span class="lineNum">      42 </span><span class="lineCov">          1 :   EXPECT_TRUE(ndt::type(&quot;Fixed * 3 * pointer[int32]&quot;).is_type_subarray(ndt::type(&quot;3 * pointer[int32]&quot;)));</span>
+<span class="lineNum">      43 </span><span class="lineCov">          1 :   EXPECT_TRUE(ndt::type(&quot;3 * 10 * pointer[int32]&quot;).is_type_subarray(ndt::type(&quot;pointer[int32]&quot;)));</span>
+<span class="lineNum">      44 </span><span class="lineCov">          1 :   EXPECT_TRUE(ndt::type(&quot;pointer[int32]&quot;).is_type_subarray(ndt::make_type&lt;int32_t&gt;()));</span>
+<span class="lineNum">      45 </span><span class="lineCov">          1 :   EXPECT_FALSE(ndt::make_type&lt;int32_t&gt;().is_type_subarray(ndt::type(&quot;pointer[int32]&quot;)));</span>
+<a name="46"><span class="lineNum">      46 </span><span class="lineCov">          1 : }</span></a>
+<span class="lineNum">      47 </span>            : 
+<span class="lineNum">      48 </span><span class="lineCov">          5 : TEST(PointerType, Dereference)</span>
+<span class="lineNum">      49 </span>            : {
+<span class="lineNum">      50 </span><span class="lineCov">          1 :   int vals[4] = {5, -1, 7, 3};</span>
+<span class="lineNum">      51 </span>            : 
+<span class="lineNum">      52 </span><span class="lineCov">          2 :   nd::array a(vals);</span>
+<span class="lineNum">      53 </span><span class="lineCov">          1 :   a = combine_into_tuple(1, &amp;a);</span>
+<span class="lineNum">      54 </span><span class="lineCov">          1 :   a = a(0);</span>
+<span class="lineNum">      55 </span>            : 
+<span class="lineNum">      56 </span><span class="lineCov">          2 :   nd::array b = a.f(&quot;dereference&quot;);</span>
+<span class="lineNum">      57 </span><span class="lineCov">          1 :   EXPECT_EQ(a.get_type(), ndt::pointer_type::make(b.get_type()));</span>
+<span class="lineNum">      58 </span><span class="lineCov">          1 :   EXPECT_EQ(b(0).as&lt;int&gt;(), 5);</span>
+<span class="lineNum">      59 </span><span class="lineCov">          1 :   EXPECT_EQ(b(1).as&lt;int&gt;(), -1);</span>
+<a name="60"><span class="lineNum">      60 </span><span class="lineCov">          1 :   EXPECT_EQ(b(2).as&lt;int&gt;(), 7);</span></a>
+<span class="lineNum">      61 </span><span class="lineCov">          1 :   EXPECT_EQ(b(3).as&lt;int&gt;(), 3);</span>
+<span class="lineNum">      62 </span><span class="lineCov">          4 : }</span>
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.10</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

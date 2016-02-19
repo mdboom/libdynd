@@ -1,0 +1,232 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - coverage.info.cleaned - src/dynd/func/assignment.cpp</title>
+  <link rel="stylesheet" type="text/css" href="../../../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../../../index.html">top level</a> - <a href="index.html">src/dynd/func</a> - assignment.cpp<span style="font-size: 80%;"> (source / <a href="assignment.cpp.func.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">coverage.info.cleaned</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">90</td>
+            <td class="headerCovTableEntry">102</td>
+            <td class="headerCovTableEntryMed">88.2 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2016-02-19</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">7</td>
+            <td class="headerCovTableEntry">8</td>
+            <td class="headerCovTableEntryMed">87.5 %</td>
+          </tr>
+          <tr><td><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : //</a>
+<span class="lineNum">       2 </span>            : // Copyright (C) 2011-15 DyND Developers
+<span class="lineNum">       3 </span>            : // BSD 2-Clause License, see LICENSE.txt
+<span class="lineNum">       4 </span>            : //
+<span class="lineNum">       5 </span>            : 
+<span class="lineNum">       6 </span>            : #include &lt;dynd/func/assignment.hpp&gt;
+<span class="lineNum">       7 </span>            : #include &lt;dynd/functional.hpp&gt;
+<span class="lineNum">       8 </span>            : #include &lt;dynd/kernels/assignment_kernels.hpp&gt;
+<span class="lineNum">       9 </span>            : #include &lt;dynd/types/any_kind_type.hpp&gt;
+<span class="lineNum">      10 </span>            : 
+<span class="lineNum">      11 </span>            : using namespace std;
+<span class="lineNum">      12 </span>            : using namespace dynd;
+<span class="lineNum">      13 </span>            : 
+<span class="lineNum">      14 </span>            : namespace {
+<span class="lineNum">      15 </span>            : 
+<span class="lineNum">      16 </span>            : template &lt;typename VariadicType, template &lt;type_id_t, type_id_t, VariadicType...&gt; class T&gt;
+<span class="lineNum">      17 </span>            : struct DYND_API _bind {
+<span class="lineNum">      18 </span>            :   template &lt;type_id_t TypeID0, type_id_t TypeID1&gt;
+<span class="lineNum">      19 </span>            :   using type = T&lt;TypeID0, TypeID1&gt;;
+<span class="lineNum">      20 </span>            : };
+<span class="lineNum">      21 </span>            : 
+<a name="22"><span class="lineNum">      22 </span>            : } // anonymous namespace</a>
+<span class="lineNum">      23 </span>            : 
+<span class="lineNum">      24 </span><span class="lineCov">          1 : DYND_API nd::callable nd::assign::make()</span>
+<span class="lineNum">      25 </span>            : {
+<span class="lineNum">      26 </span>            :   typedef type_id_sequence&lt;bool_id, int8_id, int16_id, int32_id, int64_id, int128_id, uint8_id, uint16_id, uint32_id,
+<span class="lineNum">      27 </span>            :                            uint64_id, uint128_id, float32_id, float64_id, complex_float32_id,
+<span class="lineNum">      28 </span>            :                            complex_float64_id&gt; numeric_ids;
+<span class="lineNum">      29 </span>            : 
+<span class="lineNum">      30 </span><span class="lineCov">          2 :   ndt::type self_tp = ndt::callable_type::make(ndt::any_kind_type::make(), {ndt::any_kind_type::make()}, {&quot;error_mode&quot;},</span>
+<span class="lineNum">      31 </span><span class="lineCov">          4 :                                                {ndt::make_type&lt;ndt::option_type&gt;(ndt::make_type&lt;assign_error_mode&gt;())});</span>
+<span class="lineNum">      32 </span>            : 
+<span class="lineNum">      33 </span>            :   map&lt;std::array&lt;type_id_t, 2&gt;, callable&gt; children =
+<span class="lineNum">      34 </span><span class="lineCov">          2 :       callable::make_all&lt;_bind&lt;assign_error_mode, assignment_kernel&gt;::type, numeric_ids, numeric_ids&gt;();</span>
+<span class="lineNum">      35 </span><span class="lineCov">          1 :   children[{{string_id, string_id}}] = callable::make&lt;assignment_kernel&lt;string_id, string_id&gt;&gt;();</span>
+<span class="lineNum">      36 </span><span class="lineCov">          1 :   children[{{bytes_id, bytes_id}}] = callable::make&lt;assignment_kernel&lt;bytes_id, bytes_id&gt;&gt;();</span>
+<span class="lineNum">      37 </span><span class="lineCov">          1 :   children[{{fixed_bytes_id, fixed_bytes_id}}] = callable::make&lt;assignment_kernel&lt;fixed_bytes_id, fixed_bytes_id&gt;&gt;();</span>
+<span class="lineNum">      38 </span><span class="lineCov">          1 :   children[{{char_id, char_id}}] = callable::make&lt;assignment_kernel&lt;char_id, char_id&gt;&gt;();</span>
+<span class="lineNum">      39 </span><span class="lineCov">          1 :   children[{{char_id, fixed_string_id}}] = callable::make&lt;assignment_kernel&lt;char_id, fixed_string_id&gt;&gt;();</span>
+<span class="lineNum">      40 </span><span class="lineCov">          1 :   children[{{char_id, string_id}}] = callable::make&lt;assignment_kernel&lt;char_id, string_id&gt;&gt;();</span>
+<span class="lineNum">      41 </span><span class="lineCov">          1 :   children[{{fixed_string_id, char_id}}] = callable::make&lt;assignment_kernel&lt;fixed_string_id, char_id&gt;&gt;();</span>
+<span class="lineNum">      42 </span><span class="lineCov">          1 :   children[{{string_id, char_id}}] = callable::make&lt;assignment_kernel&lt;string_id, char_id&gt;&gt;();</span>
+<span class="lineNum">      43 </span><span class="lineCov">          1 :   children[{{type_id, type_id}}] = callable::make&lt;assignment_kernel&lt;type_id, type_id&gt;&gt;();</span>
+<span class="lineNum">      44 </span><span class="lineCov">          1 :   children[{{string_id, int32_id}}] = callable::make&lt;assignment_kernel&lt;string_id, int32_id&gt;&gt;();</span>
+<span class="lineNum">      45 </span><span class="lineCov">          2 :   children[{{fixed_string_id, fixed_string_id}}] =</span>
+<span class="lineNum">      46 </span><span class="lineCov">          3 :       callable::make&lt;assignment_kernel&lt;fixed_string_id, fixed_string_id&gt;&gt;();</span>
+<span class="lineNum">      47 </span><span class="lineCov">          1 :   children[{{fixed_string_id, string_id}}] = callable::make&lt;assignment_kernel&lt;fixed_string_id, string_id&gt;&gt;();</span>
+<span class="lineNum">      48 </span><span class="lineCov">          1 :   children[{{fixed_string_id, uint8_id}}] = callable::make&lt;assignment_kernel&lt;fixed_string_id, uint8_id&gt;&gt;();</span>
+<span class="lineNum">      49 </span><span class="lineCov">          1 :   children[{{fixed_string_id, uint16_id}}] = callable::make&lt;assignment_kernel&lt;fixed_string_id, uint16_id&gt;&gt;();</span>
+<span class="lineNum">      50 </span><span class="lineCov">          1 :   children[{{fixed_string_id, uint32_id}}] = callable::make&lt;assignment_kernel&lt;fixed_string_id, uint32_id&gt;&gt;();</span>
+<span class="lineNum">      51 </span><span class="lineCov">          1 :   children[{{fixed_string_id, uint64_id}}] = callable::make&lt;assignment_kernel&lt;fixed_string_id, uint64_id&gt;&gt;();</span>
+<span class="lineNum">      52 </span><span class="lineCov">          1 :   children[{{fixed_string_id, uint128_id}}] = callable::make&lt;assignment_kernel&lt;fixed_string_id, uint128_id&gt;&gt;();</span>
+<span class="lineNum">      53 </span><span class="lineCov">          1 :   children[{{int32_id, fixed_string_id}}] = callable::make&lt;assignment_kernel&lt;int32_id, fixed_string_id&gt;&gt;();</span>
+<span class="lineNum">      54 </span><span class="lineCov">          1 :   children[{{string_id, string_id}}] = callable::make&lt;assignment_kernel&lt;string_id, string_id&gt;&gt;();</span>
+<span class="lineNum">      55 </span><span class="lineCov">          1 :   children[{{string_id, fixed_string_id}}] = callable::make&lt;assignment_kernel&lt;string_id, fixed_string_id&gt;&gt;();</span>
+<span class="lineNum">      56 </span><span class="lineCov">          1 :   children[{{bool_id, string_id}}] = callable::make&lt;assignment_kernel&lt;bool_id, string_id&gt;&gt;();</span>
+<span class="lineNum">      57 </span><span class="lineCov">          1 :   children[{{option_id, option_id}}] = callable::make&lt;assignment_kernel&lt;option_id, option_id&gt;&gt;();</span>
+<span class="lineNum">      58 </span><span class="lineCov">          1 :   children[{{int32_id, option_id}}] = callable::make&lt;option_to_value_ck&gt;(ndt::type(&quot;(?Any) -&gt; Any&quot;));</span>
+<span class="lineNum">      59 </span><span class="lineCov">          1 :   children[{{string_id, option_id}}] = callable::make&lt;option_to_value_ck&gt;(ndt::type(&quot;(?Any) -&gt; Any&quot;));</span>
+<span class="lineNum">      60 </span><span class="lineCov">          1 :   children[{{float64_id, option_id}}] = callable::make&lt;option_to_value_ck&gt;(ndt::type(&quot;(?Any) -&gt; Any&quot;));</span>
+<span class="lineNum">      61 </span><span class="lineCov">          1 :   children[{{bool_id, option_id}}] = callable::make&lt;option_to_value_ck&gt;(ndt::type(&quot;(?Any) -&gt; Any&quot;));</span>
+<span class="lineNum">      62 </span><span class="lineCov">          1 :   children[{{int8_id, option_id}}] = callable::make&lt;option_to_value_ck&gt;(ndt::type(&quot;(?Any) -&gt; Any&quot;));</span>
+<span class="lineNum">      63 </span><span class="lineCov">          1 :   children[{{uint32_id, option_id}}] = callable::make&lt;option_to_value_ck&gt;(ndt::type(&quot;(?Any) -&gt; Any&quot;));</span>
+<span class="lineNum">      64 </span><span class="lineCov">          1 :   children[{{option_id, int32_id}}] = callable::make&lt;detail::assignment_option_kernel&gt;(ndt::type(&quot;(Any) -&gt; ?Any&quot;));</span>
+<span class="lineNum">      65 </span><span class="lineCov">          1 :   children[{{option_id, string_id}}] = callable::make&lt;assignment_kernel&lt;option_id, string_id&gt;&gt;();</span>
+<span class="lineNum">      66 </span><span class="lineCov">          1 :   children[{{option_id, float64_id}}] = callable::make&lt;assignment_kernel&lt;option_id, float64_id&gt;&gt;();</span>
+<span class="lineNum">      67 </span><span class="lineCov">          1 :   children[{{option_id, bool_id}}] = callable::make&lt;detail::assignment_option_kernel&gt;(ndt::type(&quot;(Any) -&gt; ?Any&quot;));</span>
+<span class="lineNum">      68 </span><span class="lineCov">          1 :   children[{{option_id, int8_id}}] = callable::make&lt;detail::assignment_option_kernel&gt;(ndt::type(&quot;(Any) -&gt; ?Any&quot;));</span>
+<span class="lineNum">      69 </span><span class="lineCov">          1 :   children[{{option_id, uint32_id}}] = callable::make&lt;detail::assignment_option_kernel&gt;(ndt::type(&quot;(Any) -&gt; ?Any&quot;));</span>
+<span class="lineNum">      70 </span><span class="lineCov">          1 :   children[{{string_id, type_id}}] = callable::make&lt;assignment_kernel&lt;string_id, type_id&gt;&gt;();</span>
+<span class="lineNum">      71 </span><span class="lineCov">          1 :   children[{{type_id, string_id}}] = callable::make&lt;assignment_kernel&lt;type_id, string_id&gt;&gt;();</span>
+<span class="lineNum">      72 </span><span class="lineCov">          1 :   children[{{pointer_id, pointer_id}}] = callable::make&lt;assignment_kernel&lt;pointer_id, pointer_id&gt;&gt;();</span>
+<span class="lineNum">      73 </span><span class="lineCov">          1 :   children[{{int8_id, string_id}}] = callable::make&lt;assignment_kernel&lt;int8_id, string_id&gt;&gt;();</span>
+<span class="lineNum">      74 </span><span class="lineCov">          1 :   children[{{int16_id, string_id}}] = callable::make&lt;assignment_kernel&lt;int16_id, string_id&gt;&gt;();</span>
+<span class="lineNum">      75 </span><span class="lineCov">          1 :   children[{{int32_id, string_id}}] = callable::make&lt;assignment_kernel&lt;int32_id, string_id&gt;&gt;();</span>
+<span class="lineNum">      76 </span><span class="lineCov">          1 :   children[{{int64_id, string_id}}] = callable::make&lt;assignment_kernel&lt;int64_id, string_id&gt;&gt;();</span>
+<span class="lineNum">      77 </span><span class="lineCov">          1 :   children[{{uint8_id, string_id}}] = callable::make&lt;assignment_kernel&lt;uint8_id, string_id&gt;&gt;();</span>
+<span class="lineNum">      78 </span><span class="lineCov">          1 :   children[{{uint16_id, string_id}}] = callable::make&lt;assignment_kernel&lt;uint16_id, string_id&gt;&gt;();</span>
+<span class="lineNum">      79 </span><span class="lineCov">          1 :   children[{{uint32_id, string_id}}] = callable::make&lt;assignment_kernel&lt;uint32_id, string_id&gt;&gt;();</span>
+<span class="lineNum">      80 </span><span class="lineCov">          1 :   children[{{uint64_id, string_id}}] = callable::make&lt;assignment_kernel&lt;uint64_id, string_id&gt;&gt;();</span>
+<span class="lineNum">      81 </span><span class="lineCov">          1 :   children[{{float32_id, string_id}}] = callable::make&lt;assignment_kernel&lt;float32_id, string_id&gt;&gt;();</span>
+<span class="lineNum">      82 </span><span class="lineCov">          1 :   children[{{float64_id, string_id}}] = callable::make&lt;assignment_kernel&lt;float64_id, string_id&gt;&gt;();</span>
+<span class="lineNum">      83 </span><span class="lineCov">          1 :   children[{{tuple_id, tuple_id}}] = callable::make&lt;assignment_kernel&lt;tuple_id, tuple_id&gt;&gt;();</span>
+<span class="lineNum">      84 </span><span class="lineCov">          1 :   children[{{struct_id, int32_id}}] = callable::make&lt;assignment_kernel&lt;struct_id, struct_id&gt;&gt;();</span>
+<span class="lineNum">      85 </span><span class="lineCov">          1 :   children[{{struct_id, struct_id}}] = callable::make&lt;assignment_kernel&lt;struct_id, struct_id&gt;&gt;();</span>
+<span class="lineNum">      86 </span><span class="lineCov">         31 :   for (type_id_t tp_id : {bool_id, int8_id, int16_id, int32_id, int64_id, int128_id, uint8_id, uint16_id, uint32_id,</span>
+<span class="lineNum">      87 </span><span class="lineCov">         16 :                           uint64_id, uint128_id, float32_id, float64_id, fixed_dim_id, type_id}) {</span>
+<span class="lineNum">      88 </span><span class="lineCov">         15 :     children[{{tp_id, var_dim_id}}] = nd::functional::elwise(nd::functional::call&lt;assign&gt;(ndt::type(&quot;(Any) -&gt; Any&quot;)));</span>
+<span class="lineNum">      89 </span><span class="lineCov">         15 :     children[{{var_dim_id, tp_id}}] = nd::functional::elwise(nd::functional::call&lt;assign&gt;(ndt::type(&quot;(Any) -&gt; Any&quot;)));</span>
+<span class="lineNum">      90 </span>            :   }
+<span class="lineNum">      91 </span><span class="lineCov">          2 :   children[{{var_dim_id, var_dim_id}}] =</span>
+<span class="lineNum">      92 </span><span class="lineCov">          3 :       nd::functional::elwise(nd::functional::call&lt;assign&gt;(ndt::type(&quot;(Any) -&gt; Any&quot;)));</span>
+<span class="lineNum">      93 </span><span class="lineCov">         29 :   for (type_id_t tp_id : {bool_id, int8_id, int16_id, int32_id, int64_id, int128_id, uint8_id, uint16_id, uint32_id,</span>
+<span class="lineNum">      94 </span><span class="lineCov">         15 :                           uint64_id, uint128_id, float32_id, float64_id, type_id}) {</span>
+<span class="lineNum">      95 </span><span class="lineCov">         14 :     children[{{tp_id, fixed_dim_id}}] = nd::functional::elwise(nd::functional::call&lt;assign&gt;(ndt::type(&quot;(Any) -&gt; Any&quot;)));</span>
+<span class="lineNum">      96 </span><span class="lineCov">         14 :     children[{{fixed_dim_id, tp_id}}] = nd::functional::elwise(nd::functional::call&lt;assign&gt;(ndt::type(&quot;(Any) -&gt; Any&quot;)));</span>
+<span class="lineNum">      97 </span>            :   }
+<span class="lineNum">      98 </span><span class="lineCov">          2 :   children[{{fixed_dim_id, fixed_dim_id}}] =</span>
+<span class="lineNum">      99 </span><span class="lineCov">          3 :       nd::functional::elwise(nd::functional::call&lt;assign&gt;(ndt::type(&quot;(Any) -&gt; Any&quot;)));</span>
+<span class="lineNum">     100 </span>            : 
+<span class="lineNum">     101 </span><span class="lineCov">          1 :   children[{{adapt_id, int16_id}}] = nd::callable::make&lt;detail::adapt_assign_to_kernel&gt;(ndt::type(&quot;(Any) -&gt; Any&quot;));</span>
+<span class="lineNum">     102 </span><span class="lineCov">          1 :   children[{{adapt_id, int32_id}}] = nd::callable::make&lt;detail::adapt_assign_to_kernel&gt;(ndt::type(&quot;(Any) -&gt; Any&quot;));</span>
+<span class="lineNum">     103 </span><span class="lineCov">          1 :   children[{{adapt_id, int64_id}}] = nd::callable::make&lt;detail::adapt_assign_to_kernel&gt;(ndt::type(&quot;(Any) -&gt; Any&quot;));</span>
+<span class="lineNum">     104 </span><span class="lineCov">          1 :   children[{{adapt_id, float32_id}}] = nd::callable::make&lt;detail::adapt_assign_to_kernel&gt;(ndt::type(&quot;(Any) -&gt; Any&quot;));</span>
+<span class="lineNum">     105 </span><span class="lineCov">          1 :   children[{{adapt_id, float64_id}}] = nd::callable::make&lt;detail::adapt_assign_to_kernel&gt;(ndt::type(&quot;(Any) -&gt; Any&quot;));</span>
+<span class="lineNum">     106 </span><span class="lineCov">          2 :   children[{{adapt_id, complex_float32_id}}] =</span>
+<span class="lineNum">     107 </span><span class="lineCov">          3 :       nd::callable::make&lt;detail::adapt_assign_to_kernel&gt;(ndt::type(&quot;(Any) -&gt; Any&quot;));</span>
+<span class="lineNum">     108 </span><span class="lineCov">          2 :   children[{{adapt_id, complex_float64_id}}] =</span>
+<span class="lineNum">     109 </span><span class="lineCov">          3 :       nd::callable::make&lt;detail::adapt_assign_to_kernel&gt;(ndt::type(&quot;(Any) -&gt; Any&quot;));</span>
+<span class="lineNum">     110 </span>            : 
+<span class="lineNum">     111 </span><span class="lineCov">          1 :   children[{{int32_id, adapt_id}}] = nd::callable::make&lt;detail::adapt_assign_from_kernel&gt;(ndt::type(&quot;(Any) -&gt; Any&quot;));</span>
+<a name="112"><span class="lineNum">     112 </span><span class="lineCov">          1 :   children[{{struct_id, adapt_id}}] = nd::callable::make&lt;detail::adapt_assign_from_kernel&gt;(ndt::type(&quot;(Any) -&gt; Any&quot;));</span></a>
+<a name="113"><span class="lineNum">     113 </span>            : </a>
+<span class="lineNum">     114 </span><span class="lineCov">          3 :   return functional::dispatch(self_tp, [children](const ndt::type &amp;dst_tp, intptr_t DYND_UNUSED(nsrc),</span>
+<span class="lineNum">     115 </span><span class="lineCov">       2099 :                                                   const ndt::type *src_tp) mutable -&gt; callable &amp; {</span>
+<span class="lineNum">     116 </span><span class="lineCov">       2099 :     callable &amp;child = children[{{dst_tp.get_id(), src_tp[0].get_id()}}];</span>
+<span class="lineNum">     117 </span><span class="lineCov">       2099 :     if (child.is_null()) {</span>
+<span class="lineNum">     118 </span>            :       //      throw std::runtime_error(&quot;assignment error&quot;);
+<span class="lineNum">     119 </span>            :     }
+<span class="lineNum">     120 </span><span class="lineCov">       2099 :     return child;</span>
+<span class="lineNum">     121 </span><span class="lineCov">          2 :   });</span>
+<span class="lineNum">     122 </span>            : }
+<span class="lineNum">     123 </span>            : 
+<a name="124"><span class="lineNum">     124 </span>            : DYND_API struct nd::assign nd::assign;</a>
+<span class="lineNum">     125 </span>            : 
+<span class="lineNum">     126 </span><span class="lineCov">         82 : void dynd::make_assignment_kernel(nd::kernel_builder *ckb, const ndt::type &amp;dst_tp, const char *dst_arrmeta,</span>
+<span class="lineNum">     127 </span>            :                                   const ndt::type &amp;src_tp, const char *src_arrmeta, kernel_request_t kernreq,
+<span class="lineNum">     128 </span>            :                                   const eval::eval_context *ectx)
+<span class="lineNum">     129 </span>            : {
+<span class="lineNum">     130 </span><span class="lineCov">        164 :   nd::array error_mode = ectx-&gt;errmode;</span>
+<span class="lineNum">     131 </span><span class="lineCov">        164 :   nd::assign::get()-&gt;instantiate(nd::assign::get()-&gt;static_data(), NULL, ckb, dst_tp, dst_arrmeta, 1, &amp;src_tp,</span>
+<span class="lineNum">     132 </span><span class="lineCov">         82 :                                  &amp;src_arrmeta, kernreq, 1, &amp;error_mode, std::map&lt;std::string, ndt::type&gt;());</span>
+<a name="133"><span class="lineNum">     133 </span><span class="lineCov">         81 : }</span></a>
+<span class="lineNum">     134 </span>            : 
+<span class="lineNum">     135 </span><span class="lineNoCov">          0 : void dynd::make_pod_typed_data_assignment_kernel(nd::kernel_builder *ckb, size_t data_size,</span>
+<span class="lineNum">     136 </span>            :                                                  size_t DYND_UNUSED(data_alignment), kernel_request_t kernreq)
+<span class="lineNum">     137 </span>            : {
+<span class="lineNum">     138 </span>            :   // Aligned specialization tables
+<span class="lineNum">     139 </span><span class="lineNoCov">          0 :   switch (data_size) {</span>
+<span class="lineNum">     140 </span>            :   case 1:
+<span class="lineNum">     141 </span><span class="lineNoCov">          0 :     ckb-&gt;emplace_back&lt;nd::trivial_copy_kernel&lt;1&gt;&gt;(kernreq);</span>
+<span class="lineNum">     142 </span><span class="lineNoCov">          0 :     break;</span>
+<span class="lineNum">     143 </span>            :   case 2:
+<span class="lineNum">     144 </span><span class="lineNoCov">          0 :     ckb-&gt;emplace_back&lt;nd::trivial_copy_kernel&lt;2&gt;&gt;(kernreq);</span>
+<span class="lineNum">     145 </span><span class="lineNoCov">          0 :     break;</span>
+<span class="lineNum">     146 </span>            :   case 4:
+<span class="lineNum">     147 </span><span class="lineNoCov">          0 :     ckb-&gt;emplace_back&lt;nd::trivial_copy_kernel&lt;4&gt;&gt;(kernreq);</span>
+<span class="lineNum">     148 </span><span class="lineNoCov">          0 :     break;</span>
+<span class="lineNum">     149 </span>            :   case 8:
+<span class="lineNum">     150 </span><span class="lineNoCov">          0 :     ckb-&gt;emplace_back&lt;nd::trivial_copy_kernel&lt;8&gt;&gt;(kernreq);</span>
+<span class="lineNum">     151 </span><span class="lineNoCov">          0 :     break;</span>
+<span class="lineNum">     152 </span>            :   default:
+<span class="lineNum">     153 </span><span class="lineNoCov">          0 :     ckb-&gt;emplace_back&lt;nd::unaligned_copy_ck&gt;(kernreq, data_size);</span>
+<a name="154"><span class="lineNum">     154 </span><span class="lineNoCov">          0 :     break;</span></a>
+<span class="lineNum">     155 </span>            :   }
+<span class="lineNum">     156 </span><span class="lineCov">          3 : }</span>
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.10</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

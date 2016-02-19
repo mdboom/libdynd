@@ -1,0 +1,269 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - coverage.info.cleaned - src/dynd/kernels/tuple_assignment_kernels.cpp</title>
+  <link rel="stylesheet" type="text/css" href="../../../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../../../index.html">top level</a> - <a href="index.html">src/dynd/kernels</a> - tuple_assignment_kernels.cpp<span style="font-size: 80%;"> (source / <a href="tuple_assignment_kernels.cpp.func.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">coverage.info.cleaned</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">68</td>
+            <td class="headerCovTableEntry">103</td>
+            <td class="headerCovTableEntryLo">66.0 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2016-02-19</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">8</td>
+            <td class="headerCovTableEntry">9</td>
+            <td class="headerCovTableEntryMed">88.9 %</td>
+          </tr>
+          <tr><td><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : //</a>
+<span class="lineNum">       2 </span>            : // Copyright (C) 2011-15 DyND Developers
+<span class="lineNum">       3 </span>            : // BSD 2-Clause License, see LICENSE.txt
+<span class="lineNum">       4 </span>            : //
+<span class="lineNum">       5 </span>            : 
+<span class="lineNum">       6 </span>            : #include &lt;stdexcept&gt;
+<span class="lineNum">       7 </span>            : #include &lt;sstream&gt;
+<span class="lineNum">       8 </span>            : #include &lt;algorithm&gt;
+<span class="lineNum">       9 </span>            : 
+<span class="lineNum">      10 </span>            : #include &lt;dynd/type.hpp&gt;
+<span class="lineNum">      11 </span>            : #include &lt;dynd/diagnostics.hpp&gt;
+<span class="lineNum">      12 </span>            : #include &lt;dynd/kernels/assignment_kernels.hpp&gt;
+<span class="lineNum">      13 </span>            : #include &lt;dynd/kernels/tuple_assignment_kernels.hpp&gt;
+<span class="lineNum">      14 </span>            : #include &lt;dynd/func/copy.hpp&gt;
+<span class="lineNum">      15 </span>            : 
+<span class="lineNum">      16 </span>            : using namespace std;
+<span class="lineNum">      17 </span>            : using namespace dynd;
+<span class="lineNum">      18 </span>            : 
+<span class="lineNum">      19 </span>            : namespace {
+<span class="lineNum">      20 </span>            : struct tuple_unary_op_item {
+<span class="lineNum">      21 </span>            :   size_t child_kernel_offset;
+<span class="lineNum">      22 </span>            :   size_t dst_data_offset;
+<span class="lineNum">      23 </span>            :   size_t src_data_offset;
+<a name="24"><span class="lineNum">      24 </span>            : };</a>
+<span class="lineNum">      25 </span>            : 
+<span class="lineNum">      26 </span><span class="lineCov">         11 : struct tuple_unary_op_ck : nd::base_kernel&lt;tuple_unary_op_ck, 1&gt; {</span>
+<a name="27"><span class="lineNum">      27 </span>            :   vector&lt;tuple_unary_op_item&gt; m_fields;</a>
+<span class="lineNum">      28 </span>            : 
+<span class="lineNum">      29 </span><span class="lineCov">         11 :   ~tuple_unary_op_ck()</span>
+<span class="lineNum">      30 </span><span class="lineCov">         11 :   {</span>
+<span class="lineNum">      31 </span><span class="lineCov">         36 :     for (size_t i = 0; i &lt; m_fields.size(); ++i) {</span>
+<span class="lineNum">      32 </span><span class="lineCov">         25 :       get_child(m_fields[i].child_kernel_offset)-&gt;destroy();</span>
+<span class="lineNum">      33 </span>            :     }
+<a name="34"><span class="lineNum">      34 </span><span class="lineCov">         11 :   }</span></a>
+<span class="lineNum">      35 </span>            : 
+<span class="lineNum">      36 </span><span class="lineCov">         12 :   void single(char *dst, char *const *src)</span>
+<span class="lineNum">      37 </span>            :   {
+<span class="lineNum">      38 </span><span class="lineCov">         12 :     const tuple_unary_op_item *fi = &amp;m_fields[0];</span>
+<span class="lineNum">      39 </span><span class="lineCov">         12 :     intptr_t field_count = m_fields.size();</span>
+<span class="lineNum">      40 </span>            :     kernel_prefix *child;
+<span class="lineNum">      41 </span>            :     kernel_single_t child_fn;
+<span class="lineNum">      42 </span>            : 
+<span class="lineNum">      43 </span><span class="lineCov">         41 :     for (intptr_t i = 0; i &lt; field_count; ++i) {</span>
+<span class="lineNum">      44 </span><span class="lineCov">         29 :       const tuple_unary_op_item &amp;item = fi[i];</span>
+<span class="lineNum">      45 </span><span class="lineCov">         29 :       child = get_child(item.child_kernel_offset);</span>
+<span class="lineNum">      46 </span><span class="lineCov">         29 :       child_fn = child-&gt;get_function&lt;kernel_single_t&gt;();</span>
+<span class="lineNum">      47 </span><span class="lineCov">         29 :       char *child_src = src[0] + item.src_data_offset;</span>
+<span class="lineNum">      48 </span><span class="lineCov">         29 :       child_fn(child, dst + item.dst_data_offset, &amp;child_src);</span>
+<span class="lineNum">      49 </span>            :     }
+<span class="lineNum">      50 </span><span class="lineCov">         12 :   }</span>
+<span class="lineNum">      51 </span>            : };
+<a name="52"><span class="lineNum">      52 </span>            : } // anonymous namespace</a>
+<span class="lineNum">      53 </span>            : 
+<span class="lineNum">      54 </span><span class="lineCov">         11 : void dynd::make_tuple_unary_op_ckernel(const nd::base_callable *af, const ndt::callable_type *DYND_UNUSED(af_tp),</span>
+<span class="lineNum">      55 </span>            :                                        nd::kernel_builder *ckb, intptr_t field_count, const uintptr_t *dst_offsets,
+<span class="lineNum">      56 </span>            :                                        const ndt::type *dst_tp, const char *const *dst_arrmeta,
+<span class="lineNum">      57 </span>            :                                        const uintptr_t *src_offsets, const ndt::type *src_tp,
+<span class="lineNum">      58 </span>            :                                        const char *const *src_arrmeta, kernel_request_t kernreq)
+<span class="lineNum">      59 </span>            : {
+<span class="lineNum">      60 </span><span class="lineCov">         11 :   intptr_t self_offset = ckb-&gt;size();</span>
+<span class="lineNum">      61 </span><span class="lineCov">         11 :   ckb-&gt;emplace_back&lt;tuple_unary_op_ck&gt;(kernreq);</span>
+<span class="lineNum">      62 </span><span class="lineCov">         11 :   tuple_unary_op_ck *self = ckb-&gt;get_at&lt;tuple_unary_op_ck&gt;(self_offset);</span>
+<span class="lineNum">      63 </span><span class="lineCov">         11 :   self-&gt;m_fields.resize(field_count);</span>
+<span class="lineNum">      64 </span><span class="lineCov">         36 :   for (intptr_t i = 0; i &lt; field_count; ++i) {</span>
+<span class="lineNum">      65 </span><span class="lineCov">         25 :     self = ckb-&gt;get_at&lt;tuple_unary_op_ck&gt;(self_offset);</span>
+<span class="lineNum">      66 </span><span class="lineCov">         25 :     tuple_unary_op_item &amp;field = self-&gt;m_fields[i];</span>
+<span class="lineNum">      67 </span><span class="lineCov">         25 :     field.child_kernel_offset = ckb-&gt;size() - self_offset;</span>
+<span class="lineNum">      68 </span><span class="lineCov">         25 :     field.dst_data_offset = dst_offsets[i];</span>
+<span class="lineNum">      69 </span><span class="lineCov">         25 :     field.src_data_offset = src_offsets[i];</span>
+<span class="lineNum">      70 </span><span class="lineCov">         50 :     nd::array error_mode = ndt::traits&lt;assign_error_mode&gt;::na();</span>
+<span class="lineNum">      71 </span><span class="lineCov">         50 :     af-&gt;instantiate(NULL, NULL, ckb, dst_tp[i], dst_arrmeta[i], 1, &amp;src_tp[i], &amp;src_arrmeta[i], kernel_request_single,</span>
+<span class="lineNum">      72 </span><span class="lineCov">         25 :                     1, &amp;error_mode, std::map&lt;std::string, ndt::type&gt;());</span>
+<span class="lineNum">      73 </span>            :   }
+<span class="lineNum">      74 </span><span class="lineCov">         11 : }</span>
+<span class="lineNum">      75 </span>            : 
+<span class="lineNum">      76 </span>            : /////////////////////////////////////////
+<a name="77"><span class="lineNum">      77 </span>            : // tuple/struct to identical tuple/struct assignment</a>
+<span class="lineNum">      78 </span>            : 
+<span class="lineNum">      79 </span><span class="lineCov">          8 : void dynd::make_tuple_identical_assignment_kernel(nd::kernel_builder *ckb, const ndt::type &amp;val_tup_tp,</span>
+<span class="lineNum">      80 </span>            :                                                   const char *dst_arrmeta, const char *src_arrmeta,
+<span class="lineNum">      81 </span>            :                                                   kernel_request_t kernreq)
+<span class="lineNum">      82 </span>            : {
+<span class="lineNum">      83 </span><span class="lineCov">          8 :   if (val_tup_tp.get_kind() != tuple_kind &amp;&amp; val_tup_tp.get_kind() != struct_kind) {</span>
+<span class="lineNum">      84 </span><span class="lineNoCov">          0 :     stringstream ss;</span>
+<span class="lineNum">      85 </span><span class="lineNoCov">          0 :     ss &lt;&lt; &quot;make_tuple_identical_assignment_kernel: provided type &quot; &lt;&lt; val_tup_tp &lt;&lt; &quot; is not of tuple or struct kind&quot;;</span>
+<span class="lineNum">      86 </span><span class="lineNoCov">          0 :     throw runtime_error(ss.str());</span>
+<span class="lineNum">      87 </span>            :   }
+<span class="lineNum">      88 </span><span class="lineCov">          8 :   if (val_tup_tp.is_pod()) {</span>
+<span class="lineNum">      89 </span>            :     // For POD structs, get a trivial memory copy kernel
+<span class="lineNum">      90 </span><span class="lineNoCov">          0 :     make_pod_typed_data_assignment_kernel(ckb, val_tup_tp.get_data_size(), val_tup_tp.get_data_alignment(), kernreq);</span>
+<span class="lineNum">      91 </span><span class="lineNoCov">          0 :     return;</span>
+<span class="lineNum">      92 </span>            :   }
+<span class="lineNum">      93 </span>            : 
+<span class="lineNum">      94 </span><span class="lineCov">          8 :   auto sd = val_tup_tp.extended&lt;ndt::tuple_type&gt;();</span>
+<span class="lineNum">      95 </span><span class="lineCov">          8 :   intptr_t field_count = sd-&gt;get_field_count();</span>
+<span class="lineNum">      96 </span><span class="lineCov">          8 :   const std::vector&lt;uintptr_t&gt; &amp;arrmeta_offsets = sd-&gt;get_arrmeta_offsets();</span>
+<span class="lineNum">      97 </span><span class="lineCov">         16 :   shortvector&lt;const char *&gt; dst_fields_arrmeta(field_count);</span>
+<span class="lineNum">      98 </span><span class="lineCov">         25 :   for (intptr_t i = 0; i != field_count; ++i) {</span>
+<span class="lineNum">      99 </span><span class="lineCov">         17 :     dst_fields_arrmeta[i] = dst_arrmeta + arrmeta_offsets[i];</span>
+<span class="lineNum">     100 </span>            :   }
+<span class="lineNum">     101 </span><span class="lineCov">         16 :   shortvector&lt;const char *&gt; src_fields_arrmeta(field_count);</span>
+<span class="lineNum">     102 </span><span class="lineCov">         25 :   for (intptr_t i = 0; i != field_count; ++i) {</span>
+<span class="lineNum">     103 </span><span class="lineCov">         17 :     src_fields_arrmeta[i] = src_arrmeta + arrmeta_offsets[i];</span>
+<span class="lineNum">     104 </span>            :   }
+<span class="lineNum">     105 </span>            : 
+<span class="lineNum">     106 </span><span class="lineCov">         16 :   make_tuple_unary_op_ckernel(nd::copy::get().get(), nd::copy::get().get_type(), ckb, field_count,</span>
+<span class="lineNum">     107 </span><span class="lineCov">          8 :                               sd-&gt;get_data_offsets(dst_arrmeta), sd-&gt;get_field_types().data(), dst_fields_arrmeta.get(),</span>
+<span class="lineNum">     108 </span><span class="lineCov">          8 :                               sd-&gt;get_data_offsets(src_arrmeta), sd-&gt;get_field_types().data(), src_fields_arrmeta.get(),</span>
+<span class="lineNum">     109 </span><span class="lineCov">          8 :                               kernreq);</span>
+<span class="lineNum">     110 </span>            : }
+<span class="lineNum">     111 </span>            : 
+<span class="lineNum">     112 </span>            : /////////////////////////////////////////
+<span class="lineNum">     113 </span>            : // struct/tuple to different struct/tuple assignment
+<a name="114"><span class="lineNum">     114 </span>            : // (matches up fields by number, not name in struct case)</a>
+<span class="lineNum">     115 </span>            : 
+<span class="lineNum">     116 </span><span class="lineCov">          1 : void dynd::make_tuple_assignment_kernel(nd::kernel_builder *ckb, const ndt::type &amp;dst_tuple_tp, const char *dst_arrmeta,</span>
+<span class="lineNum">     117 </span>            :                                         const ndt::type &amp;src_tuple_tp, const char *src_arrmeta,
+<span class="lineNum">     118 </span>            :                                         kernel_request_t kernreq)
+<span class="lineNum">     119 </span>            : {
+<span class="lineNum">     120 </span><span class="lineCov">          1 :   if (src_tuple_tp.get_kind() != tuple_kind &amp;&amp; src_tuple_tp.get_kind() != struct_kind) {</span>
+<span class="lineNum">     121 </span><span class="lineNoCov">          0 :     stringstream ss;</span>
+<span class="lineNum">     122 </span><span class="lineNoCov">          0 :     ss &lt;&lt; &quot;make_tuple_assignment_kernel: provided source type &quot; &lt;&lt; src_tuple_tp &lt;&lt; &quot; is not of tuple or struct kind&quot;;</span>
+<span class="lineNum">     123 </span><span class="lineNoCov">          0 :     throw runtime_error(ss.str());</span>
+<span class="lineNum">     124 </span>            :   }
+<span class="lineNum">     125 </span><span class="lineCov">          1 :   if (dst_tuple_tp.get_kind() != tuple_kind &amp;&amp; dst_tuple_tp.get_kind() != struct_kind) {</span>
+<span class="lineNum">     126 </span><span class="lineNoCov">          0 :     stringstream ss;</span>
+<span class="lineNum">     127 </span><span class="lineNoCov">          0 :     ss &lt;&lt; &quot;make_tuple_assignment_kernel: provided destination type &quot; &lt;&lt; dst_tuple_tp</span>
+<span class="lineNum">     128 </span><span class="lineNoCov">          0 :        &lt;&lt; &quot; is not of tuple or struct kind&quot;;</span>
+<span class="lineNum">     129 </span><span class="lineNoCov">          0 :     throw runtime_error(ss.str());</span>
+<span class="lineNum">     130 </span>            :   }
+<span class="lineNum">     131 </span><span class="lineCov">          1 :   auto dst_sd = dst_tuple_tp.extended&lt;ndt::tuple_type&gt;();</span>
+<span class="lineNum">     132 </span><span class="lineCov">          1 :   auto src_sd = src_tuple_tp.extended&lt;ndt::tuple_type&gt;();</span>
+<span class="lineNum">     133 </span><span class="lineCov">          1 :   intptr_t field_count = dst_sd-&gt;get_field_count();</span>
+<span class="lineNum">     134 </span>            : 
+<span class="lineNum">     135 </span><span class="lineCov">          1 :   if (field_count != src_sd-&gt;get_field_count()) {</span>
+<span class="lineNum">     136 </span><span class="lineNoCov">          0 :     stringstream ss;</span>
+<span class="lineNum">     137 </span><span class="lineNoCov">          0 :     ss &lt;&lt; &quot;cannot assign dynd &quot; &lt;&lt; src_tuple_tp &lt;&lt; &quot; to &quot; &lt;&lt; dst_tuple_tp</span>
+<span class="lineNum">     138 </span><span class="lineNoCov">          0 :        &lt;&lt; &quot; because they have different numbers of fields&quot;;</span>
+<span class="lineNum">     139 </span><span class="lineNoCov">          0 :     throw type_error(ss.str());</span>
+<span class="lineNum">     140 </span>            :   }
+<span class="lineNum">     141 </span>            : 
+<span class="lineNum">     142 </span><span class="lineCov">          1 :   const std::vector&lt;uintptr_t&gt; &amp;src_arrmeta_offsets = src_sd-&gt;get_arrmeta_offsets();</span>
+<span class="lineNum">     143 </span><span class="lineCov">          2 :   shortvector&lt;const char *&gt; src_fields_arrmeta(field_count);</span>
+<span class="lineNum">     144 </span><span class="lineCov">          4 :   for (intptr_t i = 0; i != field_count; ++i) {</span>
+<span class="lineNum">     145 </span><span class="lineCov">          3 :     src_fields_arrmeta[i] = src_arrmeta + src_arrmeta_offsets[i];</span>
+<span class="lineNum">     146 </span>            :   }
+<span class="lineNum">     147 </span>            : 
+<span class="lineNum">     148 </span><span class="lineCov">          1 :   const std::vector&lt;uintptr_t&gt; &amp;dst_arrmeta_offsets = dst_sd-&gt;get_arrmeta_offsets();</span>
+<span class="lineNum">     149 </span><span class="lineCov">          2 :   shortvector&lt;const char *&gt; dst_fields_arrmeta(field_count);</span>
+<span class="lineNum">     150 </span><span class="lineCov">          4 :   for (intptr_t i = 0; i != field_count; ++i) {</span>
+<span class="lineNum">     151 </span><span class="lineCov">          3 :     dst_fields_arrmeta[i] = dst_arrmeta + dst_arrmeta_offsets[i];</span>
+<span class="lineNum">     152 </span>            :   }
+<span class="lineNum">     153 </span>            : 
+<span class="lineNum">     154 </span><span class="lineCov">          2 :   make_tuple_unary_op_ckernel(nd::copy::get().get(), nd::copy::get().get_type(), ckb, field_count,</span>
+<span class="lineNum">     155 </span><span class="lineCov">          1 :                               dst_sd-&gt;get_data_offsets(dst_arrmeta), dst_sd-&gt;get_field_types().data(),</span>
+<span class="lineNum">     156 </span><span class="lineCov">          1 :                               dst_fields_arrmeta.get(), src_sd-&gt;get_data_offsets(src_arrmeta),</span>
+<span class="lineNum">     157 </span><span class="lineCov">          2 :                               src_sd-&gt;get_field_types().data(), src_fields_arrmeta.get(), kernreq);</span>
+<span class="lineNum">     158 </span><span class="lineCov">          1 : }</span>
+<span class="lineNum">     159 </span>            : 
+<span class="lineNum">     160 </span>            : /////////////////////////////////////////
+<a name="161"><span class="lineNum">     161 </span>            : // value to each tuple/struct field assignment</a>
+<span class="lineNum">     162 </span>            : 
+<span class="lineNum">     163 </span><span class="lineNoCov">          0 : void dynd::make_broadcast_to_tuple_assignment_kernel(nd::kernel_builder *ckb, const ndt::type &amp;dst_tuple_tp,</span>
+<span class="lineNum">     164 </span>            :                                                      const char *dst_arrmeta, const ndt::type &amp;src_tp,
+<span class="lineNum">     165 </span>            :                                                      const char *src_arrmeta, kernel_request_t kernreq)
+<span class="lineNum">     166 </span>            : {
+<span class="lineNum">     167 </span>            :   // This implementation uses the same struct to struct kernel, just with
+<span class="lineNum">     168 </span>            :   // an offset of 0 for each source value. A kernel tailored to this
+<span class="lineNum">     169 </span>            :   // case can be made if better performance is needed.
+<span class="lineNum">     170 </span>            : 
+<span class="lineNum">     171 </span><span class="lineNoCov">          0 :   if (dst_tuple_tp.get_kind() != tuple_kind &amp;&amp; dst_tuple_tp.get_kind() != struct_kind) {</span>
+<span class="lineNum">     172 </span><span class="lineNoCov">          0 :     stringstream ss;</span>
+<span class="lineNum">     173 </span><span class="lineNoCov">          0 :     ss &lt;&lt; &quot;make_tuple_assignment_kernel: provided destination type &quot; &lt;&lt; dst_tuple_tp</span>
+<span class="lineNum">     174 </span><span class="lineNoCov">          0 :        &lt;&lt; &quot; is not of tuple or struct kind&quot;;</span>
+<span class="lineNum">     175 </span><span class="lineNoCov">          0 :     throw runtime_error(ss.str());</span>
+<span class="lineNum">     176 </span>            :   }
+<span class="lineNum">     177 </span><span class="lineNoCov">          0 :   auto dst_sd = dst_tuple_tp.extended&lt;ndt::tuple_type&gt;();</span>
+<span class="lineNum">     178 </span><span class="lineNoCov">          0 :   intptr_t field_count = dst_sd-&gt;get_field_count();</span>
+<span class="lineNum">     179 </span>            : 
+<span class="lineNum">     180 </span><span class="lineNoCov">          0 :   const std::vector&lt;uintptr_t&gt; &amp;dst_arrmeta_offsets = dst_sd-&gt;get_arrmeta_offsets();</span>
+<span class="lineNum">     181 </span><span class="lineNoCov">          0 :   shortvector&lt;const char *&gt; dst_fields_arrmeta(field_count);</span>
+<span class="lineNum">     182 </span><span class="lineNoCov">          0 :   for (intptr_t i = 0; i != field_count; ++i) {</span>
+<span class="lineNum">     183 </span><span class="lineNoCov">          0 :     dst_fields_arrmeta[i] = dst_arrmeta + dst_arrmeta_offsets[i];</span>
+<span class="lineNum">     184 </span>            :   }
+<span class="lineNum">     185 </span><span class="lineNoCov">          0 :   vector&lt;ndt::type&gt; src_fields_tp(field_count, src_tp);</span>
+<span class="lineNum">     186 </span><span class="lineNoCov">          0 :   vector&lt;const char *&gt; src_fields_arrmeta(field_count, src_arrmeta);</span>
+<span class="lineNum">     187 </span><span class="lineNoCov">          0 :   vector&lt;uintptr_t&gt; src_data_offsets(field_count, 0);</span>
+<span class="lineNum">     188 </span>            : 
+<span class="lineNum">     189 </span><span class="lineNoCov">          0 :   make_tuple_unary_op_ckernel(nd::copy::get().get(), nd::copy::get().get_type(), ckb, field_count,</span>
+<span class="lineNum">     190 </span><span class="lineNoCov">          0 :                               dst_sd-&gt;get_data_offsets(dst_arrmeta), dst_sd-&gt;get_field_types().data(),</span>
+<a name="191"><span class="lineNum">     191 </span><span class="lineNoCov">          0 :                               dst_fields_arrmeta.get(), &amp;src_data_offsets[0], &amp;src_fields_tp[0], &amp;src_fields_arrmeta[0],</span></a>
+<span class="lineNum">     192 </span><span class="lineNoCov">          0 :                               kernreq);</span>
+<span class="lineNum">     193 </span><span class="lineCov">          3 : }</span>
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.10</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

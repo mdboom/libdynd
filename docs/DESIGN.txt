@@ -1,0 +1,289 @@
+Copyright (C) 2011-2012, Mark Wiebe
+All rights reserved.
+Creative Commons Attribution-ShareAlike 3.0
+http://creativecommons.org/licenses/by-sa/3.0/
+
+Dynamic NDArray Library Design
+-------------------------------
+
+This is an array programming library that is being developed
+within the spirit of NumPy and including ideas that have evolved
+within that community, but designed to be comfortable in C++.
+It's main goals are:
+
+* Take array programming ideas from NumPy, APL, J, K, MATLAB,
+  R, and other systems and try to apply them in a unified,
+  consistent data model.
+* Have a flexible, high-performance, array-oriented data type
+  mechanism, which can be extended to have new data types with
+  POD (plain old data) or object semantics.
+* Delayed/lazy evaluation, where all operations return views or
+  arrays with their computation deferred.
+* Easily and efficiently embed in other dynamic or static
+  languages. The first embedding is the Blaze Local project, built
+  for Python.
+* Understand data in memory, whereever it may lie and however it might
+  be structured. It should be able to compute with the data in place
+  where that is reasonable, and export the results in place to
+  external systems where that is also reasonable.
+
+Some principles which seem desirable:
+
+* There is no default "flat" perspective, any conversion between
+  multi-dimensional and one-dimensional is explicit.
+* Type conversions get validated at conversion time, based on the
+  actual data present, not based on whether "float" can convert
+  to "int" for example.
+* Strict, fine-grained error checking by default, but with the
+  ability to easily relax it and get higher performance.
+* Data for a given dtype always is aligned as the dtype requires.
+  Unaligned data requires an "unaligned" adapter step.
+
+Everything Is A View
+--------------------
+
+In NumPy, some operations return views, and others return copies. In
+this library, the idea is that everything is a view, either directly via
+a linear striding operation, or indirectly via an expression tree.
+Leaf nodes of the expression trees can either be ndarrays themselves,
+or rvalue array generators, such as a constant generator or a linear range
+generator.
+
+This design choice is analogous to the Python 3 shift towards using iterators
+for most things. For example, in Python 2, range(4) returns
+a list [0, 1, 2, 3], whereas in Python 3 it returns a generator object
+whose repr is 'range(0, 4)'.
+
+Some example ndarray_expr_node subclasses that could be created:
+
+zero_gen<dtype>, one_gen<dtype>, constant_gen<dtype, value> (rvalue):
+    Generates 0, 1 or arbitrary constant values, respectively.
+
+int_range<integer dtype, origin, step[ndim], shape[ndim]> (rvalue):
+    Generates an integer range. This structure can be preserved under
+    remapping to multi-dimensional data and linear indexing.
+
+constant_multiply<dtype, A, childnode> (maybe lvalue?):
+    Maps the input value x to A * x.
+
+constant_add<dtype, A, childnode> (maybe lvalue?):
+    Maps the input value x to A + x.
+
+multiply<dtype, childnode0, childnode1> (rvalue):
+    Maps the input value x, y to x * y. Similar versions of add, subtract,
+    divide, etc. The childnodes must have identical shapes.
+
+linear_map<float/complex dtype, A, B, childnode> (maybe lvalue?):
+    Maps the input value x to A*x + B. A linspace is an int_range followed by
+    a linear_map. If A is non-zero, this is invertible, and we could
+    treat this as an lvalue array. Whether this in general is desireable needs
+    some thought.
+
+flat_to_ndim<ndim, shape[ndim], strides[ndim], childnode> (lvalue):
+    Maps a one-dimensional array to a multi-dimensional array.
+    result[i[0], ..., i[ndim-1]] ==
+    childnode[strides[0]*i[0] + ... + strides[ndim-1]*i[ndim-1]].
+
+linear_index<ndim, shape[ndim], base[ndim], strides[ndim], childnode> (lvalue):
+    Does a linear strided indexing operation into the childnode. This doesn't
+    change the number of dimensions of the childnode.
+
+To heuristically determine where to create temporaries, the nodes
+could indicate an estimate of how many source node accesses are
+required for each result element. For example, a matrix multiply
+node for an m by n times an n by r matrix, would indicate 2*n for
+each output element.
+
+Reference Assignment vs Value Assignment
+----------------------------------------
+
+This library has two types of assignment operations, assigning by
+reference and assigning by value. This is similar to Python+NumPy, where
+this distinction can trip up programmers fairly easily:
+
+    a = np.arange(10)
+    for x in np.nditer(a):
+        # Oops! Wanted value assignment, not reference assignment
+        x = np.sin(x)
+        # Should have been this:
+        # x[...] = np.sin(x)
+
+In a C++ library, assignment is usually done by value, and the language
+has lvalue and rvalue references built in. The dynamic nature of ndarray,
+in particular the idea that "everything is a view", makes it much more
+natural for assignment of ndarrays to be done by reference in the default
+case. At the same time, it is imperative that there be a simple, convenient
+way to do value assignment.
+
+The initial design with operator= for reference assignment had a
+troublesome special case that could trip up programmers. Assigning
+a C++ scalar to an indexed subset of an array can lead to a
+big surprise as follows:
+
+    ndarray a = arange(10).as_strided();
+    a(3) = 2;
+    // Oops! Wanted value assignment, not reference assignment
+    // This turns into a NOP, because a(3) produces a temporary ndarray,
+    // which becomes a reference to an array containing the value 2, then
+    // gets destroyed. The ndarray 'a' remains untouched, and the programmer
+    // gets no signal that this happens!
+
+To retain programmer sanity, the above should produce a compile error, an
+exception, or should be a value assignment. The solution I have found is to
+turn it into a compile error, by having the indexing operation return a
+const ndarray. Here, we view the ndarray reference as const, not the values
+it points to. Since assignment is supposed to cause the ndarray to reference
+a new array, it is only defined for non-const ndarrays. The function val_assign
+is defined for const ndarrays, because it is modifying the values the ndarray
+points at, not the ndarray reference itself.
+
+A more intuitive syntax for the val_assign function would be nice as well. This
+has been done by introducing an object which collapses to a strided array when
+its values are read, and assigns by value when being assigned to. This
+works as follows:
+
+    ndarray a = {1, 2, 3, 4, 5};
+    ndarray b;
+
+    // Compile error
+    a(3) = 2;
+    // This assigns to the values in 'a'
+    a(3).vals() = 2;
+    // This turns 'b' into a strided array containing the
+    // values produced by the expression 'a+2'.
+    b = (a + 2).vals();
+
+It is worth keeping the val_assign function as well, since it has another
+parameter for the assignment error checking rule. ... Or, the vals
+function itself could take the assignment error checking rule as a parameter,
+and the rule would be bound to this temporary value-assignment object.
+
+There is a gotcha that the C++11 'auto' adds, which applies to any
+template expression code like this.
+
+    // Turns 'b' into a strided array with the values copied in
+    ndarray b = (a + 2).vals()
+    // Turns 'c' into the unspecified value assignment type that
+    // was just supposed to have a short, temporary lifetime.
+    auto c = (a + 2).vals()
+
+Here's a taste of what can be weird when doing this kind of stuff:
+
+http://stackoverflow.com/questions/9527820/prevent-expression-templates-binding-to-rvalue-references
+
+All Data Is Aligned and in Native Byte Order
+--------------------------------------------
+
+NumPy supports misaligned data, and data in both big-endian and little-endian
+formats. This library should too, but allowing this flexibility everywhere adds
+complexity and degrades performance. Instead, data which is not aligned and
+in NBO will be exposed in the style of a "generator array". This works nicely
+with the expression tree basis for the ndarray, allowing the evaluation code
+to assume the data is well-behaved when provided with a strided array, and
+enable buffering otherwise.
+
+Output Parameters
+-----------------
+
+When output parameters are used, exception safety is not guaranteed.
+Since operations can fail part-way through, guaranteeing exception safety
+would require making a temporary copy.  In the interests of efficiency,
+this is not done. When exception safety is required, the functional-style
+operations are required.
+
+Label-based Indexing
+--------------------
+
+At the data array summit in Austin, a design was hammered to allow for
+names of the axes and labels along each axis. There were many use-cases
+people wanted for this functionality, some conflicting with each other.
+
+I think there needs to be a big distinction between an ordered mapping,
+for instance thinking of the array as a position or time instant with
+associated data.
+
+It might be worth having the labels always be a categorical dtype,
+as there might be nice ways this dtype, axis labels, and groupby-like
+operations function together.
+
+Boolean Indexing
+----------------
+
+Because an ndarray has a specific shape, and the design principle was
+chosen that there is no implicit "flat" perspective of an ndarray, an
+ndarray "a" boolean indexed with "a>0" cannot produce an ndarray if the
+shape of an array must always be fixed. Even in the one-dimensional case,
+assigning a negative value to an element of 'a' which was previously
+positiv ewould require that the shape of the saved result ndarray change.
+
+To tackle this problem, likely two new facilities need to be added to
+the ndarray library.
+
+1. The possibility of an array having a selection mask.
+2. The ability for one or more dimensions of the shape to be indeterminate,
+   signaled with the value -1.
+
+The selection mask can't be an NA mask like the one proposed recently
+for NumPy, but rather one which corresponds loosely to the IGNORE missing
+value semantics described in the NumPy missing value NEP.
+
+In NumPy, calling [] with indices and boolean masks go through
+the same interface. This mostly works out, but there are some serious
+conflicts between facility 1 and facility 2, so separating them into
+different functions seems like a better approach.
+
+To understand why conflating the two mechanisms is problematic, consider
+the following C++11 code in a hypothetical C++ REPL (for
+example cling is one). In each case, the alternative interpretations of
+the arrays produce vastly different results.
+
+    :> ndarray a, b, c;
+    :> a = arange(5);
+    :> b = a((a % 2) == 1);
+    :> cout << b << "\n";
+    'b' AS SELECTION MASK) ndarray(int32, {IGNORE, 1, IGNORE, 3, IGNORE})?
+    'b' AS COMPRESSED)     ndarray(int32, {1, 3})
+
+    :> c = zeros(5, make_dtype<int>());
+    :> c.val_assign(b);
+    'b' AS COMPRESSED)     broadcast error: cannot broadcast shape (2) to (5)
+    :> cout << c << "\n";
+    'b' AS SELECTION MASK) ndarray(int32, {0, 1, 0, 3, 0})
+
+    :> c = zeros(5, make_dtype<int>());
+    :> c({true, true, false, false, false}).val_assign(b)
+    :> cout << c << "\n";
+    'b' AND 'c[...]' AS SELECTION MASK) ndarray(int32, {0, 1, 0, 0, 0})
+    'b' AND 'c[...]' AS COMPRESSED)     ndarray(int32, {1, 3, 0, 0, 0})
+
+I propose the selection mask be created by the function ndarray::where,
+and the indeterminate dimensions be created by the indexing operator,
+which is operator() in C++.  The proposed resolution looks like this:
+
+    :> ndarray a, b, c;
+    :> a = arange(5);
+    :> b_ix = a((a % 2) == 1);
+    :> b_wr = a.where((a % 2) == 1);
+    :> cout << b_ix << "\n";
+    ndarray([1, 3], int32)
+    :> cout << b_wr << "\n";
+    ndarray([IGNORE, 1, IGNORE, 3, IGNORE], int32)
+
+    :> c = zeros(5, make_dtype<int>());
+    :> c.val_assign(b_ix);
+    broadcast error: cannot broadcast shape (2) to (5)
+    :> c.val_assign(b_wr):
+    :> cout << c << "\n";
+    ndarray(int32, {0, 1, 0, 3, 0})
+
+    :> c = zeros(5, make_dtype<int>());
+    :> c({true, true, false, false, false}).val_assign(b_ix)
+    :> cout << c << "\n";
+    ndarray(int32, {1, 3, 0, 0, 0})
+    :> c = zeros(5, make_dtype<int>());
+    :> c.where({true, true, false, false, false}).val_assign(b_wr)
+    ndarray(int32, {0, 1, 0, 0, 0})
+
+One nice property of this is that for boolean indexing, the programmer
+can be sure that each index entry lines up with a particular axis, instead
+of having it change if the boolean index object has more than one dimension.

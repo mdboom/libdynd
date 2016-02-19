@@ -1,0 +1,705 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - coverage.info - thirdparty/cephes/gamma.c</title>
+  <link rel="stylesheet" type="text/css" href="../../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../../index.html">top level</a> - <a href="index.html">thirdparty/cephes</a> - gamma.c<span style="font-size: 80%;"> (source / <a href="gamma.c.func.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">coverage.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">57</td>
+            <td class="headerCovTableEntry">120</td>
+            <td class="headerCovTableEntryLo">47.5 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2016-02-19</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">2</td>
+            <td class="headerCovTableEntry">3</td>
+            <td class="headerCovTableEntryLo">66.7 %</td>
+          </tr>
+          <tr><td><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : /*                                                     Gamma.c</a>
+<span class="lineNum">       2 </span>            :  *
+<span class="lineNum">       3 </span>            :  *     Gamma function
+<span class="lineNum">       4 </span>            :  *
+<span class="lineNum">       5 </span>            :  *
+<span class="lineNum">       6 </span>            :  *
+<span class="lineNum">       7 </span>            :  * SYNOPSIS:
+<span class="lineNum">       8 </span>            :  *
+<span class="lineNum">       9 </span>            :  * double x, y, Gamma();
+<span class="lineNum">      10 </span>            :  * extern int sgngam;
+<span class="lineNum">      11 </span>            :  *
+<span class="lineNum">      12 </span>            :  * y = Gamma( x );
+<span class="lineNum">      13 </span>            :  *
+<span class="lineNum">      14 </span>            :  *
+<span class="lineNum">      15 </span>            :  *
+<span class="lineNum">      16 </span>            :  * DESCRIPTION:
+<span class="lineNum">      17 </span>            :  *
+<span class="lineNum">      18 </span>            :  * Returns Gamma function of the argument.  The result is
+<span class="lineNum">      19 </span>            :  * correctly signed, and the sign (+1 or -1) is also
+<span class="lineNum">      20 </span>            :  * returned in a global (extern) variable named sgngam.
+<span class="lineNum">      21 </span>            :  * This variable is also filled in by the logarithmic Gamma
+<span class="lineNum">      22 </span>            :  * function lgam().
+<span class="lineNum">      23 </span>            :  *
+<span class="lineNum">      24 </span>            :  * Arguments |x| &lt;= 34 are reduced by recurrence and the function
+<span class="lineNum">      25 </span>            :  * approximated by a rational function of degree 6/7 in the
+<span class="lineNum">      26 </span>            :  * interval (2,3).  Large arguments are handled by Stirling's
+<span class="lineNum">      27 </span>            :  * formula. Large negative arguments are made positive using
+<span class="lineNum">      28 </span>            :  * a reflection formula.  
+<span class="lineNum">      29 </span>            :  *
+<span class="lineNum">      30 </span>            :  *
+<span class="lineNum">      31 </span>            :  * ACCURACY:
+<span class="lineNum">      32 </span>            :  *
+<span class="lineNum">      33 </span>            :  *                      Relative error:
+<span class="lineNum">      34 </span>            :  * arithmetic   domain     # trials      peak         rms
+<span class="lineNum">      35 </span>            :  *    DEC      -34, 34      10000       1.3e-16     2.5e-17
+<span class="lineNum">      36 </span>            :  *    IEEE    -170,-33      20000       2.3e-15     3.3e-16
+<span class="lineNum">      37 </span>            :  *    IEEE     -33,  33     20000       9.4e-16     2.2e-16
+<span class="lineNum">      38 </span>            :  *    IEEE      33, 171.6   20000       2.3e-15     3.2e-16
+<span class="lineNum">      39 </span>            :  *
+<span class="lineNum">      40 </span>            :  * Error for arguments outside the test range will be larger
+<span class="lineNum">      41 </span>            :  * owing to error amplification by the exponential function.
+<span class="lineNum">      42 </span>            :  *
+<span class="lineNum">      43 </span>            :  */
+<span class="lineNum">      44 </span>            : /*                                                     lgam()
+<span class="lineNum">      45 </span>            :  *
+<span class="lineNum">      46 </span>            :  *     Natural logarithm of Gamma function
+<span class="lineNum">      47 </span>            :  *
+<span class="lineNum">      48 </span>            :  *
+<span class="lineNum">      49 </span>            :  *
+<span class="lineNum">      50 </span>            :  * SYNOPSIS:
+<span class="lineNum">      51 </span>            :  *
+<span class="lineNum">      52 </span>            :  * double x, y, lgam();
+<span class="lineNum">      53 </span>            :  * extern int sgngam;
+<span class="lineNum">      54 </span>            :  *
+<span class="lineNum">      55 </span>            :  * y = lgam( x );
+<span class="lineNum">      56 </span>            :  *
+<span class="lineNum">      57 </span>            :  *
+<span class="lineNum">      58 </span>            :  *
+<span class="lineNum">      59 </span>            :  * DESCRIPTION:
+<span class="lineNum">      60 </span>            :  *
+<span class="lineNum">      61 </span>            :  * Returns the base e (2.718...) logarithm of the absolute
+<span class="lineNum">      62 </span>            :  * value of the Gamma function of the argument.
+<span class="lineNum">      63 </span>            :  * The sign (+1 or -1) of the Gamma function is returned in a
+<span class="lineNum">      64 </span>            :  * global (extern) variable named sgngam.
+<span class="lineNum">      65 </span>            :  *
+<span class="lineNum">      66 </span>            :  * For arguments greater than 13, the logarithm of the Gamma
+<span class="lineNum">      67 </span>            :  * function is approximated by the logarithmic version of
+<span class="lineNum">      68 </span>            :  * Stirling's formula using a polynomial approximation of
+<span class="lineNum">      69 </span>            :  * degree 4. Arguments between -33 and +33 are reduced by
+<span class="lineNum">      70 </span>            :  * recurrence to the interval [2,3] of a rational approximation.
+<span class="lineNum">      71 </span>            :  * The cosecant reflection formula is employed for arguments
+<span class="lineNum">      72 </span>            :  * less than -33.
+<span class="lineNum">      73 </span>            :  *
+<span class="lineNum">      74 </span>            :  * Arguments greater than MAXLGM return INFINITY and an error
+<span class="lineNum">      75 </span>            :  * message.  MAXLGM = 2.035093e36 for DEC
+<span class="lineNum">      76 </span>            :  * arithmetic or 2.556348e305 for IEEE arithmetic.
+<span class="lineNum">      77 </span>            :  *
+<span class="lineNum">      78 </span>            :  *
+<span class="lineNum">      79 </span>            :  *
+<span class="lineNum">      80 </span>            :  * ACCURACY:
+<span class="lineNum">      81 </span>            :  *
+<span class="lineNum">      82 </span>            :  *
+<span class="lineNum">      83 </span>            :  * arithmetic      domain        # trials     peak         rms
+<span class="lineNum">      84 </span>            :  *    DEC     0, 3                  7000     5.2e-17     1.3e-17
+<span class="lineNum">      85 </span>            :  *    DEC     2.718, 2.035e36       5000     3.9e-17     9.9e-18
+<span class="lineNum">      86 </span>            :  *    IEEE    0, 3                 28000     5.4e-16     1.1e-16
+<span class="lineNum">      87 </span>            :  *    IEEE    2.718, 2.556e305     40000     3.5e-16     8.3e-17
+<span class="lineNum">      88 </span>            :  * The error criterion was relative when the function magnitude
+<span class="lineNum">      89 </span>            :  * was greater than one but absolute when it was less than one.
+<span class="lineNum">      90 </span>            :  *
+<span class="lineNum">      91 </span>            :  * The following test used the relative error criterion, though
+<span class="lineNum">      92 </span>            :  * at certain points the relative error could be much higher than
+<span class="lineNum">      93 </span>            :  * indicated.
+<span class="lineNum">      94 </span>            :  *    IEEE    -200, -4             10000     4.8e-16     1.3e-16
+<span class="lineNum">      95 </span>            :  *
+<span class="lineNum">      96 </span>            :  */
+<span class="lineNum">      97 </span>            : 
+<span class="lineNum">      98 </span>            : /*                                                     Gamma.c */
+<span class="lineNum">      99 </span>            : /*     Gamma function  */
+<span class="lineNum">     100 </span>            : 
+<span class="lineNum">     101 </span>            : /*
+<span class="lineNum">     102 </span>            :  * Cephes Math Library Release 2.2:  July, 1992
+<span class="lineNum">     103 </span>            :  * Copyright 1984, 1987, 1989, 1992 by Stephen L. Moshier
+<span class="lineNum">     104 </span>            :  * Direct inquiries to 30 Frost Street, Cambridge, MA 02140
+<span class="lineNum">     105 </span>            :  */
+<span class="lineNum">     106 </span>            : 
+<span class="lineNum">     107 </span>            : 
+<span class="lineNum">     108 </span>            : #include &quot;mconf.h&quot;
+<span class="lineNum">     109 </span>            : 
+<span class="lineNum">     110 </span>            : #ifdef UNK
+<span class="lineNum">     111 </span>            : static double P[] = {
+<span class="lineNum">     112 </span>            :     1.60119522476751861407E-4,
+<span class="lineNum">     113 </span>            :     1.19135147006586384913E-3,
+<span class="lineNum">     114 </span>            :     1.04213797561761569935E-2,
+<span class="lineNum">     115 </span>            :     4.76367800457137231464E-2,
+<span class="lineNum">     116 </span>            :     2.07448227648435975150E-1,
+<span class="lineNum">     117 </span>            :     4.94214826801497100753E-1,
+<span class="lineNum">     118 </span>            :     9.99999999999999996796E-1
+<span class="lineNum">     119 </span>            : };
+<span class="lineNum">     120 </span>            : 
+<span class="lineNum">     121 </span>            : static double Q[] = {
+<span class="lineNum">     122 </span>            :     -2.31581873324120129819E-5,
+<span class="lineNum">     123 </span>            :     5.39605580493303397842E-4,
+<span class="lineNum">     124 </span>            :     -4.45641913851797240494E-3,
+<span class="lineNum">     125 </span>            :     1.18139785222060435552E-2,
+<span class="lineNum">     126 </span>            :     3.58236398605498653373E-2,
+<span class="lineNum">     127 </span>            :     -2.34591795718243348568E-1,
+<span class="lineNum">     128 </span>            :     7.14304917030273074085E-2,
+<span class="lineNum">     129 </span>            :     1.00000000000000000320E0
+<span class="lineNum">     130 </span>            : };
+<span class="lineNum">     131 </span>            : 
+<span class="lineNum">     132 </span>            : #define MAXGAM 171.624376956302725
+<span class="lineNum">     133 </span>            : static double LOGPI = 1.14472988584940017414;
+<span class="lineNum">     134 </span>            : #endif
+<span class="lineNum">     135 </span>            : 
+<span class="lineNum">     136 </span>            : #ifdef DEC
+<span class="lineNum">     137 </span>            : static unsigned short P[] = {
+<span class="lineNum">     138 </span>            :     0035047, 0162701, 0146301, 0005234,
+<span class="lineNum">     139 </span>            :     0035634, 0023437, 0032065, 0176530,
+<span class="lineNum">     140 </span>            :     0036452, 0137157, 0047330, 0122574,
+<span class="lineNum">     141 </span>            :     0037103, 0017310, 0143041, 0017232,
+<span class="lineNum">     142 </span>            :     0037524, 0066516, 0162563, 0164605,
+<span class="lineNum">     143 </span>            :     0037775, 0004671, 0146237, 0014222,
+<span class="lineNum">     144 </span>            :     0040200, 0000000, 0000000, 0000000
+<span class="lineNum">     145 </span>            : };
+<span class="lineNum">     146 </span>            : 
+<span class="lineNum">     147 </span>            : static unsigned short Q[] = {
+<span class="lineNum">     148 </span>            :     0134302, 0041724, 0020006, 0116565,
+<span class="lineNum">     149 </span>            :     0035415, 0072121, 0044251, 0025634,
+<span class="lineNum">     150 </span>            :     0136222, 0003447, 0035205, 0121114,
+<span class="lineNum">     151 </span>            :     0036501, 0107552, 0154335, 0104271,
+<span class="lineNum">     152 </span>            :     0037022, 0135717, 0014776, 0171471,
+<span class="lineNum">     153 </span>            :     0137560, 0034324, 0165024, 0037021,
+<span class="lineNum">     154 </span>            :     0037222, 0045046, 0047151, 0161213,
+<span class="lineNum">     155 </span>            :     0040200, 0000000, 0000000, 0000000
+<span class="lineNum">     156 </span>            : };
+<span class="lineNum">     157 </span>            : 
+<span class="lineNum">     158 </span>            : #define MAXGAM 34.84425627277176174
+<span class="lineNum">     159 </span>            : static unsigned short LPI[4] = {
+<span class="lineNum">     160 </span>            :     0040222, 0103202, 0043475, 0006750,
+<span class="lineNum">     161 </span>            : };
+<span class="lineNum">     162 </span>            : 
+<span class="lineNum">     163 </span>            : #define LOGPI *(double *)LPI
+<span class="lineNum">     164 </span>            : #endif
+<span class="lineNum">     165 </span>            : 
+<span class="lineNum">     166 </span>            : #ifdef IBMPC
+<span class="lineNum">     167 </span>            : static unsigned short P[] = {
+<span class="lineNum">     168 </span>            :     0x2153, 0x3998, 0xfcb8, 0x3f24,
+<span class="lineNum">     169 </span>            :     0xbfab, 0xe686, 0x84e3, 0x3f53,
+<span class="lineNum">     170 </span>            :     0x14b0, 0xe9db, 0x57cd, 0x3f85,
+<span class="lineNum">     171 </span>            :     0x23d3, 0x18c4, 0x63d9, 0x3fa8,
+<span class="lineNum">     172 </span>            :     0x7d31, 0xdcae, 0x8da9, 0x3fca,
+<span class="lineNum">     173 </span>            :     0xe312, 0x3993, 0xa137, 0x3fdf,
+<span class="lineNum">     174 </span>            :     0x0000, 0x0000, 0x0000, 0x3ff0
+<span class="lineNum">     175 </span>            : };
+<span class="lineNum">     176 </span>            : 
+<span class="lineNum">     177 </span>            : static unsigned short Q[] = {
+<span class="lineNum">     178 </span>            :     0xd3af, 0x8400, 0x487a, 0xbef8,
+<span class="lineNum">     179 </span>            :     0x2573, 0x2915, 0xae8a, 0x3f41,
+<span class="lineNum">     180 </span>            :     0xb44a, 0xe750, 0x40e4, 0xbf72,
+<span class="lineNum">     181 </span>            :     0xb117, 0x5b1b, 0x31ed, 0x3f88,
+<span class="lineNum">     182 </span>            :     0xde67, 0xe33f, 0x5779, 0x3fa2,
+<span class="lineNum">     183 </span>            :     0x87c2, 0x9d42, 0x071a, 0xbfce,
+<span class="lineNum">     184 </span>            :     0x3c51, 0xc9cd, 0x4944, 0x3fb2,
+<span class="lineNum">     185 </span>            :     0x0000, 0x0000, 0x0000, 0x3ff0
+<span class="lineNum">     186 </span>            : };
+<span class="lineNum">     187 </span>            : 
+<span class="lineNum">     188 </span>            : #define MAXGAM 171.624376956302725
+<span class="lineNum">     189 </span>            : static unsigned short LPI[4] = {
+<span class="lineNum">     190 </span>            :     0xa1bd, 0x48e7, 0x50d0, 0x3ff2,
+<span class="lineNum">     191 </span>            : };
+<span class="lineNum">     192 </span>            : 
+<span class="lineNum">     193 </span>            : #define LOGPI *(double *)LPI
+<span class="lineNum">     194 </span>            : #endif
+<span class="lineNum">     195 </span>            : 
+<span class="lineNum">     196 </span>            : #ifdef MIEEE
+<span class="lineNum">     197 </span>            : static unsigned short P[] = {
+<span class="lineNum">     198 </span>            :     0x3f24, 0xfcb8, 0x3998, 0x2153,
+<span class="lineNum">     199 </span>            :     0x3f53, 0x84e3, 0xe686, 0xbfab,
+<span class="lineNum">     200 </span>            :     0x3f85, 0x57cd, 0xe9db, 0x14b0,
+<span class="lineNum">     201 </span>            :     0x3fa8, 0x63d9, 0x18c4, 0x23d3,
+<span class="lineNum">     202 </span>            :     0x3fca, 0x8da9, 0xdcae, 0x7d31,
+<span class="lineNum">     203 </span>            :     0x3fdf, 0xa137, 0x3993, 0xe312,
+<span class="lineNum">     204 </span>            :     0x3ff0, 0x0000, 0x0000, 0x0000
+<span class="lineNum">     205 </span>            : };
+<span class="lineNum">     206 </span>            : 
+<span class="lineNum">     207 </span>            : static unsigned short Q[] = {
+<span class="lineNum">     208 </span>            :     0xbef8, 0x487a, 0x8400, 0xd3af,
+<span class="lineNum">     209 </span>            :     0x3f41, 0xae8a, 0x2915, 0x2573,
+<span class="lineNum">     210 </span>            :     0xbf72, 0x40e4, 0xe750, 0xb44a,
+<span class="lineNum">     211 </span>            :     0x3f88, 0x31ed, 0x5b1b, 0xb117,
+<span class="lineNum">     212 </span>            :     0x3fa2, 0x5779, 0xe33f, 0xde67,
+<span class="lineNum">     213 </span>            :     0xbfce, 0x071a, 0x9d42, 0x87c2,
+<span class="lineNum">     214 </span>            :     0x3fb2, 0x4944, 0xc9cd, 0x3c51,
+<span class="lineNum">     215 </span>            :     0x3ff0, 0x0000, 0x0000, 0x0000
+<span class="lineNum">     216 </span>            : };
+<span class="lineNum">     217 </span>            : 
+<span class="lineNum">     218 </span>            : #define MAXGAM 171.624376956302725
+<span class="lineNum">     219 </span>            : static unsigned short LPI[4] = {
+<span class="lineNum">     220 </span>            :     0x3ff2, 0x50d0, 0x48e7, 0xa1bd,
+<span class="lineNum">     221 </span>            : };
+<span class="lineNum">     222 </span>            : 
+<span class="lineNum">     223 </span>            : #define LOGPI *(double *)LPI
+<span class="lineNum">     224 </span>            : #endif
+<span class="lineNum">     225 </span>            : 
+<span class="lineNum">     226 </span>            : /* Stirling's formula for the Gamma function */
+<span class="lineNum">     227 </span>            : #if UNK
+<span class="lineNum">     228 </span>            : static double STIR[5] = {
+<span class="lineNum">     229 </span>            :     7.87311395793093628397E-4,
+<span class="lineNum">     230 </span>            :     -2.29549961613378126380E-4,
+<span class="lineNum">     231 </span>            :     -2.68132617805781232825E-3,
+<span class="lineNum">     232 </span>            :     3.47222221605458667310E-3,
+<span class="lineNum">     233 </span>            :     8.33333333333482257126E-2,
+<span class="lineNum">     234 </span>            : };
+<span class="lineNum">     235 </span>            : 
+<span class="lineNum">     236 </span>            : #define MAXSTIR 143.01608
+<span class="lineNum">     237 </span>            : static double SQTPI = 2.50662827463100050242E0;
+<span class="lineNum">     238 </span>            : #endif
+<span class="lineNum">     239 </span>            : #if DEC
+<span class="lineNum">     240 </span>            : static unsigned short STIR[20] = {
+<span class="lineNum">     241 </span>            :     0035516, 0061622, 0144553, 0112224,
+<span class="lineNum">     242 </span>            :     0135160, 0131531, 0037460, 0165740,
+<span class="lineNum">     243 </span>            :     0136057, 0134460, 0037242, 0077270,
+<span class="lineNum">     244 </span>            :     0036143, 0107070, 0156306, 0027751,
+<span class="lineNum">     245 </span>            :     0037252, 0125252, 0125252, 0146064,
+<span class="lineNum">     246 </span>            : };
+<span class="lineNum">     247 </span>            : 
+<span class="lineNum">     248 </span>            : #define MAXSTIR 26.77
+<span class="lineNum">     249 </span>            : static unsigned short SQT[4] = {
+<span class="lineNum">     250 </span>            :     0040440, 0066230, 0177661, 0034055,
+<span class="lineNum">     251 </span>            : };
+<span class="lineNum">     252 </span>            : 
+<span class="lineNum">     253 </span>            : #define SQTPI *(double *)SQT
+<span class="lineNum">     254 </span>            : #endif
+<span class="lineNum">     255 </span>            : #if IBMPC
+<span class="lineNum">     256 </span>            : static unsigned short STIR[20] = {
+<span class="lineNum">     257 </span>            :     0x7293, 0x592d, 0xcc72, 0x3f49,
+<span class="lineNum">     258 </span>            :     0x1d7c, 0x27e6, 0x166b, 0xbf2e,
+<span class="lineNum">     259 </span>            :     0x4fd7, 0x07d4, 0xf726, 0xbf65,
+<span class="lineNum">     260 </span>            :     0xc5fd, 0x1b98, 0x71c7, 0x3f6c,
+<span class="lineNum">     261 </span>            :     0x5986, 0x5555, 0x5555, 0x3fb5,
+<span class="lineNum">     262 </span>            : };
+<span class="lineNum">     263 </span>            : 
+<span class="lineNum">     264 </span>            : #define MAXSTIR 143.01608
+<span class="lineNum">     265 </span>            : static unsigned short SQT[4] = {
+<span class="lineNum">     266 </span>            :     0x2706, 0x1ff6, 0x0d93, 0x4004,
+<span class="lineNum">     267 </span>            : };
+<span class="lineNum">     268 </span>            : 
+<span class="lineNum">     269 </span>            : #define SQTPI *(double *)SQT
+<span class="lineNum">     270 </span>            : #endif
+<span class="lineNum">     271 </span>            : #if MIEEE
+<span class="lineNum">     272 </span>            : static unsigned short STIR[20] = {
+<span class="lineNum">     273 </span>            :     0x3f49, 0xcc72, 0x592d, 0x7293,
+<span class="lineNum">     274 </span>            :     0xbf2e, 0x166b, 0x27e6, 0x1d7c,
+<span class="lineNum">     275 </span>            :     0xbf65, 0xf726, 0x07d4, 0x4fd7,
+<span class="lineNum">     276 </span>            :     0x3f6c, 0x71c7, 0x1b98, 0xc5fd,
+<span class="lineNum">     277 </span>            :     0x3fb5, 0x5555, 0x5555, 0x5986,
+<span class="lineNum">     278 </span>            : };
+<span class="lineNum">     279 </span>            : 
+<span class="lineNum">     280 </span>            : #define MAXSTIR 143.01608
+<span class="lineNum">     281 </span>            : static unsigned short SQT[4] = {
+<span class="lineNum">     282 </span>            :     0x4004, 0x0d93, 0x1ff6, 0x2706,
+<span class="lineNum">     283 </span>            : };
+<span class="lineNum">     284 </span>            : 
+<span class="lineNum">     285 </span>            : #define SQTPI *(double *)SQT
+<span class="lineNum">     286 </span>            : #endif
+<span class="lineNum">     287 </span>            : 
+<span class="lineNum">     288 </span>            : int sgngam = 0;
+<span class="lineNum">     289 </span>            : extern int sgngam;
+<span class="lineNum">     290 </span>            : extern double MAXLOG, PI;
+<span class="lineNum">     291 </span>            : static double stirf(double);
+<span class="lineNum">     292 </span>            : 
+<span class="lineNum">     293 </span>            : /* Gamma function computed by Stirling's formula.
+<a name="294"><span class="lineNum">     294 </span>            :  * The polynomial STIR is valid for 33 &lt;= x &lt;= 172.</a>
+<span class="lineNum">     295 </span>            :  */
+<span class="lineNum">     296 </span><span class="lineNoCov">          0 : static double stirf(double x)</span>
+<span class="lineNum">     297 </span>            : {
+<span class="lineNum">     298 </span>            :     double y, w, v;
+<span class="lineNum">     299 </span>            : 
+<span class="lineNum">     300 </span><span class="lineNoCov">          0 :     if (x &gt;= MAXGAM) {</span>
+<span class="lineNum">     301 </span><span class="lineNoCov">          0 :         return (INFINITY);</span>
+<span class="lineNum">     302 </span>            :     }
+<span class="lineNum">     303 </span><span class="lineNoCov">          0 :     w = 1.0 / x;</span>
+<span class="lineNum">     304 </span><span class="lineNoCov">          0 :     w = 1.0 + w * polevl(w, STIR, 4);</span>
+<span class="lineNum">     305 </span><span class="lineNoCov">          0 :     y = exp(x);</span>
+<span class="lineNum">     306 </span><span class="lineNoCov">          0 :     if (x &gt; MAXSTIR) {               /* Avoid overflow in pow() */</span>
+<span class="lineNum">     307 </span><span class="lineNoCov">          0 :         v = pow(x, 0.5 * x - 0.25);</span>
+<span class="lineNum">     308 </span><span class="lineNoCov">          0 :         y = v * (v / y);</span>
+<span class="lineNum">     309 </span>            :     }
+<span class="lineNum">     310 </span>            :     else {
+<span class="lineNum">     311 </span><span class="lineNoCov">          0 :         y = pow(x, x - 0.5) / y;</span>
+<span class="lineNum">     312 </span>            :     }
+<span class="lineNum">     313 </span><span class="lineNoCov">          0 :     y = SQTPI * y * w;</span>
+<span class="lineNum">     314 </span><span class="lineNoCov">          0 :     return (y);</span>
+<span class="lineNum">     315 </span>            : }
+<span class="lineNum">     316 </span>            : 
+<a name="317"><span class="lineNum">     317 </span>            : </a>
+<span class="lineNum">     318 </span>            : 
+<span class="lineNum">     319 </span><span class="lineCov">        843 : double Gamma(double x)</span>
+<span class="lineNum">     320 </span>            : {
+<span class="lineNum">     321 </span>            :     double p, q, z;
+<span class="lineNum">     322 </span>            :     int i;
+<span class="lineNum">     323 </span>            : 
+<span class="lineNum">     324 </span><span class="lineCov">        843 :     sgngam = 1;</span>
+<span class="lineNum">     325 </span><span class="lineCov">        843 :     if (!isfinite(x)) {</span>
+<span class="lineNum">     326 </span><span class="lineNoCov">          0 :         return x;</span>
+<span class="lineNum">     327 </span>            :     }
+<span class="lineNum">     328 </span><span class="lineCov">        843 :     q = fabs(x);</span>
+<span class="lineNum">     329 </span>            : 
+<span class="lineNum">     330 </span><span class="lineCov">        843 :     if (q &gt; 33.0) {</span>
+<span class="lineNum">     331 </span><span class="lineNoCov">          0 :         if (x &lt; 0.0) {</span>
+<span class="lineNum">     332 </span><span class="lineNoCov">          0 :             p = floor(q);</span>
+<span class="lineNum">     333 </span><span class="lineNoCov">          0 :             if (p == q) {</span>
+<span class="lineNum">     334 </span>            :               gamnan:
+<span class="lineNum">     335 </span><span class="lineNoCov">          0 :                 mtherr(&quot;Gamma&quot;, OVERFLOW);</span>
+<span class="lineNum">     336 </span><span class="lineNoCov">          0 :                 return (INFINITY);</span>
+<span class="lineNum">     337 </span>            :             }
+<span class="lineNum">     338 </span><span class="lineNoCov">          0 :             i = (int) p;</span>
+<span class="lineNum">     339 </span><span class="lineNoCov">          0 :             if ((i &amp; 1) == 0)</span>
+<span class="lineNum">     340 </span><span class="lineNoCov">          0 :                 sgngam = -1;</span>
+<span class="lineNum">     341 </span><span class="lineNoCov">          0 :             z = q - p;</span>
+<span class="lineNum">     342 </span><span class="lineNoCov">          0 :             if (z &gt; 0.5) {</span>
+<span class="lineNum">     343 </span><span class="lineNoCov">          0 :                 p += 1.0;</span>
+<span class="lineNum">     344 </span><span class="lineNoCov">          0 :                 z = q - p;</span>
+<span class="lineNum">     345 </span>            :             }
+<span class="lineNum">     346 </span><span class="lineNoCov">          0 :             z = q * sin(PI * z);</span>
+<span class="lineNum">     347 </span><span class="lineNoCov">          0 :             if (z == 0.0) {</span>
+<span class="lineNum">     348 </span><span class="lineNoCov">          0 :                 return (sgngam * INFINITY);</span>
+<span class="lineNum">     349 </span>            :             }
+<span class="lineNum">     350 </span><span class="lineNoCov">          0 :             z = fabs(z);</span>
+<span class="lineNum">     351 </span><span class="lineNoCov">          0 :             z = PI / (z * stirf(q));</span>
+<span class="lineNum">     352 </span>            :         }
+<span class="lineNum">     353 </span>            :         else {
+<span class="lineNum">     354 </span><span class="lineNoCov">          0 :             z = stirf(x);</span>
+<span class="lineNum">     355 </span>            :         }
+<span class="lineNum">     356 </span><span class="lineNoCov">          0 :         return (sgngam * z);</span>
+<span class="lineNum">     357 </span>            :     }
+<span class="lineNum">     358 </span>            : 
+<span class="lineNum">     359 </span><span class="lineCov">        843 :     z = 1.0;</span>
+<span class="lineNum">     360 </span><span class="lineCov">      12681 :     while (x &gt;= 3.0) {</span>
+<span class="lineNum">     361 </span><span class="lineCov">      10995 :         x -= 1.0;</span>
+<span class="lineNum">     362 </span><span class="lineCov">      10995 :         z *= x;</span>
+<span class="lineNum">     363 </span>            :     }
+<span class="lineNum">     364 </span>            : 
+<span class="lineNum">     365 </span><span class="lineCov">       1688 :     while (x &lt; 0.0) {</span>
+<span class="lineNum">     366 </span><span class="lineCov">          2 :         if (x &gt; -1.E-9)</span>
+<span class="lineNum">     367 </span><span class="lineNoCov">          0 :             goto small;</span>
+<span class="lineNum">     368 </span><span class="lineCov">          2 :         z /= x;</span>
+<span class="lineNum">     369 </span><span class="lineCov">          2 :         x += 1.0;</span>
+<span class="lineNum">     370 </span>            :     }
+<span class="lineNum">     371 </span>            : 
+<span class="lineNum">     372 </span><span class="lineCov">       1768 :     while (x &lt; 2.0) {</span>
+<span class="lineNum">     373 </span><span class="lineCov">         82 :         if (x &lt; 1.e-9)</span>
+<span class="lineNum">     374 </span><span class="lineNoCov">          0 :             goto small;</span>
+<span class="lineNum">     375 </span><span class="lineCov">         82 :         z /= x;</span>
+<span class="lineNum">     376 </span><span class="lineCov">         82 :         x += 1.0;</span>
+<span class="lineNum">     377 </span>            :     }
+<span class="lineNum">     378 </span>            : 
+<span class="lineNum">     379 </span><span class="lineCov">        843 :     if (x == 2.0)</span>
+<span class="lineNum">     380 </span><span class="lineCov">         38 :         return (z);</span>
+<span class="lineNum">     381 </span>            : 
+<span class="lineNum">     382 </span><span class="lineCov">        805 :     x -= 2.0;</span>
+<span class="lineNum">     383 </span><span class="lineCov">        805 :     p = polevl(x, P, 6);</span>
+<span class="lineNum">     384 </span><span class="lineCov">        805 :     q = polevl(x, Q, 7);</span>
+<span class="lineNum">     385 </span><span class="lineCov">        805 :     return (z * p / q);</span>
+<span class="lineNum">     386 </span>            : 
+<span class="lineNum">     387 </span>            :   small:
+<span class="lineNum">     388 </span><span class="lineNoCov">          0 :     if (x == 0.0) {</span>
+<span class="lineNum">     389 </span><span class="lineNoCov">          0 :         goto gamnan;</span>
+<span class="lineNum">     390 </span>            :     }
+<span class="lineNum">     391 </span>            :     else
+<span class="lineNum">     392 </span><span class="lineNoCov">          0 :         return (z / ((1.0 + 0.5772156649015329 * x) * x));</span>
+<span class="lineNum">     393 </span>            : }
+<span class="lineNum">     394 </span>            : 
+<span class="lineNum">     395 </span>            : 
+<span class="lineNum">     396 </span>            : 
+<span class="lineNum">     397 </span>            : /* A[]: Stirling's formula expansion of log Gamma
+<span class="lineNum">     398 </span>            :  * B[], C[]: log Gamma function between 2 and 3
+<span class="lineNum">     399 </span>            :  */
+<span class="lineNum">     400 </span>            : #ifdef UNK
+<span class="lineNum">     401 </span>            : static double A[] = {
+<span class="lineNum">     402 </span>            :     8.11614167470508450300E-4,
+<span class="lineNum">     403 </span>            :     -5.95061904284301438324E-4,
+<span class="lineNum">     404 </span>            :     7.93650340457716943945E-4,
+<span class="lineNum">     405 </span>            :     -2.77777777730099687205E-3,
+<span class="lineNum">     406 </span>            :     8.33333333333331927722E-2
+<span class="lineNum">     407 </span>            : };
+<span class="lineNum">     408 </span>            : 
+<span class="lineNum">     409 </span>            : static double B[] = {
+<span class="lineNum">     410 </span>            :     -1.37825152569120859100E3,
+<span class="lineNum">     411 </span>            :     -3.88016315134637840924E4,
+<span class="lineNum">     412 </span>            :     -3.31612992738871184744E5,
+<span class="lineNum">     413 </span>            :     -1.16237097492762307383E6,
+<span class="lineNum">     414 </span>            :     -1.72173700820839662146E6,
+<span class="lineNum">     415 </span>            :     -8.53555664245765465627E5
+<span class="lineNum">     416 </span>            : };
+<span class="lineNum">     417 </span>            : 
+<span class="lineNum">     418 </span>            : static double C[] = {
+<span class="lineNum">     419 </span>            :     /* 1.00000000000000000000E0, */
+<span class="lineNum">     420 </span>            :     -3.51815701436523470549E2,
+<span class="lineNum">     421 </span>            :     -1.70642106651881159223E4,
+<span class="lineNum">     422 </span>            :     -2.20528590553854454839E5,
+<span class="lineNum">     423 </span>            :     -1.13933444367982507207E6,
+<span class="lineNum">     424 </span>            :     -2.53252307177582951285E6,
+<span class="lineNum">     425 </span>            :     -2.01889141433532773231E6
+<span class="lineNum">     426 </span>            : };
+<span class="lineNum">     427 </span>            : 
+<span class="lineNum">     428 </span>            : /* log( sqrt( 2*pi ) ) */
+<span class="lineNum">     429 </span>            : static double LS2PI = 0.91893853320467274178;
+<span class="lineNum">     430 </span>            : 
+<span class="lineNum">     431 </span>            : #define MAXLGM 2.556348e305
+<span class="lineNum">     432 </span>            : #endif
+<span class="lineNum">     433 </span>            : 
+<span class="lineNum">     434 </span>            : #ifdef DEC
+<span class="lineNum">     435 </span>            : static unsigned short A[] = {
+<span class="lineNum">     436 </span>            :     0035524, 0141201, 0034633, 0031405,
+<span class="lineNum">     437 </span>            :     0135433, 0176755, 0126007, 0045030,
+<span class="lineNum">     438 </span>            :     0035520, 0006371, 0003342, 0172730,
+<span class="lineNum">     439 </span>            :     0136066, 0005540, 0132605, 0026407,
+<span class="lineNum">     440 </span>            :     0037252, 0125252, 0125252, 0125132
+<span class="lineNum">     441 </span>            : };
+<span class="lineNum">     442 </span>            : 
+<span class="lineNum">     443 </span>            : static unsigned short B[] = {
+<span class="lineNum">     444 </span>            :     0142654, 0044014, 0077633, 0035410,
+<span class="lineNum">     445 </span>            :     0144027, 0110641, 0125335, 0144760,
+<span class="lineNum">     446 </span>            :     0144641, 0165637, 0142204, 0047447,
+<span class="lineNum">     447 </span>            :     0145215, 0162027, 0146246, 0155211,
+<span class="lineNum">     448 </span>            :     0145322, 0026110, 0010317, 0110130,
+<span class="lineNum">     449 </span>            :     0145120, 0061472, 0120300, 0025363
+<span class="lineNum">     450 </span>            : };
+<span class="lineNum">     451 </span>            : 
+<span class="lineNum">     452 </span>            : static unsigned short C[] = {
+<span class="lineNum">     453 </span>            :     /*0040200,0000000,0000000,0000000 */
+<span class="lineNum">     454 </span>            :     0142257, 0164150, 0163630, 0112622,
+<span class="lineNum">     455 </span>            :     0143605, 0050153, 0156116, 0135272,
+<span class="lineNum">     456 </span>            :     0144527, 0056045, 0145642, 0062332,
+<span class="lineNum">     457 </span>            :     0145213, 0012063, 0106250, 0001025,
+<span class="lineNum">     458 </span>            :     0145432, 0111254, 0044577, 0115142,
+<span class="lineNum">     459 </span>            :     0145366, 0071133, 0050217, 0005122
+<span class="lineNum">     460 </span>            : };
+<span class="lineNum">     461 </span>            : 
+<span class="lineNum">     462 </span>            : /* log( sqrt( 2*pi ) ) */
+<span class="lineNum">     463 </span>            : static unsigned short LS2P[] = { 040153, 037616, 041445, 0172645, };
+<span class="lineNum">     464 </span>            : 
+<span class="lineNum">     465 </span>            : #define LS2PI *(double *)LS2P
+<span class="lineNum">     466 </span>            : #define MAXLGM 2.035093e36
+<span class="lineNum">     467 </span>            : #endif
+<span class="lineNum">     468 </span>            : 
+<span class="lineNum">     469 </span>            : #ifdef IBMPC
+<span class="lineNum">     470 </span>            : static unsigned short A[] = {
+<span class="lineNum">     471 </span>            :     0x6661, 0x2733, 0x9850, 0x3f4a,
+<span class="lineNum">     472 </span>            :     0xe943, 0xb580, 0x7fbd, 0xbf43,
+<span class="lineNum">     473 </span>            :     0x5ebb, 0x20dc, 0x019f, 0x3f4a,
+<span class="lineNum">     474 </span>            :     0xa5a1, 0x16b0, 0xc16c, 0xbf66,
+<span class="lineNum">     475 </span>            :     0x554b, 0x5555, 0x5555, 0x3fb5
+<span class="lineNum">     476 </span>            : };
+<span class="lineNum">     477 </span>            : 
+<span class="lineNum">     478 </span>            : static unsigned short B[] = {
+<span class="lineNum">     479 </span>            :     0x6761, 0x8ff3, 0x8901, 0xc095,
+<span class="lineNum">     480 </span>            :     0xb93e, 0x355b, 0xf234, 0xc0e2,
+<span class="lineNum">     481 </span>            :     0x89e5, 0xf890, 0x3d73, 0xc114,
+<span class="lineNum">     482 </span>            :     0xdb51, 0xf994, 0xbc82, 0xc131,
+<span class="lineNum">     483 </span>            :     0xf20b, 0x0219, 0x4589, 0xc13a,
+<span class="lineNum">     484 </span>            :     0x055e, 0x5418, 0x0c67, 0xc12a
+<span class="lineNum">     485 </span>            : };
+<span class="lineNum">     486 </span>            : 
+<span class="lineNum">     487 </span>            : static unsigned short C[] = {
+<span class="lineNum">     488 </span>            :     /*0x0000,0x0000,0x0000,0x3ff0, */
+<span class="lineNum">     489 </span>            :     0x12b2, 0x1cf3, 0xfd0d, 0xc075,
+<span class="lineNum">     490 </span>            :     0xd757, 0x7b89, 0xaa0d, 0xc0d0,
+<span class="lineNum">     491 </span>            :     0x4c9b, 0xb974, 0xeb84, 0xc10a,
+<span class="lineNum">     492 </span>            :     0x0043, 0x7195, 0x6286, 0xc131,
+<span class="lineNum">     493 </span>            :     0xf34c, 0x892f, 0x5255, 0xc143,
+<span class="lineNum">     494 </span>            :     0xe14a, 0x6a11, 0xce4b, 0xc13e
+<span class="lineNum">     495 </span>            : };
+<span class="lineNum">     496 </span>            : 
+<span class="lineNum">     497 </span>            : /* log( sqrt( 2*pi ) ) */
+<span class="lineNum">     498 </span>            : static unsigned short LS2P[] = {
+<span class="lineNum">     499 </span>            :     0xbeb5, 0xc864, 0x67f1, 0x3fed
+<span class="lineNum">     500 </span>            : };
+<span class="lineNum">     501 </span>            : 
+<span class="lineNum">     502 </span>            : #define LS2PI *(double *)LS2P
+<span class="lineNum">     503 </span>            : #define MAXLGM 2.556348e305
+<span class="lineNum">     504 </span>            : #endif
+<span class="lineNum">     505 </span>            : 
+<span class="lineNum">     506 </span>            : #ifdef MIEEE
+<span class="lineNum">     507 </span>            : static unsigned short A[] = {
+<span class="lineNum">     508 </span>            :     0x3f4a, 0x9850, 0x2733, 0x6661,
+<span class="lineNum">     509 </span>            :     0xbf43, 0x7fbd, 0xb580, 0xe943,
+<span class="lineNum">     510 </span>            :     0x3f4a, 0x019f, 0x20dc, 0x5ebb,
+<span class="lineNum">     511 </span>            :     0xbf66, 0xc16c, 0x16b0, 0xa5a1,
+<span class="lineNum">     512 </span>            :     0x3fb5, 0x5555, 0x5555, 0x554b
+<span class="lineNum">     513 </span>            : };
+<span class="lineNum">     514 </span>            : 
+<span class="lineNum">     515 </span>            : static unsigned short B[] = {
+<span class="lineNum">     516 </span>            :     0xc095, 0x8901, 0x8ff3, 0x6761,
+<span class="lineNum">     517 </span>            :     0xc0e2, 0xf234, 0x355b, 0xb93e,
+<span class="lineNum">     518 </span>            :     0xc114, 0x3d73, 0xf890, 0x89e5,
+<span class="lineNum">     519 </span>            :     0xc131, 0xbc82, 0xf994, 0xdb51,
+<span class="lineNum">     520 </span>            :     0xc13a, 0x4589, 0x0219, 0xf20b,
+<span class="lineNum">     521 </span>            :     0xc12a, 0x0c67, 0x5418, 0x055e
+<span class="lineNum">     522 </span>            : };
+<span class="lineNum">     523 </span>            : 
+<span class="lineNum">     524 </span>            : static unsigned short C[] = {
+<span class="lineNum">     525 </span>            :     0xc075, 0xfd0d, 0x1cf3, 0x12b2,
+<span class="lineNum">     526 </span>            :     0xc0d0, 0xaa0d, 0x7b89, 0xd757,
+<span class="lineNum">     527 </span>            :     0xc10a, 0xeb84, 0xb974, 0x4c9b,
+<span class="lineNum">     528 </span>            :     0xc131, 0x6286, 0x7195, 0x0043,
+<span class="lineNum">     529 </span>            :     0xc143, 0x5255, 0x892f, 0xf34c,
+<span class="lineNum">     530 </span>            :     0xc13e, 0xce4b, 0x6a11, 0xe14a
+<span class="lineNum">     531 </span>            : };
+<span class="lineNum">     532 </span>            : 
+<span class="lineNum">     533 </span>            : /* log( sqrt( 2*pi ) ) */
+<span class="lineNum">     534 </span>            : static unsigned short LS2P[] = {
+<span class="lineNum">     535 </span>            :     0x3fed, 0x67f1, 0xc864, 0xbeb5
+<span class="lineNum">     536 </span>            : };
+<span class="lineNum">     537 </span>            : 
+<span class="lineNum">     538 </span>            : #define LS2PI *(double *)LS2P
+<span class="lineNum">     539 </span>            : #define MAXLGM 2.556348e305
+<span class="lineNum">     540 </span>            : #endif
+<span class="lineNum">     541 </span>            : 
+<span class="lineNum">     542 </span>            : 
+<span class="lineNum">     543 </span>            : /* Logarithm of Gamma function */
+<a name="544"><span class="lineNum">     544 </span>            : </a>
+<span class="lineNum">     545 </span>            : 
+<span class="lineNum">     546 </span><span class="lineCov">        286 : double lgam(double x)</span>
+<span class="lineNum">     547 </span>            : {
+<span class="lineNum">     548 </span>            :     double p, q, u, w, z;
+<span class="lineNum">     549 </span>            :     int i;
+<span class="lineNum">     550 </span>            : 
+<span class="lineNum">     551 </span><span class="lineCov">        286 :     sgngam = 1;</span>
+<span class="lineNum">     552 </span>            : 
+<span class="lineNum">     553 </span><span class="lineCov">        286 :     if (!isfinite(x))</span>
+<span class="lineNum">     554 </span><span class="lineNoCov">          0 :         return x;</span>
+<span class="lineNum">     555 </span>            : 
+<span class="lineNum">     556 </span><span class="lineCov">        286 :     if (x &lt; -34.0) {</span>
+<span class="lineNum">     557 </span><span class="lineNoCov">          0 :         q = -x;</span>
+<span class="lineNum">     558 </span><span class="lineNoCov">          0 :         w = lgam(q);            /* note this modifies sgngam! */</span>
+<span class="lineNum">     559 </span><span class="lineNoCov">          0 :         p = floor(q);</span>
+<span class="lineNum">     560 </span><span class="lineNoCov">          0 :         if (p == q) {</span>
+<span class="lineNum">     561 </span>            :           lgsing:
+<span class="lineNum">     562 </span><span class="lineNoCov">          0 :             mtherr(&quot;lgam&quot;, SING);</span>
+<span class="lineNum">     563 </span><span class="lineNoCov">          0 :             return (INFINITY);</span>
+<span class="lineNum">     564 </span>            :         }
+<span class="lineNum">     565 </span><span class="lineNoCov">          0 :         i = (int) p;</span>
+<span class="lineNum">     566 </span><span class="lineNoCov">          0 :         if ((i &amp; 1) == 0)</span>
+<span class="lineNum">     567 </span><span class="lineNoCov">          0 :             sgngam = -1;</span>
+<span class="lineNum">     568 </span>            :         else
+<span class="lineNum">     569 </span><span class="lineNoCov">          0 :             sgngam = 1;</span>
+<span class="lineNum">     570 </span><span class="lineNoCov">          0 :         z = q - p;</span>
+<span class="lineNum">     571 </span><span class="lineNoCov">          0 :         if (z &gt; 0.5) {</span>
+<span class="lineNum">     572 </span><span class="lineNoCov">          0 :             p += 1.0;</span>
+<span class="lineNum">     573 </span><span class="lineNoCov">          0 :             z = p - q;</span>
+<span class="lineNum">     574 </span>            :         }
+<span class="lineNum">     575 </span><span class="lineNoCov">          0 :         z = q * sin(PI * z);</span>
+<span class="lineNum">     576 </span><span class="lineNoCov">          0 :         if (z == 0.0)</span>
+<span class="lineNum">     577 </span><span class="lineNoCov">          0 :             goto lgsing;</span>
+<span class="lineNum">     578 </span>            :         /*     z = log(PI) - log( z ) - w; */
+<span class="lineNum">     579 </span><span class="lineNoCov">          0 :         z = LOGPI - log(z) - w;</span>
+<span class="lineNum">     580 </span><span class="lineNoCov">          0 :         return (z);</span>
+<span class="lineNum">     581 </span>            :     }
+<span class="lineNum">     582 </span>            : 
+<span class="lineNum">     583 </span><span class="lineCov">        286 :     if (x &lt; 13.0) {</span>
+<span class="lineNum">     584 </span><span class="lineCov">        284 :         z = 1.0;</span>
+<span class="lineNum">     585 </span><span class="lineCov">        284 :         p = 0.0;</span>
+<span class="lineNum">     586 </span><span class="lineCov">        284 :         u = x;</span>
+<span class="lineNum">     587 </span><span class="lineCov">        856 :         while (u &gt;= 3.0) {</span>
+<span class="lineNum">     588 </span><span class="lineCov">        288 :             p -= 1.0;</span>
+<span class="lineNum">     589 </span><span class="lineCov">        288 :             u = x + p;</span>
+<span class="lineNum">     590 </span><span class="lineCov">        288 :             z *= u;</span>
+<span class="lineNum">     591 </span>            :         }
+<span class="lineNum">     592 </span><span class="lineCov">       1183 :         while (u &lt; 2.0) {</span>
+<span class="lineNum">     593 </span><span class="lineCov">        615 :             if (u == 0.0)</span>
+<span class="lineNum">     594 </span><span class="lineNoCov">          0 :                 goto lgsing;</span>
+<span class="lineNum">     595 </span><span class="lineCov">        615 :             z /= u;</span>
+<span class="lineNum">     596 </span><span class="lineCov">        615 :             p += 1.0;</span>
+<span class="lineNum">     597 </span><span class="lineCov">        615 :             u = x + p;</span>
+<span class="lineNum">     598 </span>            :         }
+<span class="lineNum">     599 </span><span class="lineCov">        284 :         if (z &lt; 0.0) {</span>
+<span class="lineNum">     600 </span><span class="lineCov">         99 :             sgngam = -1;</span>
+<span class="lineNum">     601 </span><span class="lineCov">         99 :             z = -z;</span>
+<span class="lineNum">     602 </span>            :         }
+<span class="lineNum">     603 </span>            :         else
+<span class="lineNum">     604 </span><span class="lineCov">        185 :             sgngam = 1;</span>
+<span class="lineNum">     605 </span><span class="lineCov">        284 :         if (u == 2.0)</span>
+<span class="lineNum">     606 </span><span class="lineCov">         10 :             return (log(z));</span>
+<span class="lineNum">     607 </span><span class="lineCov">        274 :         p -= 2.0;</span>
+<span class="lineNum">     608 </span><span class="lineCov">        274 :         x = x + p;</span>
+<span class="lineNum">     609 </span><span class="lineCov">        274 :         p = x * polevl(x, B, 5) / p1evl(x, C, 6);</span>
+<span class="lineNum">     610 </span><span class="lineCov">        274 :         return (log(z) + p);</span>
+<span class="lineNum">     611 </span>            :     }
+<span class="lineNum">     612 </span>            : 
+<span class="lineNum">     613 </span><span class="lineCov">          2 :     if (x &gt; MAXLGM) {</span>
+<span class="lineNum">     614 </span><span class="lineNoCov">          0 :         return (sgngam * INFINITY);</span>
+<span class="lineNum">     615 </span>            :     }
+<span class="lineNum">     616 </span>            : 
+<span class="lineNum">     617 </span><span class="lineCov">          2 :     q = (x - 0.5) * log(x) - x + LS2PI;</span>
+<span class="lineNum">     618 </span><span class="lineCov">          2 :     if (x &gt; 1.0e8)</span>
+<span class="lineNum">     619 </span><span class="lineNoCov">          0 :         return (q);</span>
+<span class="lineNum">     620 </span>            : 
+<span class="lineNum">     621 </span><span class="lineCov">          2 :     p = 1.0 / (x * x);</span>
+<span class="lineNum">     622 </span><span class="lineCov">          2 :     if (x &gt;= 1000.0)</span>
+<span class="lineNum">     623 </span><span class="lineNoCov">          0 :         q += ((7.9365079365079365079365e-4 * p</span>
+<span class="lineNum">     624 </span><span class="lineNoCov">          0 :                - 2.7777777777777777777778e-3) * p</span>
+<span class="lineNum">     625 </span><span class="lineNoCov">          0 :               + 0.0833333333333333333333) / x;</span>
+<span class="lineNum">     626 </span>            :     else
+<span class="lineNum">     627 </span><span class="lineCov">          2 :         q += polevl(p, A, 4) / x;</span>
+<span class="lineNum">     628 </span><span class="lineCov">          2 :     return (q);</span>
+<span class="lineNum">     629 </span>            : }
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.10</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

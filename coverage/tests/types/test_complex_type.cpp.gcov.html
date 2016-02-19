@@ -1,0 +1,313 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - coverage.info.cleaned - tests/types/test_complex_type.cpp</title>
+  <link rel="stylesheet" type="text/css" href="../../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../../index.html">top level</a> - <a href="index.html">tests/types</a> - test_complex_type.cpp<span style="font-size: 80%;"> (source / <a href="test_complex_type.cpp.func.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">coverage.info.cleaned</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">66</td>
+            <td class="headerCovTableEntry">66</td>
+            <td class="headerCovTableEntryHi">100.0 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2016-02-19</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">24</td>
+            <td class="headerCovTableEntry">25</td>
+            <td class="headerCovTableEntryHi">96.0 %</td>
+          </tr>
+          <tr><td><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : //</a>
+<span class="lineNum">       2 </span>            : // Copyright (C) 2011-15 DyND Developers
+<span class="lineNum">       3 </span>            : // BSD 2-Clause License, see LICENSE.txt
+<span class="lineNum">       4 </span>            : //
+<span class="lineNum">       5 </span>            : 
+<span class="lineNum">       6 </span>            : #include &lt;complex&gt;
+<span class="lineNum">       7 </span>            : #include &lt;iostream&gt;
+<span class="lineNum">       8 </span>            : #include &lt;sstream&gt;
+<span class="lineNum">       9 </span>            : #include &lt;stdexcept&gt;
+<span class="lineNum">      10 </span>            : 
+<span class="lineNum">      11 </span>            : #include &quot;inc_gtest.hpp&quot;
+<span class="lineNum">      12 </span>            : #include &quot;dynd_assertions.hpp&quot;
+<span class="lineNum">      13 </span>            : 
+<span class="lineNum">      14 </span>            : #include &lt;dynd/array.hpp&gt;
+<span class="lineNum">      15 </span>            : #include &lt;dynd/math.hpp&gt;
+<span class="lineNum">      16 </span>            : 
+<span class="lineNum">      17 </span>            : using namespace std;
+<span class="lineNum">      18 </span>            : using namespace dynd;
+<span class="lineNum">      19 </span>            : 
+<span class="lineNum">      20 </span>            : #define EXPECT_COMPLEX_DOUBLE_EQ(a, b)                                                                                 \
+<span class="lineNum">      21 </span>            :   EXPECT_DOUBLE_EQ(a.real(), b.real());                                                                                \
+<span class="lineNum">      22 </span>            :   EXPECT_DOUBLE_EQ(a.imag(), b.imag())
+<span class="lineNum">      23 </span>            : 
+<span class="lineNum">      24 </span>            : #define REL_ERROR_MAX 4E-15
+<a name="25"><span class="lineNum">      25 </span>            : </a>
+<span class="lineNum">      26 </span>            : template &lt;typename T&gt;
+<span class="lineNum">      27 </span><span class="lineCov">          2 : class ComplexType : public ::testing::Test {</span>
+<a name="28"><span class="lineNum">      28 </span>            : };</a>
+<span class="lineNum">      29 </span>            : 
+<a name="30"><span class="lineNum">      30 </span><span class="lineCov">          1 : TYPED_TEST_CASE_P(ComplexType);</span></a>
+<span class="lineNum">      31 </span>            : 
+<span class="lineNum">      32 </span><span class="lineCov">          5 : TEST(Complex, Math)</span>
+<span class="lineNum">      33 </span>            : {
+<span class="lineNum">      34 </span><span class="lineCov">          1 :   dynd::complex&lt;double&gt; z;</span>
+<span class="lineNum">      35 </span>            :   typedef std::complex&lt;double&gt; cdbl;
+<span class="lineNum">      36 </span>            :   typedef std::complex&lt;double&gt; cdbl;
+<span class="lineNum">      37 </span>            : 
+<span class="lineNum">      38 </span><span class="lineCov">          1 :   z = dynd::complex&lt;double&gt;(0.0, 0.0);</span>
+<span class="lineNum">      39 </span><span class="lineCov">          1 :   EXPECT_DOUBLE_EQ(abs(z), abs(cdbl(z)));</span>
+<span class="lineNum">      40 </span><span class="lineCov">          1 :   EXPECT_DOUBLE_EQ(arg(z), arg(cdbl(z)));</span>
+<span class="lineNum">      41 </span><span class="lineCov">          1 :   EXPECT_COMPLEX_DOUBLE_EQ(dynd::exp(z), std::exp(static_cast&lt;std::complex&lt;double&gt;&gt;(z)));</span>
+<span class="lineNum">      42 </span>            :   /*
+<span class="lineNum">      43 </span>            :       EXPECT_COMPLEX_DOUBLE_EQ(log(z), log(cdbl(z)));
+<span class="lineNum">      44 </span>            :       EXPECT_COMPLEX_DOUBLE_EQ(sqrt(z), sqrt(cdbl(z)));
+<span class="lineNum">      45 </span>            :       EXPECT_COMPLEX_DOUBLE_EQ(pow(z, 1.0), pow(cdbl(z), 1.0));
+<span class="lineNum">      46 </span>            :       EXPECT_COMPLEX_DOUBLE_EQ(pow(z, 2.0), pow(cdbl(z), 2.0));
+<span class="lineNum">      47 </span>            :       EXPECT_COMPLEX_DOUBLE_EQ(pow(z, 3.0), pow(cdbl(z), 3.0));
+<span class="lineNum">      48 </span>            :       EXPECT_COMPLEX_DOUBLE_EQ(pow(z, 7.4), pow(cdbl(z), 7.4));
+<span class="lineNum">      49 </span>            : 
+<span class="lineNum">      50 </span>            :       z = dynd_complex&lt;double&gt;(1.5, 2.0);
+<span class="lineNum">      51 </span>            :       EXPECT_DOUBLE_EQ(abs(z), abs(cdbl(z)));
+<span class="lineNum">      52 </span>            :       EXPECT_DOUBLE_EQ(arg(z), arg(cdbl(z)));
+<span class="lineNum">      53 </span>            :       EXPECT_COMPLEX_DOUBLE_EQ(exp(z), exp(cdbl(z)));
+<span class="lineNum">      54 </span>            :       EXPECT_COMPLEX_DOUBLE_EQ(log(z), log(cdbl(z)));
+<span class="lineNum">      55 </span>            :       EXPECT_COMPLEX_DOUBLE_EQ(sqrt(z), sqrt(cdbl(z)));
+<span class="lineNum">      56 </span>            :       EXPECT_COMPLEX_DOUBLE_EQ(pow(z, 0.0), pow(cdbl(z), 0.0));
+<span class="lineNum">      57 </span>            :       EXPECT_COMPLEX_DOUBLE_EQ(pow(z, 1.0), pow(cdbl(z), 1.0));
+<span class="lineNum">      58 </span>            :       EXPECT_EQ_RELERR(pow(z, 2.0), dynd_complex&lt;double&gt;(pow(cdbl(z), 2.0)),
+<span class="lineNum">      59 </span>            :                        REL_ERROR_MAX);
+<span class="lineNum">      60 </span>            :       EXPECT_EQ_RELERR(pow(z, 3.0), dynd_complex&lt;double&gt;(pow(cdbl(z), 3.0)),
+<span class="lineNum">      61 </span>            :                        REL_ERROR_MAX);
+<span class="lineNum">      62 </span>            :       EXPECT_COMPLEX_DOUBLE_EQ(pow(z, 7.4), pow(cdbl(z), 7.4));
+<span class="lineNum">      63 </span>            :       EXPECT_COMPLEX_DOUBLE_EQ(pow(z, dynd_complex&lt;double&gt;(0.0, 1.0)),
+<span class="lineNum">      64 </span>            :   pow(cdbl(z), complex&lt;double&gt;(0.0, 1.0)));
+<span class="lineNum">      65 </span>            :       EXPECT_COMPLEX_DOUBLE_EQ(pow(z, dynd_complex&lt;double&gt;(0.0, -1.0)),
+<span class="lineNum">      66 </span>            :   pow(cdbl(z), complex&lt;double&gt;(0.0, -1.0)));
+<span class="lineNum">      67 </span>            :       EXPECT_COMPLEX_DOUBLE_EQ(pow(z, dynd_complex&lt;double&gt;(7.4, -6.3)),
+<span class="lineNum">      68 </span>            :   pow(cdbl(z), complex&lt;double&gt;(7.4, -6.3)));
+<span class="lineNum">      69 </span>            : 
+<span class="lineNum">      70 </span>            :       z = dynd_complex&lt;double&gt;(1.5, 0.0);
+<span class="lineNum">      71 </span>            :       EXPECT_DOUBLE_EQ(abs(z), abs(cdbl(z)));
+<span class="lineNum">      72 </span>            :       EXPECT_DOUBLE_EQ(arg(z), arg(cdbl(z)));
+<span class="lineNum">      73 </span>            :       EXPECT_COMPLEX_DOUBLE_EQ(exp(z), exp(cdbl(z)));
+<span class="lineNum">      74 </span>            :       EXPECT_COMPLEX_DOUBLE_EQ(log(z), log(cdbl(z)));
+<span class="lineNum">      75 </span>            :       EXPECT_COMPLEX_DOUBLE_EQ(sqrt(z), sqrt(cdbl(z)));
+<span class="lineNum">      76 </span>            :       EXPECT_COMPLEX_DOUBLE_EQ(pow(z, 0.0), pow(cdbl(z), 0.0));
+<span class="lineNum">      77 </span>            :       EXPECT_COMPLEX_DOUBLE_EQ(pow(z, 1.0), pow(cdbl(z), 1.0));
+<span class="lineNum">      78 </span>            :       EXPECT_COMPLEX_DOUBLE_EQ(pow(z, 2.0), pow(cdbl(z), 2.0));
+<span class="lineNum">      79 </span>            :       EXPECT_COMPLEX_DOUBLE_EQ(pow(z, 3.0), pow(cdbl(z), 3.0));
+<span class="lineNum">      80 </span>            :       EXPECT_COMPLEX_DOUBLE_EQ(pow(z, 7.4), pow(cdbl(z), 7.4));
+<span class="lineNum">      81 </span>            :       EXPECT_COMPLEX_DOUBLE_EQ(pow(z, dynd_complex&lt;double&gt;(0.0, 1.0)),
+<span class="lineNum">      82 </span>            :   pow(cdbl(z), complex&lt;double&gt;(0.0, 1.0)));
+<span class="lineNum">      83 </span>            :       EXPECT_COMPLEX_DOUBLE_EQ(pow(z, dynd_complex&lt;double&gt;(0.0, -1.0)),
+<span class="lineNum">      84 </span>            :   pow(cdbl(z), complex&lt;double&gt;(0.0, -1.0)));
+<span class="lineNum">      85 </span>            :       EXPECT_COMPLEX_DOUBLE_EQ(pow(z, dynd_complex&lt;double&gt;(7.4, -6.3)),
+<span class="lineNum">      86 </span>            :   pow(cdbl(z), complex&lt;double&gt;(7.4, -6.3)));
+<span class="lineNum">      87 </span>            : 
+<span class="lineNum">      88 </span>            :       z = dynd_complex&lt;double&gt;(0.0, 2.0);
+<span class="lineNum">      89 </span>            :       EXPECT_DOUBLE_EQ(abs(z), abs(cdbl(z)));
+<span class="lineNum">      90 </span>            :       EXPECT_DOUBLE_EQ(arg(z), arg(cdbl(z)));
+<span class="lineNum">      91 </span>            :       EXPECT_COMPLEX_DOUBLE_EQ(exp(z), exp(cdbl(z)));
+<span class="lineNum">      92 </span>            :       EXPECT_COMPLEX_DOUBLE_EQ(log(z), log(cdbl(z)));
+<span class="lineNum">      93 </span>            :       EXPECT_COMPLEX_DOUBLE_EQ(sqrt(z), sqrt(cdbl(z)));
+<span class="lineNum">      94 </span>            :       EXPECT_COMPLEX_DOUBLE_EQ(pow(z, 0.0), pow(cdbl(z), 0.0));
+<span class="lineNum">      95 </span>            :       EXPECT_COMPLEX_DOUBLE_EQ(pow(z, 1.0), pow(cdbl(z), 1.0));
+<span class="lineNum">      96 </span>            :       EXPECT_COMPLEX_DOUBLE_EQ(pow(z, 2.0), pow(cdbl(z), 2.0));
+<span class="lineNum">      97 </span>            :       EXPECT_COMPLEX_DOUBLE_EQ(pow(z, 3.0), pow(cdbl(z), 3.0));
+<span class="lineNum">      98 </span>            :       EXPECT_EQ_RELERR(pow(z, 7.4), dynd_complex&lt;double&gt;(pow(cdbl(z), 7.4)),
+<span class="lineNum">      99 </span>            :                        REL_ERROR_MAX);
+<span class="lineNum">     100 </span>            :       EXPECT_COMPLEX_DOUBLE_EQ(pow(z, dynd_complex&lt;double&gt;(0.0, 1.0)),
+<span class="lineNum">     101 </span>            :   pow(cdbl(z), complex&lt;double&gt;(0.0, 1.0)));
+<span class="lineNum">     102 </span>            :       EXPECT_COMPLEX_DOUBLE_EQ(pow(z, dynd_complex&lt;double&gt;(0.0, -1.0)),
+<span class="lineNum">     103 </span>            :   pow(cdbl(z), complex&lt;double&gt;(0.0, -1.0)));
+<span class="lineNum">     104 </span>            :       EXPECT_EQ_RELERR(
+<span class="lineNum">     105 </span>            :           pow(z, dynd_complex&lt;double&gt;(7.4, -6.3)),
+<span class="lineNum">     106 </span>            :           dynd_complex&lt;double&gt;(pow(cdbl(z), complex&lt;double&gt;(7.4, -6.3))),
+<span class="lineNum">     107 </span>            :           REL_ERROR_MAX);
+<span class="lineNum">     108 </span>            : 
+<span class="lineNum">     109 </span>            :       // Todo: pow works for both arguments complex, but there is a very small
+<span class="lineNum">     110 </span>            :   difference in the answers from dynd and std.
+<span class="lineNum">     111 </span>            :       // That's fine, but we need to specify a floating-point tolerance for
+<span class="lineNum">     112 </span>            :   testing.
+<span class="lineNum">     113 </span>            : 
+<span class="lineNum">     114 </span>            :       z = dynd_complex&lt;double&gt;(10.0, 0.5);
+<span class="lineNum">     115 </span>            :       EXPECT_DOUBLE_EQ(abs(z), abs(cdbl(z)));
+<span class="lineNum">     116 </span>            :       EXPECT_DOUBLE_EQ(arg(z), arg(cdbl(z)));
+<span class="lineNum">     117 </span>            :       EXPECT_COMPLEX_DOUBLE_EQ(exp(z), exp(cdbl(z)));
+<span class="lineNum">     118 </span>            :       EXPECT_COMPLEX_DOUBLE_EQ(log(z), log(cdbl(z)));
+<span class="lineNum">     119 </span>            :       EXPECT_COMPLEX_DOUBLE_EQ(sqrt(z), sqrt(cdbl(z)));
+<span class="lineNum">     120 </span>            :       EXPECT_COMPLEX_DOUBLE_EQ(cos(z), cos(cdbl(z)));
+<span class="lineNum">     121 </span>            :       EXPECT_COMPLEX_DOUBLE_EQ(sin(z), sin(cdbl(z)));
+<span class="lineNum">     122 </span>            : 
+<span class="lineNum">     123 </span>            :       z = dynd_complex&lt;double&gt;(10.0, -0.5);
+<span class="lineNum">     124 </span>            :       EXPECT_DOUBLE_EQ(abs(z), abs(cdbl(z)));
+<span class="lineNum">     125 </span>            :       EXPECT_DOUBLE_EQ(arg(z), arg(cdbl(z)));
+<span class="lineNum">     126 </span>            :       EXPECT_COMPLEX_DOUBLE_EQ(exp(z), exp(cdbl(z)));
+<span class="lineNum">     127 </span>            :       EXPECT_COMPLEX_DOUBLE_EQ(log(z), log(cdbl(z)));
+<span class="lineNum">     128 </span>            :       EXPECT_COMPLEX_DOUBLE_EQ(sqrt(z), sqrt(cdbl(z)));
+<span class="lineNum">     129 </span>            :       EXPECT_COMPLEX_DOUBLE_EQ(cos(z), cos(cdbl(z)));
+<span class="lineNum">     130 </span>            :       EXPECT_COMPLEX_DOUBLE_EQ(sin(z), sin(cdbl(z)));
+<span class="lineNum">     131 </span>            : 
+<span class="lineNum">     132 </span>            :       z = dynd_complex&lt;double&gt;(-10.0, 0.5);
+<span class="lineNum">     133 </span>            :       EXPECT_DOUBLE_EQ(abs(z), abs(cdbl(z)));
+<span class="lineNum">     134 </span>            :       EXPECT_DOUBLE_EQ(arg(z), arg(cdbl(z)));
+<span class="lineNum">     135 </span>            :       EXPECT_COMPLEX_DOUBLE_EQ(exp(z), exp(cdbl(z)));
+<span class="lineNum">     136 </span>            :       EXPECT_COMPLEX_DOUBLE_EQ(log(z), log(cdbl(z)));
+<span class="lineNum">     137 </span>            :       EXPECT_COMPLEX_DOUBLE_EQ(sqrt(z), sqrt(cdbl(z)));
+<span class="lineNum">     138 </span>            :       EXPECT_COMPLEX_DOUBLE_EQ(cos(z), cos(cdbl(z)));
+<span class="lineNum">     139 </span>            :       EXPECT_COMPLEX_DOUBLE_EQ(sin(z), sin(cdbl(z)));
+<span class="lineNum">     140 </span>            : 
+<span class="lineNum">     141 </span>            :       z = dynd_complex&lt;double&gt;(-10.0, -0.5);
+<span class="lineNum">     142 </span>            :       EXPECT_DOUBLE_EQ(abs(z), abs(cdbl(z)));
+<span class="lineNum">     143 </span>            :       EXPECT_DOUBLE_EQ(arg(z), arg(cdbl(z)));
+<span class="lineNum">     144 </span>            :       EXPECT_COMPLEX_DOUBLE_EQ(exp(z), exp(cdbl(z)));
+<span class="lineNum">     145 </span>            :       EXPECT_COMPLEX_DOUBLE_EQ(log(z), log(cdbl(z)));
+<span class="lineNum">     146 </span>            :       EXPECT_COMPLEX_DOUBLE_EQ(sqrt(z), sqrt(cdbl(z)));
+<span class="lineNum">     147 </span>            :       EXPECT_COMPLEX_DOUBLE_EQ(cos(z), cos(cdbl(z)));
+<span class="lineNum">     148 </span>            :       EXPECT_COMPLEX_DOUBLE_EQ(sin(z), sin(cdbl(z)));
+<span class="lineNum">     149 </span>            :   */
+<span class="lineNum">     150 </span><span class="lineCov">          1 : }</span>
+<span class="lineNum">     151 </span>            : 
+<a name="152"><span class="lineNum">     152 </span>            : #undef ASSERT_COMPLEX_DOUBLE_EQ</a>
+<span class="lineNum">     153 </span>            : 
+<span class="lineNum">     154 </span><span class="lineCov">          5 : TEST(ComplexDType, Create)</span>
+<span class="lineNum">     155 </span>            : {
+<span class="lineNum">     156 </span><span class="lineCov">          2 :   ndt::type d;</span>
+<span class="lineNum">     157 </span>            : 
+<span class="lineNum">     158 </span>            :   // complex[float32]
+<span class="lineNum">     159 </span><span class="lineCov">          1 :   d = ndt::make_type&lt;dynd::complex&lt;float&gt;&gt;();</span>
+<span class="lineNum">     160 </span><span class="lineCov">          1 :   EXPECT_EQ(complex_float32_id, d.get_id());</span>
+<span class="lineNum">     161 </span><span class="lineCov">          1 :   EXPECT_EQ(complex_kind_id, d.get_base_id());</span>
+<span class="lineNum">     162 </span><span class="lineCov">          1 :   EXPECT_EQ(8u, d.get_data_size());</span>
+<span class="lineNum">     163 </span><span class="lineCov">          1 :   EXPECT_EQ((size_t)alignof(float), d.get_data_alignment());</span>
+<span class="lineNum">     164 </span><span class="lineCov">          1 :   EXPECT_FALSE(d.is_expression());</span>
+<span class="lineNum">     165 </span><span class="lineCov">          1 :   EXPECT_EQ(&quot;complex[float32]&quot;, d.str());</span>
+<span class="lineNum">     166 </span>            :   // Roundtripping through a string
+<span class="lineNum">     167 </span><span class="lineCov">          1 :   EXPECT_EQ(d, ndt::type(d.str()));</span>
+<span class="lineNum">     168 </span>            : 
+<span class="lineNum">     169 </span>            :   // complex[float64]
+<span class="lineNum">     170 </span><span class="lineCov">          1 :   d = ndt::make_type&lt;dynd::complex&lt;double&gt;&gt;();</span>
+<span class="lineNum">     171 </span><span class="lineCov">          1 :   EXPECT_EQ(complex_float64_id, d.get_id());</span>
+<span class="lineNum">     172 </span><span class="lineCov">          1 :   EXPECT_EQ(complex_kind_id, d.get_base_id());</span>
+<span class="lineNum">     173 </span><span class="lineCov">          1 :   EXPECT_EQ(16u, d.get_data_size());</span>
+<span class="lineNum">     174 </span><span class="lineCov">          1 :   EXPECT_EQ((size_t)alignof(double), d.get_data_alignment());</span>
+<span class="lineNum">     175 </span><span class="lineCov">          1 :   EXPECT_FALSE(d.is_expression());</span>
+<span class="lineNum">     176 </span><span class="lineCov">          1 :   EXPECT_EQ(&quot;complex[float64]&quot;, d.str());</span>
+<span class="lineNum">     177 </span>            :   // Roundtripping through a string
+<span class="lineNum">     178 </span><span class="lineCov">          1 :   EXPECT_EQ(d, ndt::type(d.str()));</span>
+<a name="179"><span class="lineNum">     179 </span><span class="lineCov">          1 : }</span></a>
+<span class="lineNum">     180 </span>            : 
+<span class="lineNum">     181 </span><span class="lineCov">          5 : TEST(ComplexType, CreateFromValue)</span>
+<span class="lineNum">     182 </span>            : {
+<span class="lineNum">     183 </span><span class="lineCov">          2 :   nd::array n;</span>
+<span class="lineNum">     184 </span>            : 
+<span class="lineNum">     185 </span><span class="lineCov">          1 :   n = dynd::complex&lt;float&gt;(1.5f, 2.0f);</span>
+<span class="lineNum">     186 </span><span class="lineCov">          1 :   EXPECT_EQ(n.get_type(), ndt::make_type&lt;dynd::complex&lt;float&gt;&gt;());</span>
+<span class="lineNum">     187 </span><span class="lineCov">          1 :   EXPECT_EQ(dynd::complex&lt;float&gt;(1.5f, 2.0f), n.as&lt;dynd::complex&lt;float&gt;&gt;());</span>
+<span class="lineNum">     188 </span>            : 
+<span class="lineNum">     189 </span><span class="lineCov">          1 :   n = dynd::complex&lt;double&gt;(2.5, 3.0);</span>
+<span class="lineNum">     190 </span><span class="lineCov">          1 :   EXPECT_EQ(n.get_type(), ndt::make_type&lt;dynd::complex&lt;double&gt;&gt;());</span>
+<span class="lineNum">     191 </span><span class="lineCov">          1 :   EXPECT_EQ(dynd::complex&lt;double&gt;(2.5, 3.0), n.as&lt;dynd::complex&lt;double&gt;&gt;());</span>
+<span class="lineNum">     192 </span><span class="lineCov">          1 : }</span>
+<span class="lineNum">     193 </span>            : 
+<a name="194"><span class="lineNum">     194 </span>            : #include &lt;dynd/func/complex.hpp&gt;</a>
+<span class="lineNum">     195 </span>            : 
+<span class="lineNum">     196 </span><span class="lineCov">          5 : TEST(ComplexType, Properties)</span>
+<span class="lineNum">     197 </span>            : {
+<span class="lineNum">     198 </span><span class="lineCov">          2 :   nd::array n;</span>
+<span class="lineNum">     199 </span>            : 
+<span class="lineNum">     200 </span><span class="lineCov">          1 :   n = dynd::complex&lt;float&gt;(1.5f, 2.0f);</span>
+<span class="lineNum">     201 </span><span class="lineCov">          1 :   EXPECT_EQ(1.5f, n.p(&quot;real&quot;).as&lt;float&gt;());</span>
+<span class="lineNum">     202 </span><span class="lineCov">          1 :   EXPECT_EQ(2.0f, n.p(&quot;imag&quot;).as&lt;float&gt;());</span>
+<span class="lineNum">     203 </span>            : 
+<span class="lineNum">     204 </span><span class="lineCov">          1 :   n = dynd::complex&lt;double&gt;(2.5, 3.0);</span>
+<span class="lineNum">     205 </span><span class="lineCov">          1 :   EXPECT_EQ(2.5, n.p(&quot;real&quot;).as&lt;double&gt;());</span>
+<span class="lineNum">     206 </span><span class="lineCov">          1 :   EXPECT_EQ(3.0, n.p(&quot;imag&quot;).as&lt;double&gt;());</span>
+<span class="lineNum">     207 </span>            : 
+<span class="lineNum">     208 </span>            :   dynd::complex&lt;double&gt; avals[3] = {dynd::complex&lt;double&gt;(1, 2), dynd::complex&lt;double&gt;(-1, 1.5),
+<span class="lineNum">     209 </span><span class="lineCov">          1 :                                     dynd::complex&lt;double&gt;(3, 21.75)};</span>
+<span class="lineNum">     210 </span><span class="lineCov">          1 :   n = avals;</span>
+<span class="lineNum">     211 </span><span class="lineCov">          1 :   EXPECT_EQ(1., n.p(&quot;real&quot;)(0).as&lt;double&gt;());</span>
+<span class="lineNum">     212 </span><span class="lineCov">          1 :   EXPECT_EQ(2., n.p(&quot;imag&quot;)(0).as&lt;double&gt;());</span>
+<span class="lineNum">     213 </span><span class="lineCov">          1 :   EXPECT_EQ(-1., n.p(&quot;real&quot;)(1).as&lt;double&gt;());</span>
+<span class="lineNum">     214 </span><span class="lineCov">          1 :   EXPECT_EQ(1.5, n.p(&quot;imag&quot;)(1).as&lt;double&gt;());</span>
+<span class="lineNum">     215 </span><span class="lineCov">          1 :   EXPECT_EQ(3., n.p(&quot;real&quot;)(2).as&lt;double&gt;());</span>
+<span class="lineNum">     216 </span><span class="lineCov">          1 :   EXPECT_EQ(21.75, n.p(&quot;imag&quot;)(2).as&lt;double&gt;());</span>
+<a name="217"><span class="lineNum">     217 </span><span class="lineCov">          1 : }</span></a>
+<span class="lineNum">     218 </span>            : 
+<span class="lineNum">     219 </span><span class="lineCov">          5 : TYPED_TEST_P(ComplexType, Arithmetic)</span>
+<span class="lineNum">     220 </span>            : {
+<span class="lineNum">     221 </span><span class="lineCov">          1 :   EXPECT_EQ(std::complex&lt;TypeParam&gt;(1.5, 0.5) + static_cast&lt;TypeParam&gt;(1), dynd::complex&lt;TypeParam&gt;(1.5, 0.5) + 1);</span>
+<span class="lineNum">     222 </span><span class="lineCov">          1 :   EXPECT_EQ(static_cast&lt;TypeParam&gt;(1) + std::complex&lt;TypeParam&gt;(1.5, 0.5), 1 + dynd::complex&lt;TypeParam&gt;(1.5, 0.5));</span>
+<span class="lineNum">     223 </span>            : 
+<span class="lineNum">     224 </span><span class="lineCov">          1 :   EXPECT_EQ(std::complex&lt;TypeParam&gt;(1.3, 0.7) - 1.0, dynd::complex&lt;TypeParam&gt;(1.3, 0.7) - 1.0);</span>
+<span class="lineNum">     225 </span><span class="lineCov">          1 :   EXPECT_EQ(1.0 - std::complex&lt;TypeParam&gt;(1.3, 0.7), 1.0 - dynd::complex&lt;TypeParam&gt;(1.3, 0.7));</span>
+<span class="lineNum">     226 </span>            : 
+<span class="lineNum">     227 </span><span class="lineCov">          1 :   EXPECT_EQ(std::complex&lt;TypeParam&gt;(1.5, 0.5) * 2.0, dynd::complex&lt;TypeParam&gt;(1.5, 0.5) * 2.0);</span>
+<span class="lineNum">     228 </span><span class="lineCov">          1 :   EXPECT_EQ(2.0 * std::complex&lt;TypeParam&gt;(1.5, 0.5), 2.0 * dynd::complex&lt;TypeParam&gt;(1.5, 0.5));</span>
+<span class="lineNum">     229 </span>            : 
+<span class="lineNum">     230 </span><span class="lineCov">          1 :   EXPECT_EQ(std::complex&lt;TypeParam&gt;(1.5, 0.5) / static_cast&lt;TypeParam&gt;(2), dynd::complex&lt;TypeParam&gt;(1.5, 0.5) / 2.0f);</span>
+<span class="lineNum">     231 </span><span class="lineCov">          1 :   EXPECT_COMPLEX_DOUBLE_EQ(static_cast&lt;TypeParam&gt;(2) / std::complex&lt;TypeParam&gt;(1.5, 0.5),</span>
+<span class="lineNum">     232 </span>            :                            2.0f / dynd::complex&lt;TypeParam&gt;(1.5, 0.5));
+<span class="lineNum">     233 </span><span class="lineCov">          1 : }</span>
+<span class="lineNum">     234 </span>            : 
+<a name="235"><span class="lineNum">     235 </span><span class="lineCov">          1 : REGISTER_TYPED_TEST_CASE_P(ComplexType, Arithmetic);</span></a>
+<span class="lineNum">     236 </span>            : 
+<span class="lineNum">     237 </span><span class="lineCov">          3 : INSTANTIATE_TYPED_TEST_CASE_P(Double, ComplexType, double);</span>
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.10</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

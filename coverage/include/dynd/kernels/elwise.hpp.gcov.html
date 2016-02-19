@@ -1,0 +1,1038 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - coverage.info.cleaned - include/dynd/kernels/elwise.hpp</title>
+  <link rel="stylesheet" type="text/css" href="../../../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../../../index.html">top level</a> - <a href="index.html">include/dynd/kernels</a> - elwise.hpp<span style="font-size: 80%;"> (source / <a href="elwise.hpp.func.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">coverage.info.cleaned</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">323</td>
+            <td class="headerCovTableEntry">451</td>
+            <td class="headerCovTableEntryLo">71.6 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2016-02-19</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">46</td>
+            <td class="headerCovTableEntry">135</td>
+            <td class="headerCovTableEntryLo">34.1 %</td>
+          </tr>
+          <tr><td><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : //</a>
+<span class="lineNum">       2 </span>            : // Copyright (C) 2011-15 DyND Developers
+<span class="lineNum">       3 </span>            : // BSD 2-Clause License, see LICENSE.txt
+<span class="lineNum">       4 </span>            : //
+<span class="lineNum">       5 </span>            : 
+<span class="lineNum">       6 </span>            : #pragma once
+<span class="lineNum">       7 </span>            : 
+<span class="lineNum">       8 </span>            : #include &lt;dynd/kernels/base_kernel.hpp&gt;
+<span class="lineNum">       9 </span>            : #include &lt;dynd/types/ellipsis_dim_type.hpp&gt;
+<span class="lineNum">      10 </span>            : #include &lt;dynd/types/var_dim_type.hpp&gt;
+<span class="lineNum">      11 </span>            : #include &lt;dynd/types/dim_fragment_type.hpp&gt;
+<span class="lineNum">      12 </span>            : #include &lt;dynd/types/fixed_dim_type.hpp&gt;
+<span class="lineNum">      13 </span>            : #include &lt;dynd/callable.hpp&gt;
+<span class="lineNum">      14 </span>            : 
+<span class="lineNum">      15 </span>            : namespace dynd {
+<span class="lineNum">      16 </span>            : namespace nd {
+<span class="lineNum">      17 </span>            :   namespace functional {
+<span class="lineNum">      18 </span>            : 
+<span class="lineNum">      19 </span>            :     /**
+<span class="lineNum">      20 </span>            :      * Generic expr kernel + destructor for a strided dimension with
+<span class="lineNum">      21 </span>            :      * a fixed number of src operands.
+<span class="lineNum">      22 </span>            :      * This requires that the child kernel be created with the
+<span class="lineNum">      23 </span>            :      * kernel_request_strided type of kernel.
+<span class="lineNum">      24 </span>            :      */
+<span class="lineNum">      25 </span>            :     template &lt;type_id_t DstTypeID, type_id_t SrcTypeID, int N&gt;
+<span class="lineNum">      26 </span>            :     struct elwise_ck;
+<span class="lineNum">      27 </span>            : 
+<span class="lineNum">      28 </span>            :     /**
+<span class="lineNum">      29 </span>            :      * This defines the type and keyword argument resolution for
+<span class="lineNum">      30 </span>            :      * an elwise callable.
+<span class="lineNum">      31 </span>            :      */
+<a name="32"><span class="lineNum">      32 </span>            :     template &lt;int N&gt;</a>
+<span class="lineNum">      33 </span>            :     struct elwise_virtual_ck : base_kernel&lt;elwise_virtual_ck&lt;N&gt;&gt; {
+<span class="lineNum">      34 </span><span class="lineCov">        245 :       static void resolve_dst_type(char *static_data, char *DYND_UNUSED(data), ndt::type &amp;dst_tp, intptr_t nsrc,</span>
+<span class="lineNum">      35 </span>            :                                    const ndt::type *src_tp, intptr_t nkwd, const dynd::nd::array *kwds,
+<span class="lineNum">      36 </span>            :                                    const std::map&lt;std::string, ndt::type&gt; &amp;tp_vars)
+<span class="lineNum">      37 </span>            :       {
+<span class="lineNum">      38 </span><span class="lineCov">        245 :         const base_callable *child_af = reinterpret_cast&lt;callable *&gt;(static_data)-&gt;get();</span>
+<span class="lineNum">      39 </span><span class="lineCov">        245 :         const ndt::callable_type *child_af_tp = reinterpret_cast&lt;callable *&gt;(static_data)-&gt;get_type();</span>
+<span class="lineNum">      40 </span>            : 
+<span class="lineNum">      41 </span><span class="lineCov">        245 :         intptr_t ndim = 0;</span>
+<span class="lineNum">      42 </span>            :         // First get the type for the child callable
+<span class="lineNum">      43 </span><span class="lineCov">        490 :         ndt::type child_dst_tp;</span>
+<span class="lineNum">      44 </span><span class="lineCov">        490 :         std::vector&lt;ndt::type&gt; child_src_tp(nsrc);</span>
+<span class="lineNum">      45 </span><span class="lineCov">        653 :         for (intptr_t i = 0; i &lt; nsrc; ++i) {</span>
+<span class="lineNum">      46 </span><span class="lineCov">        408 :           intptr_t child_ndim_i = child_af_tp-&gt;get_pos_type(i).get_ndim();</span>
+<span class="lineNum">      47 </span><span class="lineCov">        408 :           if (child_ndim_i &lt; src_tp[i].get_ndim()) {</span>
+<span class="lineNum">      48 </span><span class="lineCov">        283 :             child_src_tp[i] = src_tp[i].get_dtype(child_ndim_i);</span>
+<span class="lineNum">      49 </span><span class="lineCov">        283 :             ndim = std::max(ndim, src_tp[i].get_ndim() - child_ndim_i);</span>
+<span class="lineNum">      50 </span>            :           }
+<span class="lineNum">      51 </span>            :           else {
+<span class="lineNum">      52 </span><span class="lineCov">        125 :             child_src_tp[i] = src_tp[i];</span>
+<span class="lineNum">      53 </span>            :           }
+<span class="lineNum">      54 </span>            :         }
+<span class="lineNum">      55 </span>            : 
+<span class="lineNum">      56 </span><span class="lineCov">        245 :         child_dst_tp = child_af_tp-&gt;get_return_type();</span>
+<span class="lineNum">      57 </span><span class="lineCov">        245 :         if (child_dst_tp.is_symbolic()) {</span>
+<span class="lineNum">      58 </span><span class="lineCov">        462 :           child_af-&gt;resolve_dst_type(const_cast&lt;char *&gt;(child_af-&gt;static_data()), NULL, child_dst_tp, nsrc,</span>
+<span class="lineNum">      59 </span><span class="lineCov">        231 :                                      child_src_tp.empty() ? NULL : child_src_tp.data(), nkwd, kwds, tp_vars);</span>
+<span class="lineNum">      60 </span>            :         }
+<span class="lineNum">      61 </span>            : 
+<span class="lineNum">      62 </span>            :         // ...
+<span class="lineNum">      63 </span>            :         //        new (data) ndt::type(child_dst_tp);
+<span class="lineNum">      64 </span>            : 
+<span class="lineNum">      65 </span><span class="lineCov">        245 :         if (nsrc == 0) {</span>
+<span class="lineNum">      66 </span><span class="lineNoCov">          0 :           dst_tp =</span>
+<span class="lineNum">      67 </span><span class="lineNoCov">          0 :               tp_vars.at(&quot;Dims&quot;).extended&lt;ndt::dim_fragment_type&gt;()-&gt;apply_to_dtype(child_dst_tp.without_memory_type());</span>
+<span class="lineNum">      68 </span><span class="lineNoCov">          0 :           if (child_dst_tp.get_base_id() == memory_id) {</span>
+<span class="lineNum">      69 </span><span class="lineNoCov">          0 :             dst_tp = child_dst_tp.extended&lt;ndt::base_memory_type&gt;()-&gt;with_replaced_storage_type(dst_tp);</span>
+<span class="lineNum">      70 </span>            :           }
+<span class="lineNum">      71 </span>            : 
+<span class="lineNum">      72 </span><span class="lineNoCov">          0 :           return;</span>
+<span class="lineNum">      73 </span>            :         }
+<span class="lineNum">      74 </span>            : 
+<span class="lineNum">      75 </span>            :         // Then build the type for the rest of the dimensions
+<span class="lineNum">      76 </span><span class="lineCov">        245 :         if (ndim &gt; 0) {</span>
+<span class="lineNum">      77 </span><span class="lineCov">        424 :           dimvector shape(ndim), tmp_shape(ndim);</span>
+<span class="lineNum">      78 </span><span class="lineCov">        435 :           for (intptr_t i = 0; i &lt; ndim; ++i) {</span>
+<span class="lineNum">      79 </span><span class="lineCov">        223 :             shape[i] = -1;</span>
+<span class="lineNum">      80 </span>            :           }
+<span class="lineNum">      81 </span><span class="lineCov">        578 :           for (intptr_t i = 0; i &lt; nsrc; ++i) {</span>
+<span class="lineNum">      82 </span><span class="lineCov">        366 :             intptr_t ndim_i = src_tp[i].get_ndim() - child_af_tp-&gt;get_pos_type(i).get_ndim();</span>
+<span class="lineNum">      83 </span><span class="lineCov">        366 :             if (ndim_i &gt; 0) {</span>
+<span class="lineNum">      84 </span><span class="lineCov">        566 :               ndt::type tp = src_tp[i].without_memory_type();</span>
+<span class="lineNum">      85 </span><span class="lineCov">        283 :               intptr_t *shape_i = shape.get() + (ndim - ndim_i);</span>
+<span class="lineNum">      86 </span>            :               intptr_t shape_at_j;
+<span class="lineNum">      87 </span><span class="lineCov">        582 :               for (intptr_t j = 0; j &lt; ndim_i; ++j) {</span>
+<span class="lineNum">      88 </span><span class="lineCov">        299 :                 switch (tp.get_id()) {</span>
+<span class="lineNum">      89 </span>            :                 case fixed_dim_id:
+<span class="lineNum">      90 </span><span class="lineCov">        291 :                   shape_at_j = tp.extended&lt;ndt::fixed_dim_type&gt;()-&gt;get_fixed_dim_size();</span>
+<span class="lineNum">      91 </span><span class="lineCov">        291 :                   if (shape_i[j] &lt; 0 || shape_i[j] == 1) {</span>
+<span class="lineNum">      92 </span><span class="lineCov">        440 :                     if (shape_at_j != 1) {</span>
+<span class="lineNum">      93 </span><span class="lineCov">        218 :                       shape_i[j] = shape_at_j;</span>
+<span class="lineNum">      94 </span>            :                     }
+<span class="lineNum">      95 </span>            :                   }
+<span class="lineNum">      96 </span><span class="lineCov">         71 :                   else if (shape_i[j] != shape_at_j &amp;&amp; shape_at_j != 1) {</span>
+<span class="lineNum">      97 </span><span class="lineNoCov">          0 :                     throw broadcast_error(ndim, shape.get(), ndim_i, shape_i);</span>
+<span class="lineNum">      98 </span>            :                   }
+<span class="lineNum">      99 </span><span class="lineCov">        291 :                   break;</span>
+<span class="lineNum">     100 </span>            :                 case var_dim_id:
+<span class="lineNum">     101 </span><span class="lineCov">          8 :                   break;</span>
+<span class="lineNum">     102 </span>            :                 default:
+<span class="lineNum">     103 </span><span class="lineNoCov">          0 :                   throw broadcast_error(ndim, shape.get(), ndim_i, shape_i);</span>
+<span class="lineNum">     104 </span>            :                 }
+<span class="lineNum">     105 </span><span class="lineCov">        299 :                 tp = tp.get_dtype(tp.get_ndim() - 1);</span>
+<span class="lineNum">     106 </span>            :               }
+<span class="lineNum">     107 </span>            :             }
+<span class="lineNum">     108 </span>            :           }
+<span class="lineNum">     109 </span>            : 
+<span class="lineNum">     110 </span><span class="lineCov">        424 :           ndt::type tp = child_dst_tp.without_memory_type();</span>
+<span class="lineNum">     111 </span><span class="lineCov">        435 :           for (intptr_t i = ndim - 1; i &gt;= 0; --i) {</span>
+<span class="lineNum">     112 </span><span class="lineCov">        223 :             if (shape[i] == -1) {</span>
+<span class="lineNum">     113 </span><span class="lineCov">          5 :               tp = ndt::var_dim_type::make(tp);</span>
+<span class="lineNum">     114 </span>            :             }
+<span class="lineNum">     115 </span>            :             else {
+<span class="lineNum">     116 </span><span class="lineCov">        218 :               tp = ndt::make_fixed_dim(shape[i], tp);</span>
+<span class="lineNum">     117 </span>            :             }
+<span class="lineNum">     118 </span>            :           }
+<span class="lineNum">     119 </span><span class="lineCov">        212 :           if (child_dst_tp.get_base_id() == memory_id) {</span>
+<span class="lineNum">     120 </span><span class="lineNoCov">          0 :             child_dst_tp = child_dst_tp.extended&lt;ndt::base_memory_type&gt;()-&gt;with_replaced_storage_type(tp);</span>
+<span class="lineNum">     121 </span>            :           }
+<span class="lineNum">     122 </span>            :           else {
+<span class="lineNum">     123 </span><span class="lineCov">        212 :             child_dst_tp = tp;</span>
+<span class="lineNum">     124 </span>            :           }
+<span class="lineNum">     125 </span>            :         }
+<span class="lineNum">     126 </span><span class="lineCov">        245 :         dst_tp = child_dst_tp;</span>
+<a name="127"><span class="lineNum">     127 </span>            :       }</a>
+<span class="lineNum">     128 </span>            : 
+<span class="lineNum">     129 </span><span class="lineCov">        543 :       static void instantiate(char *static_data, char *data, kernel_builder *ckb, const ndt::type &amp;dst_tp,</span>
+<span class="lineNum">     130 </span>            :                               const char *dst_arrmeta, intptr_t nsrc, const ndt::type *src_tp,
+<span class="lineNum">     131 </span>            :                               const char *const *src_arrmeta, dynd::kernel_request_t kernreq, intptr_t nkwd,
+<span class="lineNum">     132 </span>            :                               const dynd::nd::array *kwds, const std::map&lt;std::string, ndt::type&gt; &amp;tp_vars)
+<span class="lineNum">     133 </span>            : 
+<span class="lineNum">     134 </span>            :       {
+<span class="lineNum">     135 </span><span class="lineCov">        543 :         callable &amp;child = *reinterpret_cast&lt;callable *&gt;(static_data);</span>
+<span class="lineNum">     136 </span><span class="lineCov">        543 :         const ndt::callable_type *child_tp = reinterpret_cast&lt;callable *&gt;(static_data)-&gt;get_type();</span>
+<span class="lineNum">     137 </span>            : 
+<span class="lineNum">     138 </span>            :         // Check if no lifting is required
+<span class="lineNum">     139 </span><span class="lineCov">        543 :         intptr_t dst_ndim = dst_tp.get_ndim();</span>
+<span class="lineNum">     140 </span><span class="lineCov">        543 :         if (!child_tp-&gt;get_return_type().is_symbolic()) {</span>
+<span class="lineNum">     141 </span><span class="lineCov">         23 :           dst_ndim -= child_tp-&gt;get_return_type().get_ndim();</span>
+<span class="lineNum">     142 </span>            :         }
+<span class="lineNum">     143 </span>            : 
+<span class="lineNum">     144 </span><span class="lineCov">        543 :         if (dst_ndim == 0) {</span>
+<span class="lineNum">     145 </span><span class="lineCov">         38 :           intptr_t i = 0;</span>
+<span class="lineNum">     146 </span><span class="lineCov">        128 :           for (; i &lt; nsrc; ++i) {</span>
+<span class="lineNum">     147 </span><span class="lineCov">         47 :             intptr_t src_ndim = src_tp[i].get_ndim() - child_tp-&gt;get_pos_type(i).get_ndim();</span>
+<span class="lineNum">     148 </span><span class="lineCov">         47 :             if (src_ndim != 0) {</span>
+<span class="lineNum">     149 </span><span class="lineCov">          2 :               break;</span>
+<span class="lineNum">     150 </span>            :             }
+<span class="lineNum">     151 </span>            :           }
+<span class="lineNum">     152 </span><span class="lineCov">         38 :           if (i == nsrc) {</span>
+<span class="lineNum">     153 </span>            :             // No dimensions to lift, call the elementwise instantiate directly
+<span class="lineNum">     154 </span><span class="lineCov">         36 :             return child.get()-&gt;instantiate(child.get()-&gt;static_data(), NULL, ckb, dst_tp, dst_arrmeta, nsrc, src_tp,</span>
+<span class="lineNum">     155 </span><span class="lineCov">         36 :                                             src_arrmeta, kernreq, nkwd, kwds, tp_vars);</span>
+<span class="lineNum">     156 </span>            :           }
+<span class="lineNum">     157 </span>            :           else {
+<span class="lineNum">     158 </span><span class="lineCov">          2 :             intptr_t src_ndim = src_tp[i].get_ndim() - child_tp-&gt;get_pos_type(i).get_ndim();</span>
+<span class="lineNum">     159 </span><span class="lineCov">          4 :             std::stringstream ss;</span>
+<span class="lineNum">     160 </span><span class="lineCov">          4 :             ss &lt;&lt; &quot;Trying to broadcast &quot; &lt;&lt; src_ndim &lt;&lt; &quot; dimensions of &quot; &lt;&lt; src_tp[i] &lt;&lt; &quot; into 0 dimensions of &quot;</span>
+<span class="lineNum">     161 </span><span class="lineCov">          2 :                &lt;&lt; dst_tp &lt;&lt; &quot;, the destination dimension count must be greater. The &quot;</span>
+<span class="lineNum">     162 </span>            :                             &quot;element &quot;
+<span class="lineNum">     163 </span>            :                             &quot;callable type is \&quot;&quot;
+<span class="lineNum">     164 </span><span class="lineCov">          6 :                &lt;&lt; ndt::type(child_tp, true) &lt;&lt; &quot;\&quot;&quot;;</span>
+<span class="lineNum">     165 </span><span class="lineCov">          2 :             throw broadcast_error(ss.str());</span>
+<span class="lineNum">     166 </span>            :           }
+<span class="lineNum">     167 </span>            :         }
+<span class="lineNum">     168 </span>            : 
+<span class="lineNum">     169 </span>            :         // Do a pass through the src types to classify them
+<span class="lineNum">     170 </span><span class="lineCov">        505 :         bool src_all_strided = true, src_all_strided_or_var = true;</span>
+<span class="lineNum">     171 </span><span class="lineCov">       1163 :         for (intptr_t i = 0; i &lt; nsrc; ++i) {</span>
+<span class="lineNum">     172 </span><span class="lineCov">        658 :           intptr_t src_ndim = src_tp[i].get_ndim() - child_tp-&gt;get_pos_type(i).get_ndim();</span>
+<span class="lineNum">     173 </span><span class="lineCov">        658 :           switch (src_tp[i].get_id()) {</span>
+<span class="lineNum">     174 </span>            :           case fixed_dim_id:
+<span class="lineNum">     175 </span><span class="lineCov">        500 :             break;</span>
+<span class="lineNum">     176 </span>            :           case var_dim_id:
+<span class="lineNum">     177 </span><span class="lineCov">         20 :             src_all_strided = false;</span>
+<span class="lineNum">     178 </span><span class="lineCov">         20 :             break;</span>
+<span class="lineNum">     179 </span>            :           default:
+<span class="lineNum">     180 </span>            :             // If it's a scalar, allow it to broadcast like
+<span class="lineNum">     181 </span>            :             // a strided dimension
+<span class="lineNum">     182 </span><span class="lineCov">        138 :             if (src_ndim &gt; 0) {</span>
+<span class="lineNum">     183 </span><span class="lineNoCov">          0 :               src_all_strided_or_var = false;</span>
+<span class="lineNum">     184 </span>            :             }
+<span class="lineNum">     185 </span><span class="lineCov">        138 :             break;</span>
+<span class="lineNum">     186 </span>            :           }
+<span class="lineNum">     187 </span>            :         }
+<span class="lineNum">     188 </span>            : 
+<span class="lineNum">     189 </span>            :         // Call to some special-case functions based on the
+<span class="lineNum">     190 </span>            :         // destination type
+<span class="lineNum">     191 </span><span class="lineCov">        505 :         switch (dst_tp.get_id()) {</span>
+<span class="lineNum">     192 </span>            :         case fixed_dim_id:
+<span class="lineNum">     193 </span><span class="lineCov">        453 :           if (src_all_strided) {</span>
+<span class="lineNum">     194 </span>            :             return elwise_ck&lt;fixed_dim_id, fixed_dim_id, N&gt;::instantiate(
+<span class="lineNum">     195 </span><span class="lineCov">        445 :                 static_data, data, ckb, dst_tp, dst_arrmeta, nsrc, src_tp, src_arrmeta, kernreq, nkwd, kwds, tp_vars);</span>
+<span class="lineNum">     196 </span>            :           }
+<span class="lineNum">     197 </span><span class="lineCov">          8 :           else if (src_all_strided_or_var) {</span>
+<span class="lineNum">     198 </span>            :             return elwise_ck&lt;fixed_dim_id, var_dim_id, N&gt;::instantiate(
+<span class="lineNum">     199 </span><span class="lineCov">          8 :                 static_data, data, ckb, dst_tp, dst_arrmeta, nsrc, src_tp, src_arrmeta, kernreq, nkwd, kwds, tp_vars);</span>
+<span class="lineNum">     200 </span>            :           }
+<span class="lineNum">     201 </span>            :           else {
+<span class="lineNum">     202 </span>            :             // TODO
+<span class="lineNum">     203 </span>            :           }
+<span class="lineNum">     204 </span><span class="lineNoCov">          0 :           break;</span>
+<span class="lineNum">     205 </span>            :         case var_dim_id:
+<span class="lineNum">     206 </span><span class="lineCov">         52 :           if (src_all_strided_or_var) {</span>
+<span class="lineNum">     207 </span>            :             return elwise_ck&lt;var_dim_id, fixed_dim_id, N&gt;::instantiate(
+<span class="lineNum">     208 </span><span class="lineCov">         52 :                 static_data, data, ckb, dst_tp, dst_arrmeta, nsrc, src_tp, src_arrmeta, kernreq, nkwd, kwds, tp_vars);</span>
+<span class="lineNum">     209 </span>            :           }
+<span class="lineNum">     210 </span>            :           else {
+<span class="lineNum">     211 </span>            :             // TODO
+<span class="lineNum">     212 </span>            :           }
+<span class="lineNum">     213 </span><span class="lineNoCov">          0 :           break;</span>
+<span class="lineNum">     214 </span>            :         default:
+<span class="lineNum">     215 </span><span class="lineNoCov">          0 :           break;</span>
+<span class="lineNum">     216 </span>            :         }
+<span class="lineNum">     217 </span>            : 
+<span class="lineNum">     218 </span><span class="lineNoCov">          0 :         std::stringstream ss;</span>
+<span class="lineNum">     219 </span><span class="lineNoCov">          0 :         ss &lt;&lt; &quot;Cannot process lifted elwise expression from (&quot;;</span>
+<span class="lineNum">     220 </span><span class="lineNoCov">          0 :         for (intptr_t i = 0; i &lt; nsrc; ++i) {</span>
+<span class="lineNum">     221 </span><span class="lineNoCov">          0 :           ss &lt;&lt; src_tp[i];</span>
+<span class="lineNum">     222 </span><span class="lineNoCov">          0 :           if (i != nsrc - 1) {</span>
+<span class="lineNum">     223 </span><span class="lineNoCov">          0 :             ss &lt;&lt; &quot;, &quot;;</span>
+<span class="lineNum">     224 </span>            :           }
+<span class="lineNum">     225 </span>            :         }
+<span class="lineNum">     226 </span><span class="lineNoCov">          0 :         ss &lt;&lt; &quot;) to &quot; &lt;&lt; dst_tp;</span>
+<span class="lineNum">     227 </span><span class="lineNoCov">          0 :         throw std::runtime_error(ss.str());</span>
+<span class="lineNum">     228 </span>            :       }
+<span class="lineNum">     229 </span>            :     };
+<span class="lineNum">     230 </span>            : 
+<span class="lineNum">     231 </span>            :     template &lt;int N&gt;
+<span class="lineNum">     232 </span>            :     struct elwise_ck&lt;fixed_dim_id, fixed_dim_id, N&gt; : base_kernel&lt;elwise_ck&lt;fixed_dim_id, fixed_dim_id, N&gt;, N&gt; {
+<span class="lineNum">     233 </span>            :       typedef elwise_ck self_type;
+<span class="lineNum">     234 </span>            : 
+<span class="lineNum">     235 </span>            :       intptr_t m_size;
+<a name="236"><span class="lineNum">     236 </span>            :       intptr_t m_dst_stride, m_src_stride[N];</a>
+<span class="lineNum">     237 </span>            : 
+<span class="lineNum">     238 </span><span class="lineCov">        423 :       DYND_CUDA_HOST_DEVICE elwise_ck(intptr_t size, intptr_t dst_stride, const intptr_t *src_stride)</span>
+<span class="lineNum">     239 </span><span class="lineCov">        423 :           : m_size(size), m_dst_stride(dst_stride)</span>
+<span class="lineNum">     240 </span>            :       {
+<span class="lineNum">     241 </span><span class="lineCov">        423 :         memcpy(m_src_stride, src_stride, sizeof(m_src_stride));</span>
+<a name="242"><span class="lineNum">     242 </span><span class="lineCov">        423 :       }</span></a>
+<span class="lineNum">     243 </span>            : 
+<a name="244"><span class="lineNum">     244 </span><span class="lineCov">        412 :       DYND_CUDA_HOST_DEVICE ~elwise_ck() { this-&gt;get_child()-&gt;destroy(); }</span></a>
+<span class="lineNum">     245 </span>            : 
+<span class="lineNum">     246 </span><span class="lineCov">        394 :       DYND_CUDA_HOST_DEVICE void single(char *dst, char *const *src)</span>
+<span class="lineNum">     247 </span>            :       {
+<span class="lineNum">     248 </span><span class="lineCov">        394 :         kernel_prefix *child = this-&gt;get_child();</span>
+<span class="lineNum">     249 </span><span class="lineCov">        394 :         kernel_strided_t opchild = child-&gt;get_function&lt;kernel_strided_t&gt;();</span>
+<span class="lineNum">     250 </span>            : 
+<span class="lineNum">     251 </span><span class="lineCov">        394 :         opchild(child, dst, m_dst_stride, src, m_src_stride, m_size);</span>
+<a name="252"><span class="lineNum">     252 </span><span class="lineCov">        390 :       }</span></a>
+<span class="lineNum">     253 </span>            : 
+<span class="lineNum">     254 </span><span class="lineCov">         68 :       DYND_CUDA_HOST_DEVICE void strided(char *dst, intptr_t dst_stride, char *const *src, const intptr_t *src_stride,</span>
+<span class="lineNum">     255 </span>            :                                          size_t count)
+<span class="lineNum">     256 </span>            :       {
+<span class="lineNum">     257 </span><span class="lineCov">         68 :         kernel_prefix *child = this-&gt;get_child();</span>
+<span class="lineNum">     258 </span><span class="lineCov">         68 :         kernel_strided_t opchild = child-&gt;get_function&lt;kernel_strided_t&gt;();</span>
+<span class="lineNum">     259 </span>            : 
+<span class="lineNum">     260 </span>            :         char *src_loop[N];
+<span class="lineNum">     261 </span><span class="lineCov">        172 :         for (int j = 0; j != N; ++j) {</span>
+<span class="lineNum">     262 </span><span class="lineCov">        104 :           src_loop[j] = src[j];</span>
+<span class="lineNum">     263 </span>            :         }
+<span class="lineNum">     264 </span>            : 
+<span class="lineNum">     265 </span><span class="lineCov">        389 :         for (size_t i = 0; i &lt; count; i += 1) {</span>
+<span class="lineNum">     266 </span><span class="lineCov">        321 :           opchild(child, dst, m_dst_stride, src_loop, m_src_stride, m_size);</span>
+<span class="lineNum">     267 </span><span class="lineCov">        321 :           dst += dst_stride;</span>
+<span class="lineNum">     268 </span><span class="lineCov">       1006 :           for (int j = 0; j != N; ++j) {</span>
+<span class="lineNum">     269 </span><span class="lineCov">        685 :             src_loop[j] += src_stride[j];</span>
+<span class="lineNum">     270 </span>            :           }
+<span class="lineNum">     271 </span>            :         }
+<a name="272"><span class="lineNum">     272 </span><span class="lineCov">         68 :       }</span></a>
+<span class="lineNum">     273 </span>            : 
+<span class="lineNum">     274 </span><span class="lineCov">        423 :       static void instantiate(char *static_data, char *data, kernel_builder *ckb, const ndt::type &amp;dst_tp,</span>
+<span class="lineNum">     275 </span>            :                               const char *dst_arrmeta, intptr_t nsrc, const ndt::type *src_tp,
+<span class="lineNum">     276 </span>            :                               const char *const *src_arrmeta, kernel_request_t kernreq, intptr_t nkwd,
+<span class="lineNum">     277 </span>            :                               const nd::array *kwds, const std::map&lt;std::string, ndt::type&gt; &amp;tp_vars)
+<span class="lineNum">     278 </span>            :       {
+<span class="lineNum">     279 </span><span class="lineCov">        423 :         callable &amp;child = *reinterpret_cast&lt;callable *&gt;(static_data);</span>
+<span class="lineNum">     280 </span><span class="lineCov">        423 :         const ndt::callable_type *child_tp = child.get_type();</span>
+<span class="lineNum">     281 </span>            : 
+<span class="lineNum">     282 </span><span class="lineCov">        423 :         intptr_t dst_ndim = dst_tp.get_ndim();</span>
+<span class="lineNum">     283 </span><span class="lineCov">        828 :         if (!child_tp-&gt;get_return_type().is_symbolic() ||</span>
+<span class="lineNum">     284 </span><span class="lineCov">        405 :             child_tp-&gt;get_return_type().get_id() == typevar_constructed_id) {</span>
+<span class="lineNum">     285 </span><span class="lineCov">         18 :           dst_ndim -= child_tp-&gt;get_return_type().get_ndim();</span>
+<span class="lineNum">     286 </span>            :         }
+<span class="lineNum">     287 </span>            : 
+<span class="lineNum">     288 </span>            :         const char *child_dst_arrmeta;
+<span class="lineNum">     289 </span>            :         const char *child_src_arrmeta[N];
+<span class="lineNum">     290 </span><span class="lineCov">        846 :         ndt::type child_dst_tp;</span>
+<span class="lineNum">     291 </span><span class="lineCov">        846 :         ndt::type child_src_tp[N];</span>
+<span class="lineNum">     292 </span>            : 
+<span class="lineNum">     293 </span>            :         intptr_t size, dst_stride, src_stride[N];
+<span class="lineNum">     294 </span><span class="lineCov">        423 :         if (!dst_tp.get_as_strided(dst_arrmeta, &amp;size, &amp;dst_stride, &amp;child_dst_tp, &amp;child_dst_arrmeta)) {</span>
+<span class="lineNum">     295 </span><span class="lineNoCov">          0 :           std::stringstream ss;</span>
+<span class="lineNum">     296 </span><span class="lineNoCov">          0 :           ss &lt;&lt; &quot;make_elwise_strided_dimension_expr_kernel: error processing &quot;</span>
+<span class="lineNum">     297 </span>            :                 &quot;type &quot;
+<span class="lineNum">     298 </span><span class="lineNoCov">          0 :              &lt;&lt; dst_tp &lt;&lt; &quot; as strided&quot;;</span>
+<span class="lineNum">     299 </span><span class="lineNoCov">          0 :           throw type_error(ss.str());</span>
+<span class="lineNum">     300 </span>            :         }
+<span class="lineNum">     301 </span>            : 
+<span class="lineNum">     302 </span><span class="lineCov">        423 :         bool finished = dst_ndim == 1;</span>
+<span class="lineNum">     303 </span><span class="lineCov">       1016 :         for (int i = 0; i &lt; N; ++i) {</span>
+<span class="lineNum">     304 </span><span class="lineCov">        593 :           intptr_t src_ndim = src_tp[i].get_ndim() - child_tp-&gt;get_pos_type(i).get_ndim();</span>
+<span class="lineNum">     305 </span>            :           intptr_t src_size;
+<span class="lineNum">     306 </span><span class="lineCov">        593 :           if (src_ndim &lt; dst_ndim) {</span>
+<span class="lineNum">     307 </span>            :             // This src value is getting broadcasted
+<span class="lineNum">     308 </span><span class="lineCov">        137 :             src_stride[i] = 0;</span>
+<span class="lineNum">     309 </span><span class="lineCov">        137 :             child_src_arrmeta[i] = src_arrmeta[i];</span>
+<span class="lineNum">     310 </span><span class="lineCov">        137 :             child_src_tp[i] = src_tp[i];</span>
+<span class="lineNum">     311 </span><span class="lineCov">        137 :             finished &amp;= src_ndim == 0;</span>
+<span class="lineNum">     312 </span>            :           }
+<span class="lineNum">     313 </span><span class="lineCov">        456 :           else if (src_tp[i].get_as_strided(src_arrmeta[i], &amp;src_size, &amp;src_stride[i], &amp;child_src_tp[i],</span>
+<span class="lineNum">     314 </span>            :                                             &amp;child_src_arrmeta[i])) {
+<span class="lineNum">     315 </span>            :             // Check for a broadcasting error
+<span class="lineNum">     316 </span><span class="lineCov">        456 :             if (src_size != 1 &amp;&amp; size != src_size) {</span>
+<span class="lineNum">     317 </span><span class="lineNoCov">          0 :               throw broadcast_error(dst_tp, dst_arrmeta, src_tp[i], src_arrmeta[i]);</span>
+<span class="lineNum">     318 </span>            :             }
+<span class="lineNum">     319 </span><span class="lineCov">        456 :             finished &amp;= src_ndim == 1;</span>
+<span class="lineNum">     320 </span>            :           }
+<span class="lineNum">     321 </span>            :           else {
+<span class="lineNum">     322 </span><span class="lineNoCov">          0 :             std::stringstream ss;</span>
+<span class="lineNum">     323 </span><span class="lineNoCov">          0 :             ss &lt;&lt; &quot;make_elwise_strided_dimension_expr_kernel: expected strided &quot;</span>
+<span class="lineNum">     324 </span>            :                   &quot;or fixed dim, got &quot;
+<span class="lineNum">     325 </span><span class="lineNoCov">          0 :                &lt;&lt; src_tp[i];</span>
+<span class="lineNum">     326 </span><span class="lineNoCov">          0 :             throw std::runtime_error(ss.str());</span>
+<span class="lineNum">     327 </span>            :           }
+<span class="lineNum">     328 </span>            :         }
+<span class="lineNum">     329 </span>            : 
+<span class="lineNum">     330 </span><span class="lineCov">        423 :         ckb-&gt;emplace_back&lt;self_type&gt;(kernreq, size, dst_stride, dynd::detail::make_array_wrapper&lt;N&gt;(src_stride));</span>
+<span class="lineNum">     331 </span><span class="lineCov">        423 :         kernreq = kernel_request_strided;</span>
+<span class="lineNum">     332 </span>            : 
+<span class="lineNum">     333 </span>            :         // If there are still dimensions to broadcast, recursively lift more
+<span class="lineNum">     334 </span><span class="lineCov">        423 :         if (!finished) {</span>
+<span class="lineNum">     335 </span>            :           return elwise_virtual_ck&lt;N&gt;::instantiate(static_data, data, ckb, child_dst_tp, child_dst_arrmeta, nsrc,
+<span class="lineNum">     336 </span><span class="lineCov">         40 :                                                    child_src_tp, child_src_arrmeta, kernreq, nkwd, kwds, tp_vars);</span>
+<span class="lineNum">     337 </span>            :         }
+<span class="lineNum">     338 </span>            : 
+<span class="lineNum">     339 </span>            :         // Instantiate the elementwise handler
+<span class="lineNum">     340 </span><span class="lineCov">        383 :         return child.get()-&gt;instantiate(child.get()-&gt;static_data(), NULL, ckb, child_dst_tp, child_dst_arrmeta, nsrc,</span>
+<span class="lineNum">     341 </span><span class="lineCov">        383 :                                         child_src_tp, child_src_arrmeta, kernreq, nkwd, kwds, tp_vars);</span>
+<span class="lineNum">     342 </span>            :       }
+<span class="lineNum">     343 </span>            :     };
+<span class="lineNum">     344 </span>            : 
+<span class="lineNum">     345 </span>            :     // int N, int K
+<span class="lineNum">     346 </span>            : 
+<span class="lineNum">     347 </span>            :     template &lt;&gt;
+<span class="lineNum">     348 </span>            :     struct elwise_ck&lt;fixed_dim_id, fixed_dim_id, 0&gt; : base_kernel&lt;elwise_ck&lt;fixed_dim_id, fixed_dim_id, 0&gt;, 0&gt; {
+<span class="lineNum">     349 </span>            :       typedef elwise_ck self_type;
+<span class="lineNum">     350 </span>            : 
+<span class="lineNum">     351 </span>            :       intptr_t m_size;
+<a name="352"><span class="lineNum">     352 </span>            :       intptr_t m_dst_stride;</a>
+<span class="lineNum">     353 </span>            : 
+<a name="354"><span class="lineNum">     354 </span><span class="lineCov">         22 :       DYND_CUDA_HOST_DEVICE elwise_ck(intptr_t size, intptr_t dst_stride) : m_size(size), m_dst_stride(dst_stride) {}</span></a>
+<span class="lineNum">     355 </span>            : 
+<a name="356"><span class="lineNum">     356 </span><span class="lineCov">         22 :       DYND_CUDA_HOST_DEVICE ~elwise_ck() { this-&gt;get_child()-&gt;destroy(); }</span></a>
+<span class="lineNum">     357 </span>            : 
+<span class="lineNum">     358 </span><span class="lineCov">         15 :       DYND_CUDA_HOST_DEVICE void single(char *dst, char *const *src)</span>
+<span class="lineNum">     359 </span>            :       {
+<span class="lineNum">     360 </span><span class="lineCov">         15 :         kernel_prefix *child = this-&gt;get_child();</span>
+<span class="lineNum">     361 </span><span class="lineCov">         15 :         kernel_strided_t opchild = child-&gt;get_function&lt;kernel_strided_t&gt;();</span>
+<span class="lineNum">     362 </span><span class="lineCov">         15 :         opchild(child, dst, m_dst_stride, src, NULL, m_size);</span>
+<a name="363"><span class="lineNum">     363 </span><span class="lineCov">         15 :       }</span></a>
+<span class="lineNum">     364 </span>            : 
+<span class="lineNum">     365 </span><span class="lineCov">        244 :       DYND_CUDA_HOST_DEVICE void strided(char *dst, intptr_t dst_stride, char *const *DYND_UNUSED(src),</span>
+<span class="lineNum">     366 </span>            :                                          const intptr_t *DYND_UNUSED(src_stride), size_t count)
+<span class="lineNum">     367 </span>            :       {
+<span class="lineNum">     368 </span><span class="lineCov">        244 :         kernel_prefix *child = this-&gt;get_child();</span>
+<span class="lineNum">     369 </span><span class="lineCov">        244 :         kernel_strided_t opchild = child-&gt;get_function&lt;kernel_strided_t&gt;();</span>
+<span class="lineNum">     370 </span>            : 
+<span class="lineNum">     371 </span><span class="lineCov">       2016 :         for (size_t i = 0; i &lt; count; i += 1) {</span>
+<span class="lineNum">     372 </span><span class="lineCov">       1772 :           opchild(child, dst, m_dst_stride, NULL, NULL, m_size);</span>
+<span class="lineNum">     373 </span><span class="lineCov">       1772 :           dst += dst_stride;</span>
+<span class="lineNum">     374 </span>            :         }
+<a name="375"><span class="lineNum">     375 </span><span class="lineCov">        244 :       }</span></a>
+<span class="lineNum">     376 </span>            : 
+<span class="lineNum">     377 </span><span class="lineCov">         22 :       static void instantiate(char *static_data, char *data, kernel_builder *ckb, const ndt::type &amp;dst_tp,</span>
+<span class="lineNum">     378 </span>            :                               const char *dst_arrmeta, intptr_t nsrc, const ndt::type *DYND_UNUSED(src_tp),
+<span class="lineNum">     379 </span>            :                               const char *const *DYND_UNUSED(src_arrmeta), kernel_request_t kernreq, intptr_t nkwd,
+<span class="lineNum">     380 </span>            :                               const nd::array *kwds, const std::map&lt;std::string, ndt::type&gt; &amp;tp_vars)
+<span class="lineNum">     381 </span>            :       {
+<span class="lineNum">     382 </span><span class="lineCov">         22 :         callable &amp;child = *reinterpret_cast&lt;callable *&gt;(static_data);</span>
+<span class="lineNum">     383 </span><span class="lineCov">         22 :         const ndt::callable_type *child_tp = child.get_type();</span>
+<span class="lineNum">     384 </span>            : 
+<span class="lineNum">     385 </span><span class="lineCov">         22 :         intptr_t dst_ndim = dst_tp.get_ndim();</span>
+<span class="lineNum">     386 </span><span class="lineCov">         22 :         if (!child_tp-&gt;get_return_type().is_symbolic()) {</span>
+<span class="lineNum">     387 </span><span class="lineNoCov">          0 :           dst_ndim -= child_tp-&gt;get_return_type().get_ndim();</span>
+<span class="lineNum">     388 </span>            :         }
+<span class="lineNum">     389 </span><span class="lineCov">         22 :         else if (child_tp-&gt;get_return_type().get_id() == typevar_constructed_id) {</span>
+<span class="lineNum">     390 </span><span class="lineNoCov">          0 :           dst_ndim -= child_tp-&gt;get_return_type().get_ndim();</span>
+<span class="lineNum">     391 </span>            :         }
+<span class="lineNum">     392 </span>            : 
+<span class="lineNum">     393 </span>            :         const char *child_dst_arrmeta;
+<span class="lineNum">     394 </span><span class="lineCov">         44 :         ndt::type child_dst_tp;</span>
+<span class="lineNum">     395 </span>            : 
+<span class="lineNum">     396 </span>            :         intptr_t size, dst_stride;
+<span class="lineNum">     397 </span><span class="lineCov">         22 :         if (!dst_tp.get_as_strided(dst_arrmeta, &amp;size, &amp;dst_stride, &amp;child_dst_tp, &amp;child_dst_arrmeta)) {</span>
+<span class="lineNum">     398 </span><span class="lineNoCov">          0 :           std::stringstream ss;</span>
+<span class="lineNum">     399 </span>            :           ss &lt;&lt; &quot;make_elwise_strided_dimension_expr_kernel: error processing &quot;
+<span class="lineNum">     400 </span><span class="lineNoCov">          0 :                 &quot;type &quot;</span>
+<span class="lineNum">     401 </span><span class="lineNoCov">          0 :              &lt;&lt; dst_tp &lt;&lt; &quot; as strided&quot;;</span>
+<span class="lineNum">     402 </span><span class="lineNoCov">          0 :           throw type_error(ss.str());</span>
+<span class="lineNum">     403 </span>            :         }
+<span class="lineNum">     404 </span>            : 
+<span class="lineNum">     405 </span><span class="lineCov">         22 :         ckb-&gt;emplace_back&lt;self_type&gt;(kernreq, size, dst_stride);</span>
+<span class="lineNum">     406 </span><span class="lineCov">         22 :         kernreq = kernel_request_strided;</span>
+<span class="lineNum">     407 </span>            : 
+<span class="lineNum">     408 </span><span class="lineCov">         22 :         bool finished = dst_ndim == 1;</span>
+<span class="lineNum">     409 </span>            : 
+<span class="lineNum">     410 </span>            :         // If there are still dimensions to broadcast, recursively lift more
+<span class="lineNum">     411 </span><span class="lineCov">         22 :         if (!finished) {</span>
+<span class="lineNum">     412 </span>            :           return nd::functional::elwise_virtual_ck&lt;0&gt;::instantiate(
+<span class="lineNum">     413 </span><span class="lineCov">          7 :               static_data, data, ckb, child_dst_tp, child_dst_arrmeta, nsrc, NULL, NULL, kernreq, nkwd, kwds, tp_vars);</span>
+<span class="lineNum">     414 </span>            :         }
+<span class="lineNum">     415 </span>            : 
+<span class="lineNum">     416 </span>            :         // Instantiate the elementwise handler
+<span class="lineNum">     417 </span><span class="lineCov">         30 :         return child.get()-&gt;instantiate(child.get()-&gt;static_data(), NULL, ckb, child_dst_tp, child_dst_arrmeta, nsrc,</span>
+<span class="lineNum">     418 </span><span class="lineCov">         30 :                                         NULL, NULL, kernreq, nkwd, kwds, tp_vars);</span>
+<span class="lineNum">     419 </span>            :       }
+<span class="lineNum">     420 </span>            :     };
+<span class="lineNum">     421 </span>            : 
+<span class="lineNum">     422 </span>            :     /**
+<span class="lineNum">     423 </span>            :      * Generic expr kernel + destructor for a strided/var dimensions with
+<span class="lineNum">     424 </span>            :      * a fixed number of src operands, outputing to a strided dimension.
+<span class="lineNum">     425 </span>            :      * This requires that the child kernel be created with the
+<span class="lineNum">     426 </span>            :      * kernel_request_strided type of kernel.
+<span class="lineNum">     427 </span>            :      */
+<span class="lineNum">     428 </span>            :     template &lt;int N&gt;
+<span class="lineNum">     429 </span>            :     struct elwise_ck&lt;fixed_dim_id, var_dim_id, N&gt; : base_kernel&lt;elwise_ck&lt;fixed_dim_id, var_dim_id, N&gt;, N&gt; {
+<span class="lineNum">     430 </span>            :       typedef elwise_ck self_type;
+<span class="lineNum">     431 </span>            : 
+<span class="lineNum">     432 </span>            :       intptr_t m_size;
+<span class="lineNum">     433 </span>            :       intptr_t m_dst_stride, m_src_stride[N], m_src_offset[N];
+<a name="434"><span class="lineNum">     434 </span>            :       bool m_is_src_var[N];</a>
+<span class="lineNum">     435 </span>            : 
+<span class="lineNum">     436 </span><span class="lineCov">          8 :       elwise_ck(intptr_t size, intptr_t dst_stride, const intptr_t *src_stride, const intptr_t *src_offset,</span>
+<span class="lineNum">     437 </span>            :                 const bool *is_src_var)
+<span class="lineNum">     438 </span><span class="lineCov">          8 :           : m_size(size), m_dst_stride(dst_stride)</span>
+<span class="lineNum">     439 </span>            :       {
+<span class="lineNum">     440 </span><span class="lineCov">          8 :         memcpy(m_src_stride, src_stride, sizeof(m_src_stride));</span>
+<span class="lineNum">     441 </span><span class="lineCov">          8 :         memcpy(m_src_offset, src_offset, sizeof(m_src_offset));</span>
+<span class="lineNum">     442 </span><span class="lineCov">          8 :         memcpy(m_is_src_var, is_src_var, sizeof(m_is_src_var));</span>
+<a name="443"><span class="lineNum">     443 </span><span class="lineCov">          8 :       }</span></a>
+<span class="lineNum">     444 </span>            : 
+<a name="445"><span class="lineNum">     445 </span><span class="lineCov">          8 :       ~elwise_ck() { this-&gt;get_child()-&gt;destroy(); }</span></a>
+<span class="lineNum">     446 </span>            : 
+<span class="lineNum">     447 </span><span class="lineCov">         10 :       void single(char *dst, char *const *src)</span>
+<span class="lineNum">     448 </span>            :       {
+<span class="lineNum">     449 </span><span class="lineCov">         10 :         kernel_prefix *child = this-&gt;get_child();</span>
+<span class="lineNum">     450 </span><span class="lineCov">         10 :         kernel_strided_t opchild = child-&gt;get_function&lt;kernel_strided_t&gt;();</span>
+<span class="lineNum">     451 </span>            : 
+<span class="lineNum">     452 </span>            :         // Broadcast all the src 'var' dimensions to dst
+<span class="lineNum">     453 </span><span class="lineCov">         10 :         intptr_t dim_size = m_size;</span>
+<span class="lineNum">     454 </span>            :         char *modified_src[N];
+<span class="lineNum">     455 </span>            :         intptr_t modified_src_stride[N];
+<span class="lineNum">     456 </span><span class="lineCov">         20 :         for (int i = 0; i &lt; N; ++i) {</span>
+<span class="lineNum">     457 </span><span class="lineCov">         14 :           if (m_is_src_var[i]) {</span>
+<span class="lineNum">     458 </span><span class="lineCov">         10 :             ndt::var_dim_type::data_type *vddd = reinterpret_cast&lt;ndt::var_dim_type::data_type *&gt;(src[i]);</span>
+<span class="lineNum">     459 </span><span class="lineCov">         10 :             modified_src[i] = vddd-&gt;begin + m_src_offset[i];</span>
+<span class="lineNum">     460 </span><span class="lineCov">         10 :             if (vddd-&gt;size == 1) {</span>
+<span class="lineNum">     461 </span><span class="lineCov">          2 :               modified_src_stride[i] = 0;</span>
+<span class="lineNum">     462 </span>            :             }
+<span class="lineNum">     463 </span><span class="lineCov">          8 :             else if (vddd-&gt;size == static_cast&lt;size_t&gt;(dim_size)) {</span>
+<span class="lineNum">     464 </span><span class="lineCov">          4 :               modified_src_stride[i] = m_src_stride[i];</span>
+<span class="lineNum">     465 </span>            :             }
+<span class="lineNum">     466 </span>            :             else {
+<span class="lineNum">     467 </span><span class="lineCov">          4 :               throw broadcast_error(dim_size, vddd-&gt;size, &quot;strided&quot;, &quot;var&quot;);</span>
+<span class="lineNum">     468 </span>            :             }
+<span class="lineNum">     469 </span>            :           }
+<span class="lineNum">     470 </span>            :           else {
+<span class="lineNum">     471 </span>            :             // strided dimensions were fully broadcast in the kernel factory
+<span class="lineNum">     472 </span><span class="lineCov">          4 :             modified_src[i] = src[i];</span>
+<span class="lineNum">     473 </span><span class="lineCov">          4 :             modified_src_stride[i] = m_src_stride[i];</span>
+<span class="lineNum">     474 </span>            :           }
+<span class="lineNum">     475 </span>            :         }
+<span class="lineNum">     476 </span><span class="lineCov">          6 :         opchild(child, dst, m_dst_stride, modified_src, modified_src_stride, dim_size);</span>
+<a name="477"><span class="lineNum">     477 </span><span class="lineCov">          6 :       }</span></a>
+<span class="lineNum">     478 </span>            : 
+<span class="lineNum">     479 </span><span class="lineCov">          2 :       void strided(char *dst, intptr_t dst_stride, char *const *src, const intptr_t *src_stride, size_t count)</span>
+<span class="lineNum">     480 </span>            :       {
+<span class="lineNum">     481 </span>            :         char *src_loop[N];
+<span class="lineNum">     482 </span><span class="lineCov">          2 :         memcpy(src_loop, src, sizeof(src_loop));</span>
+<span class="lineNum">     483 </span><span class="lineCov">          6 :         for (size_t i = 0; i != count; ++i) {</span>
+<span class="lineNum">     484 </span><span class="lineCov">          4 :           single(dst, src_loop);</span>
+<span class="lineNum">     485 </span><span class="lineCov">          4 :           dst += dst_stride;</span>
+<span class="lineNum">     486 </span><span class="lineCov">         12 :           for (int j = 0; j != N; ++j) {</span>
+<span class="lineNum">     487 </span><span class="lineCov">          8 :             src_loop[j] += src_stride[j];</span>
+<span class="lineNum">     488 </span>            :           }
+<span class="lineNum">     489 </span>            :         }
+<a name="490"><span class="lineNum">     490 </span><span class="lineCov">          2 :       }</span></a>
+<span class="lineNum">     491 </span>            : 
+<span class="lineNum">     492 </span><span class="lineCov">          8 :       static void instantiate(char *static_data, char *data, kernel_builder *ckb, const ndt::type &amp;dst_tp,</span>
+<span class="lineNum">     493 </span>            :                               const char *dst_arrmeta, intptr_t nsrc, const ndt::type *src_tp,
+<span class="lineNum">     494 </span>            :                               const char *const *src_arrmeta, kernel_request_t kernreq, intptr_t nkwd,
+<span class="lineNum">     495 </span>            :                               const nd::array *kwds, const std::map&lt;std::string, ndt::type&gt; &amp;tp_vars)
+<span class="lineNum">     496 </span>            :       {
+<span class="lineNum">     497 </span><span class="lineCov">          8 :         callable &amp;child = *reinterpret_cast&lt;callable *&gt;(static_data);</span>
+<span class="lineNum">     498 </span><span class="lineCov">          8 :         const ndt::callable_type *child_tp = child.get_type();</span>
+<span class="lineNum">     499 </span>            : 
+<span class="lineNum">     500 </span><span class="lineCov">          8 :         intptr_t dst_ndim = dst_tp.get_ndim();</span>
+<span class="lineNum">     501 </span><span class="lineCov">          8 :         if (!child_tp-&gt;get_return_type().is_symbolic()) {</span>
+<span class="lineNum">     502 </span><span class="lineNoCov">          0 :           dst_ndim -= child_tp-&gt;get_return_type().get_ndim();</span>
+<span class="lineNum">     503 </span>            :         }
+<span class="lineNum">     504 </span>            : 
+<span class="lineNum">     505 </span>            :         const char *child_dst_arrmeta;
+<span class="lineNum">     506 </span>            :         const char *child_src_arrmeta[N];
+<span class="lineNum">     507 </span><span class="lineCov">         16 :         ndt::type child_dst_tp;</span>
+<span class="lineNum">     508 </span><span class="lineCov">         16 :         ndt::type child_src_tp[N];</span>
+<span class="lineNum">     509 </span>            : 
+<span class="lineNum">     510 </span>            :         intptr_t size, dst_stride;
+<span class="lineNum">     511 </span><span class="lineCov">          8 :         if (!dst_tp.get_as_strided(dst_arrmeta, &amp;size, &amp;dst_stride, &amp;child_dst_tp, &amp;child_dst_arrmeta)) {</span>
+<span class="lineNum">     512 </span><span class="lineNoCov">          0 :           std::stringstream ss;</span>
+<span class="lineNum">     513 </span><span class="lineNoCov">          0 :           ss &lt;&lt; &quot;make_elwise_strided_dimension_expr_kernel: error processing &quot;</span>
+<span class="lineNum">     514 </span>            :                 &quot;type &quot;
+<span class="lineNum">     515 </span><span class="lineNoCov">          0 :              &lt;&lt; dst_tp &lt;&lt; &quot; as strided&quot;;</span>
+<span class="lineNum">     516 </span><span class="lineNoCov">          0 :           throw type_error(ss.str());</span>
+<span class="lineNum">     517 </span>            :         }
+<span class="lineNum">     518 </span>            : 
+<span class="lineNum">     519 </span>            :         intptr_t src_stride[N], src_offset[N];
+<span class="lineNum">     520 </span>            :         bool is_src_var[N];
+<span class="lineNum">     521 </span><span class="lineCov">          8 :         bool finished = dst_ndim == 1;</span>
+<span class="lineNum">     522 </span><span class="lineCov">         18 :         for (int i = 0; i &lt; N; ++i) {</span>
+<span class="lineNum">     523 </span>            :           intptr_t src_size;
+<span class="lineNum">     524 </span><span class="lineCov">         10 :           intptr_t src_ndim = src_tp[i].get_ndim() - child_tp-&gt;get_pos_type(i).get_ndim();</span>
+<span class="lineNum">     525 </span>            :           // The src[i] strided parameters
+<span class="lineNum">     526 </span><span class="lineCov">         10 :           if (src_ndim &lt; dst_ndim) {</span>
+<span class="lineNum">     527 </span>            :             // This src value is getting broadcasted
+<span class="lineNum">     528 </span><span class="lineNoCov">          0 :             src_stride[i] = 0;</span>
+<span class="lineNum">     529 </span><span class="lineNoCov">          0 :             src_offset[i] = 0;</span>
+<span class="lineNum">     530 </span><span class="lineNoCov">          0 :             is_src_var[i] = false;</span>
+<span class="lineNum">     531 </span><span class="lineNoCov">          0 :             child_src_arrmeta[i] = src_arrmeta[i];</span>
+<span class="lineNum">     532 </span><span class="lineNoCov">          0 :             child_src_tp[i] = src_tp[i];</span>
+<span class="lineNum">     533 </span><span class="lineNoCov">          0 :             finished &amp;= src_ndim == 0;</span>
+<span class="lineNum">     534 </span>            :           }
+<span class="lineNum">     535 </span><span class="lineCov">         10 :           else if (src_tp[i].get_as_strided(src_arrmeta[i], &amp;src_size, &amp;src_stride[i], &amp;child_src_tp[i],</span>
+<span class="lineNum">     536 </span>            :                                             &amp;child_src_arrmeta[i])) {
+<span class="lineNum">     537 </span>            :             // Check for a broadcasting error
+<span class="lineNum">     538 </span><span class="lineCov">          2 :             if (src_size != 1 &amp;&amp; size != src_size) {</span>
+<span class="lineNum">     539 </span><span class="lineNoCov">          0 :               throw broadcast_error(dst_tp, dst_arrmeta, src_tp[i], src_arrmeta[i]);</span>
+<span class="lineNum">     540 </span>            :             }
+<span class="lineNum">     541 </span><span class="lineCov">          2 :             src_offset[i] = 0;</span>
+<span class="lineNum">     542 </span><span class="lineCov">          2 :             is_src_var[i] = false;</span>
+<span class="lineNum">     543 </span><span class="lineCov">          2 :             finished &amp;= src_ndim == 1;</span>
+<span class="lineNum">     544 </span>            :           }
+<span class="lineNum">     545 </span>            :           else {
+<span class="lineNum">     546 </span><span class="lineCov">          8 :             const ndt::var_dim_type *vdd = static_cast&lt;const ndt::var_dim_type *&gt;(src_tp[i].extended());</span>
+<span class="lineNum">     547 </span>            :             const ndt::var_dim_type::metadata_type *src_md =
+<span class="lineNum">     548 </span><span class="lineCov">          8 :                 reinterpret_cast&lt;const ndt::var_dim_type::metadata_type *&gt;(src_arrmeta[i]);</span>
+<span class="lineNum">     549 </span><span class="lineCov">          8 :             src_stride[i] = src_md-&gt;stride;</span>
+<span class="lineNum">     550 </span><span class="lineCov">          8 :             src_offset[i] = src_md-&gt;offset;</span>
+<span class="lineNum">     551 </span><span class="lineCov">          8 :             is_src_var[i] = true;</span>
+<span class="lineNum">     552 </span><span class="lineCov">          8 :             child_src_arrmeta[i] = src_arrmeta[i] + sizeof(ndt::var_dim_type::metadata_type);</span>
+<span class="lineNum">     553 </span><span class="lineCov">          8 :             child_src_tp[i] = vdd-&gt;get_element_type();</span>
+<span class="lineNum">     554 </span><span class="lineCov">          8 :             finished &amp;= src_ndim == 1;</span>
+<span class="lineNum">     555 </span>            :           }
+<span class="lineNum">     556 </span>            :         }
+<span class="lineNum">     557 </span>            : 
+<span class="lineNum">     558 </span><span class="lineCov">          8 :         ckb-&gt;emplace_back&lt;self_type&gt;(kernreq, size, dst_stride, src_stride, src_offset, is_src_var);</span>
+<span class="lineNum">     559 </span>            : 
+<span class="lineNum">     560 </span>            :         // If there are still dimensions to broadcast, recursively lift more
+<span class="lineNum">     561 </span><span class="lineCov">          8 :         if (!finished) {</span>
+<span class="lineNum">     562 </span>            :           return nd::functional::elwise_virtual_ck&lt;N&gt;::instantiate(
+<span class="lineNum">     563 </span>            :               static_data, data, ckb, child_dst_tp, child_dst_arrmeta, nsrc, child_src_tp, child_src_arrmeta,
+<span class="lineNum">     564 </span><span class="lineNoCov">          0 :               kernel_request_strided, nkwd, kwds, tp_vars);</span>
+<span class="lineNum">     565 </span>            :         }
+<span class="lineNum">     566 </span>            :         // Instantiate the elementwise handler
+<span class="lineNum">     567 </span><span class="lineCov">          8 :         return child.get()-&gt;instantiate(child.get()-&gt;static_data(), NULL, ckb, child_dst_tp, child_dst_arrmeta, nsrc,</span>
+<span class="lineNum">     568 </span><span class="lineCov">          8 :                                         child_src_tp, child_src_arrmeta, kernel_request_strided, nkwd, kwds, tp_vars);</span>
+<span class="lineNum">     569 </span>            :       }
+<span class="lineNum">     570 </span>            :     };
+<span class="lineNum">     571 </span>            : 
+<span class="lineNum">     572 </span>            :     template &lt;&gt;
+<span class="lineNum">     573 </span>            :     struct elwise_ck&lt;fixed_dim_id, var_dim_id, 0&gt; : base_kernel&lt;elwise_ck&lt;fixed_dim_id, var_dim_id, 0&gt;, 0&gt; {
+<span class="lineNum">     574 </span>            :       typedef elwise_ck self_type;
+<span class="lineNum">     575 </span>            : 
+<span class="lineNum">     576 </span>            :       intptr_t m_size;
+<a name="577"><span class="lineNum">     577 </span>            :       intptr_t m_dst_stride;</a>
+<span class="lineNum">     578 </span>            : 
+<a name="579"><span class="lineNum">     579 </span><span class="lineNoCov">          0 :       elwise_ck(intptr_t size, intptr_t dst_stride) : m_size(size), m_dst_stride(dst_stride) {}</span></a>
+<span class="lineNum">     580 </span>            : 
+<a name="581"><span class="lineNum">     581 </span><span class="lineNoCov">          0 :       ~elwise_ck() { this-&gt;get_child()-&gt;destroy(); }</span></a>
+<span class="lineNum">     582 </span>            : 
+<span class="lineNum">     583 </span><span class="lineNoCov">          0 :       void single(char *dst, char *const *DYND_UNUSED(src))</span>
+<span class="lineNum">     584 </span>            :       {
+<span class="lineNum">     585 </span><span class="lineNoCov">          0 :         kernel_prefix *child = this-&gt;get_child();</span>
+<span class="lineNum">     586 </span><span class="lineNoCov">          0 :         kernel_strided_t opchild = child-&gt;get_function&lt;kernel_strided_t&gt;();</span>
+<span class="lineNum">     587 </span>            : 
+<span class="lineNum">     588 </span>            :         // Broadcast all the src 'var' dimensions to dst
+<span class="lineNum">     589 </span><span class="lineNoCov">          0 :         intptr_t dim_size = m_size;</span>
+<span class="lineNum">     590 </span><span class="lineNoCov">          0 :         opchild(child, dst, m_dst_stride, NULL, NULL, dim_size);</span>
+<a name="591"><span class="lineNum">     591 </span><span class="lineNoCov">          0 :       }</span></a>
+<span class="lineNum">     592 </span>            : 
+<span class="lineNum">     593 </span><span class="lineNoCov">          0 :       void strided(char *dst, intptr_t dst_stride, char *const *DYND_UNUSED(src),</span>
+<span class="lineNum">     594 </span>            :                    const intptr_t *DYND_UNUSED(src_stride), size_t count)
+<span class="lineNum">     595 </span>            :       {
+<span class="lineNum">     596 </span><span class="lineNoCov">          0 :         for (size_t i = 0; i != count; ++i) {</span>
+<span class="lineNum">     597 </span><span class="lineNoCov">          0 :           single(dst, NULL);</span>
+<span class="lineNum">     598 </span><span class="lineNoCov">          0 :           dst += dst_stride;</span>
+<span class="lineNum">     599 </span>            :         }
+<a name="600"><span class="lineNum">     600 </span><span class="lineNoCov">          0 :       }</span></a>
+<span class="lineNum">     601 </span>            : 
+<span class="lineNum">     602 </span><span class="lineNoCov">          0 :       static void instantiate(char *static_data, char *data, kernel_builder *ckb, const ndt::type &amp;dst_tp,</span>
+<span class="lineNum">     603 </span>            :                               const char *dst_arrmeta, intptr_t nsrc, const ndt::type *DYND_UNUSED(src_tp),
+<span class="lineNum">     604 </span>            :                               const char *const *DYND_UNUSED(src_arrmeta), kernel_request_t kernreq, intptr_t nkwd,
+<span class="lineNum">     605 </span>            :                               const nd::array *kwds, const std::map&lt;std::string, ndt::type&gt; &amp;tp_vars)
+<span class="lineNum">     606 </span>            :       {
+<span class="lineNum">     607 </span><span class="lineNoCov">          0 :         callable &amp;child = *reinterpret_cast&lt;callable *&gt;(static_data);</span>
+<span class="lineNum">     608 </span><span class="lineNoCov">          0 :         const ndt::callable_type *child_tp = child.get_type();</span>
+<span class="lineNum">     609 </span>            : 
+<span class="lineNum">     610 </span><span class="lineNoCov">          0 :         intptr_t dst_ndim = dst_tp.get_ndim();</span>
+<span class="lineNum">     611 </span><span class="lineNoCov">          0 :         if (!child_tp-&gt;get_return_type().is_symbolic()) {</span>
+<span class="lineNum">     612 </span><span class="lineNoCov">          0 :           dst_ndim -= child_tp-&gt;get_return_type().get_ndim();</span>
+<span class="lineNum">     613 </span>            :         }
+<span class="lineNum">     614 </span>            : 
+<span class="lineNum">     615 </span>            :         const char *child_dst_arrmeta;
+<span class="lineNum">     616 </span><span class="lineNoCov">          0 :         ndt::type child_dst_tp;</span>
+<span class="lineNum">     617 </span>            : 
+<span class="lineNum">     618 </span>            :         intptr_t size, dst_stride;
+<span class="lineNum">     619 </span><span class="lineNoCov">          0 :         if (!dst_tp.get_as_strided(dst_arrmeta, &amp;size, &amp;dst_stride, &amp;child_dst_tp, &amp;child_dst_arrmeta)) {</span>
+<span class="lineNum">     620 </span><span class="lineNoCov">          0 :           std::stringstream ss;</span>
+<span class="lineNum">     621 </span>            :           ss &lt;&lt; &quot;make_elwise_strided_dimension_expr_kernel: error processing &quot;
+<span class="lineNum">     622 </span><span class="lineNoCov">          0 :                 &quot;type &quot;</span>
+<span class="lineNum">     623 </span><span class="lineNoCov">          0 :              &lt;&lt; dst_tp &lt;&lt; &quot; as strided&quot;;</span>
+<span class="lineNum">     624 </span><span class="lineNoCov">          0 :           throw type_error(ss.str());</span>
+<span class="lineNum">     625 </span>            :         }
+<span class="lineNum">     626 </span>            : 
+<span class="lineNum">     627 </span><span class="lineNoCov">          0 :         bool finished = dst_ndim == 1;</span>
+<span class="lineNum">     628 </span><span class="lineNoCov">          0 :         ckb-&gt;emplace_back&lt;self_type&gt;(kernreq, size, dst_stride);</span>
+<span class="lineNum">     629 </span>            : 
+<span class="lineNum">     630 </span>            :         // If there are still dimensions to broadcast, recursively lift more
+<span class="lineNum">     631 </span><span class="lineNoCov">          0 :         if (!finished) {</span>
+<span class="lineNum">     632 </span>            :           return nd::functional::elwise_virtual_ck&lt;0&gt;::instantiate(static_data, data, ckb, child_dst_tp,
+<span class="lineNum">     633 </span>            :                                                                    child_dst_arrmeta, nsrc, NULL, NULL,
+<span class="lineNum">     634 </span><span class="lineNoCov">          0 :                                                                    kernel_request_strided, nkwd, kwds, tp_vars);</span>
+<span class="lineNum">     635 </span>            :         }
+<span class="lineNum">     636 </span>            :         // Instantiate the elementwise handler
+<span class="lineNum">     637 </span><span class="lineNoCov">          0 :         return child.get()-&gt;instantiate(child.get()-&gt;static_data(), NULL, ckb, child_dst_tp, child_dst_arrmeta, nsrc,</span>
+<span class="lineNum">     638 </span><span class="lineNoCov">          0 :                                         NULL, NULL, kernel_request_strided, nkwd, kwds, tp_vars);</span>
+<span class="lineNum">     639 </span>            :       }
+<span class="lineNum">     640 </span>            :     };
+<span class="lineNum">     641 </span>            : 
+<span class="lineNum">     642 </span>            :     /**
+<span class="lineNum">     643 </span>            :      * Generic expr kernel + destructor for a strided/var dimensions with
+<span class="lineNum">     644 </span>            :      * a fixed number of src operands, outputing to a var dimension.
+<span class="lineNum">     645 </span>            :      * This requires that the child kernel be created with the
+<span class="lineNum">     646 </span>            :      * kernel_request_strided type of kernel.
+<span class="lineNum">     647 </span>            :      */
+<span class="lineNum">     648 </span>            :     template &lt;int N&gt;
+<span class="lineNum">     649 </span>            :     struct elwise_ck&lt;var_dim_id, fixed_dim_id, N&gt; : base_kernel&lt;elwise_ck&lt;var_dim_id, fixed_dim_id, N&gt;, N&gt; {
+<span class="lineNum">     650 </span>            :       typedef elwise_ck self_type;
+<span class="lineNum">     651 </span>            : 
+<span class="lineNum">     652 </span>            :       memory_block_data *m_dst_memblock;
+<span class="lineNum">     653 </span>            :       size_t m_dst_target_alignment;
+<span class="lineNum">     654 </span>            :       intptr_t m_dst_stride, m_dst_offset, m_src_stride[N], m_src_offset[N], m_src_size[N];
+<a name="655"><span class="lineNum">     655 </span>            :       bool m_is_src_var[N];</a>
+<span class="lineNum">     656 </span>            : 
+<span class="lineNum">     657 </span><span class="lineCov">         52 :       elwise_ck(memory_block_data *dst_memblock, size_t dst_target_alignment, intptr_t dst_stride, intptr_t dst_offset,</span>
+<span class="lineNum">     658 </span>            :                 const intptr_t *src_stride, const intptr_t *src_offset, const intptr_t *src_size,
+<span class="lineNum">     659 </span>            :                 const bool *is_src_var)
+<span class="lineNum">     660 </span>            :           : m_dst_memblock(dst_memblock), m_dst_target_alignment(dst_target_alignment), m_dst_stride(dst_stride),
+<span class="lineNum">     661 </span><span class="lineCov">         52 :             m_dst_offset(dst_offset)</span>
+<span class="lineNum">     662 </span>            :       {
+<span class="lineNum">     663 </span><span class="lineCov">         52 :         memcpy(m_src_stride, src_stride, sizeof(m_src_stride));</span>
+<span class="lineNum">     664 </span><span class="lineCov">         52 :         memcpy(m_src_offset, src_offset, sizeof(m_src_offset));</span>
+<span class="lineNum">     665 </span><span class="lineCov">         52 :         memcpy(m_src_size, src_size, sizeof(m_src_size));</span>
+<span class="lineNum">     666 </span><span class="lineCov">         52 :         memcpy(m_is_src_var, is_src_var, sizeof(m_is_src_var));</span>
+<a name="667"><span class="lineNum">     667 </span><span class="lineCov">         52 :       }</span></a>
+<span class="lineNum">     668 </span>            : 
+<a name="669"><span class="lineNum">     669 </span><span class="lineCov">         52 :       ~elwise_ck() { this-&gt;get_child()-&gt;destroy(); }</span></a>
+<span class="lineNum">     670 </span>            : 
+<span class="lineNum">     671 </span><span class="lineCov">         63 :       void single(char *dst, char *const *src)</span>
+<span class="lineNum">     672 </span>            :       {
+<span class="lineNum">     673 </span><span class="lineCov">         63 :         kernel_prefix *child = this-&gt;get_child();</span>
+<span class="lineNum">     674 </span><span class="lineCov">         63 :         kernel_strided_t opchild = child-&gt;get_function&lt;kernel_strided_t&gt;();</span>
+<span class="lineNum">     675 </span>            : 
+<span class="lineNum">     676 </span><span class="lineCov">         63 :         ndt::var_dim_type::data_type *dst_vddd = reinterpret_cast&lt;ndt::var_dim_type::data_type *&gt;(dst);</span>
+<span class="lineNum">     677 </span>            :         char *modified_dst;
+<span class="lineNum">     678 </span><span class="lineCov">         63 :         intptr_t modified_dst_stride = 0;</span>
+<span class="lineNum">     679 </span>            :         intptr_t dim_size;
+<span class="lineNum">     680 </span>            :         char *modified_src[N];
+<span class="lineNum">     681 </span>            :         intptr_t modified_src_stride[N];
+<span class="lineNum">     682 </span><span class="lineCov">         63 :         if (dst_vddd-&gt;begin != NULL) {</span>
+<span class="lineNum">     683 </span>            :           // If the destination already has allocated data, broadcast to that
+<span class="lineNum">     684 </span>            :           // data
+<span class="lineNum">     685 </span><span class="lineCov">         23 :           modified_dst = dst_vddd-&gt;begin + m_dst_offset;</span>
+<span class="lineNum">     686 </span>            :           // Broadcast all the inputs to the existing destination dimension size
+<span class="lineNum">     687 </span><span class="lineCov">         23 :           dim_size = dst_vddd-&gt;size;</span>
+<span class="lineNum">     688 </span><span class="lineCov">         43 :           for (int i = 0; i &lt; N; ++i) {</span>
+<span class="lineNum">     689 </span><span class="lineCov">         23 :             if (m_is_src_var[i]) {</span>
+<span class="lineNum">     690 </span><span class="lineCov">          3 :               ndt::var_dim_type::data_type *vddd = reinterpret_cast&lt;ndt::var_dim_type::data_type *&gt;(src[i]);</span>
+<span class="lineNum">     691 </span><span class="lineCov">          3 :               modified_src[i] = vddd-&gt;begin + m_src_offset[i];</span>
+<span class="lineNum">     692 </span><span class="lineCov">          3 :               if (vddd-&gt;size == 1) {</span>
+<span class="lineNum">     693 </span><span class="lineCov">          1 :                 modified_src_stride[i] = 0;</span>
+<span class="lineNum">     694 </span>            :               }
+<span class="lineNum">     695 </span><span class="lineCov">          2 :               else if (vddd-&gt;size == static_cast&lt;size_t&gt;(dim_size)) {</span>
+<span class="lineNum">     696 </span><span class="lineCov">          1 :                 modified_src_stride[i] = m_src_stride[i];</span>
+<span class="lineNum">     697 </span>            :               }
+<span class="lineNum">     698 </span>            :               else {
+<span class="lineNum">     699 </span><span class="lineCov">          1 :                 throw broadcast_error(dim_size, vddd-&gt;size, &quot;var&quot;, &quot;var&quot;);</span>
+<span class="lineNum">     700 </span>            :               }
+<span class="lineNum">     701 </span>            :             }
+<span class="lineNum">     702 </span>            :             else {
+<span class="lineNum">     703 </span><span class="lineCov">         20 :               modified_src[i] = src[i];</span>
+<span class="lineNum">     704 </span><span class="lineCov">         20 :               if (m_src_size[i] == 1) {</span>
+<span class="lineNum">     705 </span><span class="lineCov">         15 :                 modified_src_stride[i] = 0;</span>
+<span class="lineNum">     706 </span>            :               }
+<span class="lineNum">     707 </span><span class="lineCov">          5 :               else if (m_src_size[i] == dim_size) {</span>
+<span class="lineNum">     708 </span><span class="lineCov">          3 :                 modified_src_stride[i] = m_src_stride[i];</span>
+<span class="lineNum">     709 </span>            :               }
+<span class="lineNum">     710 </span>            :               else {
+<span class="lineNum">     711 </span><span class="lineCov">          2 :                 throw broadcast_error(dim_size, m_src_size[i], &quot;var&quot;, &quot;strided&quot;);</span>
+<span class="lineNum">     712 </span>            :               }
+<span class="lineNum">     713 </span>            :             }
+<span class="lineNum">     714 </span>            :           }
+<span class="lineNum">     715 </span>            :         }
+<span class="lineNum">     716 </span>            :         else {
+<span class="lineNum">     717 </span><span class="lineCov">         40 :           if (m_dst_offset != 0) {</span>
+<span class="lineNum">     718 </span><span class="lineNoCov">          0 :             throw std::runtime_error(&quot;Cannot assign to an uninitialized dynd var_dim &quot;</span>
+<span class="lineNum">     719 </span><span class="lineNoCov">          0 :                                      &quot;which has a non-zero offset&quot;);</span>
+<span class="lineNum">     720 </span>            :           }
+<span class="lineNum">     721 </span>            :           // Broadcast all the inputs together to get the destination size
+<span class="lineNum">     722 </span><span class="lineCov">         40 :           dim_size = 1;</span>
+<span class="lineNum">     723 </span><span class="lineCov">         86 :           for (int i = 0; i &lt; N; ++i) {</span>
+<span class="lineNum">     724 </span><span class="lineCov">         46 :             if (m_is_src_var[i]) {</span>
+<span class="lineNum">     725 </span><span class="lineCov">         15 :               ndt::var_dim_type::data_type *vddd = reinterpret_cast&lt;ndt::var_dim_type::data_type *&gt;(src[i]);</span>
+<span class="lineNum">     726 </span><span class="lineCov">         15 :               modified_src[i] = vddd-&gt;begin + m_src_offset[i];</span>
+<span class="lineNum">     727 </span><span class="lineCov">         15 :               if (vddd-&gt;size == 1) {</span>
+<span class="lineNum">     728 </span><span class="lineCov">          5 :                 modified_src_stride[i] = 0;</span>
+<span class="lineNum">     729 </span>            :               }
+<span class="lineNum">     730 </span><span class="lineCov">         10 :               else if (dim_size == 1) {</span>
+<span class="lineNum">     731 </span><span class="lineCov">         10 :                 dim_size = vddd-&gt;size;</span>
+<span class="lineNum">     732 </span><span class="lineCov">         10 :                 modified_src_stride[i] = m_src_stride[i];</span>
+<span class="lineNum">     733 </span>            :               }
+<span class="lineNum">     734 </span><span class="lineNoCov">          0 :               else if (vddd-&gt;size == static_cast&lt;size_t&gt;(dim_size)) {</span>
+<span class="lineNum">     735 </span><span class="lineNoCov">          0 :                 modified_src_stride[i] = m_src_stride[i];</span>
+<span class="lineNum">     736 </span>            :               }
+<span class="lineNum">     737 </span>            :               else {
+<span class="lineNum">     738 </span><span class="lineNoCov">          0 :                 throw broadcast_error(dim_size, vddd-&gt;size, &quot;var&quot;, &quot;var&quot;);</span>
+<span class="lineNum">     739 </span>            :               }
+<span class="lineNum">     740 </span>            :             }
+<span class="lineNum">     741 </span>            :             else {
+<span class="lineNum">     742 </span><span class="lineCov">         31 :               modified_src[i] = src[i];</span>
+<span class="lineNum">     743 </span><span class="lineCov">         31 :               if (m_src_size[i] == 1) {</span>
+<span class="lineNum">     744 </span><span class="lineCov">          6 :                 modified_src_stride[i] = 0;</span>
+<span class="lineNum">     745 </span>            :               }
+<span class="lineNum">     746 </span><span class="lineCov">         25 :               else if (m_src_size[i] == dim_size) {</span>
+<span class="lineNum">     747 </span><span class="lineNoCov">          0 :                 modified_src_stride[i] = m_src_stride[i];</span>
+<span class="lineNum">     748 </span>            :               }
+<span class="lineNum">     749 </span><span class="lineCov">         25 :               else if (dim_size == 1) {</span>
+<span class="lineNum">     750 </span><span class="lineCov">         25 :                 dim_size = m_src_size[i];</span>
+<span class="lineNum">     751 </span><span class="lineCov">         25 :                 modified_src_stride[i] = m_src_stride[i];</span>
+<span class="lineNum">     752 </span>            :               }
+<span class="lineNum">     753 </span>            :               else {
+<span class="lineNum">     754 </span><span class="lineNoCov">          0 :                 throw broadcast_error(dim_size, m_src_size[i], &quot;var&quot;, &quot;strided&quot;);</span>
+<span class="lineNum">     755 </span>            :               }
+<span class="lineNum">     756 </span>            :             }
+<span class="lineNum">     757 </span>            :           }
+<span class="lineNum">     758 </span>            :           // Allocate the output array data
+<span class="lineNum">     759 </span><span class="lineCov">         40 :           dst_vddd-&gt;begin = m_dst_memblock-&gt;alloc(dim_size);</span>
+<span class="lineNum">     760 </span><span class="lineCov">         40 :           modified_dst = dst_vddd-&gt;begin;</span>
+<span class="lineNum">     761 </span><span class="lineCov">         40 :           dst_vddd-&gt;size = dim_size;</span>
+<span class="lineNum">     762 </span>            :         }
+<span class="lineNum">     763 </span><span class="lineCov">         60 :         if (dim_size &lt;= 1) {</span>
+<span class="lineNum">     764 </span><span class="lineCov">          8 :           modified_dst_stride = 0;</span>
+<span class="lineNum">     765 </span>            :         }
+<span class="lineNum">     766 </span>            :         else {
+<span class="lineNum">     767 </span><span class="lineCov">         52 :           modified_dst_stride = m_dst_stride;</span>
+<span class="lineNum">     768 </span>            :         }
+<span class="lineNum">     769 </span><span class="lineCov">         60 :         opchild(child, modified_dst, modified_dst_stride, modified_src, modified_src_stride, dim_size);</span>
+<a name="770"><span class="lineNum">     770 </span><span class="lineCov">         60 :       }</span></a>
+<span class="lineNum">     771 </span>            : 
+<span class="lineNum">     772 </span><span class="lineCov">          7 :       void strided(char *dst, intptr_t dst_stride, char *const *src, const intptr_t *src_stride, size_t count)</span>
+<span class="lineNum">     773 </span>            :       {
+<span class="lineNum">     774 </span>            :         char *src_loop[N];
+<span class="lineNum">     775 </span><span class="lineCov">          7 :         memcpy(src_loop, src, sizeof(src_loop));</span>
+<span class="lineNum">     776 </span><span class="lineCov">         25 :         for (size_t i = 0; i != count; ++i) {</span>
+<span class="lineNum">     777 </span><span class="lineCov">         18 :           single(dst, src_loop);</span>
+<span class="lineNum">     778 </span><span class="lineCov">         18 :           dst += dst_stride;</span>
+<span class="lineNum">     779 </span><span class="lineCov">         42 :           for (int j = 0; j != N; ++j) {</span>
+<span class="lineNum">     780 </span><span class="lineCov">         24 :             src_loop[j] += src_stride[j];</span>
+<span class="lineNum">     781 </span>            :           }
+<span class="lineNum">     782 </span>            :         }
+<a name="783"><span class="lineNum">     783 </span><span class="lineCov">          7 :       }</span></a>
+<span class="lineNum">     784 </span>            : 
+<span class="lineNum">     785 </span><span class="lineCov">         52 :       static void instantiate(char *static_data, char *data, kernel_builder *ckb, const ndt::type &amp;dst_tp,</span>
+<span class="lineNum">     786 </span>            :                               const char *dst_arrmeta, intptr_t nsrc, const ndt::type *src_tp,
+<span class="lineNum">     787 </span>            :                               const char *const *src_arrmeta, kernel_request_t kernreq, intptr_t nkwd,
+<span class="lineNum">     788 </span>            :                               const nd::array *kwds, const std::map&lt;std::string, ndt::type&gt; &amp;tp_vars)
+<span class="lineNum">     789 </span>            :       {
+<span class="lineNum">     790 </span><span class="lineCov">         52 :         callable &amp;child = *reinterpret_cast&lt;callable *&gt;(static_data);</span>
+<span class="lineNum">     791 </span><span class="lineCov">         52 :         const ndt::callable_type *child_tp = child.get_type();</span>
+<span class="lineNum">     792 </span>            : 
+<span class="lineNum">     793 </span><span class="lineCov">         52 :         intptr_t dst_ndim = dst_tp.get_ndim();</span>
+<span class="lineNum">     794 </span><span class="lineCov">         52 :         if (!child_tp-&gt;get_return_type().is_symbolic()) {</span>
+<span class="lineNum">     795 </span><span class="lineCov">          4 :           dst_ndim -= child_tp-&gt;get_return_type().get_ndim();</span>
+<span class="lineNum">     796 </span>            :         }
+<span class="lineNum">     797 </span>            : 
+<span class="lineNum">     798 </span>            :         const char *child_dst_arrmeta;
+<span class="lineNum">     799 </span>            :         const char *child_src_arrmeta[N];
+<span class="lineNum">     800 </span><span class="lineCov">        104 :         ndt::type child_dst_tp;</span>
+<span class="lineNum">     801 </span><span class="lineCov">        104 :         ndt::type child_src_tp[N];</span>
+<span class="lineNum">     802 </span>            : 
+<span class="lineNum">     803 </span>            :         // The dst var parameters
+<span class="lineNum">     804 </span><span class="lineCov">         52 :         const ndt::var_dim_type *dst_vdd = dst_tp.extended&lt;ndt::var_dim_type&gt;();</span>
+<span class="lineNum">     805 </span>            :         const ndt::var_dim_type::metadata_type *dst_md =
+<span class="lineNum">     806 </span><span class="lineCov">         52 :             reinterpret_cast&lt;const ndt::var_dim_type::metadata_type *&gt;(dst_arrmeta);</span>
+<span class="lineNum">     807 </span>            : 
+<span class="lineNum">     808 </span><span class="lineCov">         52 :         child_dst_arrmeta = dst_arrmeta + sizeof(ndt::var_dim_type::metadata_type);</span>
+<span class="lineNum">     809 </span><span class="lineCov">         52 :         child_dst_tp = dst_vdd-&gt;get_element_type();</span>
+<span class="lineNum">     810 </span>            : 
+<span class="lineNum">     811 </span>            :         intptr_t src_stride[N], src_offset[N], src_size[N];
+<span class="lineNum">     812 </span>            :         bool is_src_var[N];
+<span class="lineNum">     813 </span>            : 
+<span class="lineNum">     814 </span><span class="lineCov">         52 :         bool finished = dst_ndim == 1;</span>
+<span class="lineNum">     815 </span><span class="lineCov">        107 :         for (int i = 0; i &lt; N; ++i) {</span>
+<span class="lineNum">     816 </span>            :           // The src[i] strided parameters
+<span class="lineNum">     817 </span><span class="lineCov">         55 :           intptr_t src_ndim = src_tp[i].get_ndim() - child_tp-&gt;get_pos_type(i).get_ndim();</span>
+<span class="lineNum">     818 </span><span class="lineCov">         55 :           if (src_ndim &lt; dst_ndim) {</span>
+<span class="lineNum">     819 </span>            :             // This src value is getting broadcasted
+<span class="lineNum">     820 </span><span class="lineCov">         10 :             src_stride[i] = 0;</span>
+<span class="lineNum">     821 </span><span class="lineCov">         10 :             src_offset[i] = 0;</span>
+<span class="lineNum">     822 </span><span class="lineCov">         10 :             src_size[i] = 1;</span>
+<span class="lineNum">     823 </span><span class="lineCov">         10 :             is_src_var[i] = false;</span>
+<span class="lineNum">     824 </span><span class="lineCov">         10 :             child_src_arrmeta[i] = src_arrmeta[i];</span>
+<span class="lineNum">     825 </span><span class="lineCov">         10 :             child_src_tp[i] = src_tp[i];</span>
+<span class="lineNum">     826 </span><span class="lineCov">         10 :             finished &amp;= src_ndim == 0;</span>
+<span class="lineNum">     827 </span>            :           }
+<span class="lineNum">     828 </span><span class="lineCov">         45 :           else if (src_tp[i].get_as_strided(src_arrmeta[i], &amp;src_size[i], &amp;src_stride[i], &amp;child_src_tp[i],</span>
+<span class="lineNum">     829 </span>            :                                             &amp;child_src_arrmeta[i])) {
+<span class="lineNum">     830 </span><span class="lineCov">         33 :             src_offset[i] = 0;</span>
+<span class="lineNum">     831 </span><span class="lineCov">         33 :             is_src_var[i] = false;</span>
+<span class="lineNum">     832 </span><span class="lineCov">         33 :             finished &amp;= src_ndim == 1;</span>
+<span class="lineNum">     833 </span>            :           }
+<span class="lineNum">     834 </span>            :           else {
+<span class="lineNum">     835 </span><span class="lineCov">         12 :             const ndt::var_dim_type *vdd = static_cast&lt;const ndt::var_dim_type *&gt;(src_tp[i].extended());</span>
+<span class="lineNum">     836 </span>            :             const ndt::var_dim_type::metadata_type *src_md =
+<span class="lineNum">     837 </span><span class="lineCov">         12 :                 reinterpret_cast&lt;const ndt::var_dim_type::metadata_type *&gt;(src_arrmeta[i]);</span>
+<span class="lineNum">     838 </span><span class="lineCov">         12 :             src_stride[i] = src_md-&gt;stride;</span>
+<span class="lineNum">     839 </span><span class="lineCov">         12 :             src_offset[i] = src_md-&gt;offset;</span>
+<span class="lineNum">     840 </span><span class="lineCov">         12 :             is_src_var[i] = true;</span>
+<span class="lineNum">     841 </span><span class="lineCov">         12 :             child_src_arrmeta[i] = src_arrmeta[i] + sizeof(ndt::var_dim_type::metadata_type);</span>
+<span class="lineNum">     842 </span><span class="lineCov">         12 :             child_src_tp[i] = vdd-&gt;get_element_type();</span>
+<span class="lineNum">     843 </span><span class="lineCov">         12 :             finished &amp;= src_ndim == 1;</span>
+<span class="lineNum">     844 </span>            :           }
+<span class="lineNum">     845 </span>            :         }
+<span class="lineNum">     846 </span>            : 
+<span class="lineNum">     847 </span><span class="lineCov">         52 :         ckb-&gt;emplace_back&lt;self_type&gt;(kernreq, dst_md-&gt;blockref.get(), dst_vdd-&gt;get_target_alignment(), dst_md-&gt;stride,</span>
+<span class="lineNum">     848 </span>            :                                      dst_md-&gt;offset, src_stride, src_offset, src_size, is_src_var);
+<span class="lineNum">     849 </span>            : 
+<span class="lineNum">     850 </span>            :         // If there are still dimensions to broadcast, recursively lift more
+<span class="lineNum">     851 </span><span class="lineCov">         52 :         if (!finished) {</span>
+<span class="lineNum">     852 </span>            :           return elwise_virtual_ck&lt;N&gt;::instantiate(static_data, data, ckb, child_dst_tp, child_dst_arrmeta, nsrc,
+<span class="lineNum">     853 </span>            :                                                    child_src_tp, child_src_arrmeta, kernel_request_strided, nkwd, kwds,
+<span class="lineNum">     854 </span><span class="lineNoCov">          0 :                                                    tp_vars);</span>
+<span class="lineNum">     855 </span>            :         }
+<span class="lineNum">     856 </span>            :         // All the types matched, so instantiate the elementwise handler
+<span class="lineNum">     857 </span><span class="lineCov">         52 :         return child.get()-&gt;instantiate(child.get()-&gt;static_data(), NULL, ckb, child_dst_tp, child_dst_arrmeta, nsrc,</span>
+<span class="lineNum">     858 </span><span class="lineCov">         52 :                                         child_src_tp, child_src_arrmeta, kernel_request_strided, nkwd, kwds, tp_vars);</span>
+<span class="lineNum">     859 </span>            :       }
+<span class="lineNum">     860 </span>            :     };
+<span class="lineNum">     861 </span>            : 
+<span class="lineNum">     862 </span>            :     template &lt;&gt;
+<span class="lineNum">     863 </span>            :     struct elwise_ck&lt;var_dim_id, fixed_dim_id, 0&gt; : base_kernel&lt;elwise_ck&lt;var_dim_id, fixed_dim_id, 0&gt;, 0&gt; {
+<span class="lineNum">     864 </span>            :       typedef elwise_ck self_type;
+<span class="lineNum">     865 </span>            : 
+<span class="lineNum">     866 </span>            :       memory_block_data *m_dst_memblock;
+<span class="lineNum">     867 </span>            :       size_t m_dst_target_alignment;
+<a name="868"><span class="lineNum">     868 </span>            :       intptr_t m_dst_stride, m_dst_offset;</a>
+<span class="lineNum">     869 </span>            : 
+<span class="lineNum">     870 </span><span class="lineNoCov">          0 :       elwise_ck(memory_block_data *dst_memblock, size_t dst_target_alignment, intptr_t dst_stride, intptr_t dst_offset)</span>
+<span class="lineNum">     871 </span>            :           : m_dst_memblock(dst_memblock), m_dst_target_alignment(dst_target_alignment), m_dst_stride(dst_stride),
+<span class="lineNum">     872 </span><span class="lineNoCov">          0 :             m_dst_offset(dst_offset)</span>
+<span class="lineNum">     873 </span>            :       {
+<a name="874"><span class="lineNum">     874 </span><span class="lineNoCov">          0 :       }</span></a>
+<span class="lineNum">     875 </span>            : 
+<a name="876"><span class="lineNum">     876 </span><span class="lineNoCov">          0 :       ~elwise_ck() { this-&gt;get_child()-&gt;destroy(); }</span></a>
+<span class="lineNum">     877 </span>            : 
+<span class="lineNum">     878 </span><span class="lineNoCov">          0 :       void single(char *dst, char *const *DYND_UNUSED(src))</span>
+<span class="lineNum">     879 </span>            :       {
+<span class="lineNum">     880 </span><span class="lineNoCov">          0 :         kernel_prefix *child = this-&gt;get_child();</span>
+<span class="lineNum">     881 </span><span class="lineNoCov">          0 :         kernel_strided_t opchild = child-&gt;get_function&lt;kernel_strided_t&gt;();</span>
+<span class="lineNum">     882 </span>            : 
+<span class="lineNum">     883 </span><span class="lineNoCov">          0 :         ndt::var_dim_type::data_type *dst_vddd = reinterpret_cast&lt;ndt::var_dim_type::data_type *&gt;(dst);</span>
+<span class="lineNum">     884 </span>            :         char *modified_dst;
+<span class="lineNum">     885 </span><span class="lineNoCov">          0 :         intptr_t modified_dst_stride = 0;</span>
+<span class="lineNum">     886 </span>            :         intptr_t dim_size;
+<span class="lineNum">     887 </span><span class="lineNoCov">          0 :         if (dst_vddd-&gt;begin != NULL) {</span>
+<span class="lineNum">     888 </span>            :           // If the destination already has allocated data, broadcast to that
+<span class="lineNum">     889 </span>            :           // data
+<span class="lineNum">     890 </span><span class="lineNoCov">          0 :           modified_dst = dst_vddd-&gt;begin + m_dst_offset;</span>
+<span class="lineNum">     891 </span>            :           // Broadcast all the inputs to the existing destination dimension size
+<span class="lineNum">     892 </span><span class="lineNoCov">          0 :           dim_size = dst_vddd-&gt;size;</span>
+<span class="lineNum">     893 </span>            :         }
+<span class="lineNum">     894 </span>            :         else {
+<span class="lineNum">     895 </span><span class="lineNoCov">          0 :           if (m_dst_offset != 0) {</span>
+<span class="lineNum">     896 </span>            :             throw std::runtime_error(&quot;Cannot assign to an uninitialized dynd var_dim &quot;
+<span class="lineNum">     897 </span><span class="lineNoCov">          0 :                                      &quot;which has a non-zero offset&quot;);</span>
+<span class="lineNum">     898 </span>            :           }
+<span class="lineNum">     899 </span>            :           // Broadcast all the inputs together to get the destination size
+<span class="lineNum">     900 </span><span class="lineNoCov">          0 :           dim_size = 1;</span>
+<span class="lineNum">     901 </span>            :           // Allocate the output
+<span class="lineNum">     902 </span><span class="lineNoCov">          0 :           dst_vddd-&gt;begin = m_dst_memblock-&gt;alloc(dim_size);</span>
+<span class="lineNum">     903 </span><span class="lineNoCov">          0 :           modified_dst = dst_vddd-&gt;begin;</span>
+<span class="lineNum">     904 </span><span class="lineNoCov">          0 :           dst_vddd-&gt;size = dim_size;</span>
+<span class="lineNum">     905 </span>            :         }
+<span class="lineNum">     906 </span><span class="lineNoCov">          0 :         if (dim_size &lt;= 1) {</span>
+<span class="lineNum">     907 </span><span class="lineNoCov">          0 :           modified_dst_stride = 0;</span>
+<span class="lineNum">     908 </span>            :         }
+<span class="lineNum">     909 </span>            :         else {
+<span class="lineNum">     910 </span><span class="lineNoCov">          0 :           modified_dst_stride = m_dst_stride;</span>
+<span class="lineNum">     911 </span>            :         }
+<span class="lineNum">     912 </span><span class="lineNoCov">          0 :         opchild(child, modified_dst, modified_dst_stride, NULL, NULL, dim_size);</span>
+<a name="913"><span class="lineNum">     913 </span><span class="lineNoCov">          0 :       }</span></a>
+<span class="lineNum">     914 </span>            : 
+<span class="lineNum">     915 </span><span class="lineNoCov">          0 :       static void instantiate(char *static_data, char *data, kernel_builder *ckb, const ndt::type &amp;dst_tp,</span>
+<span class="lineNum">     916 </span>            :                               const char *dst_arrmeta, intptr_t nsrc, const ndt::type *DYND_UNUSED(src_tp),
+<span class="lineNum">     917 </span>            :                               const char *const *DYND_UNUSED(src_arrmeta), kernel_request_t kernreq, intptr_t nkwd,
+<span class="lineNum">     918 </span>            :                               const nd::array *kwds, const std::map&lt;std::string, ndt::type&gt; &amp;tp_vars)
+<span class="lineNum">     919 </span>            :       {
+<span class="lineNum">     920 </span><span class="lineNoCov">          0 :         callable &amp;child = *reinterpret_cast&lt;callable *&gt;(static_data);</span>
+<span class="lineNum">     921 </span><span class="lineNoCov">          0 :         const ndt::callable_type *child_tp = child.get_type();</span>
+<span class="lineNum">     922 </span>            : 
+<span class="lineNum">     923 </span><span class="lineNoCov">          0 :         intptr_t dst_ndim = dst_tp.get_ndim();</span>
+<span class="lineNum">     924 </span><span class="lineNoCov">          0 :         if (!child_tp-&gt;get_return_type().is_symbolic()) {</span>
+<span class="lineNum">     925 </span><span class="lineNoCov">          0 :           dst_ndim -= child_tp-&gt;get_return_type().get_ndim();</span>
+<span class="lineNum">     926 </span>            :         }
+<span class="lineNum">     927 </span>            : 
+<span class="lineNum">     928 </span>            :         const char *child_dst_arrmeta;
+<span class="lineNum">     929 </span><span class="lineNoCov">          0 :         ndt::type child_dst_tp;</span>
+<span class="lineNum">     930 </span>            : 
+<span class="lineNum">     931 </span>            :         // The dst var parameters
+<span class="lineNum">     932 </span><span class="lineNoCov">          0 :         const ndt::var_dim_type *dst_vdd = dst_tp.extended&lt;ndt::var_dim_type&gt;();</span>
+<span class="lineNum">     933 </span>            :         const ndt::var_dim_type::metadata_type *dst_md =
+<span class="lineNum">     934 </span><span class="lineNoCov">          0 :             reinterpret_cast&lt;const ndt::var_dim_type::metadata_type *&gt;(dst_arrmeta);</span>
+<span class="lineNum">     935 </span>            : 
+<span class="lineNum">     936 </span><span class="lineNoCov">          0 :         child_dst_arrmeta = dst_arrmeta + sizeof(ndt::var_dim_type::metadata_type);</span>
+<span class="lineNum">     937 </span><span class="lineNoCov">          0 :         child_dst_tp = dst_vdd-&gt;get_element_type();</span>
+<span class="lineNum">     938 </span>            : 
+<span class="lineNum">     939 </span><span class="lineNoCov">          0 :         bool finished = dst_ndim == 1;</span>
+<span class="lineNum">     940 </span>            : 
+<span class="lineNum">     941 </span><span class="lineNoCov">          0 :         ckb-&gt;emplace_back&lt;self_type&gt;(kernreq, dst_md-&gt;blockref.get(), dst_vdd-&gt;get_target_alignment(), dst_md-&gt;stride,</span>
+<span class="lineNum">     942 </span><span class="lineNoCov">          0 :                                      dst_md-&gt;offset);</span>
+<span class="lineNum">     943 </span>            : 
+<span class="lineNum">     944 </span>            :         // If there are still dimensions to broadcast, recursively lift more
+<span class="lineNum">     945 </span><span class="lineNoCov">          0 :         if (!finished) {</span>
+<span class="lineNum">     946 </span>            :           return nd::functional::elwise_virtual_ck&lt;0&gt;::instantiate(static_data, data, ckb, child_dst_tp,
+<span class="lineNum">     947 </span>            :                                                                    child_dst_arrmeta, nsrc, NULL, NULL,
+<span class="lineNum">     948 </span><span class="lineNoCov">          0 :                                                                    kernel_request_strided, nkwd, kwds, tp_vars);</span>
+<span class="lineNum">     949 </span>            :         }
+<span class="lineNum">     950 </span>            :         // All the types matched, so instantiate the elementwise handler
+<span class="lineNum">     951 </span><span class="lineNoCov">          0 :         return child.get()-&gt;instantiate(child.get()-&gt;static_data(), NULL, ckb, child_dst_tp, child_dst_arrmeta, nsrc,</span>
+<span class="lineNum">     952 </span><span class="lineNoCov">          0 :                                         NULL, NULL, kernel_request_strided, nkwd, kwds, tp_vars);</span>
+<span class="lineNum">     953 </span>            :       }
+<span class="lineNum">     954 </span>            :     };
+<span class="lineNum">     955 </span>            : 
+<span class="lineNum">     956 </span>            :     template &lt;int N&gt;
+<span class="lineNum">     957 </span>            :     struct elwise_ck&lt;var_dim_id, var_dim_id, N&gt; : elwise_ck&lt;var_dim_id, fixed_dim_id, N&gt; {
+<span class="lineNum">     958 </span>            :     };
+<span class="lineNum">     959 </span>            : 
+<span class="lineNum">     960 </span>            :   } // namespace dynd::nd::functional
+<span class="lineNum">     961 </span>            : } // namespace dynd::nd
+<span class="lineNum">     962 </span>            : } // namespace dynd
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.10</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

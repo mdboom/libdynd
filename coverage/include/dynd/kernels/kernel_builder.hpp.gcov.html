@@ -1,0 +1,230 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - coverage.info.cleaned - include/dynd/kernels/kernel_builder.hpp</title>
+  <link rel="stylesheet" type="text/css" href="../../../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../../../index.html">top level</a> - <a href="index.html">include/dynd/kernels</a> - kernel_builder.hpp<span style="font-size: 80%;"> (source / <a href="kernel_builder.hpp.func.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">coverage.info.cleaned</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">46</td>
+            <td class="headerCovTableEntry">49</td>
+            <td class="headerCovTableEntryHi">93.9 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2016-02-19</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">917</td>
+            <td class="headerCovTableEntry">5601</td>
+            <td class="headerCovTableEntryLo">16.4 %</td>
+          </tr>
+          <tr><td><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : //</a>
+<span class="lineNum">       2 </span>            : // Copyright (C) 2011-15 DyND Developers
+<span class="lineNum">       3 </span>            : // BSD 2-Clause License, see LICENSE.txt
+<span class="lineNum">       4 </span>            : //
+<span class="lineNum">       5 </span>            : 
+<span class="lineNum">       6 </span>            : #pragma once
+<span class="lineNum">       7 </span>            : 
+<span class="lineNum">       8 </span>            : #include &lt;new&gt;
+<span class="lineNum">       9 </span>            : #include &lt;algorithm&gt;
+<span class="lineNum">      10 </span>            : #include &lt;map&gt;
+<span class="lineNum">      11 </span>            : 
+<span class="lineNum">      12 </span>            : namespace dynd {
+<span class="lineNum">      13 </span>            : namespace nd {
+<span class="lineNum">      14 </span>            : 
+<span class="lineNum">      15 </span>            :   struct kernel_prefix;
+<span class="lineNum">      16 </span>            : 
+<span class="lineNum">      17 </span>            :   /**
+<span class="lineNum">      18 </span>            :    * Function pointers + data for a hierarchical
+<span class="lineNum">      19 </span>            :    * kernel which operates on type/arrmeta in
+<span class="lineNum">      20 </span>            :    * some configuration.
+<span class="lineNum">      21 </span>            :    *
+<span class="lineNum">      22 </span>            :    * The data placed in the kernel's data must
+<span class="lineNum">      23 </span>            :    * be relocatable with a memcpy, it must not rely on its
+<span class="lineNum">      24 </span>            :    * own address.
+<span class="lineNum">      25 </span>            :    */
+<span class="lineNum">      26 </span>            :   class kernel_builder {
+<span class="lineNum">      27 </span>            :   protected:
+<span class="lineNum">      28 </span>            :     // Pointer to the kernel function pointers + data
+<span class="lineNum">      29 </span>            :     char *m_data;
+<span class="lineNum">      30 </span>            :     intptr_t m_capacity;
+<span class="lineNum">      31 </span>            :     intptr_t m_size;
+<span class="lineNum">      32 </span>            : 
+<span class="lineNum">      33 </span>            :     // When the amount of data is small, this static data is used,
+<span class="lineNum">      34 </span>            :     // otherwise dynamic memory is allocated when it gets too big
+<a name="35"><span class="lineNum">      35 </span>            :     char m_static_data[16 * 8];</a>
+<span class="lineNum">      36 </span>            : 
+<span class="lineNum">      37 </span><span class="lineCov">       3811 :     bool using_static_data() const { return m_data == &amp;m_static_data[0]; }</span>
+<span class="lineNum">      38 </span>            : 
+<span class="lineNum">      39 </span>            :     DYND_API void destroy();
+<a name="40"><span class="lineNum">      40 </span>            : </a>
+<span class="lineNum">      41 </span>            :   public:
+<span class="lineNum">      42 </span><span class="lineCov">       3707 :     kernel_builder() : m_data(m_static_data), m_capacity(sizeof(m_static_data)), m_size(0)</span>
+<span class="lineNum">      43 </span>            :     {
+<span class="lineNum">      44 </span><span class="lineCov">       3707 :       set(m_static_data, 0, sizeof(m_static_data));</span>
+<a name="45"><span class="lineNum">      45 </span><span class="lineCov">       3707 :     }</span></a>
+<span class="lineNum">      46 </span>            : 
+<a name="47"><span class="lineNum">      47 </span><span class="lineCov">       3707 :     ~kernel_builder() { destroy(); }</span></a>
+<span class="lineNum">      48 </span>            : 
+<span class="lineNum">      49 </span><span class="lineCov">       1672 :     size_t size() const { return m_size; }</span>
+<span class="lineNum">      50 </span>            : 
+<span class="lineNum">      51 </span>            :     size_t capacity() const { return m_capacity; }
+<span class="lineNum">      52 </span>            : 
+<span class="lineNum">      53 </span>            :     /**
+<span class="lineNum">      54 </span>            :      * This function ensures that the ckernel's data
+<span class="lineNum">      55 </span>            :      * is at least the required number of bytes. It
+<span class="lineNum">      56 </span>            :      * should only be called during the construction phase
+<a name="57"><span class="lineNum">      57 </span>            :      * of the kernel when constructing a leaf kernel.</a>
+<span class="lineNum">      58 </span>            :      */
+<span class="lineNum">      59 </span><span class="lineCov">       5869 :     void reserve(intptr_t requested_capacity)</span>
+<span class="lineNum">      60 </span>            :     {
+<span class="lineNum">      61 </span><span class="lineCov">       5869 :       if (m_capacity &lt; requested_capacity) {</span>
+<span class="lineNum">      62 </span>            :         // Grow by a factor of 1.5
+<span class="lineNum">      63 </span>            :         // https://github.com/facebook/folly/blob/master/folly/docs/FBVector.md
+<span class="lineNum">      64 </span><span class="lineCov">        104 :         intptr_t grown_capacity = m_capacity * 3 / 2;</span>
+<span class="lineNum">      65 </span><span class="lineCov">        104 :         if (requested_capacity &lt; grown_capacity) {</span>
+<span class="lineNum">      66 </span><span class="lineCov">        104 :           requested_capacity = grown_capacity;</span>
+<span class="lineNum">      67 </span>            :         }
+<span class="lineNum">      68 </span>            :         // Do a realloc
+<span class="lineNum">      69 </span><span class="lineCov">        104 :         char *new_data = reinterpret_cast&lt;char *&gt;(realloc(m_data, m_capacity, requested_capacity));</span>
+<span class="lineNum">      70 </span><span class="lineCov">        104 :         if (new_data == NULL) {</span>
+<span class="lineNum">      71 </span><span class="lineNoCov">          0 :           destroy();</span>
+<span class="lineNum">      72 </span><span class="lineNoCov">          0 :           m_data = NULL;</span>
+<span class="lineNum">      73 </span><span class="lineNoCov">          0 :           throw std::bad_alloc();</span>
+<span class="lineNum">      74 </span>            :         }
+<span class="lineNum">      75 </span>            :         // Zero out the newly allocated capacity
+<span class="lineNum">      76 </span><span class="lineCov">        104 :         set(reinterpret_cast&lt;char *&gt;(new_data) + m_capacity, 0, requested_capacity - m_capacity);</span>
+<span class="lineNum">      77 </span><span class="lineCov">        104 :         m_data = new_data;</span>
+<span class="lineNum">      78 </span><span class="lineCov">        104 :         m_capacity = requested_capacity;</span>
+<span class="lineNum">      79 </span>            :       }
+<a name="80"><span class="lineNum">      80 </span><span class="lineCov">       5869 :     }</span></a>
+<span class="lineNum">      81 </span>            : 
+<span class="lineNum">      82 </span><span class="lineCov">       7409 :     kernel_prefix *get() const { return reinterpret_cast&lt;kernel_prefix *&gt;(m_data); }</span>
+<span class="lineNum">      83 </span>            : 
+<span class="lineNum">      84 </span>            :     /**
+<span class="lineNum">      85 </span>            :      * For use during construction, gets the ckernel component
+<span class="lineNum">      86 </span>            :      * at the requested offset.
+<a name="87"><span class="lineNum">      87 </span>            :      */</a>
+<span class="lineNum">      88 </span>            :     template &lt;typename KernelType&gt;
+<span class="lineNum">      89 </span><span class="lineCov">       6515 :     KernelType *get_at(size_t offset)</span>
+<span class="lineNum">      90 </span>            :     {
+<span class="lineNum">      91 </span><span class="lineCov">       6515 :       return reinterpret_cast&lt;KernelType *&gt;(m_data + offset);</span>
+<a name="92"><span class="lineNum">      92 </span>            :     }</a>
+<span class="lineNum">      93 </span>            : 
+<a name="94"><span class="lineNum">      94 </span><span class="lineCov">         98 :     void *alloc(size_t size) { return std::malloc(size); }</span></a>
+<span class="lineNum">      95 </span>            : 
+<span class="lineNum">      96 </span><span class="lineCov">        104 :     void *realloc(void *ptr, size_t old_size, size_t new_size)</span>
+<span class="lineNum">      97 </span>            :     {
+<span class="lineNum">      98 </span><span class="lineCov">        104 :       if (using_static_data()) {</span>
+<span class="lineNum">      99 </span>            :         // If we were previously using the static data, do a malloc
+<span class="lineNum">     100 </span><span class="lineCov">         98 :         void *new_data = alloc(new_size);</span>
+<span class="lineNum">     101 </span>            :         // If the allocation succeeded, copy the old data as the realloc would
+<span class="lineNum">     102 </span><span class="lineCov">         98 :         if (new_data != NULL) {</span>
+<span class="lineNum">     103 </span><span class="lineCov">         98 :           copy(new_data, ptr, old_size);</span>
+<span class="lineNum">     104 </span>            :         }
+<span class="lineNum">     105 </span><span class="lineCov">         98 :         return new_data;</span>
+<span class="lineNum">     106 </span>            :       }
+<span class="lineNum">     107 </span>            :       else {
+<span class="lineNum">     108 </span><span class="lineCov">          6 :         return std::realloc(ptr, new_size);</span>
+<span class="lineNum">     109 </span>            :       }
+<a name="110"><span class="lineNum">     110 </span>            :     }</a>
+<span class="lineNum">     111 </span>            : 
+<span class="lineNum">     112 </span><span class="lineCov">       3707 :     void free(void *ptr)</span>
+<span class="lineNum">     113 </span>            :     {
+<span class="lineNum">     114 </span><span class="lineCov">       3707 :       if (!using_static_data()) {</span>
+<span class="lineNum">     115 </span><span class="lineCov">         98 :         std::free(ptr);</span>
+<span class="lineNum">     116 </span>            :       }
+<a name="117"><span class="lineNum">     117 </span><span class="lineCov">       3707 :     }</span></a>
+<span class="lineNum">     118 </span>            : 
+<a name="119"><span class="lineNum">     119 </span><span class="lineCov">         98 :     void *copy(void *dst, const void *src, size_t size) { return std::memcpy(dst, src, size); }</span></a>
+<span class="lineNum">     120 </span>            : 
+<a name="121"><span class="lineNum">     121 </span><span class="lineCov">       3811 :     void *set(void *dst, int value, size_t size) { return std::memset(dst, value, size); }</span></a>
+<span class="lineNum">     122 </span>            : 
+<span class="lineNum">     123 </span><span class="lineCov">         68 :     void emplace_back(size_t size)</span>
+<span class="lineNum">     124 </span>            :     {
+<span class="lineNum">     125 </span><span class="lineCov">         68 :       m_size += aligned_size(size);</span>
+<span class="lineNum">     126 </span><span class="lineCov">         68 :       reserve(m_size);</span>
+<span class="lineNum">     127 </span><span class="lineCov">         68 :     }</span>
+<span class="lineNum">     128 </span>            : 
+<span class="lineNum">     129 </span>            :     /**
+<span class="lineNum">     130 </span>            :      * Creates the kernel, and increments ``m_size`` to the position after it.
+<a name="131"><span class="lineNum">     131 </span>            :      */</a>
+<span class="lineNum">     132 </span>            :     template &lt;typename KernelType, typename... ArgTypes&gt;
+<span class="lineNum">     133 </span><span class="lineCov">       5590 :     void emplace_back(ArgTypes &amp;&amp;... args)</span>
+<span class="lineNum">     134 </span>            :     {
+<span class="lineNum">     135 </span>            :       /* Alignment requirement of the type. */
+<span class="lineNum">     136 </span>            :       static_assert(alignof(KernelType) &lt;= 8, &quot;kernel types require alignment to be at most 8 bytes&quot;);
+<span class="lineNum">     137 </span>            : 
+<span class="lineNum">     138 </span><span class="lineCov">       5590 :       size_t offset = m_size;</span>
+<span class="lineNum">     139 </span><span class="lineCov">       5590 :       m_size += aligned_size(sizeof(KernelType));</span>
+<span class="lineNum">     140 </span><span class="lineCov">       5590 :       reserve(m_size);</span>
+<span class="lineNum">     141 </span><span class="lineCov">       5590 :       KernelType::init(this-&gt;get_at&lt;KernelType&gt;(offset), std::forward&lt;ArgTypes&gt;(args)...);</span>
+<span class="lineNum">     142 </span><span class="lineCov">       5590 :     }</span>
+<span class="lineNum">     143 </span>            : 
+<span class="lineNum">     144 </span>            :     /**
+<a name="145"><span class="lineNum">     145 </span>            :      * Aligns a size as required by kernels.</a>
+<span class="lineNum">     146 </span>            :      */
+<span class="lineNum">     147 </span><span class="lineCov">      11566 :     static constexpr size_t aligned_size(size_t size)</span>
+<span class="lineNum">     148 </span>            :     {
+<span class="lineNum">     149 </span><span class="lineCov">      11566 :       return (size + static_cast&lt;size_t&gt;(7)) &amp; ~static_cast&lt;size_t&gt;(7);</span>
+<span class="lineNum">     150 </span>            :     }
+<span class="lineNum">     151 </span>            :   };
+<span class="lineNum">     152 </span>            : 
+<span class="lineNum">     153 </span>            : } // namespace dynd::nd
+<span class="lineNum">     154 </span>            : } // namespace dynd
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.10</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

@@ -1,0 +1,335 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - coverage.info.cleaned - include/dynd/kernels/convert_kernel.hpp</title>
+  <link rel="stylesheet" type="text/css" href="../../../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../../../index.html">top level</a> - <a href="index.html">include/dynd/kernels</a> - convert_kernel.hpp<span style="font-size: 80%;"> (source / <a href="convert_kernel.hpp.func.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">coverage.info.cleaned</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">106</td>
+            <td class="headerCovTableEntry">134</td>
+            <td class="headerCovTableEntryMed">79.1 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2016-02-19</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">15</td>
+            <td class="headerCovTableEntry">16</td>
+            <td class="headerCovTableEntryHi">93.8 %</td>
+          </tr>
+          <tr><td><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : //</a>
+<span class="lineNum">       2 </span>            : // Copyright (C) 2011-15 DyND Developers
+<span class="lineNum">       3 </span>            : // BSD 2-Clause License, see LICENSE.txt
+<span class="lineNum">       4 </span>            : //
+<span class="lineNum">       5 </span>            : 
+<span class="lineNum">       6 </span>            : #pragma once
+<span class="lineNum">       7 </span>            : 
+<span class="lineNum">       8 </span>            : #include &lt;dynd/func/assignment.hpp&gt;
+<span class="lineNum">       9 </span>            : 
+<span class="lineNum">      10 </span>            : namespace dynd {
+<span class="lineNum">      11 </span>            : namespace nd {
+<span class="lineNum">      12 </span>            :   namespace functional {
+<span class="lineNum">      13 </span>            : 
+<span class="lineNum">      14 </span>            :     /**
+<span class="lineNum">      15 </span>            :      * Given a buffer array of type &quot;N * T&quot; which was
+<span class="lineNum">      16 </span>            :      * created by nd::empty, resets it so it can be used
+<span class="lineNum">      17 </span>            :      * as a buffer again.
+<span class="lineNum">      18 </span>            :      *
+<span class="lineNum">      19 </span>            :      * NOTE: If the array is not of type &quot;N * T&quot; and default
+<span class="lineNum">      20 </span>            :      *       initialized by nd::empty, undefined behavior will result.
+<a name="21"><span class="lineNum">      21 </span>            :      *</a>
+<span class="lineNum">      22 </span>            :      */
+<span class="lineNum">      23 </span><span class="lineNoCov">          0 :     inline void reset_strided_buffer_array(const nd::array &amp;buf)</span>
+<span class="lineNum">      24 </span>            :     {
+<span class="lineNum">      25 </span><span class="lineNoCov">          0 :       const ndt::type &amp;buf_tp = buf.get_type();</span>
+<span class="lineNum">      26 </span><span class="lineNoCov">          0 :       ndt::base_type::flags_type flags = buf_tp.extended()-&gt;get_flags();</span>
+<span class="lineNum">      27 </span><span class="lineNoCov">          0 :       if (flags &amp; (type_flag_blockref | type_flag_zeroinit | type_flag_destructor)) {</span>
+<span class="lineNum">      28 </span><span class="lineNoCov">          0 :         char *buf_arrmeta = buf.get()-&gt;metadata();</span>
+<span class="lineNum">      29 </span><span class="lineNoCov">          0 :         char *buf_data = buf.data();</span>
+<span class="lineNum">      30 </span><span class="lineNoCov">          0 :         buf_tp.extended()-&gt;arrmeta_reset_buffers(buf.get()-&gt;metadata());</span>
+<span class="lineNum">      31 </span><span class="lineNoCov">          0 :         fixed_dim_type_arrmeta *am = reinterpret_cast&lt;fixed_dim_type_arrmeta *&gt;(buf_arrmeta);</span>
+<span class="lineNum">      32 </span><span class="lineNoCov">          0 :         if (flags &amp; type_flag_destructor) {</span>
+<span class="lineNum">      33 </span><span class="lineNoCov">          0 :           buf_tp.extended()-&gt;data_destruct(buf_arrmeta, buf_data);</span>
+<span class="lineNum">      34 </span>            :         }
+<span class="lineNum">      35 </span><span class="lineNoCov">          0 :         memset(buf_data, 0, am-&gt;dim_size * am-&gt;stride);</span>
+<span class="lineNum">      36 </span>            :       }
+<span class="lineNum">      37 </span><span class="lineNoCov">          0 :     }</span>
+<span class="lineNum">      38 </span>            : 
+<span class="lineNum">      39 </span>            :     class DYND_API buffer_storage {
+<span class="lineNum">      40 </span>            :       char *m_storage;
+<span class="lineNum">      41 </span>            :       char *m_arrmeta;
+<span class="lineNum">      42 </span>            :       ndt::type m_type;
+<a name="43"><span class="lineNum">      43 </span>            :       intptr_t m_stride;</a>
+<span class="lineNum">      44 </span>            : 
+<span class="lineNum">      45 </span><span class="lineCov">          8 :       void internal_allocate()</span>
+<span class="lineNum">      46 </span>            :       {
+<span class="lineNum">      47 </span><span class="lineCov">          8 :         if (m_type.get_id() != uninitialized_id) {</span>
+<span class="lineNum">      48 </span><span class="lineCov">          8 :           m_stride = m_type.get_data_size();</span>
+<span class="lineNum">      49 </span><span class="lineCov">          8 :           m_storage = new char[DYND_BUFFER_CHUNK_SIZE * m_stride];</span>
+<span class="lineNum">      50 </span><span class="lineCov">          8 :           m_arrmeta = NULL;</span>
+<span class="lineNum">      51 </span><span class="lineCov">          8 :           size_t metasize = m_type.is_builtin() ? 0 : m_type.extended()-&gt;get_arrmeta_size();</span>
+<span class="lineNum">      52 </span><span class="lineCov">          8 :           if (metasize != 0) {</span>
+<span class="lineNum">      53 </span>            :             try {
+<span class="lineNum">      54 </span><span class="lineNoCov">          0 :               m_arrmeta = new char[metasize];</span>
+<span class="lineNum">      55 </span><span class="lineNoCov">          0 :               m_type.extended()-&gt;arrmeta_default_construct(m_arrmeta, true);</span>
+<span class="lineNum">      56 </span>            :             }
+<span class="lineNum">      57 </span><span class="lineNoCov">          0 :             catch (...) {</span>
+<span class="lineNum">      58 </span><span class="lineNoCov">          0 :               delete[] m_storage;</span>
+<span class="lineNum">      59 </span><span class="lineNoCov">          0 :               delete[] m_arrmeta;</span>
+<span class="lineNum">      60 </span><span class="lineNoCov">          0 :               throw;</span>
+<span class="lineNum">      61 </span>            :             }
+<span class="lineNum">      62 </span>            :           }
+<span class="lineNum">      63 </span>            :         }
+<span class="lineNum">      64 </span><span class="lineCov">          8 :       }</span>
+<a name="65"><span class="lineNum">      65 </span>            : </a>
+<span class="lineNum">      66 </span>            :     public:
+<span class="lineNum">      67 </span><span class="lineCov">         18 :       buffer_storage() : m_storage(NULL), m_arrmeta(NULL), m_type() {}</span>
+<span class="lineNum">      68 </span>            : 
+<span class="lineNum">      69 </span>            :       buffer_storage(const buffer_storage &amp;rhs) : m_storage(NULL), m_arrmeta(NULL), m_type(rhs.m_type)
+<span class="lineNum">      70 </span>            :       {
+<span class="lineNum">      71 </span>            :         internal_allocate();
+<span class="lineNum">      72 </span>            :       }
+<span class="lineNum">      73 </span>            : 
+<a name="74"><span class="lineNum">      74 </span>            :       buffer_storage(const ndt::type &amp;tp) : m_storage(NULL), m_arrmeta(NULL), m_type(tp) { internal_allocate(); }</a>
+<span class="lineNum">      75 </span>            : 
+<span class="lineNum">      76 </span><span class="lineCov">         18 :       ~buffer_storage()</span>
+<span class="lineNum">      77 </span><span class="lineCov">         18 :       {</span>
+<span class="lineNum">      78 </span><span class="lineCov">         18 :         if (m_storage &amp;&amp; m_type.get_flags() &amp; type_flag_destructor) {</span>
+<span class="lineNum">      79 </span><span class="lineNoCov">          0 :           m_type.extended()-&gt;data_destruct_strided(m_arrmeta, m_storage, m_stride, DYND_BUFFER_CHUNK_SIZE);</span>
+<span class="lineNum">      80 </span>            :         }
+<span class="lineNum">      81 </span><span class="lineCov">         18 :         delete[] m_storage;</span>
+<span class="lineNum">      82 </span><span class="lineCov">         18 :         if (m_arrmeta) {</span>
+<span class="lineNum">      83 </span><span class="lineNoCov">          0 :           m_type.extended()-&gt;arrmeta_destruct(m_arrmeta);</span>
+<span class="lineNum">      84 </span><span class="lineNoCov">          0 :           delete[] m_arrmeta;</span>
+<span class="lineNum">      85 </span>            :         }
+<span class="lineNum">      86 </span><span class="lineCov">         18 :       }</span>
+<span class="lineNum">      87 </span>            : 
+<span class="lineNum">      88 </span>            :       // Assignment copies the same type
+<span class="lineNum">      89 </span>            :       buffer_storage &amp;operator=(const buffer_storage &amp;rhs)
+<span class="lineNum">      90 </span>            :       {
+<span class="lineNum">      91 </span>            :         allocate(rhs.m_type);
+<span class="lineNum">      92 </span>            :         return *this;
+<a name="93"><span class="lineNum">      93 </span>            :       }</a>
+<span class="lineNum">      94 </span>            : 
+<span class="lineNum">      95 </span><span class="lineCov">          8 :       void allocate(const ndt::type &amp;tp)</span>
+<span class="lineNum">      96 </span>            :       {
+<span class="lineNum">      97 </span><span class="lineCov">          8 :         delete[] m_storage;</span>
+<span class="lineNum">      98 </span><span class="lineCov">          8 :         m_storage = 0;</span>
+<span class="lineNum">      99 </span><span class="lineCov">          8 :         if (m_arrmeta) {</span>
+<span class="lineNum">     100 </span><span class="lineNoCov">          0 :           m_type.extended()-&gt;arrmeta_destruct(m_arrmeta);</span>
+<span class="lineNum">     101 </span><span class="lineNoCov">          0 :           delete[] m_arrmeta;</span>
+<span class="lineNum">     102 </span><span class="lineNoCov">          0 :           m_arrmeta = NULL;</span>
+<span class="lineNum">     103 </span>            :         }
+<span class="lineNum">     104 </span><span class="lineCov">          8 :         m_type = tp;</span>
+<span class="lineNum">     105 </span><span class="lineCov">          8 :         internal_allocate();</span>
+<a name="106"><span class="lineNum">     106 </span><span class="lineCov">          8 :       }</span></a>
+<span class="lineNum">     107 </span>            : 
+<a name="108"><span class="lineNum">     108 </span><span class="lineCov">         40 :       bool is_null() const { return m_storage == NULL; }</span></a>
+<span class="lineNum">     109 </span>            : 
+<span class="lineNum">     110 </span><span class="lineCov">          4 :       intptr_t get_stride() const { return m_stride; }</span>
+<span class="lineNum">     111 </span>            : 
+<a name="112"><span class="lineNum">     112 </span>            :       const ndt::type &amp;get_type() const { return m_type; }</a>
+<span class="lineNum">     113 </span>            : 
+<a name="114"><span class="lineNum">     114 </span><span class="lineCov">         18 :       char *const &amp;get_storage() const { return m_storage; }</span></a>
+<span class="lineNum">     115 </span>            : 
+<a name="116"><span class="lineNum">     116 </span><span class="lineCov">         16 :       const char *get_arrmeta() const { return m_arrmeta; }</span></a>
+<span class="lineNum">     117 </span>            : 
+<span class="lineNum">     118 </span><span class="lineCov">         10 :       void reset_arrmeta()</span>
+<span class="lineNum">     119 </span>            :       {
+<span class="lineNum">     120 </span><span class="lineCov">         10 :         if (m_arrmeta &amp;&amp; !m_type.is_builtin()) {</span>
+<span class="lineNum">     121 </span><span class="lineNoCov">          0 :           m_type.extended()-&gt;arrmeta_reset_buffers(m_arrmeta);</span>
+<span class="lineNum">     122 </span>            :         }
+<span class="lineNum">     123 </span><span class="lineCov">         10 :       }</span>
+<span class="lineNum">     124 </span>            :     };
+<span class="lineNum">     125 </span>            : 
+<span class="lineNum">     126 </span>            :     /**
+<span class="lineNum">     127 </span>            :      * Instantiate an callable, adding buffers for any inputs where the types
+<a name="128"><span class="lineNum">     128 </span>            :      * don't match.</a>
+<span class="lineNum">     129 </span>            :      */
+<span class="lineNum">     130 </span><span class="lineCov">          7 :     struct convert_kernel : base_kernel&lt;convert_kernel&gt; {</span>
+<span class="lineNum">     131 </span>            :       typedef callable static_data_type;
+<span class="lineNum">     132 </span>            : 
+<span class="lineNum">     133 </span>            :       intptr_t narg;
+<span class="lineNum">     134 </span>            :       std::vector&lt;intptr_t&gt; m_src_buf_ck_offsets;
+<a name="135"><span class="lineNum">     135 </span>            :       std::vector&lt;buffer_storage&gt; m_bufs;</a>
+<span class="lineNum">     136 </span>            : 
+<a name="137"><span class="lineNum">     137 </span><span class="lineCov">          7 :       convert_kernel(intptr_t narg) : narg(narg), m_src_buf_ck_offsets(this-&gt;narg), m_bufs(this-&gt;narg) {}</span></a>
+<span class="lineNum">     138 </span>            : 
+<span class="lineNum">     139 </span><span class="lineCov">          6 :       void call(array *dst, const array *src)</span>
+<span class="lineNum">     140 </span>            :       {
+<span class="lineNum">     141 </span><span class="lineCov">         12 :         std::vector&lt;char *&gt; src_data(narg);</span>
+<span class="lineNum">     142 </span><span class="lineCov">         22 :         for (int i = 0; i &lt; narg; ++i) {</span>
+<span class="lineNum">     143 </span><span class="lineCov">         16 :           src_data[i] = const_cast&lt;char *&gt;(src[i].cdata());</span>
+<span class="lineNum">     144 </span>            :         }
+<span class="lineNum">     145 </span><span class="lineCov">          6 :         this-&gt;single(const_cast&lt;char *&gt;(dst-&gt;cdata()), src_data.data());</span>
+<a name="146"><span class="lineNum">     146 </span><span class="lineCov">          6 :       }</span></a>
+<span class="lineNum">     147 </span>            : 
+<span class="lineNum">     148 </span><span class="lineCov">          6 :       void single(char *dst, char *const *src)</span>
+<span class="lineNum">     149 </span>            :       {
+<span class="lineNum">     150 </span><span class="lineCov">         12 :         std::vector&lt;char *&gt; buf_src(narg);</span>
+<span class="lineNum">     151 </span><span class="lineCov">         22 :         for (intptr_t i = 0; i &lt; narg; ++i) {</span>
+<span class="lineNum">     152 </span><span class="lineCov">         16 :           if (!m_bufs[i].is_null()) {</span>
+<span class="lineNum">     153 </span><span class="lineCov">          6 :             m_bufs[i].reset_arrmeta();</span>
+<span class="lineNum">     154 </span><span class="lineCov">          6 :             kernel_prefix *ck = get_child(m_src_buf_ck_offsets[i]);</span>
+<span class="lineNum">     155 </span><span class="lineCov">          6 :             ck-&gt;single(m_bufs[i].get_storage(), &amp;src[i]);</span>
+<span class="lineNum">     156 </span><span class="lineCov">          6 :             buf_src[i] = m_bufs[i].get_storage();</span>
+<span class="lineNum">     157 </span>            :           }
+<span class="lineNum">     158 </span>            :           else {
+<span class="lineNum">     159 </span><span class="lineCov">         10 :             buf_src[i] = src[i];</span>
+<span class="lineNum">     160 </span>            :           }
+<span class="lineNum">     161 </span>            :         }
+<span class="lineNum">     162 </span><span class="lineCov">          6 :         kernel_prefix *child = get_child();</span>
+<span class="lineNum">     163 </span><span class="lineCov">          6 :         child-&gt;single(dst, &amp;buf_src[0]);</span>
+<a name="164"><span class="lineNum">     164 </span><span class="lineCov">          6 :       }</span></a>
+<span class="lineNum">     165 </span>            : 
+<span class="lineNum">     166 </span><span class="lineCov">          1 :       void strided(char *dst, intptr_t dst_stride, char *const *src, const intptr_t *src_stride, size_t count)</span>
+<span class="lineNum">     167 </span>            :       {
+<span class="lineNum">     168 </span><span class="lineCov">          2 :         std::vector&lt;char *&gt; buf_src(narg);</span>
+<span class="lineNum">     169 </span><span class="lineCov">          2 :         std::vector&lt;intptr_t&gt; buf_stride(narg);</span>
+<span class="lineNum">     170 </span><span class="lineCov">          1 :         kernel_prefix *child = get_child();</span>
+<span class="lineNum">     171 </span><span class="lineCov">          1 :         kernel_strided_t child_fn = child-&gt;get_function&lt;kernel_strided_t&gt;();</span>
+<span class="lineNum">     172 </span>            : 
+<span class="lineNum">     173 </span><span class="lineCov">          3 :         for (intptr_t i = 0; i &lt; narg; ++i) {</span>
+<span class="lineNum">     174 </span><span class="lineCov">          2 :           if (!m_bufs[i].is_null()) {</span>
+<span class="lineNum">     175 </span><span class="lineCov">          2 :             buf_src[i] = m_bufs[i].get_storage();</span>
+<span class="lineNum">     176 </span><span class="lineCov">          2 :             buf_stride[i] = m_bufs[i].get_stride();</span>
+<span class="lineNum">     177 </span>            :           }
+<span class="lineNum">     178 </span>            :           else {
+<span class="lineNum">     179 </span><span class="lineNoCov">          0 :             buf_src[i] = src[i];</span>
+<span class="lineNum">     180 </span><span class="lineNoCov">          0 :             buf_stride[i] = src_stride[i];</span>
+<span class="lineNum">     181 </span>            :           }
+<span class="lineNum">     182 </span>            :         }
+<span class="lineNum">     183 </span>            : 
+<span class="lineNum">     184 </span><span class="lineCov">          3 :         while (count &gt; 0) {</span>
+<span class="lineNum">     185 </span><span class="lineCov">          1 :           size_t chunk_size = std::min(count, (size_t)DYND_BUFFER_CHUNK_SIZE);</span>
+<span class="lineNum">     186 </span><span class="lineCov">          3 :           for (intptr_t i = 0; i &lt; narg; ++i) {</span>
+<span class="lineNum">     187 </span><span class="lineCov">          2 :             if (!m_bufs[i].is_null()) {</span>
+<span class="lineNum">     188 </span><span class="lineCov">          2 :               m_bufs[i].reset_arrmeta();</span>
+<span class="lineNum">     189 </span><span class="lineCov">          2 :               kernel_prefix *ck = get_child(m_src_buf_ck_offsets[i]);</span>
+<span class="lineNum">     190 </span><span class="lineCov">          2 :               kernel_strided_t ck_fn = ck-&gt;get_function&lt;kernel_strided_t&gt;();</span>
+<span class="lineNum">     191 </span><span class="lineCov">          2 :               ck_fn(ck, m_bufs[i].get_storage(), m_bufs[i].get_stride(), &amp;src[i], &amp;src_stride[i], chunk_size);</span>
+<span class="lineNum">     192 </span>            :             }
+<span class="lineNum">     193 </span>            :           }
+<span class="lineNum">     194 </span><span class="lineCov">          1 :           child_fn(child, dst, dst_stride, &amp;buf_src[0], &amp;buf_stride[0], chunk_size);</span>
+<span class="lineNum">     195 </span><span class="lineCov">          3 :           for (intptr_t i = 0; i &lt; narg; ++i) {</span>
+<span class="lineNum">     196 </span><span class="lineCov">          2 :             if (!m_bufs[i].is_null()) {</span>
+<span class="lineNum">     197 </span><span class="lineCov">          2 :               m_bufs[i].reset_arrmeta();</span>
+<span class="lineNum">     198 </span><span class="lineCov">          2 :               kernel_prefix *ck = get_child(m_src_buf_ck_offsets[i]);</span>
+<span class="lineNum">     199 </span><span class="lineCov">          2 :               kernel_strided_t ck_fn = ck-&gt;get_function&lt;kernel_strided_t&gt;();</span>
+<span class="lineNum">     200 </span><span class="lineCov">          2 :               ck_fn(ck, m_bufs[i].get_storage(), buf_stride[i], &amp;src[i], &amp;src_stride[i], chunk_size);</span>
+<span class="lineNum">     201 </span>            :             }
+<span class="lineNum">     202 </span>            :             else {
+<span class="lineNum">     203 </span><span class="lineNoCov">          0 :               buf_src[i] += chunk_size * buf_stride[i];</span>
+<span class="lineNum">     204 </span>            :             }
+<span class="lineNum">     205 </span>            :           }
+<span class="lineNum">     206 </span><span class="lineCov">          1 :           count -= chunk_size;</span>
+<span class="lineNum">     207 </span>            :         }
+<a name="208"><span class="lineNum">     208 </span><span class="lineCov">          1 :       }</span></a>
+<span class="lineNum">     209 </span>            : 
+<span class="lineNum">     210 </span><span class="lineCov">          7 :       static void instantiate(char *static_data, char *DYND_UNUSED(data), kernel_builder *ckb, const ndt::type &amp;dst_tp,</span>
+<span class="lineNum">     211 </span>            :                               const char *dst_arrmeta, intptr_t nsrc, const ndt::type *src_tp,
+<span class="lineNum">     212 </span>            :                               const char *const *src_arrmeta, kernel_request_t kernreq, intptr_t nkwd,
+<span class="lineNum">     213 </span>            :                               const array *kwds, const std::map&lt;std::string, ndt::type&gt; &amp;tp_vars)
+<span class="lineNum">     214 </span>            :       {
+<span class="lineNum">     215 </span><span class="lineCov">          7 :         intptr_t ckb_offset = ckb-&gt;size();</span>
+<span class="lineNum">     216 </span><span class="lineCov">          7 :         callable &amp;af = *reinterpret_cast&lt;callable *&gt;(static_data);</span>
+<span class="lineNum">     217 </span><span class="lineCov">          7 :         const std::vector&lt;ndt::type&gt; &amp;src_tp_for_af = af.get_type()-&gt;get_pos_types();</span>
+<span class="lineNum">     218 </span>            : 
+<span class="lineNum">     219 </span><span class="lineCov">          7 :         intptr_t root_ckb_offset = ckb_offset;</span>
+<span class="lineNum">     220 </span><span class="lineCov">          7 :         ckb-&gt;emplace_back&lt;convert_kernel&gt;(kernreq, nsrc);</span>
+<span class="lineNum">     221 </span><span class="lineCov">          7 :         ckb_offset = ckb-&gt;size();</span>
+<span class="lineNum">     222 </span><span class="lineCov">         14 :         std::vector&lt;const char *&gt; buffered_arrmeta(nsrc);</span>
+<span class="lineNum">     223 </span><span class="lineCov">          7 :         convert_kernel *self = ckb-&gt;get_at&lt;convert_kernel&gt;(root_ckb_offset);</span>
+<span class="lineNum">     224 </span><span class="lineCov">         25 :         for (intptr_t i = 0; i &lt; nsrc; ++i) {</span>
+<span class="lineNum">     225 </span><span class="lineCov">         18 :           if (src_tp[i] == src_tp_for_af[i]) {</span>
+<span class="lineNum">     226 </span><span class="lineCov">         10 :             buffered_arrmeta[i] = src_arrmeta[i];</span>
+<span class="lineNum">     227 </span>            :           }
+<span class="lineNum">     228 </span>            :           else {
+<span class="lineNum">     229 </span><span class="lineCov">          8 :             self-&gt;m_bufs[i].allocate(src_tp_for_af[i]);</span>
+<span class="lineNum">     230 </span><span class="lineCov">          8 :             buffered_arrmeta[i] = self-&gt;m_bufs[i].get_arrmeta();</span>
+<span class="lineNum">     231 </span>            :           }
+<span class="lineNum">     232 </span>            :         }
+<span class="lineNum">     233 </span>            :         // Instantiate the callable being buffered
+<span class="lineNum">     234 </span><span class="lineCov">         21 :         af.get()-&gt;instantiate(af.get()-&gt;static_data(), NULL, ckb, dst_tp, dst_arrmeta, nsrc, src_tp_for_af.data(),</span>
+<span class="lineNum">     235 </span><span class="lineCov">         21 :                               &amp;buffered_arrmeta[0], kernreq | kernel_request_data_only, nkwd, kwds, tp_vars);</span>
+<span class="lineNum">     236 </span><span class="lineCov">          7 :         ckb_offset = ckb-&gt;size();</span>
+<span class="lineNum">     237 </span><span class="lineCov">          7 :         reinterpret_cast&lt;kernel_builder *&gt;(ckb)-&gt;reserve(ckb_offset + sizeof(kernel_prefix));</span>
+<span class="lineNum">     238 </span><span class="lineCov">          7 :         self = reinterpret_cast&lt;kernel_builder *&gt;(ckb)-&gt;get_at&lt;convert_kernel&gt;(root_ckb_offset);</span>
+<span class="lineNum">     239 </span>            :         // Instantiate assignments for all the buffered operands
+<span class="lineNum">     240 </span><span class="lineCov">         25 :         for (intptr_t i = 0; i &lt; nsrc; ++i) {</span>
+<span class="lineNum">     241 </span><span class="lineCov">         18 :           if (!self-&gt;m_bufs[i].is_null()) {</span>
+<span class="lineNum">     242 </span><span class="lineCov">          8 :             self-&gt;m_src_buf_ck_offsets[i] = ckb_offset - root_ckb_offset;</span>
+<span class="lineNum">     243 </span><span class="lineCov">         16 :             nd::array error_mode = eval::default_eval_context.errmode;</span>
+<span class="lineNum">     244 </span><span class="lineCov">         16 :             assign::get()-&gt;instantiate(assign::get()-&gt;static_data(), NULL, ckb, src_tp_for_af[i],</span>
+<span class="lineNum">     245 </span><span class="lineCov">          8 :                                        self-&gt;m_bufs[i].get_arrmeta(), 1, src_tp + i, src_arrmeta + i,</span>
+<span class="lineNum">     246 </span><span class="lineCov">          8 :                                        kernreq | kernel_request_data_only, 1, &amp;error_mode, tp_vars);</span>
+<span class="lineNum">     247 </span><span class="lineCov">          8 :             ckb_offset = ckb-&gt;size();</span>
+<span class="lineNum">     248 </span><span class="lineCov">          8 :             reinterpret_cast&lt;kernel_builder *&gt;(ckb)-&gt;reserve(ckb_offset + sizeof(kernel_prefix));</span>
+<span class="lineNum">     249 </span><span class="lineCov">          8 :             if (i &lt; nsrc - 1) {</span>
+<span class="lineNum">     250 </span><span class="lineCov">          3 :               self = reinterpret_cast&lt;kernel_builder *&gt;(ckb)-&gt;get_at&lt;convert_kernel&gt;(root_ckb_offset);</span>
+<span class="lineNum">     251 </span>            :             }
+<span class="lineNum">     252 </span>            :           }
+<span class="lineNum">     253 </span>            :         }
+<span class="lineNum">     254 </span><span class="lineCov">          7 :       }</span>
+<span class="lineNum">     255 </span>            :     };
+<span class="lineNum">     256 </span>            : 
+<span class="lineNum">     257 </span>            :   } // namespace dynd::nd::functional
+<span class="lineNum">     258 </span>            : } // namespace dynd::nd
+<span class="lineNum">     259 </span>            : } // namespace dynd
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.10</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

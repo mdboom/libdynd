@@ -1,0 +1,383 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - coverage.info.cleaned - tests/array/test_json_parser.cpp</title>
+  <link rel="stylesheet" type="text/css" href="../../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../../index.html">top level</a> - <a href="index.html">tests/array</a> - test_json_parser.cpp<span style="font-size: 80%;"> (source / <a href="test_json_parser.cpp.func.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">coverage.info.cleaned</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">145</td>
+            <td class="headerCovTableEntry">150</td>
+            <td class="headerCovTableEntryHi">96.7 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2016-02-19</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">30</td>
+            <td class="headerCovTableEntry">30</td>
+            <td class="headerCovTableEntryHi">100.0 %</td>
+          </tr>
+          <tr><td><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : //</a>
+<span class="lineNum">       2 </span>            : // Copyright (C) 2011-15 DyND Developers
+<span class="lineNum">       3 </span>            : // BSD 2-Clause License, see LICENSE.txt
+<span class="lineNum">       4 </span>            : //
+<span class="lineNum">       5 </span>            : 
+<span class="lineNum">       6 </span>            : #include &lt;iostream&gt;
+<span class="lineNum">       7 </span>            : #include &lt;stdexcept&gt;
+<span class="lineNum">       8 </span>            : #include &lt;algorithm&gt;
+<span class="lineNum">       9 </span>            : #include &lt;cmath&gt;
+<span class="lineNum">      10 </span>            : 
+<span class="lineNum">      11 </span>            : #include &quot;inc_gtest.hpp&quot;
+<span class="lineNum">      12 </span>            : #include &quot;../dynd_assertions.hpp&quot;
+<span class="lineNum">      13 </span>            : 
+<span class="lineNum">      14 </span>            : #include &lt;dynd/view.hpp&gt;
+<span class="lineNum">      15 </span>            : #include &lt;dynd/json_parser.hpp&gt;
+<span class="lineNum">      16 </span>            : #include &lt;dynd/callable.hpp&gt;
+<span class="lineNum">      17 </span>            : #include &lt;dynd/types/var_dim_type.hpp&gt;
+<span class="lineNum">      18 </span>            : #include &lt;dynd/types/fixed_dim_type.hpp&gt;
+<span class="lineNum">      19 </span>            : #include &lt;dynd/types/struct_type.hpp&gt;
+<span class="lineNum">      20 </span>            : #include &lt;dynd/types/struct_type.hpp&gt;
+<span class="lineNum">      21 </span>            : #include &lt;dynd/types/date_type.hpp&gt;
+<span class="lineNum">      22 </span>            : #include &lt;dynd/types/string_type.hpp&gt;
+<span class="lineNum">      23 </span>            : #include &lt;dynd/types/option_type.hpp&gt;
+<span class="lineNum">      24 </span>            : #include &lt;dynd/parse.hpp&gt;
+<span class="lineNum">      25 </span>            : 
+<span class="lineNum">      26 </span>            : using namespace std;
+<a name="27"><span class="lineNum">      27 </span>            : using namespace dynd;</a>
+<span class="lineNum">      28 </span>            : 
+<span class="lineNum">      29 </span><span class="lineCov">          5 : TEST(JSONParser, UnsignedIntegerLimits)</span>
+<span class="lineNum">      30 </span>            : {
+<span class="lineNum">      31 </span><span class="lineCov">          2 :   nd::array n;</span>
+<span class="lineNum">      32 </span>            : 
+<span class="lineNum">      33 </span><span class="lineCov">          1 :   n = parse_json(ndt::make_type&lt;uint8_t&gt;(), &quot;0&quot;);</span>
+<span class="lineNum">      34 </span><span class="lineCov">          1 :   EXPECT_EQ(0u, n.as&lt;uint8_t&gt;());</span>
+<span class="lineNum">      35 </span><span class="lineCov">          1 :   n = parse_json(ndt::make_type&lt;uint8_t&gt;(), &quot;-0&quot;);</span>
+<span class="lineNum">      36 </span><span class="lineCov">          1 :   EXPECT_EQ(0u, n.as&lt;uint8_t&gt;());</span>
+<span class="lineNum">      37 </span><span class="lineCov">          1 :   n = parse_json(ndt::make_type&lt;uint8_t&gt;(), &quot;255&quot;);</span>
+<span class="lineNum">      38 </span><span class="lineCov">          1 :   EXPECT_EQ(255, n.as&lt;uint8_t&gt;());</span>
+<span class="lineNum">      39 </span><span class="lineCov">          1 :   n = parse_json(ndt::make_type&lt;uint16_t&gt;(), &quot;0&quot;);</span>
+<span class="lineNum">      40 </span><span class="lineCov">          1 :   EXPECT_EQ(0u, n.as&lt;uint16_t&gt;());</span>
+<span class="lineNum">      41 </span><span class="lineCov">          1 :   n = parse_json(ndt::make_type&lt;uint16_t&gt;(), &quot;-0&quot;);</span>
+<span class="lineNum">      42 </span><span class="lineCov">          1 :   EXPECT_EQ(0u, n.as&lt;uint16_t&gt;());</span>
+<span class="lineNum">      43 </span><span class="lineCov">          1 :   n = parse_json(ndt::make_type&lt;uint16_t&gt;(), &quot;65535&quot;);</span>
+<span class="lineNum">      44 </span><span class="lineCov">          1 :   EXPECT_EQ(65535, n.as&lt;uint16_t&gt;());</span>
+<span class="lineNum">      45 </span><span class="lineCov">          1 :   n = parse_json(ndt::make_type&lt;uint32_t&gt;(), &quot;0&quot;);</span>
+<span class="lineNum">      46 </span><span class="lineCov">          1 :   EXPECT_EQ(0u, n.as&lt;uint32_t&gt;());</span>
+<span class="lineNum">      47 </span><span class="lineCov">          1 :   n = parse_json(ndt::make_type&lt;uint32_t&gt;(), &quot;-0&quot;);</span>
+<span class="lineNum">      48 </span><span class="lineCov">          1 :   EXPECT_EQ(0u, n.as&lt;uint32_t&gt;());</span>
+<span class="lineNum">      49 </span><span class="lineCov">          1 :   n = parse_json(ndt::make_type&lt;uint32_t&gt;(), &quot;4294967295&quot;);</span>
+<span class="lineNum">      50 </span><span class="lineCov">          1 :   EXPECT_EQ(4294967295U, n.as&lt;uint32_t&gt;());</span>
+<span class="lineNum">      51 </span><span class="lineCov">          1 :   n = parse_json(ndt::make_type&lt;uint64_t&gt;(), &quot;0&quot;);</span>
+<span class="lineNum">      52 </span><span class="lineCov">          1 :   EXPECT_EQ(0u, n.as&lt;uint64_t&gt;());</span>
+<span class="lineNum">      53 </span><span class="lineCov">          1 :   n = parse_json(ndt::make_type&lt;uint64_t&gt;(), &quot;-0&quot;);</span>
+<span class="lineNum">      54 </span><span class="lineCov">          1 :   EXPECT_EQ(0u, n.as&lt;uint64_t&gt;());</span>
+<span class="lineNum">      55 </span>            : 
+<span class="lineNum">      56 </span><span class="lineCov">          1 :   n = parse_json(ndt::make_type&lt;uint64_t&gt;(), &quot;18446744073709551615&quot;);</span>
+<span class="lineNum">      57 </span><span class="lineCov">          1 :   EXPECT_EQ(18446744073709551615ULL, n.as&lt;uint64_t&gt;());</span>
+<span class="lineNum">      58 </span><span class="lineCov">          1 :   n = parse_json(ndt::make_type&lt;uint128&gt;(), &quot;0&quot;);</span>
+<span class="lineNum">      59 </span><span class="lineCov">          1 :   EXPECT_EQ(0u, n.as&lt;uint128&gt;());</span>
+<span class="lineNum">      60 </span><span class="lineCov">          1 :   n = parse_json(ndt::make_type&lt;uint128&gt;(), &quot;-0&quot;);</span>
+<span class="lineNum">      61 </span><span class="lineCov">          1 :   EXPECT_EQ(0u, n.as&lt;uint128&gt;());</span>
+<span class="lineNum">      62 </span><span class="lineCov">          1 :   n = parse_json(ndt::make_type&lt;uint128&gt;(), &quot;340282366920938463463374607431768211455&quot;);</span>
+<span class="lineNum">      63 </span><span class="lineCov">          1 :   EXPECT_EQ(0xffffffffffffffffULL, n.as&lt;uint128&gt;().m_lo);</span>
+<span class="lineNum">      64 </span><span class="lineCov">          1 :   EXPECT_EQ(0xffffffffffffffffULL, n.as&lt;uint128&gt;().m_hi);</span>
+<span class="lineNum">      65 </span><span class="lineCov">          2 :   EXPECT_THROW(parse_json(ndt::make_type&lt;uint8_t&gt;(), &quot;-1&quot;), exception);</span>
+<span class="lineNum">      66 </span><span class="lineCov">          2 :   EXPECT_THROW(parse_json(ndt::make_type&lt;uint8_t&gt;(), &quot;256&quot;), exception);</span>
+<span class="lineNum">      67 </span><span class="lineCov">          2 :   EXPECT_THROW(parse_json(ndt::make_type&lt;uint16_t&gt;(), &quot;-1&quot;), exception);</span>
+<span class="lineNum">      68 </span><span class="lineCov">          2 :   EXPECT_THROW(parse_json(ndt::make_type&lt;uint16_t&gt;(), &quot;65536&quot;), exception);</span>
+<span class="lineNum">      69 </span><span class="lineCov">          2 :   EXPECT_THROW(parse_json(ndt::make_type&lt;uint32_t&gt;(), &quot;-1&quot;), exception);</span>
+<span class="lineNum">      70 </span><span class="lineCov">          2 :   EXPECT_THROW(parse_json(ndt::make_type&lt;uint32_t&gt;(), &quot;4294967296&quot;), exception);</span>
+<span class="lineNum">      71 </span><span class="lineCov">          2 :   EXPECT_THROW(parse_json(ndt::make_type&lt;uint64_t&gt;(), &quot;-1&quot;), exception);</span>
+<span class="lineNum">      72 </span><span class="lineCov">          2 :   EXPECT_THROW(parse_json(ndt::make_type&lt;uint64_t&gt;(), &quot;18446744073709551616&quot;), exception);</span>
+<span class="lineNum">      73 </span><span class="lineCov">          2 :   EXPECT_THROW(parse_json(ndt::make_type&lt;uint128&gt;(), &quot;-1&quot;), exception);</span>
+<span class="lineNum">      74 </span><span class="lineCov">          2 :   EXPECT_THROW(parse_json(ndt::make_type&lt;uint128&gt;(), &quot;340282366920938463463374607431768211456&quot;), exception);</span>
+<a name="75"><span class="lineNum">      75 </span><span class="lineCov">          1 : }</span></a>
+<span class="lineNum">      76 </span>            : 
+<span class="lineNum">      77 </span><span class="lineCov">          5 : TEST(JSONParser, IntFromString)</span>
+<span class="lineNum">      78 </span>            : {
+<span class="lineNum">      79 </span><span class="lineCov">          2 :   nd::array a;</span>
+<span class="lineNum">      80 </span>            : 
+<span class="lineNum">      81 </span><span class="lineCov">          1 :   a = parse_json(ndt::make_type&lt;int&gt;(), &quot;\&quot;123456\&quot;&quot;);</span>
+<span class="lineNum">      82 </span><span class="lineCov">          1 :   EXPECT_EQ(123456, a.as&lt;int&gt;());</span>
+<span class="lineNum">      83 </span><span class="lineCov">          1 :   a = parse_json(ndt::make_type&lt;int&gt;(), &quot;\&quot;-123456\&quot;&quot;);</span>
+<span class="lineNum">      84 </span><span class="lineCov">          1 :   EXPECT_EQ(-123456, a.as&lt;int&gt;());</span>
+<span class="lineNum">      85 </span>            : 
+<span class="lineNum">      86 </span><span class="lineCov">          2 :   EXPECT_THROW(parse_json(ndt::make_type&lt;int&gt;(), &quot;\&quot;-12356blarg\&quot;&quot;), exception);</span>
+<span class="lineNum">      87 </span><span class="lineCov">          1 :   eval::eval_context ectx_nocheck;</span>
+<span class="lineNum">      88 </span><span class="lineCov">          1 :   ectx_nocheck.errmode = assign_error_nocheck;</span>
+<span class="lineNum">      89 </span><span class="lineCov">          1 :   a = parse_json(ndt::make_type&lt;int&gt;(), &quot;\&quot;-12356blarg\&quot;&quot;, &amp;ectx_nocheck);</span>
+<span class="lineNum">      90 </span><span class="lineCov">          1 :   EXPECT_EQ(-12356, a.as&lt;int&gt;());</span>
+<a name="91"><span class="lineNum">      91 </span><span class="lineCov">          1 : }</span></a>
+<span class="lineNum">      92 </span>            : 
+<span class="lineNum">      93 </span><span class="lineCov">          5 : TEST(JSONParser, BuiltinsFromFloat)</span>
+<span class="lineNum">      94 </span>            : {
+<span class="lineNum">      95 </span><span class="lineCov">          2 :   nd::array n;</span>
+<span class="lineNum">      96 </span>            : 
+<span class="lineNum">      97 </span><span class="lineCov">          1 :   n = parse_json(ndt::make_type&lt;float&gt;(), &quot;123&quot;);</span>
+<span class="lineNum">      98 </span><span class="lineCov">          1 :   EXPECT_EQ(ndt::make_type&lt;float&gt;(), n.get_type());</span>
+<span class="lineNum">      99 </span><span class="lineCov">          1 :   EXPECT_EQ(123.f, n.as&lt;float&gt;());</span>
+<span class="lineNum">     100 </span><span class="lineCov">          1 :   n = parse_json(ndt::make_type&lt;float&gt;(), &quot;1.5&quot;);</span>
+<span class="lineNum">     101 </span><span class="lineCov">          1 :   EXPECT_EQ(ndt::make_type&lt;float&gt;(), n.get_type());</span>
+<span class="lineNum">     102 </span><span class="lineCov">          1 :   EXPECT_EQ(1.5f, n.as&lt;float&gt;());</span>
+<span class="lineNum">     103 </span><span class="lineCov">          1 :   n = parse_json(ndt::make_type&lt;float&gt;(), &quot;1.5e2&quot;);</span>
+<span class="lineNum">     104 </span><span class="lineCov">          1 :   EXPECT_EQ(ndt::make_type&lt;float&gt;(), n.get_type());</span>
+<span class="lineNum">     105 </span><span class="lineCov">          1 :   EXPECT_EQ(1.5e2f, n.as&lt;float&gt;());</span>
+<span class="lineNum">     106 </span>            : 
+<span class="lineNum">     107 </span><span class="lineCov">          1 :   n = parse_json(ndt::make_type&lt;double&gt;(), &quot;123&quot;);</span>
+<span class="lineNum">     108 </span><span class="lineCov">          1 :   EXPECT_EQ(ndt::make_type&lt;double&gt;(), n.get_type());</span>
+<span class="lineNum">     109 </span><span class="lineCov">          1 :   EXPECT_EQ(123., n.as&lt;double&gt;());</span>
+<span class="lineNum">     110 </span><span class="lineCov">          1 :   n = parse_json(ndt::make_type&lt;double&gt;(), &quot;1.5&quot;);</span>
+<span class="lineNum">     111 </span><span class="lineCov">          1 :   EXPECT_EQ(ndt::make_type&lt;double&gt;(), n.get_type());</span>
+<span class="lineNum">     112 </span><span class="lineCov">          1 :   EXPECT_EQ(1.5, n.as&lt;double&gt;());</span>
+<span class="lineNum">     113 </span><span class="lineCov">          1 :   n = parse_json(ndt::make_type&lt;double&gt;(), &quot;1.5e2&quot;);</span>
+<span class="lineNum">     114 </span><span class="lineCov">          1 :   EXPECT_EQ(ndt::make_type&lt;double&gt;(), n.get_type());</span>
+<span class="lineNum">     115 </span><span class="lineCov">          1 :   EXPECT_EQ(1.5e2, n.as&lt;double&gt;());</span>
+<a name="116"><span class="lineNum">     116 </span><span class="lineCov">          1 : }</span></a>
+<span class="lineNum">     117 </span>            : 
+<span class="lineNum">     118 </span><span class="lineCov">          5 : TEST(JSONParser, Struct)</span>
+<span class="lineNum">     119 </span>            : {
+<span class="lineNum">     120 </span><span class="lineCov">          2 :   nd::array n;</span>
+<span class="lineNum">     121 </span>            :   ndt::type sdt = ndt::struct_type::make({&quot;id&quot;, &quot;amount&quot;, &quot;name&quot;, &quot;when&quot;},
+<span class="lineNum">     122 </span>            :                                          {ndt::make_type&lt;int&gt;(), ndt::make_type&lt;double&gt;(),
+<span class="lineNum">     123 </span><span class="lineCov">          2 :                                           ndt::make_type&lt;ndt::string_type&gt;(), ndt::make_type&lt;ndt::string_type&gt;()});</span>
+<span class="lineNum">     124 </span>            : 
+<span class="lineNum">     125 </span>            :   // A straightforward struct
+<span class="lineNum">     126 </span><span class="lineCov">          2 :   n = parse_json(sdt, &quot;{\&quot;amount\&quot;:3.75,\&quot;id\&quot;:24601,&quot;</span>
+<span class="lineNum">     127 </span><span class="lineCov">          1 :                       &quot; \&quot;when\&quot;:\&quot;2012-09-19\&quot;,\&quot;name\&quot;:\&quot;Jean\&quot;}&quot;);</span>
+<span class="lineNum">     128 </span><span class="lineCov">          1 :   EXPECT_EQ(sdt, n.get_type());</span>
+<span class="lineNum">     129 </span><span class="lineCov">          1 :   EXPECT_EQ(24601, n(0).as&lt;int&gt;());</span>
+<span class="lineNum">     130 </span><span class="lineCov">          1 :   EXPECT_EQ(3.75, n(1).as&lt;double&gt;());</span>
+<span class="lineNum">     131 </span><span class="lineCov">          1 :   EXPECT_EQ(&quot;Jean&quot;, n(2).as&lt;std::string&gt;());</span>
+<span class="lineNum">     132 </span><span class="lineCov">          1 :   EXPECT_EQ(&quot;2012-09-19&quot;, n(3).as&lt;std::string&gt;());</span>
+<span class="lineNum">     133 </span>            : 
+<span class="lineNum">     134 </span>            :   // Default parsing policy discards extra JSON fields
+<span class="lineNum">     135 </span><span class="lineCov">          2 :   n = parse_json(sdt, &quot;{\&quot;amount\&quot;:3.75,\&quot;id\&quot;:24601,\&quot;discarded\&quot;:[1,2,3],&quot;</span>
+<span class="lineNum">     136 </span><span class="lineCov">          1 :                       &quot; \&quot;when\&quot;:\&quot;2012-09-19\&quot;,\&quot;name\&quot;:\&quot;Jean\&quot;}&quot;);</span>
+<span class="lineNum">     137 </span><span class="lineCov">          1 :   EXPECT_EQ(sdt, n.get_type());</span>
+<span class="lineNum">     138 </span><span class="lineCov">          1 :   EXPECT_EQ(24601, n(0).as&lt;int&gt;());</span>
+<span class="lineNum">     139 </span><span class="lineCov">          1 :   EXPECT_EQ(3.75, n(1).as&lt;double&gt;());</span>
+<span class="lineNum">     140 </span><span class="lineCov">          1 :   EXPECT_EQ(&quot;Jean&quot;, n(2).as&lt;std::string&gt;());</span>
+<span class="lineNum">     141 </span><span class="lineCov">          1 :   EXPECT_EQ(&quot;2012-09-19&quot;, n(3).as&lt;std::string&gt;());</span>
+<span class="lineNum">     142 </span>            : 
+<span class="lineNum">     143 </span>            :   // Every field must be populated, though
+<span class="lineNum">     144 </span><span class="lineCov">          2 :   EXPECT_THROW(parse_json(sdt, &quot;{\&quot;amount\&quot;:3.75,\&quot;discarded\&quot;:[1,2,3],&quot;</span>
+<span class="lineNum">     145 </span>            :                                &quot; \&quot;when\&quot;:\&quot;2012-09-19\&quot;,\&quot;name\&quot;:\&quot;Jean\&quot;}&quot;),
+<span class="lineNum">     146 </span><span class="lineNoCov">          0 :                invalid_argument);</span>
+<a name="147"><span class="lineNum">     147 </span><span class="lineCov">          1 : }</span></a>
+<span class="lineNum">     148 </span>            : 
+<span class="lineNum">     149 </span><span class="lineCov">          5 : TEST(JSONParser, NestedStruct)</span>
+<span class="lineNum">     150 </span>            : {
+<span class="lineNum">     151 </span><span class="lineCov">          2 :   nd::array n;</span>
+<span class="lineNum">     152 </span>            :   ndt::type sdt = ndt::struct_type::make(
+<span class="lineNum">     153 </span><span class="lineCov">          2 :       {&quot;position&quot;, &quot;amount&quot;, &quot;data&quot;}, {ndt::make_fixed_dim(3, ndt::make_type&lt;float&gt;()), ndt::make_type&lt;double&gt;(),</span>
+<span class="lineNum">     154 </span>            :                                        ndt::struct_type::make({&quot;name&quot;, &quot;when&quot;}, {ndt::make_type&lt;ndt::string_type&gt;(),
+<span class="lineNum">     155 </span><span class="lineCov">          2 :                                                                                  ndt::make_type&lt;ndt::string_type&gt;()})});</span>
+<span class="lineNum">     156 </span>            : 
+<span class="lineNum">     157 </span><span class="lineCov">          2 :   n = parse_json(sdt, &quot;{\&quot;data\&quot;:{\&quot;name\&quot;:\&quot;Harvey\&quot;, \&quot;when\&quot;:\&quot;1970-02-13\&quot;}, &quot;</span>
+<span class="lineNum">     158 </span><span class="lineCov">          1 :                       &quot;\&quot;amount\&quot;: 10.5, \&quot;position\&quot;: [3.5,1.0,1e10] }&quot;);</span>
+<span class="lineNum">     159 </span><span class="lineCov">          1 :   EXPECT_EQ(sdt, n.get_type());</span>
+<span class="lineNum">     160 </span><span class="lineCov">          1 :   EXPECT_EQ(3.5, n(0, 0).as&lt;float&gt;());</span>
+<span class="lineNum">     161 </span><span class="lineCov">          1 :   EXPECT_EQ(1.0, n(0, 1).as&lt;float&gt;());</span>
+<span class="lineNum">     162 </span><span class="lineCov">          1 :   EXPECT_EQ(1e10, n(0, 2).as&lt;float&gt;());</span>
+<span class="lineNum">     163 </span><span class="lineCov">          1 :   EXPECT_EQ(10.5, n(1).as&lt;double&gt;());</span>
+<span class="lineNum">     164 </span><span class="lineCov">          1 :   EXPECT_EQ(&quot;Harvey&quot;, n(2, 0).as&lt;std::string&gt;());</span>
+<span class="lineNum">     165 </span><span class="lineCov">          1 :   EXPECT_EQ(&quot;1970-02-13&quot;, n(2, 1).as&lt;std::string&gt;());</span>
+<span class="lineNum">     166 </span>            : 
+<span class="lineNum">     167 </span>            :   // Too many entries in &quot;position&quot;
+<span class="lineNum">     168 </span><span class="lineCov">          2 :   EXPECT_THROW(parse_json(sdt, &quot;{\&quot;data\&quot;:{\&quot;name\&quot;:\&quot;Harvey\&quot;, \&quot;when\&quot;:\&quot;1970-02-13\&quot;}, &quot;</span>
+<span class="lineNum">     169 </span>            :                                &quot;\&quot;amount\&quot;: 10.5, \&quot;position\&quot;: [1.5,3.5,1.0,1e10] }&quot;),
+<span class="lineNum">     170 </span><span class="lineNoCov">          0 :                invalid_argument);</span>
+<span class="lineNum">     171 </span>            : 
+<span class="lineNum">     172 </span>            :   // Too few entries in &quot;position&quot;
+<span class="lineNum">     173 </span><span class="lineCov">          2 :   EXPECT_THROW(parse_json(sdt, &quot;{\&quot;data\&quot;:{\&quot;name\&quot;:\&quot;Harvey\&quot;, \&quot;when\&quot;:\&quot;1970-02-13\&quot;}, &quot;</span>
+<span class="lineNum">     174 </span>            :                                &quot;\&quot;amount\&quot;: 10.5, \&quot;position\&quot;: [1.0,1e10] }&quot;),
+<span class="lineNum">     175 </span><span class="lineNoCov">          0 :                invalid_argument);</span>
+<span class="lineNum">     176 </span>            : 
+<span class="lineNum">     177 </span>            :   // Missing field &quot;when&quot;
+<span class="lineNum">     178 </span><span class="lineCov">          2 :   EXPECT_THROW(parse_json(sdt, &quot;{\&quot;data\&quot;:{\&quot;name\&quot;:\&quot;Harvey\&quot;, \&quot;when2\&quot;:\&quot;1970-02-13\&quot;}, &quot;</span>
+<span class="lineNum">     179 </span>            :                                &quot;\&quot;amount\&quot;: 10.5, \&quot;position\&quot;: [3.5,1.0,1e10] }&quot;),
+<span class="lineNum">     180 </span><span class="lineNoCov">          0 :                invalid_argument);</span>
+<a name="181"><span class="lineNum">     181 </span><span class="lineCov">          1 : }</span></a>
+<span class="lineNum">     182 </span>            : 
+<span class="lineNum">     183 </span><span class="lineCov">          5 : TEST(JSONParser, ListOfStruct)</span>
+<span class="lineNum">     184 </span>            : {
+<span class="lineNum">     185 </span><span class="lineCov">          2 :   nd::array n;</span>
+<span class="lineNum">     186 </span>            :   ndt::type sdt = ndt::var_dim_type::make(
+<span class="lineNum">     187 </span><span class="lineCov">          6 :       ndt::struct_type::make({&quot;position&quot;, &quot;amount&quot;, &quot;data&quot;},</span>
+<span class="lineNum">     188 </span><span class="lineCov">          2 :                              {ndt::make_fixed_dim(3, ndt::make_type&lt;float&gt;()), ndt::make_type&lt;double&gt;(),</span>
+<span class="lineNum">     189 </span>            :                               ndt::struct_type::make({&quot;name&quot;, &quot;when&quot;}, {ndt::make_type&lt;ndt::string_type&gt;(),
+<span class="lineNum">     190 </span><span class="lineCov">         13 :                                                                         ndt::make_type&lt;ndt::string_type&gt;()})}));</span>
+<span class="lineNum">     191 </span>            : 
+<span class="lineNum">     192 </span><span class="lineCov">          2 :   n = parse_json(sdt, &quot;[{\&quot;data\&quot;:{\&quot;name\&quot;:\&quot;Harvey\&quot;, \&quot;when\&quot;:\&quot;1970-02-13\&quot;}, \n&quot;</span>
+<span class="lineNum">     193 </span>            :                       &quot;\&quot;amount\&quot;: 10.5, \&quot;position\&quot;: [3.5,1.0,1e10] },\n&quot;
+<span class="lineNum">     194 </span>            :                       &quot;{\&quot;position\&quot;:[1,2,3], \&quot;amount\&quot;: 3.125,\n&quot;
+<span class="lineNum">     195 </span><span class="lineCov">          1 :                       &quot;\&quot;data\&quot;:{ \&quot;when\&quot;:\&quot;2013-12-25\&quot;, \&quot;name\&quot;:\&quot;Frank\&quot;}}]&quot;);</span>
+<span class="lineNum">     196 </span><span class="lineCov">          1 :   EXPECT_EQ(3.5, n(0, 0, 0).as&lt;float&gt;());</span>
+<span class="lineNum">     197 </span><span class="lineCov">          1 :   EXPECT_EQ(1.0, n(0, 0, 1).as&lt;float&gt;());</span>
+<span class="lineNum">     198 </span><span class="lineCov">          1 :   EXPECT_EQ(1e10, n(0, 0, 2).as&lt;float&gt;());</span>
+<span class="lineNum">     199 </span><span class="lineCov">          1 :   EXPECT_EQ(10.5, n(0, 1).as&lt;double&gt;());</span>
+<span class="lineNum">     200 </span><span class="lineCov">          1 :   EXPECT_EQ(&quot;Harvey&quot;, n(0, 2, 0).as&lt;std::string&gt;());</span>
+<span class="lineNum">     201 </span><span class="lineCov">          1 :   EXPECT_EQ(&quot;1970-02-13&quot;, n(0, 2, 1).as&lt;std::string&gt;());</span>
+<span class="lineNum">     202 </span><span class="lineCov">          1 :   EXPECT_EQ(1, n(1, 0, 0).as&lt;float&gt;());</span>
+<span class="lineNum">     203 </span><span class="lineCov">          1 :   EXPECT_EQ(2, n(1, 0, 1).as&lt;float&gt;());</span>
+<span class="lineNum">     204 </span><span class="lineCov">          1 :   EXPECT_EQ(3, n(1, 0, 2).as&lt;float&gt;());</span>
+<span class="lineNum">     205 </span><span class="lineCov">          1 :   EXPECT_EQ(3.125, n(1, 1).as&lt;double&gt;());</span>
+<span class="lineNum">     206 </span><span class="lineCov">          1 :   EXPECT_EQ(&quot;Frank&quot;, n(1, 2, 0).as&lt;std::string&gt;());</span>
+<span class="lineNum">     207 </span><span class="lineCov">          1 :   EXPECT_EQ(&quot;2013-12-25&quot;, n(1, 2, 1).as&lt;std::string&gt;());</span>
+<span class="lineNum">     208 </span>            : 
+<span class="lineNum">     209 </span>            :   // Spurious '#' inserted
+<span class="lineNum">     210 </span><span class="lineCov">          2 :   EXPECT_THROW(parse_json(sdt, &quot;[{\&quot;data\&quot;:{\&quot;name\&quot;:\&quot;Harvey\&quot;, \&quot;when\&quot;:\&quot;1970-02-13\&quot;}, \n&quot;</span>
+<span class="lineNum">     211 </span>            :                                &quot;\&quot;amount\&quot;: 10.5, \&quot;position\&quot;: [3.5,1.0,1e10] },\n&quot;
+<span class="lineNum">     212 </span>            :                                &quot;{\&quot;position\&quot;:[1,2,3], \&quot;amount\&quot;: 3.125#,\n&quot;
+<span class="lineNum">     213 </span>            :                                &quot;\&quot;data\&quot;:{ \&quot;when\&quot;:\&quot;2013-12-25\&quot;, \&quot;name\&quot;:\&quot;Frank\&quot;}}]&quot;),
+<span class="lineNum">     214 </span><span class="lineNoCov">          0 :                invalid_argument);</span>
+<a name="215"><span class="lineNum">     215 </span><span class="lineCov">          1 : }</span></a>
+<span class="lineNum">     216 </span>            : 
+<span class="lineNum">     217 </span><span class="lineCov">          5 : TEST(JSON, ParserWithMissingValue)</span>
+<span class="lineNum">     218 </span>            : {
+<span class="lineNum">     219 </span><span class="lineCov">          2 :   nd::array a = parse_json(ndt::type(&quot;{x: ?int32, y: ?float64}&quot;), &quot;{\&quot;x\&quot;: 7}&quot;);</span>
+<span class="lineNum">     220 </span><span class="lineCov">          1 :   EXPECT_ARRAY_VALS_EQ(a.p(&quot;x&quot;), 7);</span>
+<span class="lineNum">     221 </span><span class="lineCov">          1 :   EXPECT_TRUE(a.p(&quot;y&quot;).is_na());</span>
+<span class="lineNum">     222 </span>            : 
+<span class="lineNum">     223 </span><span class="lineCov">          1 :   a = parse_json(ndt::type(&quot;{x: ?int32, y: ?float64}&quot;), &quot;{\&quot;x\&quot;: 7, \&quot;y\&quot;: 11.5}&quot;);</span>
+<span class="lineNum">     224 </span><span class="lineCov">          1 :   EXPECT_ARRAY_VALS_EQ(a.p(&quot;x&quot;), 7);</span>
+<span class="lineNum">     225 </span><span class="lineCov">          1 :   EXPECT_ARRAY_VALS_EQ(a.p(&quot;y&quot;), 11.5);</span>
+<span class="lineNum">     226 </span>            : 
+<span class="lineNum">     227 </span><span class="lineCov">          1 :   a = parse_json(ndt::type(&quot;{x: ?int32, y: ?float64}&quot;), &quot;{}&quot;);</span>
+<a name="228"><span class="lineNum">     228 </span><span class="lineCov">          1 :   EXPECT_TRUE(a.p(&quot;x&quot;).is_na());</span></a>
+<span class="lineNum">     229 </span><span class="lineCov">          1 :   EXPECT_TRUE(a.p(&quot;y&quot;).is_na());</span>
+<span class="lineNum">     230 </span><span class="lineCov">          4 : }</span>
+<span class="lineNum">     231 </span>            : 
+<span class="lineNum">     232 </span>            : /*
+<span class="lineNum">     233 </span>            : TEST(JSON, DiscoverBool)
+<span class="lineNum">     234 </span>            : {
+<span class="lineNum">     235 </span>            :   EXPECT_EQ(ndt::make_type&lt;bool1&gt;(), ndt::json::discover(&quot;true&quot;));
+<span class="lineNum">     236 </span>            :   EXPECT_EQ(ndt::make_type&lt;bool1&gt;(), ndt::json::discover(&quot;false&quot;));
+<span class="lineNum">     237 </span>            : }
+<span class="lineNum">     238 </span>            : 
+<span class="lineNum">     239 </span>            : TEST(JSON, DiscoverInt64)
+<span class="lineNum">     240 </span>            : {
+<span class="lineNum">     241 </span>            :   EXPECT_EQ(ndt::make_type&lt;int64&gt;(), ndt::json::discover(&quot;0&quot;));
+<span class="lineNum">     242 </span>            :   EXPECT_EQ(ndt::make_type&lt;int64&gt;(), ndt::json::discover(&quot;3&quot;));
+<span class="lineNum">     243 </span>            :   EXPECT_EQ(ndt::make_type&lt;int64&gt;(), ndt::json::discover(&quot;11&quot;));
+<span class="lineNum">     244 </span>            : 
+<span class="lineNum">     245 </span>            :   EXPECT_EQ(ndt::make_type&lt;int64&gt;(), ndt::json::discover(&quot;-1&quot;));
+<span class="lineNum">     246 </span>            :   EXPECT_EQ(ndt::make_type&lt;int64&gt;(), ndt::json::discover(&quot;-5&quot;));
+<span class="lineNum">     247 </span>            : }
+<span class="lineNum">     248 </span>            : 
+<span class="lineNum">     249 </span>            : TEST(JSON, DiscoverFloat64)
+<span class="lineNum">     250 </span>            : {
+<span class="lineNum">     251 </span>            :   EXPECT_EQ(ndt::make_type&lt;float64&gt;(), ndt::json::discover(&quot;0.5&quot;));
+<span class="lineNum">     252 </span>            :   EXPECT_EQ(ndt::make_type&lt;float64&gt;(), ndt::json::discover(&quot;3.14&quot;));
+<span class="lineNum">     253 </span>            : }
+<span class="lineNum">     254 </span>            : 
+<span class="lineNum">     255 </span>            : TEST(JSON, DiscoverString) { EXPECT_EQ(ndt::type(string_id), ndt::json::discover(&quot;\&quot;Hello, world!\&quot;&quot;)); }
+<span class="lineNum">     256 </span>            : 
+<span class="lineNum">     257 </span>            : TEST(JSON, DiscoverOption) { EXPECT_EQ(ndt::type(&quot;?Any&quot;), ndt::json::discover(&quot;null&quot;)); }
+<span class="lineNum">     258 </span>            : 
+<span class="lineNum">     259 </span>            : TEST(JSON, DiscoverArray)
+<span class="lineNum">     260 </span>            : {
+<span class="lineNum">     261 </span>            :   EXPECT_EQ(ndt::type(&quot;()&quot;), ndt::json::discover(&quot;[]&quot;));
+<span class="lineNum">     262 </span>            : 
+<span class="lineNum">     263 </span>            :   EXPECT_EQ(ndt::type(&quot;1 * int64&quot;), ndt::json::discover(&quot;[0]&quot;));
+<span class="lineNum">     264 </span>            :   EXPECT_EQ(ndt::type(&quot;1 * string&quot;), ndt::json::discover(&quot;[\&quot;JSON\&quot;]&quot;));
+<span class="lineNum">     265 </span>            :   EXPECT_EQ(ndt::type(&quot;1 * {x: int64, y: float64}&quot;), ndt::json::discover(&quot;[{\&quot;x\&quot;: 3, \&quot;y\&quot;: 0.75}]&quot;));
+<span class="lineNum">     266 </span>            :   EXPECT_EQ(ndt::type(&quot;2 * int64&quot;), ndt::json::discover(&quot;[11, -3]&quot;));
+<span class="lineNum">     267 </span>            :   EXPECT_EQ(ndt::type(&quot;5 * int64&quot;), ndt::json::discover(&quot;[0, 1, 2, 3, 4]&quot;));
+<span class="lineNum">     268 </span>            :   EXPECT_EQ(ndt::type(&quot;5 * float64&quot;), ndt::json::discover(&quot;[0, 1, 2.5, 3, 4]&quot;));
+<span class="lineNum">     269 </span>            :   EXPECT_EQ(ndt::type(&quot;5 * float64&quot;), ndt::json::discover(&quot;[0.5, 1, 2, 3, 4]&quot;));
+<span class="lineNum">     270 </span>            : 
+<span class="lineNum">     271 </span>            :   EXPECT_EQ(ndt::type(&quot;5 * ?int64&quot;), ndt::json::discover(&quot;[null, 1, 2, 3, 4]&quot;));
+<span class="lineNum">     272 </span>            :   EXPECT_EQ(ndt::type(&quot;5 * ?int64&quot;), ndt::json::discover(&quot;[0, 1, null, 3, 4]&quot;));
+<span class="lineNum">     273 </span>            :   EXPECT_EQ(ndt::type(&quot;5 * ?int64&quot;), ndt::json::discover(&quot;[0, 1, 2, 3, null]&quot;));
+<span class="lineNum">     274 </span>            :   EXPECT_EQ(ndt::type(&quot;3 * ?float64&quot;), ndt::json::discover(&quot;[null, -7, 3.3]&quot;));
+<span class="lineNum">     275 </span>            : 
+<span class="lineNum">     276 </span>            :   EXPECT_EQ(ndt::type(&quot;(int64, string)&quot;), ndt::json::discover(&quot;[2, \&quot;Hello, world!\&quot;]&quot;));
+<span class="lineNum">     277 </span>            : 
+<span class="lineNum">     278 </span>            :   EXPECT_EQ(ndt::type(&quot;2 * 1 * int64&quot;), ndt::json::discover(&quot;[[10], [7]]&quot;));
+<span class="lineNum">     279 </span>            :   EXPECT_EQ(ndt::type(&quot;1 * 2 * int64&quot;), ndt::json::discover(&quot;[[10, 7]]&quot;));
+<span class="lineNum">     280 </span>            :   EXPECT_EQ(ndt::type(&quot;2 * 2 * int64&quot;), ndt::json::discover(&quot;[[0, 1], [2, 3]]&quot;));
+<span class="lineNum">     281 </span>            :   EXPECT_EQ(ndt::type(&quot;2 * 3 * int64&quot;), ndt::json::discover(&quot;[[0, 1, 11], [2, 3, -4]]&quot;));
+<span class="lineNum">     282 </span>            : 
+<span class="lineNum">     283 </span>            :   EXPECT_EQ(ndt::type(&quot;2 * ?2 * int64&quot;), ndt::json::discover(&quot;[null, [2, 3]]&quot;));
+<span class="lineNum">     284 </span>            :   EXPECT_EQ(ndt::type(&quot;2 * ?3 * int64&quot;), ndt::json::discover(&quot;[[0, -1, 1], null]&quot;));
+<span class="lineNum">     285 </span>            :   EXPECT_EQ(ndt::type(&quot;2 * ?2 * float64&quot;), ndt::json::discover(&quot;[[0, 1.2], null]&quot;));
+<span class="lineNum">     286 </span>            : 
+<span class="lineNum">     287 </span>            :   EXPECT_EQ(ndt::type(&quot;2 * var * int64&quot;), ndt::json::discover(&quot;[[0, 1], [2]]&quot;));
+<span class="lineNum">     288 </span>            :   EXPECT_EQ(ndt::type(&quot;2 * var * var * int64&quot;), ndt::json::discover(&quot;[[[0, 1], [2]], [[3]]]&quot;));
+<span class="lineNum">     289 </span>            : 
+<span class="lineNum">     290 </span>            :   EXPECT_EQ(ndt::type(&quot;2 * var * 3 * int64&quot;), ndt::json::discover(&quot;[[[0, 1, 4], [2, 5, 3]], [[3, 1, 2]]]&quot;));
+<span class="lineNum">     291 </span>            : 
+<span class="lineNum">     292 </span>            :   EXPECT_EQ(ndt::type(&quot;2 * var * float64&quot;), ndt::json::discover(&quot;[[0.5, 1], [2]]&quot;));
+<span class="lineNum">     293 </span>            :   EXPECT_EQ(ndt::type(&quot;2 * var * ?float64&quot;), ndt::json::discover(&quot;[[0.5, 1], [null]]&quot;));
+<span class="lineNum">     294 </span>            : 
+<span class="lineNum">     295 </span>            :   EXPECT_EQ(ndt::type(&quot;2 * var * ?int64&quot;), ndt::json::discover(&quot;[[0, null], [2]]&quot;));
+<span class="lineNum">     296 </span>            : }
+<span class="lineNum">     297 </span>            : 
+<span class="lineNum">     298 </span>            : TEST(JSON, DiscoverObject)
+<span class="lineNum">     299 </span>            : {
+<span class="lineNum">     300 </span>            :   EXPECT_EQ(ndt::type(&quot;{}&quot;), ndt::json::discover(&quot;{}&quot;));
+<span class="lineNum">     301 </span>            : 
+<span class="lineNum">     302 </span>            :   EXPECT_EQ(ndt::type(&quot;{a: int64}&quot;), ndt::json::discover(&quot;{\&quot;a\&quot;: 3}&quot;));
+<span class="lineNum">     303 </span>            :   EXPECT_EQ(ndt::type(&quot;{a: float64}&quot;), ndt::json::discover(&quot;{\&quot;a\&quot;: 3.14}&quot;));
+<span class="lineNum">     304 </span>            : 
+<span class="lineNum">     305 </span>            :   EXPECT_EQ(ndt::type(&quot;{x: float64, y: 3 * int64}&quot;), ndt::json::discover(&quot;{\&quot;x\&quot;: 3.14, \&quot;y\&quot;: [1, 2, 3]}&quot;));
+<span class="lineNum">     306 </span>            : }
+<span class="lineNum">     307 </span>            : */
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.10</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

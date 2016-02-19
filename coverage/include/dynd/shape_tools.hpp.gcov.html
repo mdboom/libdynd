@@ -1,0 +1,334 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - coverage.info.cleaned - include/dynd/shape_tools.hpp</title>
+  <link rel="stylesheet" type="text/css" href="../../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../../index.html">top level</a> - <a href="index.html">include/dynd</a> - shape_tools.hpp<span style="font-size: 80%;"> (source / <a href="shape_tools.hpp.func.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">coverage.info.cleaned</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">18</td>
+            <td class="headerCovTableEntry">33</td>
+            <td class="headerCovTableEntryLo">54.5 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2016-02-19</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">3</td>
+            <td class="headerCovTableEntry">4</td>
+            <td class="headerCovTableEntryMed">75.0 %</td>
+          </tr>
+          <tr><td><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : //</a>
+<span class="lineNum">       2 </span>            : // Copyright (C) 2011-15 DyND Developers
+<span class="lineNum">       3 </span>            : // BSD 2-Clause License, see LICENSE.txt
+<span class="lineNum">       4 </span>            : //
+<span class="lineNum">       5 </span>            : 
+<span class="lineNum">       6 </span>            : #pragma once
+<span class="lineNum">       7 </span>            : 
+<span class="lineNum">       8 </span>            : #include &lt;iostream&gt;
+<span class="lineNum">       9 </span>            : 
+<span class="lineNum">      10 </span>            : #include &lt;dynd/type.hpp&gt;
+<span class="lineNum">      11 </span>            : #include &lt;dynd/shortvector.hpp&gt;
+<span class="lineNum">      12 </span>            : #include &lt;dynd/array.hpp&gt;
+<span class="lineNum">      13 </span>            : 
+<span class="lineNum">      14 </span>            : namespace dynd {
+<span class="lineNum">      15 </span>            : 
+<span class="lineNum">      16 </span>            : /**
+<span class="lineNum">      17 </span>            :  * This function returns true if the src_shape can broadcast to the dst_shape
+<span class="lineNum">      18 </span>            :  * It's following the same rules as numpy. The
+<span class="lineNum">      19 </span>            :  * destination ndim must be greator or equal, and each
+<span class="lineNum">      20 </span>            :  * dimension size must be broadcastable with everything
+<span class="lineNum">      21 </span>            :  * shoved to the right.
+<span class="lineNum">      22 </span>            :  */
+<span class="lineNum">      23 </span>            : DYND_API bool shape_can_broadcast(intptr_t dst_ndim, const intptr_t *dst_shape, intptr_t src_ndim,
+<span class="lineNum">      24 </span>            :                                   const intptr_t *src_shape);
+<span class="lineNum">      25 </span>            : 
+<span class="lineNum">      26 </span>            : inline bool shape_can_broadcast(const std::vector&lt;intptr_t&gt; &amp;dst_shape, const std::vector&lt;intptr_t&gt; &amp;src_shape)
+<span class="lineNum">      27 </span>            : {
+<span class="lineNum">      28 </span>            :   return shape_can_broadcast(dst_shape.size(), dst_shape.empty() ? NULL : &amp;dst_shape[0], src_shape.size(),
+<span class="lineNum">      29 </span>            :                              src_shape.empty() ? NULL : &amp;src_shape[0]);
+<span class="lineNum">      30 </span>            : }
+<span class="lineNum">      31 </span>            : 
+<span class="lineNum">      32 </span>            : /**
+<span class="lineNum">      33 </span>            :  * This function broadcasts the dimensions and strides of 'src' to a given
+<span class="lineNum">      34 </span>            :  * shape, raising an error if it cannot be broadcast.
+<span class="lineNum">      35 </span>            :  *
+<span class="lineNum">      36 </span>            :  * \param ndim        The number of dimensions being broadcast to.
+<span class="lineNum">      37 </span>            :  * \param shape       The shape being broadcast to.
+<span class="lineNum">      38 </span>            :  * \param src_ndim    The number of dimensions of the input which is to be broadcast.
+<span class="lineNum">      39 </span>            :  * \param src_shape   The shape of the input which is to be broadcast.
+<span class="lineNum">      40 </span>            :  * \param src_strides The strides of the input which is to be broadcast.
+<span class="lineNum">      41 </span>            :  * \param out_strides The resulting strides after broadcasting (with length 'ndim').
+<span class="lineNum">      42 </span>            :  */
+<span class="lineNum">      43 </span>            : DYND_API void broadcast_to_shape(intptr_t ndim, const intptr_t *shape, intptr_t src_ndim, const intptr_t *src_shape,
+<span class="lineNum">      44 </span>            :                                  const intptr_t *src_strides, intptr_t *out_strides);
+<span class="lineNum">      45 </span>            : 
+<span class="lineNum">      46 </span>            : /**
+<span class="lineNum">      47 </span>            :  * This function broadcasts the input array's shapes together,
+<span class="lineNum">      48 </span>            :  * producing a broadcast shape as the result. For any dimension in
+<span class="lineNum">      49 </span>            :  * an input with a variable-sized shape, the output shape is set
+<span class="lineNum">      50 </span>            :  * to a negative value.
+<span class="lineNum">      51 </span>            :  *
+<span class="lineNum">      52 </span>            :  * \param ninputs  The number of inputs whose shapes are to be broadcasted.
+<span class="lineNum">      53 </span>            :  * \param inputs  The inputs whose shapes are to be broadcasted.
+<span class="lineNum">      54 </span>            :  * \param out_undim  The number of dimensions in the output shape.
+<span class="lineNum">      55 </span>            :  * \param out_shape  This is filled with the broadcast shape.
+<span class="lineNum">      56 </span>            :  * \param out_axis_perm  A permutation of the axis for the output to use to
+<span class="lineNum">      57 </span>            :  *                       match the input's memory ordering.
+<span class="lineNum">      58 </span>            :  */
+<span class="lineNum">      59 </span>            : DYND_API void broadcast_input_shapes(intptr_t ninputs, const nd::array *inputs, intptr_t &amp;out_undim,
+<span class="lineNum">      60 </span>            :                                      dimvector &amp;out_shape, shortvector&lt;int&gt; &amp;out_axis_perm);
+<span class="lineNum">      61 </span>            : 
+<span class="lineNum">      62 </span>            : /**
+<span class="lineNum">      63 </span>            :  * Adjusts out_shape to broadcast it with the input shape.
+<span class="lineNum">      64 </span>            :  *
+<span class="lineNum">      65 </span>            :  * \param out_undim  The number of dimensions in the output
+<span class="lineNum">      66 </span>            :  *                   broadcast shape. This should be set to
+<span class="lineNum">      67 </span>            :  *                   the maximum of all the input undim values
+<span class="lineNum">      68 </span>            :  *                   that will be incrementally broadcasted.
+<span class="lineNum">      69 </span>            :  * \param out_shape  The shape that gets updated to become the
+<span class="lineNum">      70 </span>            :  *                   final broadcast shape. This should be
+<span class="lineNum">      71 </span>            :  *                   initialized to all ones before incrementally
+<span class="lineNum">      72 </span>            :  *                   broadcasting.
+<span class="lineNum">      73 </span>            :  * \param undim  The number of dimensions in the input shape.
+<span class="lineNum">      74 </span>            :  * \param shape  The input shape.
+<span class="lineNum">      75 </span>            :  */
+<span class="lineNum">      76 </span>            : DYND_API void incremental_broadcast(intptr_t out_undim, intptr_t *out_shape, intptr_t undim, const intptr_t *shape);
+<span class="lineNum">      77 </span>            : 
+<span class="lineNum">      78 </span>            : /**
+<span class="lineNum">      79 </span>            :  * This function creates a permutation based on one ndarray's strides.
+<span class="lineNum">      80 </span>            :  * The value strides(out_axis_perm[0]) is the smallest stride,
+<span class="lineNum">      81 </span>            :  * and strides(out_axis_perm[ndim-1]) is the largest stride.
+<span class="lineNum">      82 </span>            :  *
+<span class="lineNum">      83 </span>            :  * \param ndim  The number of values in strides and out_axis_perm.
+<span class="lineNum">      84 </span>            :  * \param strides  The strides values used for sorting.
+<span class="lineNum">      85 </span>            :  * \param out_axis_perm  A permutation which corresponds to the input strides.
+<span class="lineNum">      86 </span>            :  */
+<span class="lineNum">      87 </span>            : DYND_API void strides_to_axis_perm(intptr_t ndim, const intptr_t *strides, int *out_axis_perm);
+<span class="lineNum">      88 </span>            : 
+<span class="lineNum">      89 </span>            : /**
+<span class="lineNum">      90 </span>            :  * This function creates fresh strides based on the provided axis
+<span class="lineNum">      91 </span>            :  * permutation and element size. This function does not validate
+<span class="lineNum">      92 </span>            :  * that axis_perm is a valid permutation, the caller must ensure
+<span class="lineNum">      93 </span>            :  * this.
+<span class="lineNum">      94 </span>            :  *
+<span class="lineNum">      95 </span>            :  * \param ndim  The number of elements in axis_perm and out_strides.
+<span class="lineNum">      96 </span>            :  * \param axis_perm  A permutation of the axes, must contain the values
+<span class="lineNum">      97 </span>            :  *                   [0, ..., ndim) in some order.
+<span class="lineNum">      98 </span>            :  * \param shape  The shape of the array for the created strides.
+<span class="lineNum">      99 </span>            :  * \param element_size  The size of one array element (this is the smallest
+<span class="lineNum">     100 </span>            :  *                      stride in the created strides array.
+<span class="lineNum">     101 </span>            :  * \param out_strides  The calculated strides are placed here.
+<span class="lineNum">     102 </span>            :  */
+<span class="lineNum">     103 </span>            : DYND_API void axis_perm_to_strides(intptr_t ndim, const int *axis_perm, const intptr_t *shape, intptr_t element_size,
+<span class="lineNum">     104 </span>            :                                    intptr_t *out_strides);
+<span class="lineNum">     105 </span>            : 
+<span class="lineNum">     106 </span>            : /**
+<span class="lineNum">     107 </span>            :  * This function creates a permutation based on the array of operand strides,
+<span class="lineNum">     108 </span>            :  * trying to match the memory ordering of both where possible and defaulting to
+<span class="lineNum">     109 </span>            :  * C-order where not possible.
+<span class="lineNum">     110 </span>            :  */
+<span class="lineNum">     111 </span>            : DYND_API void multistrides_to_axis_perm(intptr_t ndim, int noperands, const intptr_t **operstrides, int *out_axis_perm);
+<span class="lineNum">     112 </span>            : 
+<a name="113"><span class="lineNum">     113 </span>            : // For some reason casting 'intptr_t **' to 'const intptr_t **' causes</a>
+<span class="lineNum">     114 </span>            : // a warning in g++ 4.6.1, this overload works around that.
+<span class="lineNum">     115 </span><span class="lineCov">          6 : inline void multistrides_to_axis_perm(intptr_t ndim, int noperands, intptr_t **operstrides, int *out_axis_perm)</span>
+<span class="lineNum">     116 </span>            : {
+<span class="lineNum">     117 </span><span class="lineCov">          6 :   multistrides_to_axis_perm(ndim, noperands, const_cast&lt;const intptr_t **&gt;(operstrides), out_axis_perm);</span>
+<span class="lineNum">     118 </span><span class="lineCov">          6 : }</span>
+<span class="lineNum">     119 </span>            : 
+<a name="120"><span class="lineNum">     120 </span>            : DYND_API void print_shape(std::ostream &amp;o, intptr_t ndim, const intptr_t *shape);</a>
+<span class="lineNum">     121 </span>            : 
+<span class="lineNum">     122 </span><span class="lineNoCov">          0 : inline void print_shape(std::ostream &amp;o, const std::vector&lt;intptr_t&gt; &amp;shape)</span>
+<span class="lineNum">     123 </span>            : {
+<span class="lineNum">     124 </span><span class="lineNoCov">          0 :   print_shape(o, (int)shape.size(), shape.empty() ? NULL : &amp;shape[0]);</span>
+<span class="lineNum">     125 </span><span class="lineNoCov">          0 : }</span>
+<span class="lineNum">     126 </span>            : 
+<span class="lineNum">     127 </span>            : /**
+<span class="lineNum">     128 </span>            :  * Applies the indexing rules for a single linear indexing irange object to
+<span class="lineNum">     129 </span>            :  * a dimension of the specified size.
+<span class="lineNum">     130 </span>            :  *
+<span class="lineNum">     131 </span>            :  * \param idx  The irange indexing object.
+<span class="lineNum">     132 </span>            :  * \param dimension_size  The size of the dimension to which the idx is being applied.
+<span class="lineNum">     133 </span>            :  * \param error_i  The position in the shape where the indexing is being applied.
+<span class="lineNum">     134 </span>            :  * \param error_tp The type to which the indexing is being applied, or NULL.
+<span class="lineNum">     135 </span>            :  * \param out_remove_dimension  Is set to true if the dimension should be removed
+<span class="lineNum">     136 </span>            :  * \param out_start_index  The start index of the resolved indexing.
+<span class="lineNum">     137 </span>            :  * \param out_index_stride  The index stride of the resolved indexing.
+<span class="lineNum">     138 </span>            :  * \param out_dimension_size  The size of the resulting dimension from the resolved indexing.
+<span class="lineNum">     139 </span>            :  */
+<span class="lineNum">     140 </span>            : DYND_API void apply_single_linear_index(const irange &amp;idx, intptr_t dimension_size, intptr_t error_i,
+<span class="lineNum">     141 </span>            :                                         const ndt::type *error_tp, bool &amp;out_remove_dimension,
+<span class="lineNum">     142 </span>            :                                         intptr_t &amp;out_start_index, intptr_t &amp;out_index_stride,
+<span class="lineNum">     143 </span>            :                                         intptr_t &amp;out_dimension_size);
+<span class="lineNum">     144 </span>            : 
+<span class="lineNum">     145 </span>            : /**
+<span class="lineNum">     146 </span>            :  * Applies indexing rules for a single integer index, returning an index
+<span class="lineNum">     147 </span>            :  * in the range [0, dimension_size).
+<span class="lineNum">     148 </span>            :  *
+<span class="lineNum">     149 </span>            :  * \param i0  The integer index.
+<span class="lineNum">     150 </span>            :  * \param dimension_size  The size of the dimension being indexed.
+<span class="lineNum">     151 </span>            :  * \param error_tp  If non-NULL, a type used for error messages.
+<span class="lineNum">     152 </span>            :  *
+<a name="153"><span class="lineNum">     153 </span>            :  * \returns  An index value in the range [0, dimension_size).</a>
+<span class="lineNum">     154 </span>            :  */
+<span class="lineNum">     155 </span><span class="lineCov">         12 : inline intptr_t apply_single_index(intptr_t i0, intptr_t dimension_size, const ndt::type *error_tp)</span>
+<span class="lineNum">     156 </span>            : {
+<span class="lineNum">     157 </span><span class="lineCov">         12 :   if (i0 &gt;= 0) {</span>
+<span class="lineNum">     158 </span><span class="lineCov">          9 :     if (i0 &lt; dimension_size) {</span>
+<span class="lineNum">     159 </span><span class="lineCov">          9 :       return i0;</span>
+<span class="lineNum">     160 </span>            :     }
+<span class="lineNum">     161 </span>            :     else {
+<span class="lineNum">     162 </span><span class="lineNoCov">          0 :       if (error_tp) {</span>
+<span class="lineNum">     163 </span><span class="lineNoCov">          0 :         intptr_t ndim = error_tp-&gt;extended()-&gt;get_ndim();</span>
+<span class="lineNum">     164 </span><span class="lineNoCov">          0 :         dimvector shape(ndim);</span>
+<span class="lineNum">     165 </span><span class="lineNoCov">          0 :         error_tp-&gt;extended()-&gt;get_shape(ndim, 0, shape.get(), NULL, NULL);</span>
+<span class="lineNum">     166 </span><span class="lineNoCov">          0 :         throw index_out_of_bounds(i0, 0, ndim, shape.get());</span>
+<span class="lineNum">     167 </span>            :       }
+<span class="lineNum">     168 </span>            :       else {
+<span class="lineNum">     169 </span><span class="lineNoCov">          0 :         throw index_out_of_bounds(i0, dimension_size);</span>
+<span class="lineNum">     170 </span>            :       }
+<span class="lineNum">     171 </span>            :     }
+<span class="lineNum">     172 </span>            :   }
+<span class="lineNum">     173 </span><span class="lineCov">          3 :   else if (i0 &gt;= -dimension_size) {</span>
+<span class="lineNum">     174 </span><span class="lineCov">          3 :     return i0 + dimension_size;</span>
+<span class="lineNum">     175 </span>            :   }
+<span class="lineNum">     176 </span>            :   else {
+<span class="lineNum">     177 </span><span class="lineNoCov">          0 :     if (error_tp) {</span>
+<span class="lineNum">     178 </span><span class="lineNoCov">          0 :       intptr_t ndim = error_tp-&gt;extended()-&gt;get_ndim();</span>
+<span class="lineNum">     179 </span><span class="lineNoCov">          0 :       dimvector shape(ndim);</span>
+<span class="lineNum">     180 </span><span class="lineNoCov">          0 :       error_tp-&gt;extended()-&gt;get_shape(ndim, 0, shape.get(), NULL, NULL);</span>
+<span class="lineNum">     181 </span><span class="lineNoCov">          0 :       throw index_out_of_bounds(i0, 0, ndim, shape.get());</span>
+<span class="lineNum">     182 </span>            :     }
+<span class="lineNum">     183 </span>            :     else {
+<span class="lineNum">     184 </span><span class="lineNoCov">          0 :       throw index_out_of_bounds(i0, dimension_size);</span>
+<span class="lineNum">     185 </span>            :     }
+<span class="lineNum">     186 </span>            :   }
+<span class="lineNum">     187 </span>            : }
+<span class="lineNum">     188 </span>            : 
+<span class="lineNum">     189 </span>            : /**
+<span class="lineNum">     190 </span>            :  * Checks whether an array represents a valid permutation.
+<span class="lineNum">     191 </span>            :  *
+<span class="lineNum">     192 </span>            :  * \param size  The number of entries in the permutation
+<span class="lineNum">     193 </span>            :  * \param perm  The permutation array.
+<span class="lineNum">     194 </span>            :  *
+<span class="lineNum">     195 </span>            :  * \returns  True if it's a valid permutation, false otherwise.
+<a name="196"><span class="lineNum">     196 </span>            :  */</a>
+<span class="lineNum">     197 </span>            : template &lt;typename T0, typename T1&gt;
+<span class="lineNum">     198 </span><span class="lineCov">         13 : inline bool is_valid_perm(T0 size, const T1 *perm)</span>
+<span class="lineNum">     199 </span>            : {
+<span class="lineNum">     200 </span><span class="lineCov">         26 :   shortvector&lt;char&gt; flags(size);</span>
+<span class="lineNum">     201 </span><span class="lineCov">         13 :   memset(flags.get(), 0, size);</span>
+<span class="lineNum">     202 </span><span class="lineCov">         49 :   for (T0 i = 0; i != size; ++i) {</span>
+<span class="lineNum">     203 </span><span class="lineCov">         38 :     T1 v = *perm++;</span>
+<span class="lineNum">     204 </span><span class="lineCov">         38 :     if (v &gt;= 0 &amp;&amp; v &lt; size &amp;&amp; !flags[v]) {</span>
+<span class="lineNum">     205 </span><span class="lineCov">         36 :       flags[v] = 1;</span>
+<span class="lineNum">     206 </span>            :     }
+<span class="lineNum">     207 </span>            :     else {
+<span class="lineNum">     208 </span><span class="lineCov">          2 :       return false;</span>
+<span class="lineNum">     209 </span>            :     }
+<span class="lineNum">     210 </span>            :   }
+<span class="lineNum">     211 </span><span class="lineCov">         11 :   return true;</span>
+<span class="lineNum">     212 </span>            : }
+<span class="lineNum">     213 </span>            : 
+<span class="lineNum">     214 </span>            : inline bool strides_are_c_contiguous(intptr_t ndim, intptr_t element_size, const intptr_t *shape,
+<span class="lineNum">     215 </span>            :                                      const intptr_t *strides)
+<span class="lineNum">     216 </span>            : {
+<span class="lineNum">     217 </span>            :   // The loop counter must be a signed integer for this reverse loop to work
+<span class="lineNum">     218 </span>            :   for (intptr_t i = static_cast&lt;intptr_t&gt;(ndim) - 1; i &gt;= 0; --i) {
+<span class="lineNum">     219 </span>            :     if (shape[i] != 1 &amp;&amp; strides[i] != element_size) {
+<span class="lineNum">     220 </span>            :       return false;
+<span class="lineNum">     221 </span>            :     }
+<span class="lineNum">     222 </span>            :     element_size *= shape[i];
+<span class="lineNum">     223 </span>            :   }
+<span class="lineNum">     224 </span>            :   return true;
+<span class="lineNum">     225 </span>            : }
+<span class="lineNum">     226 </span>            : 
+<span class="lineNum">     227 </span>            : inline bool strides_are_f_contiguous(intptr_t ndim, intptr_t element_size, const intptr_t *shape,
+<span class="lineNum">     228 </span>            :                                      const intptr_t *strides)
+<span class="lineNum">     229 </span>            : {
+<span class="lineNum">     230 </span>            :   for (intptr_t i = 0; i &lt; ndim; ++i) {
+<span class="lineNum">     231 </span>            :     if (shape[i] != 1 &amp;&amp; strides[i] != element_size) {
+<span class="lineNum">     232 </span>            :       return false;
+<span class="lineNum">     233 </span>            :     }
+<span class="lineNum">     234 </span>            :     element_size *= shape[i];
+<span class="lineNum">     235 </span>            :   }
+<span class="lineNum">     236 </span>            :   return true;
+<span class="lineNum">     237 </span>            : }
+<span class="lineNum">     238 </span>            : 
+<span class="lineNum">     239 </span>            : /**
+<span class="lineNum">     240 </span>            :  * Classifies the axis order of the type, where current_stride is
+<span class="lineNum">     241 </span>            :  * the absolute value of the stride for the current dimension,
+<span class="lineNum">     242 </span>            :  * and element_tp/element_arrmeta are for the element.
+<span class="lineNum">     243 </span>            :  *
+<span class="lineNum">     244 </span>            :  * \param current_stride  The stride of the current dimension It must be nonzero.
+<span class="lineNum">     245 </span>            :  * \param element_tp  The type of the elements. It must have undim &gt; 0.
+<span class="lineNum">     246 </span>            :  * \param element_arrmeta  The arrmeta of the elements.
+<span class="lineNum">     247 </span>            :  */
+<span class="lineNum">     248 </span>            : DYND_API axis_order_classification_t classify_strided_axis_order(intptr_t current_stride, const ndt::type &amp;element_tp,
+<span class="lineNum">     249 </span>            :                                                                  const char *element_arrmeta);
+<span class="lineNum">     250 </span>            : 
+<span class="lineNum">     251 </span>            : enum shape_signal_t {
+<span class="lineNum">     252 </span>            :   /** Shape value that has never been initialized */
+<span class="lineNum">     253 </span>            :   shape_signal_uninitialized = -2,
+<span class="lineNum">     254 </span>            :   /** Shape value that may have more than one size, depending on index */
+<span class="lineNum">     255 </span>            :   shape_signal_varying = -1,
+<span class="lineNum">     256 </span>            : };
+<span class="lineNum">     257 </span>            : 
+<span class="lineNum">     258 </span>            : } // namespace dynd
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.10</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

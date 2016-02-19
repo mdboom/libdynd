@@ -1,0 +1,317 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - coverage.info.cleaned - include/dynd/types/date_util.hpp</title>
+  <link rel="stylesheet" type="text/css" href="../../../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../../../index.html">top level</a> - <a href="index.html">include/dynd/types</a> - date_util.hpp<span style="font-size: 80%;"> (source / <a href="date_util.hpp.func.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">coverage.info.cleaned</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntry">16</td>
+            <td class="headerCovTableEntryLo">0.0 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2016-02-19</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntry">6</td>
+            <td class="headerCovTableEntryLo">0.0 %</td>
+          </tr>
+          <tr><td><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : //</a>
+<span class="lineNum">       2 </span>            : // Copyright (C) 2011-15 DyND Developers
+<span class="lineNum">       3 </span>            : // BSD 2-Clause License, see LICENSE.txt
+<span class="lineNum">       4 </span>            : //
+<span class="lineNum">       5 </span>            : 
+<span class="lineNum">       6 </span>            : #pragma once
+<span class="lineNum">       7 </span>            : 
+<span class="lineNum">       8 </span>            : #include &lt;algorithm&gt;
+<span class="lineNum">       9 </span>            : #include &lt;limits&gt;
+<span class="lineNum">      10 </span>            : #include &lt;iostream&gt;
+<span class="lineNum">      11 </span>            : 
+<span class="lineNum">      12 </span>            : #include &lt;dynd/config.hpp&gt;
+<span class="lineNum">      13 </span>            : 
+<span class="lineNum">      14 </span>            : #define DYND_DATE_NA (std::numeric_limits&lt;int32_t&gt;::min())
+<span class="lineNum">      15 </span>            : 
+<span class="lineNum">      16 </span>            : #define DYND_TICKS_PER_DAY (24LL * 60LL * 60LL * 10000000LL)
+<span class="lineNum">      17 </span>            : #define DYND_SECONDS_PER_DAY (24LL * 60LL * 60LL)
+<span class="lineNum">      18 </span>            : 
+<span class="lineNum">      19 </span>            : namespace dynd {
+<span class="lineNum">      20 </span>            : 
+<span class="lineNum">      21 </span>            : namespace ndt {
+<span class="lineNum">      22 </span>            :   class type;
+<span class="lineNum">      23 </span>            : } // namespace ndt
+<span class="lineNum">      24 </span>            : 
+<span class="lineNum">      25 </span>            : /**
+<span class="lineNum">      26 </span>            :  * An enumeration for describing how to interpret ambiguous
+<span class="lineNum">      27 </span>            :  * dates such as &quot;01/02/03&quot; or &quot;01/02/1995&quot;.
+<span class="lineNum">      28 </span>            :  */
+<span class="lineNum">      29 </span>            : enum date_parse_order_t { date_parse_no_ambig, date_parse_ymd, date_parse_mdy, date_parse_dmy };
+<span class="lineNum">      30 </span>            : 
+<span class="lineNum">      31 </span>            : DYND_API std::ostream &amp;operator&lt;&lt;(std::ostream &amp;o, date_parse_order_t date_order);
+<span class="lineNum">      32 </span>            : 
+<span class="lineNum">      33 </span>            : struct DYND_API date_ymd {
+<span class="lineNum">      34 </span>            :   int16_t year;
+<span class="lineNum">      35 </span>            :   int8_t month;
+<span class="lineNum">      36 </span>            :   int8_t day;
+<span class="lineNum">      37 </span>            : 
+<span class="lineNum">      38 </span>            :   static const int month_lengths[2][12];
+<a name="39"><span class="lineNum">      39 </span>            :   static const int month_starts[2][13];</a>
+<span class="lineNum">      40 </span>            : 
+<span class="lineNum">      41 </span><span class="lineNoCov">          0 :   static inline bool is_leap_year(int year) { return year % 4 == 0 &amp;&amp; (year % 100 != 0 || year % 400 == 0); }</span>
+<span class="lineNum">      42 </span>            : 
+<span class="lineNum">      43 </span>            :   static inline int get_month_length(int year, int month)
+<span class="lineNum">      44 </span>            :   {
+<span class="lineNum">      45 </span>            :     if (month &gt;= 1 &amp;&amp; month &lt;= 12) {
+<span class="lineNum">      46 </span>            :       return month_lengths[is_leap_year(year)][month - 1];
+<span class="lineNum">      47 </span>            :     }
+<span class="lineNum">      48 </span>            :     else {
+<span class="lineNum">      49 </span>            :       return 0;
+<span class="lineNum">      50 </span>            :     }
+<a name="51"><span class="lineNum">      51 </span>            :   }</a>
+<span class="lineNum">      52 </span>            : 
+<span class="lineNum">      53 </span><span class="lineNoCov">          0 :   static inline bool is_valid(int year, int month, int day)</span>
+<span class="lineNum">      54 </span>            :   {
+<span class="lineNum">      55 </span><span class="lineNoCov">          0 :     if (month &lt; 1 || month &gt; 12) {</span>
+<span class="lineNum">      56 </span><span class="lineNoCov">          0 :       return false;</span>
+<span class="lineNum">      57 </span>            :     }
+<span class="lineNum">      58 </span><span class="lineNoCov">          0 :     else if (day &lt; 1 || day &gt; month_lengths[is_leap_year(year)][month - 1]) {</span>
+<span class="lineNum">      59 </span><span class="lineNoCov">          0 :       return false;</span>
+<span class="lineNum">      60 </span>            :     }
+<span class="lineNum">      61 </span>            :     else {
+<span class="lineNum">      62 </span><span class="lineNoCov">          0 :       return true;</span>
+<span class="lineNum">      63 </span>            :     }
+<a name="64"><span class="lineNum">      64 </span>            :   }</a>
+<span class="lineNum">      65 </span>            : 
+<span class="lineNum">      66 </span><span class="lineNoCov">          0 :   inline bool is_valid() const { return is_valid(year, month, day); }</span>
+<span class="lineNum">      67 </span>            : 
+<span class="lineNum">      68 </span>            :   inline bool is_na() const { return month == -128; }
+<span class="lineNum">      69 </span>            : 
+<span class="lineNum">      70 </span>            :   /**
+<span class="lineNum">      71 </span>            :    * Gets the length of the month this date is
+<span class="lineNum">      72 </span>            :    * in. Returns 0 for an invalid date.
+<span class="lineNum">      73 </span>            :    */
+<span class="lineNum">      74 </span>            :   inline int get_month_length() const { return get_month_length(year, month); }
+<span class="lineNum">      75 </span>            : 
+<span class="lineNum">      76 </span>            :   /**
+<span class="lineNum">      77 </span>            :    * Gets the 0-based day of the week, where
+<a name="78"><span class="lineNum">      78 </span>            :    * 0 is Monday, 6 is Sunday.</a>
+<span class="lineNum">      79 </span>            :    */
+<span class="lineNum">      80 </span><span class="lineNoCov">          0 :   inline int get_weekday() const</span>
+<span class="lineNum">      81 </span>            :   {
+<span class="lineNum">      82 </span><span class="lineNoCov">          0 :     int days = to_days();</span>
+<span class="lineNum">      83 </span>            :     // January 5, 1970 is Monday
+<span class="lineNum">      84 </span><span class="lineNoCov">          0 :     int weekday = (days - 4) % 7;</span>
+<span class="lineNum">      85 </span><span class="lineNoCov">          0 :     if (weekday &lt; 0) {</span>
+<span class="lineNum">      86 </span><span class="lineNoCov">          0 :       weekday += 7;</span>
+<span class="lineNum">      87 </span>            :     }
+<span class="lineNum">      88 </span><span class="lineNoCov">          0 :     return weekday;</span>
+<span class="lineNum">      89 </span>            :   }
+<span class="lineNum">      90 </span>            : 
+<span class="lineNum">      91 </span>            :   /**
+<span class="lineNum">      92 </span>            :    * Gets the 0-based day of the year,
+<span class="lineNum">      93 </span>            :    * values 0-365, but returns -1 for an invalid
+<span class="lineNum">      94 </span>            :    * date.
+<span class="lineNum">      95 </span>            :    */
+<span class="lineNum">      96 </span>            :   inline int get_day_of_year() const
+<span class="lineNum">      97 </span>            :   {
+<span class="lineNum">      98 </span>            :     if (is_valid(year, month, day)) {
+<span class="lineNum">      99 </span>            :       return month_starts[is_leap_year(year)][month - 1] + day - 1;
+<span class="lineNum">     100 </span>            :     }
+<span class="lineNum">     101 </span>            :     else {
+<span class="lineNum">     102 </span>            :       return -1;
+<span class="lineNum">     103 </span>            :     }
+<span class="lineNum">     104 </span>            :   }
+<span class="lineNum">     105 </span>            : 
+<span class="lineNum">     106 </span>            :   /**
+<span class="lineNum">     107 </span>            :    * Converts the ymd into a days offset from January 1, 1970.
+<span class="lineNum">     108 </span>            :    */
+<span class="lineNum">     109 </span>            :   static int32_t to_days(int year, int month, int day);
+<span class="lineNum">     110 </span>            : 
+<span class="lineNum">     111 </span>            :   /**
+<a name="112"><span class="lineNum">     112 </span>            :    * Converts the ymd into a days offset from January 1, 1970.</a>
+<span class="lineNum">     113 </span>            :    */
+<span class="lineNum">     114 </span><span class="lineNoCov">          0 :   int32_t to_days() const { return to_days(year, month, day); }</span>
+<span class="lineNum">     115 </span>            : 
+<span class="lineNum">     116 </span>            :   /**
+<span class="lineNum">     117 </span>            :    * Converts the ymd into an ISO 8601 string, or &quot;&quot; if it
+<span class="lineNum">     118 </span>            :    * is invalid. For years from 0001 to 9999, uses &quot;####-##-##&quot;,
+<span class="lineNum">     119 </span>            :    * and for years outside that range uses &quot;-######-##-##&quot; or
+<span class="lineNum">     120 </span>            :    * &quot;+######-##-##&quot;.
+<span class="lineNum">     121 </span>            :    */
+<span class="lineNum">     122 </span>            :   static std::string to_str(int year, int month, int day);
+<span class="lineNum">     123 </span>            : 
+<span class="lineNum">     124 </span>            :   /**
+<span class="lineNum">     125 </span>            :    * Converts the ymd into an ISO 8601 string, or &quot;&quot; if it
+<span class="lineNum">     126 </span>            :    * is invalid. For years from 0001 to 9999, uses &quot;####-##-##&quot;,
+<span class="lineNum">     127 </span>            :    * and for years outside that range uses &quot;-######-##-##&quot; or
+<a name="128"><span class="lineNum">     128 </span>            :    * &quot;+######-##-##&quot;.</a>
+<span class="lineNum">     129 </span>            :    */
+<span class="lineNum">     130 </span><span class="lineNoCov">          0 :   inline std::string to_str() const { return to_str(year, month, day); }</span>
+<span class="lineNum">     131 </span>            : 
+<span class="lineNum">     132 </span>            :   /**
+<span class="lineNum">     133 </span>            :    * Sets the year/month/day from a 1970 epoch days offset.
+<span class="lineNum">     134 </span>            :    *
+<span class="lineNum">     135 </span>            :    * \param days  A days offset from January 1, 1970.
+<span class="lineNum">     136 </span>            :    */
+<span class="lineNum">     137 </span>            :   void set_from_days(int32_t days);
+<span class="lineNum">     138 </span>            : 
+<span class="lineNum">     139 </span>            :   /**
+<span class="lineNum">     140 </span>            :    * Sets the year/month/day from the ticks-based date, throwing
+<span class="lineNum">     141 </span>            :    * away the time portion.
+<span class="lineNum">     142 </span>            :    */
+<span class="lineNum">     143 </span>            :   inline void set_from_ticks(int64_t ticks)
+<span class="lineNum">     144 </span>            :   {
+<span class="lineNum">     145 </span>            :     if (ticks &gt;= 0) {
+<span class="lineNum">     146 </span>            :       set_from_days(static_cast&lt;int32_t&gt;(ticks / DYND_TICKS_PER_DAY));
+<span class="lineNum">     147 </span>            :     }
+<span class="lineNum">     148 </span>            :     else {
+<span class="lineNum">     149 </span>            :       set_from_days(static_cast&lt;int32_t&gt;((ticks - (DYND_TICKS_PER_DAY - 1)) / DYND_TICKS_PER_DAY));
+<span class="lineNum">     150 </span>            :     }
+<span class="lineNum">     151 </span>            :   }
+<span class="lineNum">     152 </span>            : 
+<span class="lineNum">     153 </span>            :   /**
+<span class="lineNum">     154 </span>            :    * Sets the year/month/day to NA.
+<span class="lineNum">     155 </span>            :    */
+<span class="lineNum">     156 </span>            :   inline void set_to_na() { month = -128; }
+<span class="lineNum">     157 </span>            : 
+<span class="lineNum">     158 </span>            :   /**
+<span class="lineNum">     159 </span>            :    * Sets the year/month/day from a string. Accepts a wide variety of
+<span class="lineNum">     160 </span>            :    * inputs, but by default rejects ambiguous formats like MM/DD/YY vs
+<span class="lineNum">     161 </span>            :    * DD/MM/YY. Two digit years are handled with a sliding window
+<span class="lineNum">     162 </span>            :    * starting 70 years ago by default.
+<span class="lineNum">     163 </span>            :    *
+<span class="lineNum">     164 </span>            :    * \param s  Date string.
+<span class="lineNum">     165 </span>            :    * \param ambig  Order to use for ambiguous cases like &quot;01/02/03&quot;
+<span class="lineNum">     166 </span>            :    *               or &quot;01/02/1995&quot;.
+<span class="lineNum">     167 </span>            :    * \param century_window  Number describing how to handle dates with
+<span class="lineNum">     168 </span>            :    *                        two digit years. Values 1 to 99 mean to use
+<span class="lineNum">     169 </span>            :    *                        a sliding window starting that many years back.
+<span class="lineNum">     170 </span>            :    *                        Values 1000 and higher mean to use a fixed window
+<span class="lineNum">     171 </span>            :    *                        starting at the year given. The value 0 means to
+<span class="lineNum">     172 </span>            :    *                        disallow two digit years.
+<span class="lineNum">     173 </span>            :    */
+<span class="lineNum">     174 </span>            :   inline void set_from_str(const std::string &amp;s, date_parse_order_t ambig = date_parse_no_ambig,
+<span class="lineNum">     175 </span>            :                            int century_window = 70, assign_error_mode errmode = assign_error_fractional)
+<span class="lineNum">     176 </span>            :   {
+<span class="lineNum">     177 </span>            :     return set_from_str(s.data(), s.data() + s.size(), ambig, century_window, errmode);
+<span class="lineNum">     178 </span>            :   }
+<span class="lineNum">     179 </span>            : 
+<span class="lineNum">     180 </span>            :   void set_from_str(const char *begin, const char *end, date_parse_order_t ambig, int century_window,
+<span class="lineNum">     181 </span>            :                     assign_error_mode errmode);
+<span class="lineNum">     182 </span>            : 
+<span class="lineNum">     183 </span>            :   /**
+<span class="lineNum">     184 </span>            :    * When a year is a two digit year that should be resolved as a four
+<span class="lineNum">     185 </span>            :    * digit year, this function provides the resolution
+<span class="lineNum">     186 </span>            :    * using a fixed window strategy. The window is from `year_start` to
+<span class="lineNum">     187 </span>            :    * 100 years later.
+<span class="lineNum">     188 </span>            :    *
+<span class="lineNum">     189 </span>            :    * \param year  The year to apply the fixed window to.
+<span class="lineNum">     190 </span>            :    * \param year_start  The year at which the window starts.
+<span class="lineNum">     191 </span>            :    *
+<span class="lineNum">     192 </span>            :    * \returns  The adjusted year.
+<span class="lineNum">     193 </span>            :    */
+<span class="lineNum">     194 </span>            :   static int resolve_2digit_year_fixed_window(int year, int year_start);
+<span class="lineNum">     195 </span>            : 
+<span class="lineNum">     196 </span>            :   /**
+<span class="lineNum">     197 </span>            :    * When a year is a two digit year that should be resolved as a four
+<span class="lineNum">     198 </span>            :    * digit year, this function provides the resolution
+<span class="lineNum">     199 </span>            :    * using a sliding window strategy. The window is from
+<span class="lineNum">     200 </span>            :    * the current year with `years_ago` years subtracted from it, and is
+<span class="lineNum">     201 </span>            :    * one century long.
+<span class="lineNum">     202 </span>            :    *
+<span class="lineNum">     203 </span>            :    * This function simply retrieves the current year, and calls the variant
+<span class="lineNum">     204 </span>            :    * with selectable `year_start`.
+<span class="lineNum">     205 </span>            :    *
+<span class="lineNum">     206 </span>            :    * \param year  The year to apply the sliding window to.
+<span class="lineNum">     207 </span>            :    * \param years_ago  The number of years before the current date for the
+<span class="lineNum">     208 </span>            :    *                   start of the window.
+<span class="lineNum">     209 </span>            :    *
+<span class="lineNum">     210 </span>            :    * \returns  The adjusted year.
+<span class="lineNum">     211 </span>            :    */
+<span class="lineNum">     212 </span>            :   static int resolve_2digit_year_sliding_window(int year, int years_ago);
+<span class="lineNum">     213 </span>            : 
+<span class="lineNum">     214 </span>            :   /**
+<span class="lineNum">     215 </span>            :    * This function resolves a two digit year, choosing between a sliding
+<span class="lineNum">     216 </span>            :    * or fixed window approach based on the parameter value.
+<span class="lineNum">     217 </span>            :    *
+<span class="lineNum">     218 </span>            :    * \param year  The year to apply the century selection to.
+<span class="lineNum">     219 </span>            :    * \param century_window  Number describing how to handle dates with
+<span class="lineNum">     220 </span>            :    *                        two digit years. Values 1 to 99 mean to use
+<span class="lineNum">     221 </span>            :    *                        a sliding window starting that many years back.
+<span class="lineNum">     222 </span>            :    *                        Values 1000 and higher mean to use a fixed window
+<span class="lineNum">     223 </span>            :    *                        starting at the year given. The value 0 means to
+<span class="lineNum">     224 </span>            :    *                        disallow two digit years.
+<span class="lineNum">     225 </span>            :    *
+<span class="lineNum">     226 </span>            :    * \returns  The adjusted year.
+<span class="lineNum">     227 </span>            :    */
+<span class="lineNum">     228 </span>            :   static int resolve_2digit_year(int year, int century_window);
+<span class="lineNum">     229 </span>            : 
+<span class="lineNum">     230 </span>            :   /**
+<span class="lineNum">     231 </span>            :    * Returns the current date in the local time zone.
+<span class="lineNum">     232 </span>            :    */
+<span class="lineNum">     233 </span>            :   static date_ymd get_current_local_date();
+<span class="lineNum">     234 </span>            : 
+<span class="lineNum">     235 </span>            :   /**
+<span class="lineNum">     236 </span>            :    * Returns an ndt::type corresponding to the date_ymd structure.
+<span class="lineNum">     237 </span>            :    */
+<span class="lineNum">     238 </span>            :   static const ndt::type &amp;type();
+<span class="lineNum">     239 </span>            : };
+<span class="lineNum">     240 </span>            : 
+<span class="lineNum">     241 </span>            : } // namespace dynd
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.10</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

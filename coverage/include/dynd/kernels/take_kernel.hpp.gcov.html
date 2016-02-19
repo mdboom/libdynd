@@ -1,0 +1,134 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - coverage.info.cleaned - include/dynd/kernels/take_kernel.hpp</title>
+  <link rel="stylesheet" type="text/css" href="../../../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../../../index.html">top level</a> - <a href="index.html">include/dynd/kernels</a> - take_kernel.hpp<span style="font-size: 80%;"> (source / <a href="take_kernel.hpp.func.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">coverage.info.cleaned</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">3</td>
+            <td class="headerCovTableEntry">3</td>
+            <td class="headerCovTableEntryHi">100.0 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2016-02-19</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">3</td>
+            <td class="headerCovTableEntry">3</td>
+            <td class="headerCovTableEntryHi">100.0 %</td>
+          </tr>
+          <tr><td><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : //</a>
+<span class="lineNum">       2 </span>            : // Copyright (C) 2011-15 DyND Developers
+<span class="lineNum">       3 </span>            : // BSD 2-Clause License, see LICENSE.txt
+<span class="lineNum">       4 </span>            : //
+<span class="lineNum">       5 </span>            : 
+<span class="lineNum">       6 </span>            : #pragma once
+<span class="lineNum">       7 </span>            : 
+<span class="lineNum">       8 </span>            : #include &lt;dynd/kernels/base_kernel.hpp&gt;
+<span class="lineNum">       9 </span>            : 
+<span class="lineNum">      10 </span>            : namespace dynd {
+<a name="11"><span class="lineNum">      11 </span>            : namespace nd {</a>
+<span class="lineNum">      12 </span>            : 
+<span class="lineNum">      13 </span><span class="lineCov">          2 :   struct DYND_API masked_take_ck : base_kernel&lt;masked_take_ck, 2&gt; {</span>
+<span class="lineNum">      14 </span>            :     ndt::type m_dst_tp;
+<span class="lineNum">      15 </span>            :     const char *m_dst_meta;
+<a name="16"><span class="lineNum">      16 </span>            :     intptr_t m_dim_size, m_src0_stride, m_mask_stride;</a>
+<span class="lineNum">      17 </span>            : 
+<span class="lineNum">      18 </span><span class="lineCov">          2 :     ~masked_take_ck() { get_child()-&gt;destroy(); }</span>
+<span class="lineNum">      19 </span>            : 
+<span class="lineNum">      20 </span>            :     void single(char *dst, char *const *src);
+<span class="lineNum">      21 </span>            : 
+<span class="lineNum">      22 </span>            :     static void instantiate(char *static_data, char *data, kernel_builder *ckb, const ndt::type &amp;dst_tp,
+<span class="lineNum">      23 </span>            :                             const char *dst_arrmeta, intptr_t nsrc, const ndt::type *src_tp,
+<span class="lineNum">      24 </span>            :                             const char *const *src_arrmeta, kernel_request_t kernreq, intptr_t nkwd,
+<span class="lineNum">      25 </span>            :                             const nd::array *kwds, const std::map&lt;std::string, ndt::type&gt; &amp;tp_vars);
+<span class="lineNum">      26 </span>            :   };
+<span class="lineNum">      27 </span>            : 
+<span class="lineNum">      28 </span>            :   /**
+<span class="lineNum">      29 </span>            :    * CKernel which does an indexed take operation. The child ckernel
+<span class="lineNum">      30 </span>            :    * should be a single unary operation.
+<span class="lineNum">      31 </span>            :    */
+<span class="lineNum">      32 </span>            :   struct DYND_API indexed_take_ck : base_kernel&lt;indexed_take_ck, 2&gt; {
+<span class="lineNum">      33 </span>            :     intptr_t m_dst_dim_size, m_dst_stride, m_index_stride;
+<a name="34"><span class="lineNum">      34 </span>            :     intptr_t m_src0_dim_size, m_src0_stride;</a>
+<span class="lineNum">      35 </span>            : 
+<span class="lineNum">      36 </span><span class="lineCov">          2 :     ~indexed_take_ck() { get_child()-&gt;destroy(); }</span>
+<span class="lineNum">      37 </span>            : 
+<span class="lineNum">      38 </span>            :     void single(char *dst, char *const *src);
+<span class="lineNum">      39 </span>            : 
+<span class="lineNum">      40 </span>            :     static void instantiate(char *static_data, char *data, kernel_builder *ckb, const ndt::type &amp;dst_tp,
+<span class="lineNum">      41 </span>            :                             const char *dst_arrmeta, intptr_t nsrc, const ndt::type *src_tp,
+<span class="lineNum">      42 </span>            :                             const char *const *src_arrmeta, kernel_request_t kernreq, intptr_t nkwd,
+<span class="lineNum">      43 </span>            :                             const nd::array *kwds, const std::map&lt;std::string, ndt::type&gt; &amp;tp_vars);
+<span class="lineNum">      44 </span>            :   };
+<span class="lineNum">      45 </span>            : 
+<span class="lineNum">      46 </span>            :   struct DYND_API take_ck : base_kernel&lt;take_ck&gt; {
+<span class="lineNum">      47 </span>            :     static void resolve_dst_type(char *static_data, char *data, ndt::type &amp;dst_tp, intptr_t nsrc,
+<span class="lineNum">      48 </span>            :                                  const ndt::type *src_tp, intptr_t nkwd, const array *kwds,
+<span class="lineNum">      49 </span>            :                                  const std::map&lt;std::string, ndt::type&gt; &amp;tp_vars);
+<span class="lineNum">      50 </span>            : 
+<span class="lineNum">      51 </span>            :     static void instantiate(char *static_data, char *data, kernel_builder *ckb, const ndt::type &amp;dst_tp,
+<span class="lineNum">      52 </span>            :                             const char *dst_arrmeta, intptr_t nsrc, const ndt::type *src_tp,
+<span class="lineNum">      53 </span>            :                             const char *const *src_arrmeta, kernel_request_t kernreq, intptr_t nkwd,
+<span class="lineNum">      54 </span>            :                             const nd::array *kwds, const std::map&lt;std::string, ndt::type&gt; &amp;tp_vars);
+<span class="lineNum">      55 </span>            :   };
+<span class="lineNum">      56 </span>            : 
+<span class="lineNum">      57 </span>            : } // namespace dynd::nd
+<span class="lineNum">      58 </span>            : } // namespace dynd
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.10</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

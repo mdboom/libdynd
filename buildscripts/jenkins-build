@@ -1,0 +1,95 @@
+#!/bin/bash
+#
+#
+# Copyright (C) 2011-15 DyND Developers
+# BSD 2-Clause License, see LICENSE.txt
+#
+#
+#
+# This is the master linux/osx build + test script for building
+# libdynd.
+# Jenkins Requirements:
+#   - Use a jenkins build matrix for multiple
+#     platforms/python versions
+#   - Use the XShell plugin to launch this script
+#   - Call the script from the root workspace
+#     directory as buildscripts/jenkins-build
+#   - Use a user-defined axis to select compiler versions with COMPILER_VERSION
+#
+#   - This script is currently hacked for centos5,
+#     with http://people.centos.org/tru/devtools-2/
+#     (a newer gcc) installed.
+#
+
+# Set options to echo every command and exit on error
+set -xe
+
+# Require a compiler version to be selected
+if [ "${COMPILER_VERSION}" == "" ]; then
+ echo You must select a compiler version with the COMPILER_VERSION variable.
+ exit 1
+fi
+
+# Use the COMPILER_VERSION variable to pick a compiler
+if [ `uname` == Darwin ]; then
+ if [ "${COMPILER_VERSION}" == "gcc" ]; then
+  export CC=gcc
+  export CXX=g++
+ elif [ "${COMPILER_VERSION}" == "clang" ]; then
+  export CC=clang
+  export CXX=clang++
+ else
+  echo Invalid compiler version on `uname`: ${COMPILER_VERSION}
+  exit 1
+ fi
+ export MACOSX_DEPLOYMENT_TARGET=10.8
+else
+ if [ "${COMPILER_VERSION}" == "gcc" ]; then
+  if [ -f /opt/rh/devtoolset-2/enable ]; then
+   # Enable devtoolset-2, a newer gcc toolchain
+   . /opt/rh/devtoolset-2/enable
+   # Statically link the standard C/C++ library, because
+   # we are building on an old centos5 machine.
+   export LDFLAGS="-static-libgcc -static-libstdc++"
+   export CC=gcc
+   export CXX=g++
+  elif [ -f /usr/bin/gcc-4.9 ]; then
+   # On the nvidia1 build machine, need to use gcc 4.9 instead of gcc
+   export CC=gcc-4.9
+   export CXX=g++-4.9
+  else
+   export CC=gcc
+   export CXX=g++
+  fi
+ elif [ "${COMPILER_VERSION}" == "clang" ]; then
+  export CC=clang
+  export CXX=clang++
+ else
+  echo Invalid compiler version on `uname`: ${COMPILER_VERSION}
+  exit 1
+ fi
+fi
+
+rm -rf build
+
+if [ `uname` == 'Darwin' ]; then
+    # On OSX, use @rpath for relative linking
+    export EXTRA="-DUSE_RELATIVE_RPATH=ON -DCMAKE_CXX_FLAGS=-stdlib=libc++"
+else
+    export EXTRA=
+fi
+
+if [ ${PLATFORM} == 'cuda' ]; then
+    export EXTRA="${EXTRA} -DDYND_CUDA=ON"
+fi
+
+mkdir build
+cd build
+cmake \
+    ${EXTRA} \
+    -DCMAKE_INSTALL_PREFIX=install \
+    -DCMAKE_C_COMPILER=${CC} \
+    -DCMAKE_CXX_COMPILER=${CXX} .. || exit 1
+make -j5
+
+./tests/test_libdynd  --gtest_output=xml:../test_results.xml || exit 1

@@ -1,0 +1,1003 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - coverage.info.cleaned - src/dynd/json_parser.cpp</title>
+  <link rel="stylesheet" type="text/css" href="../../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../../index.html">top level</a> - <a href="index.html">src/dynd</a> - json_parser.cpp<span style="font-size: 80%;"> (source / <a href="json_parser.cpp.func.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">coverage.info.cleaned</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">245</td>
+            <td class="headerCovTableEntry">433</td>
+            <td class="headerCovTableEntryLo">56.6 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2016-02-19</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">19</td>
+            <td class="headerCovTableEntry">24</td>
+            <td class="headerCovTableEntryMed">79.2 %</td>
+          </tr>
+          <tr><td><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : //</a>
+<span class="lineNum">       2 </span>            : // Copyright (C) 2011-15 DyND Developers
+<span class="lineNum">       3 </span>            : // BSD 2-Clause License, see LICENSE.txt
+<span class="lineNum">       4 </span>            : //
+<span class="lineNum">       5 </span>            : 
+<span class="lineNum">       6 </span>            : #include &lt;dynd/json_parser.hpp&gt;
+<span class="lineNum">       7 </span>            : #include &lt;dynd/callable.hpp&gt;
+<span class="lineNum">       8 </span>            : #include &lt;dynd/types/base_bytes_type.hpp&gt;
+<span class="lineNum">       9 </span>            : #include &lt;dynd/types/string_type.hpp&gt;
+<span class="lineNum">      10 </span>            : #include &lt;dynd/types/fixed_dim_type.hpp&gt;
+<span class="lineNum">      11 </span>            : #include &lt;dynd/types/var_dim_type.hpp&gt;
+<span class="lineNum">      12 </span>            : #include &lt;dynd/types/date_type.hpp&gt;
+<span class="lineNum">      13 </span>            : #include &lt;dynd/types/option_type.hpp&gt;
+<span class="lineNum">      14 </span>            : #include &lt;dynd/parse.hpp&gt;
+<span class="lineNum">      15 </span>            : #include &lt;dynd/kernels/parse_kernel.hpp&gt;
+<span class="lineNum">      16 </span>            : 
+<span class="lineNum">      17 </span>            : using namespace std;
+<a name="18"><span class="lineNum">      18 </span>            : using namespace dynd;</a>
+<span class="lineNum">      19 </span>            : 
+<a name="20"><span class="lineNum">      20 </span><span class="lineNoCov">          0 : nd::array nd::json::parse2(const ndt::type &amp;tp, const std::string &amp;str) { return parse_json(tp, str.data()); }</span></a>
+<span class="lineNum">      21 </span>            : 
+<span class="lineNum">      22 </span><span class="lineNoCov">          0 : static void json_as_buffer(const nd::array &amp;json, nd::array &amp;out_tmp_ref, const char *&amp;begin, const char *&amp;end)</span>
+<span class="lineNum">      23 </span>            : {
+<span class="lineNum">      24 </span>            :   // Check the type of 'json', and get pointers to the begin/end of a UTF-8
+<span class="lineNum">      25 </span>            :   // buffer
+<span class="lineNum">      26 </span><span class="lineNoCov">          0 :   ndt::type json_type = json.get_type().value_type();</span>
+<span class="lineNum">      27 </span><span class="lineNoCov">          0 :   switch (json_type.get_kind()) {</span>
+<span class="lineNum">      28 </span>            :   case string_kind: {
+<span class="lineNum">      29 </span><span class="lineNoCov">          0 :     const ndt::base_string_type *sdt = json_type.extended&lt;ndt::base_string_type&gt;();</span>
+<span class="lineNum">      30 </span><span class="lineNoCov">          0 :     switch (sdt-&gt;get_encoding()) {</span>
+<span class="lineNum">      31 </span>            :     case string_encoding_ascii:
+<span class="lineNum">      32 </span>            :     case string_encoding_utf_8:
+<span class="lineNum">      33 </span><span class="lineNoCov">          0 :       out_tmp_ref = json.eval();</span>
+<span class="lineNum">      34 </span>            :       // The data is already UTF-8, so use the buffer directly
+<span class="lineNum">      35 </span><span class="lineNoCov">          0 :       sdt-&gt;get_string_range(&amp;begin, &amp;end, out_tmp_ref.get()-&gt;metadata(), out_tmp_ref.cdata());</span>
+<span class="lineNum">      36 </span><span class="lineNoCov">          0 :       break;</span>
+<span class="lineNum">      37 </span>            :     default: {
+<span class="lineNum">      38 </span>            :       // The data needs to be converted to UTF-8 before parsing
+<span class="lineNum">      39 </span><span class="lineNoCov">          0 :       ndt::type utf8_tp = ndt::make_type&lt;ndt::string_type&gt;();</span>
+<span class="lineNum">      40 </span><span class="lineNoCov">          0 :       out_tmp_ref = json.ucast(utf8_tp).eval();</span>
+<span class="lineNum">      41 </span><span class="lineNoCov">          0 :       sdt = static_cast&lt;const ndt::base_string_type *&gt;(utf8_tp.extended());</span>
+<span class="lineNum">      42 </span><span class="lineNoCov">          0 :       sdt-&gt;get_string_range(&amp;begin, &amp;end, out_tmp_ref.get()-&gt;metadata(), out_tmp_ref.cdata());</span>
+<span class="lineNum">      43 </span><span class="lineNoCov">          0 :       break;</span>
+<span class="lineNum">      44 </span>            :     }
+<span class="lineNum">      45 </span>            :     }
+<span class="lineNum">      46 </span><span class="lineNoCov">          0 :     break;</span>
+<span class="lineNum">      47 </span>            :   }
+<span class="lineNum">      48 </span>            :   case bytes_kind: {
+<span class="lineNum">      49 </span><span class="lineNoCov">          0 :     out_tmp_ref = json.eval();</span>
+<span class="lineNum">      50 </span><span class="lineNoCov">          0 :     const ndt::base_bytes_type *bdt = json_type.extended&lt;ndt::base_bytes_type&gt;();</span>
+<span class="lineNum">      51 </span><span class="lineNoCov">          0 :     bdt-&gt;get_bytes_range(&amp;begin, &amp;end, out_tmp_ref.get()-&gt;metadata(), out_tmp_ref.cdata());</span>
+<span class="lineNum">      52 </span><span class="lineNoCov">          0 :     break;</span>
+<span class="lineNum">      53 </span>            :   }
+<span class="lineNum">      54 </span>            :   default: {
+<span class="lineNum">      55 </span><span class="lineNoCov">          0 :     stringstream ss;</span>
+<span class="lineNum">      56 </span>            :     ss &lt;&lt; &quot;Input for JSON parsing must be either bytes (interpreted as UTF-8) &quot;
+<span class="lineNum">      57 </span><span class="lineNoCov">          0 :           &quot;or a string, not \&quot;&quot; &lt;&lt; json_type &lt;&lt; &quot;\&quot;&quot;;</span>
+<span class="lineNum">      58 </span><span class="lineNoCov">          0 :     throw runtime_error(ss.str());</span>
+<span class="lineNum">      59 </span>            :     break;
+<span class="lineNum">      60 </span>            :   }
+<span class="lineNum">      61 </span>            :   }
+<a name="62"><span class="lineNum">      62 </span><span class="lineNoCov">          0 : }</span></a>
+<span class="lineNum">      63 </span>            : 
+<span class="lineNum">      64 </span><span class="lineNoCov">          0 : void dynd::parse_json(nd::array &amp;out, const nd::array &amp;json, const eval::eval_context *ectx)</span>
+<span class="lineNum">      65 </span>            : {
+<span class="lineNum">      66 </span><span class="lineNoCov">          0 :   const char *json_begin = NULL, *json_end = NULL;</span>
+<span class="lineNum">      67 </span><span class="lineNoCov">          0 :   nd::array tmp_ref;</span>
+<span class="lineNum">      68 </span><span class="lineNoCov">          0 :   json_as_buffer(json, tmp_ref, json_begin, json_end);</span>
+<span class="lineNum">      69 </span><span class="lineNoCov">          0 :   parse_json(out, json_begin, json_end, ectx);</span>
+<a name="70"><span class="lineNum">      70 </span><span class="lineNoCov">          0 : }</span></a>
+<span class="lineNum">      71 </span>            : 
+<span class="lineNum">      72 </span><span class="lineNoCov">          0 : nd::array dynd::parse_json(const ndt::type &amp;tp, const nd::array &amp;json, const eval::eval_context *ectx)</span>
+<span class="lineNum">      73 </span>            : {
+<span class="lineNum">      74 </span><span class="lineNoCov">          0 :   const char *json_begin = NULL, *json_end = NULL;</span>
+<span class="lineNum">      75 </span><span class="lineNoCov">          0 :   nd::array tmp_ref;</span>
+<span class="lineNum">      76 </span><span class="lineNoCov">          0 :   json_as_buffer(json, tmp_ref, json_begin, json_end);</span>
+<span class="lineNum">      77 </span><span class="lineNoCov">          0 :   return parse_json(tp, json_begin, json_end, ectx);</span>
+<span class="lineNum">      78 </span>            : }
+<span class="lineNum">      79 </span>            : 
+<span class="lineNum">      80 </span>            : static void parse_json(const ndt::type &amp;tp, const char *arrmeta, char *out_data, const char *&amp;json_begin,
+<a name="81"><span class="lineNum">      81 </span>            :                        const char *json_end, const eval::eval_context *ectx);</a>
+<span class="lineNum">      82 </span>            : 
+<span class="lineNum">      83 </span><span class="lineCov">          9 : static void skip_json_value(const char *&amp;begin, const char *end)</span>
+<span class="lineNum">      84 </span>            : {
+<span class="lineNum">      85 </span><span class="lineCov">          9 :   skip_whitespace(begin, end);</span>
+<span class="lineNum">      86 </span><span class="lineCov">          9 :   if (begin == end) {</span>
+<span class="lineNum">      87 </span><span class="lineNoCov">          0 :     throw parse_error(begin, &quot;malformed JSON, expecting an element&quot;);</span>
+<span class="lineNum">      88 </span>            :   }
+<span class="lineNum">      89 </span><span class="lineCov">          9 :   char c = *begin;</span>
+<span class="lineNum">      90 </span><span class="lineCov">          9 :   switch (c) {</span>
+<span class="lineNum">      91 </span>            :   // Object
+<span class="lineNum">      92 </span>            :   case '{':
+<span class="lineNum">      93 </span><span class="lineNoCov">          0 :     ++begin;</span>
+<span class="lineNum">      94 </span><span class="lineNoCov">          0 :     if (!parse_token(begin, end, &quot;}&quot;)) {</span>
+<span class="lineNum">      95 </span><span class="lineNoCov">          0 :       for (;;) {</span>
+<span class="lineNum">      96 </span>            :         const char *strbegin, *strend;
+<span class="lineNum">      97 </span>            :         bool escaped;
+<span class="lineNum">      98 </span><span class="lineNoCov">          0 :         skip_whitespace(begin, end);</span>
+<span class="lineNum">      99 </span><span class="lineNoCov">          0 :         if (!parse_doublequote_string_no_ws(begin, end, strbegin, strend, escaped)) {</span>
+<span class="lineNum">     100 </span><span class="lineNoCov">          0 :           throw parse_error(begin, &quot;expected string for name in object dict&quot;);</span>
+<span class="lineNum">     101 </span>            :         }
+<span class="lineNum">     102 </span><span class="lineNoCov">          0 :         if (!parse_token(begin, end, &quot;:&quot;)) {</span>
+<span class="lineNum">     103 </span><span class="lineNoCov">          0 :           throw parse_error(begin, &quot;expected ':' separating name from value in object dict&quot;);</span>
+<span class="lineNum">     104 </span>            :         }
+<span class="lineNum">     105 </span><span class="lineNoCov">          0 :         skip_json_value(begin, end);</span>
+<span class="lineNum">     106 </span><span class="lineNoCov">          0 :         if (!parse_token(begin, end, &quot;,&quot;)) {</span>
+<span class="lineNum">     107 </span><span class="lineNoCov">          0 :           break;</span>
+<span class="lineNum">     108 </span>            :         }
+<span class="lineNum">     109 </span>            :       }
+<span class="lineNum">     110 </span><span class="lineNoCov">          0 :       if (!parse_token(begin, end, &quot;}&quot;)) {</span>
+<span class="lineNum">     111 </span><span class="lineNoCov">          0 :         throw parse_error(begin, &quot;expected object separator ',' or terminator '}'&quot;);</span>
+<span class="lineNum">     112 </span>            :       }
+<span class="lineNum">     113 </span>            :     }
+<span class="lineNum">     114 </span><span class="lineNoCov">          0 :     break;</span>
+<span class="lineNum">     115 </span>            :   // Array
+<span class="lineNum">     116 </span>            :   case '[':
+<span class="lineNum">     117 </span><span class="lineCov">          2 :     ++begin;</span>
+<span class="lineNum">     118 </span><span class="lineCov">          2 :     if (!parse_token(begin, end, &quot;]&quot;)) {</span>
+<span class="lineNum">     119 </span><span class="lineCov">          4 :       for (;;) {</span>
+<span class="lineNum">     120 </span><span class="lineCov">          6 :         skip_json_value(begin, end);</span>
+<span class="lineNum">     121 </span><span class="lineCov">          6 :         if (!parse_token(begin, end, &quot;,&quot;)) {</span>
+<span class="lineNum">     122 </span><span class="lineCov">          2 :           break;</span>
+<span class="lineNum">     123 </span>            :         }
+<span class="lineNum">     124 </span>            :       }
+<span class="lineNum">     125 </span><span class="lineCov">          2 :       if (!parse_token(begin, end, &quot;]&quot;)) {</span>
+<span class="lineNum">     126 </span><span class="lineNoCov">          0 :         throw parse_error(begin, &quot;expected array separator ',' or terminator ']'&quot;);</span>
+<span class="lineNum">     127 </span>            :       }
+<span class="lineNum">     128 </span>            :     }
+<span class="lineNum">     129 </span><span class="lineCov">          2 :     break;</span>
+<span class="lineNum">     130 </span>            :   case '&quot;': {
+<span class="lineNum">     131 </span>            :     const char *strbegin, *strend;
+<span class="lineNum">     132 </span>            :     bool escaped;
+<span class="lineNum">     133 </span><span class="lineCov">          1 :     if (!parse_doublequote_string_no_ws(begin, end, strbegin, strend, escaped)) {</span>
+<span class="lineNum">     134 </span><span class="lineNoCov">          0 :       throw parse_error(begin, &quot;invalid string&quot;);</span>
+<span class="lineNum">     135 </span>            :     }
+<span class="lineNum">     136 </span><span class="lineCov">          1 :     break;</span>
+<span class="lineNum">     137 </span>            :   }
+<span class="lineNum">     138 </span>            :   case 't':
+<span class="lineNum">     139 </span><span class="lineNoCov">          0 :     if (!parse_token(begin, end, &quot;true&quot;)) {</span>
+<span class="lineNum">     140 </span><span class="lineNoCov">          0 :       throw parse_error(begin, &quot;invalid json value&quot;);</span>
+<span class="lineNum">     141 </span>            :     }
+<span class="lineNum">     142 </span><span class="lineNoCov">          0 :     break;</span>
+<span class="lineNum">     143 </span>            :   case 'f':
+<span class="lineNum">     144 </span><span class="lineNoCov">          0 :     if (!parse_token(begin, end, &quot;false&quot;)) {</span>
+<span class="lineNum">     145 </span><span class="lineNoCov">          0 :       throw parse_error(begin, &quot;invalid json value&quot;);</span>
+<span class="lineNum">     146 </span>            :     }
+<span class="lineNum">     147 </span><span class="lineNoCov">          0 :     break;</span>
+<span class="lineNum">     148 </span>            :   case 'n':
+<span class="lineNum">     149 </span><span class="lineNoCov">          0 :     if (!parse_token(begin, end, &quot;null&quot;)) {</span>
+<span class="lineNum">     150 </span><span class="lineNoCov">          0 :       throw parse_error(begin, &quot;invalid json value&quot;);</span>
+<span class="lineNum">     151 </span>            :     }
+<span class="lineNum">     152 </span><span class="lineNoCov">          0 :     break;</span>
+<span class="lineNum">     153 </span>            :   default:
+<span class="lineNum">     154 </span><span class="lineCov">          6 :     if (c == '-' || ('0' &lt;= c &amp;&amp; c &lt;= '9')) {</span>
+<span class="lineNum">     155 </span><span class="lineCov">          6 :       const char *nbegin = NULL, *nend = NULL;</span>
+<span class="lineNum">     156 </span><span class="lineCov">          6 :       if (!json::parse_number(begin, end, nbegin, nend)) {</span>
+<span class="lineNum">     157 </span><span class="lineNoCov">          0 :         throw parse_error(begin, &quot;invalid number&quot;);</span>
+<span class="lineNum">     158 </span><span class="lineCov">          6 :       }</span>
+<span class="lineNum">     159 </span>            :     }
+<span class="lineNum">     160 </span>            :     else {
+<span class="lineNum">     161 </span><span class="lineNoCov">          0 :       throw parse_error(begin, &quot;invalid json value&quot;);</span>
+<span class="lineNum">     162 </span>            :     }
+<span class="lineNum">     163 </span>            :   }
+<a name="164"><span class="lineNum">     164 </span><span class="lineCov">          9 : }</span></a>
+<span class="lineNum">     165 </span>            : 
+<span class="lineNum">     166 </span><span class="lineCov">        265 : static void parse_strided_dim_json(const ndt::type &amp;tp, const char *arrmeta, char *out_data, const char *&amp;begin,</span>
+<span class="lineNum">     167 </span>            :                                    const char *end, const eval::eval_context *ectx)
+<span class="lineNum">     168 </span>            : {
+<span class="lineNum">     169 </span>            :   intptr_t dim_size, stride;
+<span class="lineNum">     170 </span><span class="lineCov">        530 :   ndt::type el_tp;</span>
+<span class="lineNum">     171 </span>            :   const char *el_arrmeta;
+<span class="lineNum">     172 </span><span class="lineCov">        265 :   if (!tp.get_as_strided(arrmeta, &amp;dim_size, &amp;stride, &amp;el_tp, &amp;el_arrmeta)) {</span>
+<span class="lineNum">     173 </span><span class="lineNoCov">          0 :     throw json_parse_error(begin, &quot;expected a strided dimension&quot;, tp);</span>
+<span class="lineNum">     174 </span>            :   }
+<span class="lineNum">     175 </span>            : 
+<span class="lineNum">     176 </span><span class="lineCov">        265 :   if (!parse_token(begin, end, &quot;[&quot;)) {</span>
+<span class="lineNum">     177 </span><span class="lineNoCov">          0 :     throw json_parse_error(begin, &quot;expected list starting with '['&quot;, tp);</span>
+<span class="lineNum">     178 </span>            :   }
+<span class="lineNum">     179 </span><span class="lineCov">        862 :   for (intptr_t i = 0; i &lt; dim_size; ++i) {</span>
+<span class="lineNum">     180 </span><span class="lineCov">        598 :     parse_json(el_tp, el_arrmeta, out_data + i * stride, begin, end, ectx);</span>
+<span class="lineNum">     181 </span><span class="lineCov">        598 :     if (i &lt; dim_size - 1 &amp;&amp; !parse_token(begin, end, &quot;,&quot;)) {</span>
+<span class="lineNum">     182 </span><span class="lineCov">          1 :       throw json_parse_error(begin, &quot;array is too short, expected ',' list item separator&quot;, tp);</span>
+<span class="lineNum">     183 </span>            :     }
+<span class="lineNum">     184 </span>            :   }
+<span class="lineNum">     185 </span><span class="lineCov">        264 :   if (!parse_token(begin, end, &quot;]&quot;)) {</span>
+<span class="lineNum">     186 </span><span class="lineCov">          1 :     throw json_parse_error(begin, &quot;array is too long, expected list terminator ']'&quot;, tp);</span>
+<span class="lineNum">     187 </span>            :   }
+<a name="188"><span class="lineNum">     188 </span><span class="lineCov">        263 : }</span></a>
+<span class="lineNum">     189 </span>            : 
+<span class="lineNum">     190 </span><span class="lineCov">         71 : static void parse_var_dim_json(const ndt::type &amp;tp, const char *arrmeta, char *out_data, const char *&amp;begin,</span>
+<span class="lineNum">     191 </span>            :                                const char *end, const eval::eval_context *ectx)
+<span class="lineNum">     192 </span>            : {
+<span class="lineNum">     193 </span><span class="lineCov">         71 :   const ndt::var_dim_type *vad = tp.extended&lt;ndt::var_dim_type&gt;();</span>
+<span class="lineNum">     194 </span><span class="lineCov">         71 :   const ndt::var_dim_type::metadata_type *md = reinterpret_cast&lt;const ndt::var_dim_type::metadata_type *&gt;(arrmeta);</span>
+<span class="lineNum">     195 </span><span class="lineCov">         71 :   intptr_t stride = md-&gt;stride;</span>
+<span class="lineNum">     196 </span><span class="lineCov">         71 :   const ndt::type &amp;element_tp = vad-&gt;get_element_type();</span>
+<span class="lineNum">     197 </span>            : 
+<span class="lineNum">     198 </span><span class="lineCov">         71 :   ndt::var_dim_type::data_type *out = reinterpret_cast&lt;ndt::var_dim_type::data_type *&gt;(out_data);</span>
+<span class="lineNum">     199 </span>            : 
+<span class="lineNum">     200 </span><span class="lineCov">         71 :   intptr_t size = 0, allocated_size = 8;</span>
+<span class="lineNum">     201 </span><span class="lineCov">         71 :   out-&gt;begin = md-&gt;blockref-&gt;alloc(allocated_size);</span>
+<span class="lineNum">     202 </span>            : 
+<span class="lineNum">     203 </span><span class="lineCov">         71 :   if (!parse_token(begin, end, &quot;[&quot;)) {</span>
+<span class="lineNum">     204 </span><span class="lineNoCov">          0 :     throw json_parse_error(begin, &quot;expected array starting with '['&quot;, tp);</span>
+<span class="lineNum">     205 </span>            :   }
+<span class="lineNum">     206 </span>            :   // If it's not an empty list, start the loop parsing the elements
+<span class="lineNum">     207 </span><span class="lineCov">         71 :   if (!parse_token(begin, end, &quot;]&quot;)) {</span>
+<span class="lineNum">     208 </span><span class="lineCov">        121 :     for (;;) {</span>
+<span class="lineNum">     209 </span>            :       // Increase the allocated array size if necessary
+<span class="lineNum">     210 </span><span class="lineCov">        188 :       if (size == allocated_size) {</span>
+<span class="lineNum">     211 </span><span class="lineNoCov">          0 :         allocated_size *= 2;</span>
+<span class="lineNum">     212 </span><span class="lineNoCov">          0 :         out-&gt;begin = md-&gt;blockref-&gt;resize(out-&gt;begin, allocated_size);</span>
+<span class="lineNum">     213 </span>            :       }
+<span class="lineNum">     214 </span><span class="lineCov">        188 :       ++size;</span>
+<span class="lineNum">     215 </span><span class="lineCov">        188 :       out-&gt;size = size;</span>
+<span class="lineNum">     216 </span><span class="lineCov">        188 :       parse_json(element_tp, arrmeta + sizeof(ndt::var_dim_type::metadata_type), out-&gt;begin + (size - 1) * stride,</span>
+<span class="lineNum">     217 </span><span class="lineCov">        188 :                  begin, end, ectx);</span>
+<span class="lineNum">     218 </span><span class="lineCov">        187 :       if (!parse_token(begin, end, &quot;,&quot;)) {</span>
+<span class="lineNum">     219 </span><span class="lineCov">         66 :         break;</span>
+<span class="lineNum">     220 </span>            :       }
+<span class="lineNum">     221 </span>            :     }
+<span class="lineNum">     222 </span><span class="lineCov">         66 :     if (!parse_token(begin, end, &quot;]&quot;)) {</span>
+<span class="lineNum">     223 </span><span class="lineNoCov">          0 :       throw json_parse_error(begin, &quot;expected array separator ',' or terminator ']'&quot;, tp);</span>
+<span class="lineNum">     224 </span>            :     }
+<span class="lineNum">     225 </span>            :   }
+<span class="lineNum">     226 </span>            : 
+<span class="lineNum">     227 </span>            :   // Shrink-wrap the memory to just fit the string
+<span class="lineNum">     228 </span><span class="lineCov">         70 :   out-&gt;begin = md-&gt;blockref-&gt;resize(out-&gt;begin, size);</span>
+<span class="lineNum">     229 </span><span class="lineCov">         70 :   out-&gt;size = size;</span>
+<a name="230"><span class="lineNum">     230 </span><span class="lineCov">         70 : }</span></a>
+<span class="lineNum">     231 </span>            : 
+<span class="lineNum">     232 </span><span class="lineCov">         31 : static bool parse_struct_json_from_object(const ndt::type &amp;tp, const char *arrmeta, char *out_data, const char *&amp;begin,</span>
+<span class="lineNum">     233 </span>            :                                           const char *end, const eval::eval_context *ectx)
+<span class="lineNum">     234 </span>            : {
+<span class="lineNum">     235 </span><span class="lineCov">         31 :   const char *saved_begin = begin;</span>
+<span class="lineNum">     236 </span><span class="lineCov">         31 :   if (!parse_token(begin, end, &quot;{&quot;)) {</span>
+<span class="lineNum">     237 </span><span class="lineCov">          4 :     return false;</span>
+<span class="lineNum">     238 </span>            :   }
+<span class="lineNum">     239 </span>            : 
+<span class="lineNum">     240 </span><span class="lineCov">         27 :   const ndt::struct_type *fsd = tp.extended&lt;ndt::struct_type&gt;();</span>
+<span class="lineNum">     241 </span><span class="lineCov">         27 :   intptr_t field_count = fsd-&gt;get_field_count();</span>
+<span class="lineNum">     242 </span><span class="lineCov">         27 :   const size_t *data_offsets = fsd-&gt;get_data_offsets(arrmeta);</span>
+<span class="lineNum">     243 </span><span class="lineCov">         27 :   const std::vector&lt;uintptr_t&gt; &amp;arrmeta_offsets = fsd-&gt;get_arrmeta_offsets();</span>
+<span class="lineNum">     244 </span>            : 
+<span class="lineNum">     245 </span>            :   // Keep track of which fields we've seen
+<span class="lineNum">     246 </span><span class="lineCov">         54 :   shortvector&lt;bool&gt; populated_fields(field_count);</span>
+<span class="lineNum">     247 </span><span class="lineCov">         27 :   memset(populated_fields.get(), 0, sizeof(bool) * field_count);</span>
+<span class="lineNum">     248 </span>            : 
+<span class="lineNum">     249 </span>            :   // If it's not an empty object, start the loop parsing the elements
+<span class="lineNum">     250 </span><span class="lineCov">         27 :   if (!parse_token(begin, end, &quot;}&quot;)) {</span>
+<span class="lineNum">     251 </span><span class="lineCov">         39 :     for (;;) {</span>
+<span class="lineNum">     252 </span>            :       const char *strbegin, *strend;
+<span class="lineNum">     253 </span>            :       bool escaped;
+<span class="lineNum">     254 </span><span class="lineCov">         63 :       skip_whitespace(begin, end);</span>
+<span class="lineNum">     255 </span><span class="lineCov">         63 :       if (!parse_doublequote_string_no_ws(begin, end, strbegin, strend, escaped)) {</span>
+<span class="lineNum">     256 </span><span class="lineNoCov">          0 :         throw json_parse_error(begin, &quot;expected string for name in object dict&quot;, tp);</span>
+<span class="lineNum">     257 </span>            :       }
+<span class="lineNum">     258 </span><span class="lineCov">         63 :       if (!parse_token(begin, end, &quot;:&quot;)) {</span>
+<span class="lineNum">     259 </span><span class="lineNoCov">          0 :         throw json_parse_error(begin, &quot;expected ':' separating name from value in object dict&quot;, tp);</span>
+<span class="lineNum">     260 </span>            :       }
+<span class="lineNum">     261 </span>            :       intptr_t i;
+<span class="lineNum">     262 </span><span class="lineCov">         63 :       if (escaped) {</span>
+<span class="lineNum">     263 </span><span class="lineNoCov">          0 :         std::string name;</span>
+<span class="lineNum">     264 </span><span class="lineNoCov">          0 :         unescape_string(strbegin, strend, name);</span>
+<span class="lineNum">     265 </span><span class="lineNoCov">          0 :         i = fsd-&gt;get_field_index(name);</span>
+<span class="lineNum">     266 </span>            :       }
+<span class="lineNum">     267 </span>            :       else {
+<span class="lineNum">     268 </span><span class="lineCov">         63 :         i = fsd-&gt;get_field_index(std::string(strbegin, strend));</span>
+<span class="lineNum">     269 </span>            :       }
+<span class="lineNum">     270 </span><span class="lineCov">         63 :       if (i == -1) {</span>
+<span class="lineNum">     271 </span>            :         // TODO: Add an error policy to this parser of whether to throw an error
+<span class="lineNum">     272 </span>            :         //       or not. For now, just throw away fields not in the destination.
+<span class="lineNum">     273 </span><span class="lineCov">          3 :         skip_json_value(begin, end);</span>
+<span class="lineNum">     274 </span>            :       }
+<span class="lineNum">     275 </span>            :       else {
+<span class="lineNum">     276 </span><span class="lineCov">         60 :         parse_json(fsd-&gt;get_field_type(i), arrmeta + arrmeta_offsets[i], out_data + data_offsets[i], begin, end, ectx);</span>
+<span class="lineNum">     277 </span><span class="lineCov">         57 :         populated_fields[i] = true;</span>
+<span class="lineNum">     278 </span>            :       }
+<span class="lineNum">     279 </span><span class="lineCov">         60 :       if (!parse_token(begin, end, &quot;,&quot;)) {</span>
+<span class="lineNum">     280 </span><span class="lineCov">         21 :         break;</span>
+<span class="lineNum">     281 </span>            :       }
+<span class="lineNum">     282 </span>            :     }
+<span class="lineNum">     283 </span><span class="lineCov">         21 :     if (!parse_token(begin, end, &quot;}&quot;)) {</span>
+<span class="lineNum">     284 </span><span class="lineCov">          1 :       throw json_parse_error(begin, &quot;expected object dict separator ',' or terminator '}'&quot;, tp);</span>
+<span class="lineNum">     285 </span>            :     }
+<span class="lineNum">     286 </span>            :   }
+<span class="lineNum">     287 </span>            : 
+<span class="lineNum">     288 </span><span class="lineCov">         74 :   for (intptr_t i = 0; i &lt; field_count; ++i) {</span>
+<span class="lineNum">     289 </span><span class="lineCov">         53 :     if (!populated_fields[i]) {</span>
+<span class="lineNum">     290 </span><span class="lineCov">          5 :       const ndt::type &amp;field_tp = fsd-&gt;get_field_type(i);</span>
+<span class="lineNum">     291 </span><span class="lineCov">          5 :       if (field_tp.get_id() == option_id) {</span>
+<span class="lineNum">     292 </span><span class="lineCov">          3 :         field_tp.extended&lt;ndt::option_type&gt;()-&gt;assign_na(arrmeta + arrmeta_offsets[i], out_data + data_offsets[i],</span>
+<span class="lineNum">     293 </span><span class="lineCov">          3 :                                                          &amp;eval::default_eval_context);</span>
+<span class="lineNum">     294 </span>            :       }
+<span class="lineNum">     295 </span>            :       else {
+<span class="lineNum">     296 </span><span class="lineCov">          4 :         stringstream ss;</span>
+<span class="lineNum">     297 </span><span class="lineCov">          2 :         ss &lt;&lt; &quot;object dict does not contain the field &quot;;</span>
+<span class="lineNum">     298 </span><span class="lineCov">          2 :         print_escaped_utf8_string(ss, fsd-&gt;get_field_name(i));</span>
+<span class="lineNum">     299 </span><span class="lineCov">          2 :         ss &lt;&lt; &quot; as required by the data type&quot;;</span>
+<span class="lineNum">     300 </span><span class="lineCov">          2 :         skip_whitespace(saved_begin, end);</span>
+<span class="lineNum">     301 </span><span class="lineCov">          2 :         throw json_parse_error(saved_begin, ss.str(), tp);</span>
+<span class="lineNum">     302 </span>            :       }
+<span class="lineNum">     303 </span>            :     }
+<span class="lineNum">     304 </span>            :   }
+<span class="lineNum">     305 </span>            : 
+<span class="lineNum">     306 </span><span class="lineCov">         21 :   return true;</span>
+<a name="307"><span class="lineNum">     307 </span>            : }</a>
+<span class="lineNum">     308 </span>            : 
+<span class="lineNum">     309 </span><span class="lineCov">         18 : static bool parse_tuple_json_from_list(const ndt::type &amp;tp, const char *arrmeta, char *out_data, const char *&amp;begin,</span>
+<span class="lineNum">     310 </span>            :                                        const char *end, const eval::eval_context *ectx)
+<span class="lineNum">     311 </span>            : {
+<span class="lineNum">     312 </span><span class="lineCov">         18 :   if (!parse_token(begin, end, &quot;[&quot;)) {</span>
+<span class="lineNum">     313 </span><span class="lineNoCov">          0 :     return false;</span>
+<span class="lineNum">     314 </span>            :   }
+<span class="lineNum">     315 </span>            : 
+<span class="lineNum">     316 </span><span class="lineCov">         18 :   auto fsd = tp.extended&lt;ndt::tuple_type&gt;();</span>
+<span class="lineNum">     317 </span><span class="lineCov">         18 :   intptr_t field_count = fsd-&gt;get_field_count();</span>
+<span class="lineNum">     318 </span><span class="lineCov">         18 :   const size_t *data_offsets = fsd-&gt;get_data_offsets(arrmeta);</span>
+<span class="lineNum">     319 </span><span class="lineCov">         18 :   const std::vector&lt;uintptr_t&gt; &amp;arrmeta_offsets = fsd-&gt;get_arrmeta_offsets();</span>
+<span class="lineNum">     320 </span>            : 
+<span class="lineNum">     321 </span>            :   // Loop through all the fields
+<span class="lineNum">     322 </span><span class="lineCov">         55 :   for (intptr_t i = 0; i != field_count; ++i) {</span>
+<span class="lineNum">     323 </span><span class="lineCov">         37 :     skip_whitespace(begin, end);</span>
+<span class="lineNum">     324 </span><span class="lineCov">         37 :     parse_json(fsd-&gt;get_field_type(i), arrmeta + arrmeta_offsets[i], out_data + data_offsets[i], begin, end, ectx);</span>
+<span class="lineNum">     325 </span><span class="lineCov">         37 :     if (i != field_count - 1 &amp;&amp; !parse_token(begin, end, &quot;,&quot;)) {</span>
+<span class="lineNum">     326 </span><span class="lineNoCov">          0 :       throw json_parse_error(begin, &quot;expected list item separator ','&quot;, tp);</span>
+<span class="lineNum">     327 </span>            :     }
+<span class="lineNum">     328 </span>            :   }
+<span class="lineNum">     329 </span>            : 
+<span class="lineNum">     330 </span><span class="lineCov">         18 :   if (!parse_token(begin, end, &quot;]&quot;)) {</span>
+<span class="lineNum">     331 </span><span class="lineNoCov">          0 :     throw json_parse_error(begin, &quot;expected end of list ']'&quot;, tp);</span>
+<span class="lineNum">     332 </span>            :   }
+<span class="lineNum">     333 </span>            : 
+<span class="lineNum">     334 </span><span class="lineCov">         18 :   return true;</span>
+<a name="335"><span class="lineNum">     335 </span>            : }</a>
+<span class="lineNum">     336 </span>            : 
+<span class="lineNum">     337 </span><span class="lineCov">         31 : static void parse_struct_json(const ndt::type &amp;tp, const char *arrmeta, char *out_data, const char *&amp;begin,</span>
+<span class="lineNum">     338 </span>            :                               const char *end, const eval::eval_context *ectx)
+<span class="lineNum">     339 </span>            : {
+<span class="lineNum">     340 </span><span class="lineCov">         31 :   if (parse_struct_json_from_object(tp, arrmeta, out_data, begin, end, ectx)) {</span>
+<span class="lineNum">     341 </span>            :   }
+<span class="lineNum">     342 </span><span class="lineCov">          4 :   else if (parse_tuple_json_from_list(tp, arrmeta, out_data, begin, end, ectx)) {</span>
+<span class="lineNum">     343 </span>            :   }
+<span class="lineNum">     344 </span>            :   else {
+<span class="lineNum">     345 </span><span class="lineNoCov">          0 :     throw json_parse_error(begin, &quot;expected object dict starting with '{' or list with '['&quot;, tp);</span>
+<span class="lineNum">     346 </span>            :   }
+<a name="347"><span class="lineNum">     347 </span><span class="lineCov">         25 : }</span></a>
+<span class="lineNum">     348 </span>            : 
+<span class="lineNum">     349 </span><span class="lineCov">         14 : static void parse_tuple_json(const ndt::type &amp;tp, const char *arrmeta, char *out_data, const char *&amp;begin,</span>
+<span class="lineNum">     350 </span>            :                              const char *end, const eval::eval_context *ectx)
+<span class="lineNum">     351 </span>            : {
+<span class="lineNum">     352 </span><span class="lineCov">         14 :   if (parse_tuple_json_from_list(tp, arrmeta, out_data, begin, end, ectx)) {</span>
+<span class="lineNum">     353 </span>            :   }
+<span class="lineNum">     354 </span>            :   else {
+<span class="lineNum">     355 </span><span class="lineNoCov">          0 :     throw json_parse_error(begin, &quot;expected object dict starting with '{' or list with '['&quot;, tp);</span>
+<span class="lineNum">     356 </span>            :   }
+<a name="357"><span class="lineNum">     357 </span><span class="lineCov">         14 : }</span></a>
+<span class="lineNum">     358 </span>            : 
+<span class="lineNum">     359 </span><span class="lineCov">          8 : static void parse_bool_json(const ndt::type &amp;tp, const char *DYND_UNUSED(arrmeta), char *out_data, const char *&amp;rbegin,</span>
+<span class="lineNum">     360 </span>            :                             const char *end, bool option, const eval::eval_context *ectx)
+<span class="lineNum">     361 </span>            : {
+<span class="lineNum">     362 </span><span class="lineCov">          8 :   const char *begin = rbegin;</span>
+<span class="lineNum">     363 </span><span class="lineCov">          8 :   char value = 3;</span>
+<span class="lineNum">     364 </span>            :   const char *nbegin, *nend;
+<span class="lineNum">     365 </span>            :   bool escaped;
+<span class="lineNum">     366 </span><span class="lineCov">          8 :   if (parse_token(begin, end, &quot;true&quot;)) {</span>
+<span class="lineNum">     367 </span><span class="lineCov">          4 :     value = 1;</span>
+<span class="lineNum">     368 </span>            :   }
+<span class="lineNum">     369 </span><span class="lineCov">          4 :   else if (parse_token(begin, end, &quot;false&quot;)) {</span>
+<span class="lineNum">     370 </span><span class="lineCov">          4 :     value = 0;</span>
+<span class="lineNum">     371 </span>            :   }
+<span class="lineNum">     372 </span><span class="lineNoCov">          0 :   else if (parse_token(begin, end, &quot;null&quot;)) {</span>
+<span class="lineNum">     373 </span><span class="lineNoCov">          0 :     if (option || ectx-&gt;errmode != assign_error_nocheck) {</span>
+<span class="lineNum">     374 </span><span class="lineNoCov">          0 :       value = 2;</span>
+<span class="lineNum">     375 </span>            :     }
+<span class="lineNum">     376 </span>            :     else {
+<span class="lineNum">     377 </span><span class="lineNoCov">          0 :       value = 0;</span>
+<span class="lineNum">     378 </span>            :     }
+<span class="lineNum">     379 </span>            :   }
+<span class="lineNum">     380 </span><span class="lineNoCov">          0 :   else if (json::parse_number(begin, end, nbegin, nend)) {</span>
+<span class="lineNum">     381 </span><span class="lineNoCov">          0 :     if (nend - nbegin == 1) {</span>
+<span class="lineNum">     382 </span><span class="lineNoCov">          0 :       if (*nbegin == '0') {</span>
+<span class="lineNum">     383 </span><span class="lineNoCov">          0 :         value = 0;</span>
+<span class="lineNum">     384 </span>            :       }
+<span class="lineNum">     385 </span><span class="lineNoCov">          0 :       else if (*nbegin == '1' || ectx-&gt;errmode == assign_error_nocheck) {</span>
+<span class="lineNum">     386 </span><span class="lineNoCov">          0 :         value = 1;</span>
+<span class="lineNum">     387 </span>            :       }
+<span class="lineNum">     388 </span>            :     }
+<span class="lineNum">     389 </span>            :   }
+<span class="lineNum">     390 </span><span class="lineNoCov">          0 :   else if (parse_doublequote_string_no_ws(begin, end, nbegin, nend, escaped)) {</span>
+<span class="lineNum">     391 </span><span class="lineNoCov">          0 :     if (!escaped) {</span>
+<span class="lineNum">     392 </span><span class="lineNoCov">          0 :       if (ectx-&gt;errmode == assign_error_nocheck) {</span>
+<span class="lineNum">     393 </span><span class="lineNoCov">          0 :         value = parse&lt;bool&gt;(nbegin, nend, nocheck);</span>
+<span class="lineNum">     394 </span>            :       }
+<span class="lineNum">     395 </span>            :       else {
+<span class="lineNum">     396 </span><span class="lineNoCov">          0 :         value = parse&lt;bool&gt;(nbegin, nend);</span>
+<span class="lineNum">     397 </span>            :       }
+<span class="lineNum">     398 </span>            :     }
+<span class="lineNum">     399 </span>            :     else {
+<span class="lineNum">     400 </span><span class="lineNoCov">          0 :       std::string s;</span>
+<span class="lineNum">     401 </span><span class="lineNoCov">          0 :       unescape_string(nbegin, nend, s);</span>
+<span class="lineNum">     402 </span><span class="lineNoCov">          0 :       if (ectx-&gt;errmode == assign_error_nocheck) {</span>
+<span class="lineNum">     403 </span><span class="lineNoCov">          0 :         value = parse&lt;bool&gt;(s.data(), s.data() + s.size(), nocheck);</span>
+<span class="lineNum">     404 </span>            :       }
+<span class="lineNum">     405 </span>            :       else {
+<span class="lineNum">     406 </span><span class="lineNoCov">          0 :         value = parse&lt;bool&gt;(s.data(), s.data() + s.size());</span>
+<span class="lineNum">     407 </span>            :       }
+<span class="lineNum">     408 </span>            :     }
+<span class="lineNum">     409 </span>            :   }
+<span class="lineNum">     410 </span>            : 
+<span class="lineNum">     411 </span><span class="lineCov">          8 :   if (value &lt; 2) {</span>
+<span class="lineNum">     412 </span><span class="lineCov">          8 :     if (tp.get_id() == bool_id) {</span>
+<span class="lineNum">     413 </span><span class="lineCov">          8 :       *out_data = value;</span>
+<span class="lineNum">     414 </span>            :     }
+<span class="lineNum">     415 </span>            :     else {
+<span class="lineNum">     416 </span><span class="lineNoCov">          0 :       throw json_parse_error(rbegin, &quot;expected a boolean true or false&quot;, tp);</span>
+<span class="lineNum">     417 </span>            :     }
+<span class="lineNum">     418 </span><span class="lineCov">          8 :     rbegin = begin;</span>
+<span class="lineNum">     419 </span>            :   }
+<span class="lineNum">     420 </span><span class="lineNoCov">          0 :   else if (value == 2 &amp;&amp; option) {</span>
+<span class="lineNum">     421 </span><span class="lineNoCov">          0 :     if (!tp.is_expression()) {</span>
+<span class="lineNum">     422 </span><span class="lineNoCov">          0 :       *out_data = value;</span>
+<span class="lineNum">     423 </span>            :     }
+<span class="lineNum">     424 </span>            :     else {
+<span class="lineNum">     425 </span><span class="lineNoCov">          0 :       throw json_parse_error(rbegin, &quot;expected a boolean true or false&quot;, tp);</span>
+<span class="lineNum">     426 </span>            :     }
+<span class="lineNum">     427 </span><span class="lineNoCov">          0 :     rbegin = begin;</span>
+<span class="lineNum">     428 </span>            :   }
+<span class="lineNum">     429 </span>            :   else {
+<span class="lineNum">     430 </span><span class="lineNoCov">          0 :     throw json_parse_error(rbegin, &quot;expected a boolean true or false&quot;, tp);</span>
+<span class="lineNum">     431 </span>            :   }
+<a name="432"><span class="lineNum">     432 </span><span class="lineCov">          8 : }</span></a>
+<span class="lineNum">     433 </span>            : 
+<span class="lineNum">     434 </span><span class="lineCov">         66 : static void parse_string_json(const ndt::type &amp;tp, const char *arrmeta, char *out_data, const char *&amp;rbegin,</span>
+<span class="lineNum">     435 </span>            :                               const char *end, const eval::eval_context *ectx)
+<span class="lineNum">     436 </span>            : {
+<span class="lineNum">     437 </span><span class="lineCov">         66 :   const char *begin = rbegin;</span>
+<span class="lineNum">     438 </span><span class="lineCov">         66 :   skip_whitespace(begin, end);</span>
+<span class="lineNum">     439 </span>            :   const char *strbegin, *strend;
+<span class="lineNum">     440 </span>            :   bool escaped;
+<span class="lineNum">     441 </span><span class="lineCov">         66 :   if (parse_doublequote_string_no_ws(begin, end, strbegin, strend, escaped)) {</span>
+<span class="lineNum">     442 </span><span class="lineCov">         66 :     const ndt::base_string_type *bsd = tp.extended&lt;ndt::base_string_type&gt;();</span>
+<span class="lineNum">     443 </span>            :     try {
+<span class="lineNum">     444 </span><span class="lineCov">         66 :       if (!escaped) {</span>
+<span class="lineNum">     445 </span><span class="lineCov">         66 :         bsd-&gt;set_from_utf8_string(arrmeta, out_data, strbegin, strend, ectx);</span>
+<span class="lineNum">     446 </span>            :       }
+<span class="lineNum">     447 </span>            :       else {
+<span class="lineNum">     448 </span><span class="lineNoCov">          0 :         std::string val;</span>
+<span class="lineNum">     449 </span><span class="lineNoCov">          0 :         unescape_string(strbegin, strend, val);</span>
+<span class="lineNum">     450 </span><span class="lineNoCov">          0 :         bsd-&gt;set_from_utf8_string(arrmeta, out_data, val, ectx);</span>
+<span class="lineNum">     451 </span>            :       }
+<span class="lineNum">     452 </span>            :     }
+<span class="lineNum">     453 </span><span class="lineNoCov">          0 :     catch (const std::exception &amp;e) {</span>
+<span class="lineNum">     454 </span><span class="lineNoCov">          0 :       skip_whitespace(rbegin, begin);</span>
+<span class="lineNum">     455 </span><span class="lineNoCov">          0 :       throw json_parse_error(rbegin, e.what(), tp);</span>
+<span class="lineNum">     456 </span>            :     }
+<span class="lineNum">     457 </span><span class="lineNoCov">          0 :     catch (const dynd::dynd_exception &amp;e) {</span>
+<span class="lineNum">     458 </span><span class="lineNoCov">          0 :       skip_whitespace(rbegin, begin);</span>
+<span class="lineNum">     459 </span><span class="lineNoCov">          0 :       throw json_parse_error(rbegin, e.what(), tp);</span>
+<span class="lineNum">     460 </span>            :     }
+<span class="lineNum">     461 </span>            :   }
+<span class="lineNum">     462 </span>            :   else {
+<span class="lineNum">     463 </span><span class="lineNoCov">          0 :     throw json_parse_error(begin, &quot;expected a string&quot;, tp);</span>
+<span class="lineNum">     464 </span>            :   }
+<span class="lineNum">     465 </span><span class="lineCov">         66 :   rbegin = begin;</span>
+<a name="466"><span class="lineNum">     466 </span><span class="lineCov">         66 : }</span></a>
+<span class="lineNum">     467 </span>            : 
+<span class="lineNum">     468 </span><span class="lineCov">         20 : static void parse_type(const ndt::type &amp;tp, const char *DYND_UNUSED(arrmeta), char *out_data, const char *&amp;rbegin,</span>
+<span class="lineNum">     469 </span>            :                        const char *end, bool option, const eval::eval_context *DYND_UNUSED(ectx))
+<span class="lineNum">     470 </span>            : {
+<span class="lineNum">     471 </span><span class="lineCov">         20 :   const char *begin = rbegin;</span>
+<span class="lineNum">     472 </span><span class="lineCov">         20 :   skip_whitespace(begin, end);</span>
+<span class="lineNum">     473 </span>            :   const char *strbegin, *strend;
+<span class="lineNum">     474 </span>            :   bool escaped;
+<span class="lineNum">     475 </span><span class="lineCov">         20 :   if (option &amp;&amp; parse_token(begin, end, &quot;null&quot;)) {</span>
+<span class="lineNum">     476 </span><span class="lineNoCov">          0 :     switch (tp.get_id()) {</span>
+<span class="lineNum">     477 </span>            :     case type_id:
+<span class="lineNum">     478 </span><span class="lineNoCov">          0 :       *reinterpret_cast&lt;ndt::type *&gt;(out_data) = ndt::type();</span>
+<span class="lineNum">     479 </span><span class="lineNoCov">          0 :       return;</span>
+<span class="lineNum">     480 </span>            :     default:
+<span class="lineNum">     481 </span><span class="lineNoCov">          0 :       break;</span>
+<span class="lineNum">     482 </span>            :     }
+<span class="lineNum">     483 </span><span class="lineNoCov">          0 :     stringstream ss;</span>
+<span class="lineNum">     484 </span><span class="lineNoCov">          0 :     ss &lt;&lt; &quot;Unrecognized type type \&quot;&quot; &lt;&lt; tp &lt;&lt; &quot;\&quot;&quot;;</span>
+<span class="lineNum">     485 </span><span class="lineNoCov">          0 :     throw runtime_error(ss.str());</span>
+<span class="lineNum">     486 </span>            :   }
+<span class="lineNum">     487 </span><span class="lineCov">         20 :   else if (parse_doublequote_string_no_ws(begin, end, strbegin, strend, escaped)) {</span>
+<span class="lineNum">     488 </span><span class="lineCov">         40 :     std::string val;</span>
+<span class="lineNum">     489 </span><span class="lineCov">         20 :     if (escaped) {</span>
+<span class="lineNum">     490 </span><span class="lineNoCov">          0 :       unescape_string(strbegin, strend, val);</span>
+<span class="lineNum">     491 </span><span class="lineNoCov">          0 :       strbegin = val.data();</span>
+<span class="lineNum">     492 </span><span class="lineNoCov">          0 :       strend = strbegin + val.size();</span>
+<span class="lineNum">     493 </span>            :     }
+<span class="lineNum">     494 </span>            :     try {
+<span class="lineNum">     495 </span><span class="lineCov">         20 :       *reinterpret_cast&lt;ndt::type *&gt;(out_data) = ndt::type(strbegin, strend);</span>
+<span class="lineNum">     496 </span>            :     }
+<span class="lineNum">     497 </span><span class="lineNoCov">          0 :     catch (const std::exception &amp;e) {</span>
+<span class="lineNum">     498 </span><span class="lineNoCov">          0 :       skip_whitespace(rbegin, begin);</span>
+<span class="lineNum">     499 </span><span class="lineNoCov">          0 :       throw json_parse_error(rbegin, e.what(), tp);</span>
+<span class="lineNum">     500 </span>            :     }
+<span class="lineNum">     501 </span><span class="lineNoCov">          0 :     catch (const dynd::dynd_exception &amp;e) {</span>
+<span class="lineNum">     502 </span><span class="lineNoCov">          0 :       skip_whitespace(rbegin, begin);</span>
+<span class="lineNum">     503 </span><span class="lineNoCov">          0 :       throw json_parse_error(rbegin, e.what(), tp);</span>
+<span class="lineNum">     504 </span>            :     }
+<span class="lineNum">     505 </span>            :   }
+<span class="lineNum">     506 </span>            :   else {
+<span class="lineNum">     507 </span><span class="lineNoCov">          0 :     throw json_parse_error(begin, &quot;expected a string&quot;, tp);</span>
+<span class="lineNum">     508 </span>            :   }
+<span class="lineNum">     509 </span><span class="lineCov">         20 :   rbegin = begin;</span>
+<a name="510"><span class="lineNum">     510 </span>            : }</a>
+<span class="lineNum">     511 </span>            : 
+<span class="lineNum">     512 </span><span class="lineCov">        336 : static void parse_dim_json(const ndt::type &amp;tp, const char *arrmeta, char *out_data, const char *&amp;begin,</span>
+<span class="lineNum">     513 </span>            :                            const char *end, const eval::eval_context *ectx)
+<span class="lineNum">     514 </span>            : {
+<span class="lineNum">     515 </span><span class="lineCov">        336 :   switch (tp.get_id()) {</span>
+<span class="lineNum">     516 </span>            :   case fixed_dim_id:
+<span class="lineNum">     517 </span><span class="lineCov">        265 :     parse_strided_dim_json(tp, arrmeta, out_data, begin, end, ectx);</span>
+<span class="lineNum">     518 </span><span class="lineCov">        263 :     break;</span>
+<span class="lineNum">     519 </span>            :   case var_dim_id:
+<span class="lineNum">     520 </span><span class="lineCov">         71 :     parse_var_dim_json(tp, arrmeta, out_data, begin, end, ectx);</span>
+<span class="lineNum">     521 </span><span class="lineCov">         70 :     break;</span>
+<span class="lineNum">     522 </span>            :   default: {
+<span class="lineNum">     523 </span><span class="lineNoCov">          0 :     stringstream ss;</span>
+<span class="lineNum">     524 </span><span class="lineNoCov">          0 :     ss &lt;&lt; &quot;parse_json: unsupported dynd dimension type \&quot;&quot; &lt;&lt; tp &lt;&lt; &quot;\&quot;&quot;;</span>
+<span class="lineNum">     525 </span><span class="lineNoCov">          0 :     throw runtime_error(ss.str());</span>
+<span class="lineNum">     526 </span>            :   }
+<span class="lineNum">     527 </span>            :   }
+<a name="528"><span class="lineNum">     528 </span><span class="lineCov">        333 : }</span></a>
+<span class="lineNum">     529 </span>            : 
+<span class="lineNum">     530 </span><span class="lineCov">         88 : static void parse_option_json(const ndt::type &amp;tp, const char *arrmeta, char *out_data, const char *&amp;begin,</span>
+<span class="lineNum">     531 </span>            :                               const char *end, const eval::eval_context *ectx)
+<span class="lineNum">     532 </span>            : {
+<span class="lineNum">     533 </span><span class="lineCov">         88 :   skip_whitespace(begin, end);</span>
+<span class="lineNum">     534 </span><span class="lineCov">         88 :   const char *saved_begin = begin;</span>
+<span class="lineNum">     535 </span><span class="lineCov">         88 :   if (tp.is_scalar()) {</span>
+<span class="lineNum">     536 </span><span class="lineCov">         88 :     if (parse_token(begin, end, &quot;null&quot;)) {</span>
+<span class="lineNum">     537 </span><span class="lineCov">         38 :       tp.extended&lt;ndt::option_type&gt;()-&gt;assign_na(arrmeta, out_data, ectx);</span>
+<span class="lineNum">     538 </span><span class="lineCov">         38 :       return;</span>
+<span class="lineNum">     539 </span>            :     }
+<span class="lineNum">     540 </span>            :     else {
+<span class="lineNum">     541 </span><span class="lineCov">         50 :       const ndt::type &amp;value_tp = tp.extended&lt;ndt::option_type&gt;()-&gt;get_value_type();</span>
+<span class="lineNum">     542 </span>            :       const char *strbegin, *strend;
+<span class="lineNum">     543 </span>            :       bool escaped;
+<span class="lineNum">     544 </span><span class="lineCov">         50 :       if (parse_doublequote_string_no_ws(begin, end, strbegin, strend, escaped)) {</span>
+<span class="lineNum">     545 </span>            :         try {
+<span class="lineNum">     546 </span><span class="lineCov">          3 :           if (!escaped) {</span>
+<span class="lineNum">     547 </span><span class="lineCov">          3 :             tp.extended()-&gt;set_from_utf8_string(arrmeta, out_data, strbegin, strend, ectx);</span>
+<span class="lineNum">     548 </span>            :           }
+<span class="lineNum">     549 </span>            :           else {
+<span class="lineNum">     550 </span><span class="lineNoCov">          0 :             std::string val;</span>
+<span class="lineNum">     551 </span><span class="lineNoCov">          0 :             unescape_string(strbegin, strend, val);</span>
+<span class="lineNum">     552 </span><span class="lineNoCov">          0 :             tp.extended()-&gt;set_from_utf8_string(arrmeta, out_data, val, ectx);</span>
+<span class="lineNum">     553 </span>            :           }
+<span class="lineNum">     554 </span><span class="lineCov">          3 :           return;</span>
+<span class="lineNum">     555 </span>            :         }
+<span class="lineNum">     556 </span><span class="lineNoCov">          0 :         catch (const exception &amp;e) {</span>
+<span class="lineNum">     557 </span><span class="lineNoCov">          0 :           throw json_parse_error(saved_begin, e.what(), tp);</span>
+<span class="lineNum">     558 </span>            :         }
+<span class="lineNum">     559 </span><span class="lineNoCov">          0 :         catch (const dynd::dynd_exception &amp;e) {</span>
+<span class="lineNum">     560 </span><span class="lineNoCov">          0 :           throw json_parse_error(saved_begin, e.what(), tp);</span>
+<span class="lineNum">     561 </span>            :         }
+<span class="lineNum">     562 </span>            :       }
+<span class="lineNum">     563 </span><span class="lineCov">         47 :       else if (value_tp.get_kind() == bool_kind) {</span>
+<span class="lineNum">     564 </span><span class="lineCov">          4 :         if (parse_token(begin, end, &quot;true&quot;)) {</span>
+<span class="lineNum">     565 </span><span class="lineCov">          1 :           *out_data = 1;</span>
+<span class="lineNum">     566 </span>            :         }
+<span class="lineNum">     567 </span><span class="lineCov">          3 :         else if (parse_token(begin, end, &quot;false&quot;)) {</span>
+<span class="lineNum">     568 </span><span class="lineCov">          1 :           *out_data = 0;</span>
+<span class="lineNum">     569 </span>            :         }
+<span class="lineNum">     570 </span><span class="lineCov">          2 :         else if (json::parse_number(begin, end, strbegin, strend)) {</span>
+<span class="lineNum">     571 </span><span class="lineCov">          2 :           if (compare_range_to_literal(strbegin, strend, &quot;1&quot;)) {</span>
+<span class="lineNum">     572 </span><span class="lineCov">          1 :             *out_data = 1;</span>
+<span class="lineNum">     573 </span>            :           }
+<span class="lineNum">     574 </span><span class="lineCov">          1 :           else if (compare_range_to_literal(strbegin, strend, &quot;0&quot;)) {</span>
+<span class="lineNum">     575 </span><span class="lineCov">          1 :             *out_data = 0;</span>
+<span class="lineNum">     576 </span>            :           }
+<span class="lineNum">     577 </span>            :           else {
+<span class="lineNum">     578 </span><span class="lineNoCov">          0 :             throw json_parse_error(begin, &quot;expected a boolean&quot;, tp);</span>
+<span class="lineNum">     579 </span>            :           }
+<span class="lineNum">     580 </span>            :         }
+<span class="lineNum">     581 </span>            :         else {
+<span class="lineNum">     582 </span><span class="lineNoCov">          0 :           throw json_parse_error(begin, &quot;expected a boolean&quot;, tp);</span>
+<span class="lineNum">     583 </span>            :         }
+<span class="lineNum">     584 </span><span class="lineCov">          4 :         return;</span>
+<span class="lineNum">     585 </span>            :       }
+<span class="lineNum">     586 </span><span class="lineCov">        102 :       else if (value_tp.get_kind() == sint_kind || value_tp.get_kind() == uint_kind ||</span>
+<span class="lineNum">     587 </span><span class="lineCov">         51 :                value_tp.get_kind() == real_kind || value_tp.get_kind() == complex_kind) {</span>
+<span class="lineNum">     588 </span><span class="lineCov">         43 :         if (json::parse_number(begin, end, strbegin, strend)) {</span>
+<span class="lineNum">     589 </span><span class="lineCov">         43 :           string_to_number(out_data, value_tp.get_id(), strbegin, strend, ectx-&gt;errmode);</span>
+<span class="lineNum">     590 </span>            :         }
+<span class="lineNum">     591 </span>            :         else {
+<span class="lineNum">     592 </span><span class="lineNoCov">          0 :           throw json_parse_error(begin, &quot;expected a number&quot;, tp);</span>
+<span class="lineNum">     593 </span>            :         }
+<span class="lineNum">     594 </span><span class="lineCov">         43 :         return;</span>
+<span class="lineNum">     595 </span>            :       }
+<span class="lineNum">     596 </span>            :       else {
+<span class="lineNum">     597 </span><span class="lineNoCov">          0 :         throw json_parse_error(begin, &quot;expected a string&quot;, tp);</span>
+<span class="lineNum">     598 </span>            :       }
+<span class="lineNum">     599 </span>            :     }
+<span class="lineNum">     600 </span>            :   }
+<span class="lineNum">     601 </span>            : 
+<span class="lineNum">     602 </span><span class="lineNoCov">          0 :   stringstream ss;</span>
+<span class="lineNum">     603 </span><span class="lineNoCov">          0 :   ss &lt;&lt; &quot;parse_json: unsupported dynd type \&quot;&quot; &lt;&lt; tp &lt;&lt; &quot;\&quot;&quot;;</span>
+<span class="lineNum">     604 </span><span class="lineNoCov">          0 :   throw runtime_error(ss.str());</span>
+<a name="605"><span class="lineNum">     605 </span>            : }</a>
+<span class="lineNum">     606 </span>            : 
+<span class="lineNum">     607 </span><span class="lineCov">       1053 : static void parse_json(const ndt::type &amp;tp, const char *arrmeta, char *out_data, const char *&amp;begin, const char *end,</span>
+<span class="lineNum">     608 </span>            :                        const eval::eval_context *ectx)
+<span class="lineNum">     609 </span>            : {
+<span class="lineNum">     610 </span><span class="lineCov">       1053 :   skip_whitespace(begin, end);</span>
+<span class="lineNum">     611 </span><span class="lineCov">       1053 :   switch (tp.get_kind()) {</span>
+<span class="lineNum">     612 </span>            :   case dim_kind:
+<span class="lineNum">     613 </span><span class="lineCov">        336 :     parse_dim_json(tp, arrmeta, out_data, begin, end, ectx);</span>
+<span class="lineNum">     614 </span><span class="lineCov">        333 :     return;</span>
+<span class="lineNum">     615 </span>            :   case struct_kind:
+<span class="lineNum">     616 </span><span class="lineCov">         31 :     parse_struct_json(tp, arrmeta, out_data, begin, end, ectx);</span>
+<span class="lineNum">     617 </span><span class="lineCov">         25 :     return;</span>
+<span class="lineNum">     618 </span>            :   case tuple_kind:
+<span class="lineNum">     619 </span><span class="lineCov">         14 :     parse_tuple_json(tp, arrmeta, out_data, begin, end, ectx);</span>
+<span class="lineNum">     620 </span><span class="lineCov">         14 :     return;</span>
+<span class="lineNum">     621 </span>            :   case bool_kind:
+<span class="lineNum">     622 </span><span class="lineCov">          8 :     parse_bool_json(tp, arrmeta, out_data, begin, end, false, ectx);</span>
+<span class="lineNum">     623 </span><span class="lineCov">          8 :     return;</span>
+<span class="lineNum">     624 </span>            :   case sint_kind:
+<span class="lineNum">     625 </span>            :   case uint_kind:
+<span class="lineNum">     626 </span>            :   case real_kind:
+<span class="lineNum">     627 </span>            :   case complex_kind:
+<span class="lineNum">     628 </span><span class="lineCov">        490 :     parse_number_json(tp, out_data, begin, end, false, ectx);</span>
+<span class="lineNum">     629 </span><span class="lineCov">        479 :     return;</span>
+<span class="lineNum">     630 </span>            :   case string_kind:
+<span class="lineNum">     631 </span><span class="lineCov">         66 :     parse_string_json(tp, arrmeta, out_data, begin, end, ectx);</span>
+<span class="lineNum">     632 </span><span class="lineCov">         66 :     return;</span>
+<span class="lineNum">     633 </span>            :   case type_kind:
+<span class="lineNum">     634 </span><span class="lineCov">         20 :     parse_type(tp, arrmeta, out_data, begin, end, false, ectx);</span>
+<span class="lineNum">     635 </span><span class="lineCov">         20 :     return;</span>
+<span class="lineNum">     636 </span>            :   case option_kind:
+<span class="lineNum">     637 </span><span class="lineCov">         88 :     parse_option_json(tp, arrmeta, out_data, begin, end, ectx);</span>
+<span class="lineNum">     638 </span><span class="lineCov">         88 :     return;</span>
+<span class="lineNum">     639 </span>            :   default:
+<span class="lineNum">     640 </span><span class="lineNoCov">          0 :     break;</span>
+<span class="lineNum">     641 </span>            :   }
+<span class="lineNum">     642 </span>            : 
+<span class="lineNum">     643 </span><span class="lineNoCov">          0 :   stringstream ss;</span>
+<span class="lineNum">     644 </span><span class="lineNoCov">          0 :   ss &lt;&lt; &quot;parse_json: unsupported dynd type \&quot;&quot; &lt;&lt; tp &lt;&lt; &quot;\&quot;&quot;;</span>
+<span class="lineNum">     645 </span><span class="lineNoCov">          0 :   throw runtime_error(ss.str());</span>
+<span class="lineNum">     646 </span>            : }
+<span class="lineNum">     647 </span>            : 
+<span class="lineNum">     648 </span>            : /**
+<span class="lineNum">     649 </span>            :  * Returns the row/column where the error occured, as well as the current and
+<span class="lineNum">     650 </span>            :  * previous
+<a name="651"><span class="lineNum">     651 </span>            :  * lines for printing some context.</a>
+<span class="lineNum">     652 </span>            :  */
+<span class="lineNum">     653 </span><span class="lineCov">          6 : static void get_error_line_column(const char *begin, const char *end, const char *position, std::string &amp;out_line_prev,</span>
+<span class="lineNum">     654 </span>            :                                   std::string &amp;out_line_cur, int &amp;out_line, int &amp;out_column)
+<span class="lineNum">     655 </span>            : {
+<span class="lineNum">     656 </span><span class="lineCov">          6 :   out_line_prev = &quot;&quot;;</span>
+<span class="lineNum">     657 </span><span class="lineCov">          6 :   out_line_cur = &quot;&quot;;</span>
+<span class="lineNum">     658 </span><span class="lineCov">          6 :   out_line = 1;</span>
+<span class="lineNum">     659 </span><span class="lineCov">         10 :   while (begin &lt; end) {</span>
+<span class="lineNum">     660 </span><span class="lineCov">          8 :     const char *line_end = (const char *)memchr(begin, '\n', end - begin);</span>
+<span class="lineNum">     661 </span><span class="lineCov">          8 :     out_line_prev.swap(out_line_cur);</span>
+<span class="lineNum">     662 </span>            :     // If no \n was found
+<span class="lineNum">     663 </span><span class="lineCov">          8 :     if (line_end == NULL) {</span>
+<span class="lineNum">     664 </span><span class="lineCov">          5 :       out_column = int(position - begin + 1);</span>
+<span class="lineNum">     665 </span><span class="lineCov">          5 :       out_line_cur = std::string(begin, end);</span>
+<span class="lineNum">     666 </span><span class="lineCov">          5 :       return;</span>
+<span class="lineNum">     667 </span>            :     }
+<span class="lineNum">     668 </span>            :     else {
+<span class="lineNum">     669 </span><span class="lineCov">          3 :       out_line_cur = std::string(begin, line_end);</span>
+<span class="lineNum">     670 </span><span class="lineCov">          3 :       ++line_end;</span>
+<span class="lineNum">     671 </span><span class="lineCov">          3 :       if (position &lt; line_end) {</span>
+<span class="lineNum">     672 </span><span class="lineCov">          1 :         out_column = int(position - begin + 1);</span>
+<span class="lineNum">     673 </span><span class="lineCov">          1 :         return;</span>
+<span class="lineNum">     674 </span>            :       }
+<span class="lineNum">     675 </span>            :     }
+<span class="lineNum">     676 </span><span class="lineCov">          2 :     begin = line_end;</span>
+<span class="lineNum">     677 </span><span class="lineCov">          2 :     ++out_line;</span>
+<span class="lineNum">     678 </span>            :   }
+<span class="lineNum">     679 </span>            : 
+<span class="lineNum">     680 </span><span class="lineNoCov">          0 :   throw runtime_error(&quot;Cannot get line number of error, its position is out of range&quot;);</span>
+<a name="681"><span class="lineNum">     681 </span>            : }</a>
+<span class="lineNum">     682 </span>            : 
+<span class="lineNum">     683 </span><span class="lineCov">          6 : void print_json_parse_error_marker(std::ostream &amp;o, const std::string &amp;line_prev, const std::string &amp;line_cur, int line,</span>
+<span class="lineNum">     684 </span>            :                                    int column)
+<span class="lineNum">     685 </span>            : {
+<span class="lineNum">     686 </span><span class="lineCov">          6 :   if (line_cur.size() &lt; 200) {</span>
+<span class="lineNum">     687 </span>            :     // If the line is short, print the lines and indicate the error
+<span class="lineNum">     688 </span><span class="lineCov">          6 :     if (line &gt; 1) {</span>
+<span class="lineNum">     689 </span><span class="lineCov">          1 :       o &lt;&lt; line_prev &lt;&lt; &quot;\n&quot;;</span>
+<span class="lineNum">     690 </span>            :     }
+<span class="lineNum">     691 </span><span class="lineCov">          6 :     o &lt;&lt; line_cur &lt;&lt; &quot;\n&quot;;</span>
+<span class="lineNum">     692 </span><span class="lineCov">        223 :     for (int i = 0; i &lt; column - 1; ++i) {</span>
+<span class="lineNum">     693 </span><span class="lineCov">        217 :       o &lt;&lt; &quot; &quot;;</span>
+<span class="lineNum">     694 </span>            :     }
+<span class="lineNum">     695 </span><span class="lineCov">          6 :     o &lt;&lt; &quot;^\n&quot;;</span>
+<span class="lineNum">     696 </span>            :   }
+<span class="lineNum">     697 </span>            :   else {
+<span class="lineNum">     698 </span>            :     // If the line is long, print a part of the line and indicate the error
+<span class="lineNum">     699 </span><span class="lineNoCov">          0 :     if (column &lt; 80) {</span>
+<span class="lineNum">     700 </span><span class="lineNoCov">          0 :       o &lt;&lt; line_cur.substr(0, 80) &lt;&lt; &quot; ...\n&quot;;</span>
+<span class="lineNum">     701 </span><span class="lineNoCov">          0 :       for (int i = 0; i &lt; column - 1; ++i) {</span>
+<span class="lineNum">     702 </span><span class="lineNoCov">          0 :         o &lt;&lt; &quot; &quot;;</span>
+<span class="lineNum">     703 </span>            :       }
+<span class="lineNum">     704 </span><span class="lineNoCov">          0 :       o &lt;&lt; &quot;^\n&quot;;</span>
+<span class="lineNum">     705 </span>            :     }
+<span class="lineNum">     706 </span>            :     else {
+<span class="lineNum">     707 </span><span class="lineNoCov">          0 :       int start = column - 60;</span>
+<span class="lineNum">     708 </span><span class="lineNoCov">          0 :       o &lt;&lt; &quot; ... &quot; &lt;&lt; line_cur.substr(start - 1, 80) &lt;&lt; &quot; ...\n&quot;;</span>
+<span class="lineNum">     709 </span><span class="lineNoCov">          0 :       for (int i = 0; i &lt; 65; ++i) {</span>
+<span class="lineNum">     710 </span><span class="lineNoCov">          0 :         o &lt;&lt; &quot; &quot;;</span>
+<span class="lineNum">     711 </span>            :       }
+<span class="lineNum">     712 </span><span class="lineNoCov">          0 :       o &lt;&lt; &quot;^\n&quot;;</span>
+<span class="lineNum">     713 </span>            :     }
+<span class="lineNum">     714 </span>            :   }
+<a name="715"><span class="lineNum">     715 </span><span class="lineCov">          6 : }</span></a>
+<span class="lineNum">     716 </span>            : 
+<span class="lineNum">     717 </span><span class="lineNoCov">          0 : void dynd::validate_json(const char *json_begin, const char *json_end)</span>
+<span class="lineNum">     718 </span>            : {
+<span class="lineNum">     719 </span>            :   try {
+<span class="lineNum">     720 </span><span class="lineNoCov">          0 :     const char *begin = json_begin, *end = json_end;</span>
+<span class="lineNum">     721 </span><span class="lineNoCov">          0 :     ::skip_json_value(begin, end);</span>
+<span class="lineNum">     722 </span><span class="lineNoCov">          0 :     skip_whitespace(begin, end);</span>
+<span class="lineNum">     723 </span><span class="lineNoCov">          0 :     if (begin != end) {</span>
+<span class="lineNum">     724 </span><span class="lineNoCov">          0 :       throw parse_error(begin, &quot;unexpected trailing JSON text&quot;);</span>
+<span class="lineNum">     725 </span>            :     }
+<span class="lineNum">     726 </span>            :   }
+<span class="lineNum">     727 </span><span class="lineNoCov">          0 :   catch (const parse_error &amp;e) {</span>
+<span class="lineNum">     728 </span><span class="lineNoCov">          0 :     stringstream ss;</span>
+<span class="lineNum">     729 </span><span class="lineNoCov">          0 :     std::string line_prev, line_cur;</span>
+<span class="lineNum">     730 </span>            :     int line, column;
+<span class="lineNum">     731 </span><span class="lineNoCov">          0 :     get_error_line_column(json_begin, json_end, e.get_position(), line_prev, line_cur, line, column);</span>
+<span class="lineNum">     732 </span><span class="lineNoCov">          0 :     ss &lt;&lt; &quot;Error validating JSON at line &quot; &lt;&lt; line &lt;&lt; &quot;, column &quot; &lt;&lt; column &lt;&lt; &quot;\n&quot;;</span>
+<span class="lineNum">     733 </span><span class="lineNoCov">          0 :     ss &lt;&lt; &quot;Message: &quot; &lt;&lt; e.what() &lt;&lt; &quot;\n&quot;;</span>
+<span class="lineNum">     734 </span><span class="lineNoCov">          0 :     print_json_parse_error_marker(ss, line_prev, line_cur, line, column);</span>
+<span class="lineNum">     735 </span><span class="lineNoCov">          0 :     throw invalid_argument(ss.str());</span>
+<span class="lineNum">     736 </span>            :   }
+<a name="737"><span class="lineNum">     737 </span><span class="lineNoCov">          0 : }</span></a>
+<span class="lineNum">     738 </span>            : 
+<span class="lineNum">     739 </span><span class="lineCov">        170 : void dynd::parse_json(nd::array &amp;out, const char *json_begin, const char *json_end, const eval::eval_context *ectx)</span>
+<span class="lineNum">     740 </span>            : {
+<span class="lineNum">     741 </span>            :   try {
+<span class="lineNum">     742 </span><span class="lineCov">        170 :     const char *begin = json_begin, *end = json_end;</span>
+<span class="lineNum">     743 </span><span class="lineCov">        340 :     ndt::type tp = out.get_type();</span>
+<span class="lineNum">     744 </span><span class="lineCov">        170 :     ::parse_json(tp, out.get()-&gt;metadata(), out.data(), begin, end, ectx);</span>
+<span class="lineNum">     745 </span><span class="lineCov">        154 :     skip_whitespace(begin, end);</span>
+<span class="lineNum">     746 </span><span class="lineCov">        154 :     if (begin != end) {</span>
+<span class="lineNum">     747 </span><span class="lineNoCov">          0 :       throw json_parse_error(begin, &quot;unexpected trailing JSON text&quot;, tp);</span>
+<span class="lineNum">     748 </span>            :     }
+<span class="lineNum">     749 </span>            :   }
+<span class="lineNum">     750 </span><span class="lineCov">         12 :   catch (const json_parse_error &amp;e) {</span>
+<span class="lineNum">     751 </span><span class="lineCov">         12 :     stringstream ss;</span>
+<span class="lineNum">     752 </span><span class="lineCov">         12 :     std::string line_prev, line_cur;</span>
+<span class="lineNum">     753 </span>            :     int line, column;
+<span class="lineNum">     754 </span><span class="lineCov">          6 :     get_error_line_column(json_begin, json_end, e.get_position(), line_prev, line_cur, line, column);</span>
+<span class="lineNum">     755 </span><span class="lineCov">          6 :     ss &lt;&lt; &quot;Error parsing JSON at line &quot; &lt;&lt; line &lt;&lt; &quot;, column &quot; &lt;&lt; column &lt;&lt; &quot;\n&quot;;</span>
+<span class="lineNum">     756 </span><span class="lineCov">          6 :     ss &lt;&lt; &quot;DyND Type: &quot; &lt;&lt; e.get_type() &lt;&lt; &quot;\n&quot;;</span>
+<span class="lineNum">     757 </span><span class="lineCov">          6 :     ss &lt;&lt; &quot;Message: &quot; &lt;&lt; e.what() &lt;&lt; &quot;\n&quot;;</span>
+<span class="lineNum">     758 </span><span class="lineCov">          6 :     print_json_parse_error_marker(ss, line_prev, line_cur, line, column);</span>
+<span class="lineNum">     759 </span><span class="lineCov">          6 :     throw invalid_argument(ss.str());</span>
+<span class="lineNum">     760 </span>            :   }
+<span class="lineNum">     761 </span><span class="lineNoCov">          0 :   catch (const parse_error &amp;e) {</span>
+<span class="lineNum">     762 </span><span class="lineNoCov">          0 :     stringstream ss;</span>
+<span class="lineNum">     763 </span><span class="lineNoCov">          0 :     std::string line_prev, line_cur;</span>
+<span class="lineNum">     764 </span>            :     int line, column;
+<span class="lineNum">     765 </span><span class="lineNoCov">          0 :     get_error_line_column(json_begin, json_end, e.get_position(), line_prev, line_cur, line, column);</span>
+<span class="lineNum">     766 </span><span class="lineNoCov">          0 :     ss &lt;&lt; &quot;Error parsing JSON at line &quot; &lt;&lt; line &lt;&lt; &quot;, column &quot; &lt;&lt; column &lt;&lt; &quot;\n&quot;;</span>
+<span class="lineNum">     767 </span><span class="lineNoCov">          0 :     ss &lt;&lt; &quot;Message: &quot; &lt;&lt; e.what() &lt;&lt; &quot;\n&quot;;</span>
+<span class="lineNum">     768 </span><span class="lineNoCov">          0 :     print_json_parse_error_marker(ss, line_prev, line_cur, line, column);</span>
+<span class="lineNum">     769 </span><span class="lineNoCov">          0 :     throw invalid_argument(ss.str());</span>
+<span class="lineNum">     770 </span>            :   }
+<a name="771"><span class="lineNum">     771 </span><span class="lineCov">        154 : }</span></a>
+<span class="lineNum">     772 </span>            : 
+<span class="lineNum">     773 </span><span class="lineCov">        124 : nd::array dynd::parse_json(const ndt::type &amp;tp, const char *json_begin, const char *json_end,</span>
+<span class="lineNum">     774 </span>            :                            const eval::eval_context *ectx)
+<span class="lineNum">     775 </span>            : {
+<span class="lineNum">     776 </span><span class="lineCov">        124 :   nd::array result;</span>
+<span class="lineNum">     777 </span><span class="lineCov">        124 :   result = nd::empty(tp);</span>
+<span class="lineNum">     778 </span><span class="lineCov">        124 :   parse_json(result, json_begin, json_end, ectx);</span>
+<span class="lineNum">     779 </span><span class="lineCov">        108 :   if (!tp.is_builtin()) {</span>
+<span class="lineNum">     780 </span><span class="lineCov">         83 :     tp.extended()-&gt;arrmeta_finalize_buffers(result.get()-&gt;metadata());</span>
+<a name="781"><span class="lineNum">     781 </span>            :   }</a>
+<span class="lineNum">     782 </span><span class="lineCov">        108 :   return result;</span>
+<span class="lineNum">     783 </span><span class="lineCov">          3 : }</span>
+<span class="lineNum">     784 </span>            : 
+<span class="lineNum">     785 </span>            : /*
+<span class="lineNum">     786 </span>            : static ndt::type discover_type(const char *&amp;begin, const char *end)
+<span class="lineNum">     787 </span>            : {
+<span class="lineNum">     788 </span>            :   skip_whitespace(begin, end);
+<span class="lineNum">     789 </span>            :   if (begin == end) {
+<span class="lineNum">     790 </span>            :     throw parse_error(begin, &quot;malformed JSON, expecting an element&quot;);
+<span class="lineNum">     791 </span>            :   }
+<span class="lineNum">     792 </span>            :   char c = *begin;
+<span class="lineNum">     793 </span>            :   switch (c) {
+<span class="lineNum">     794 </span>            :   // Object
+<span class="lineNum">     795 </span>            :   case '{': {
+<span class="lineNum">     796 </span>            :     ++begin;
+<span class="lineNum">     797 </span>            :     if (parse_token(begin, end, &quot;}&quot;)) {
+<span class="lineNum">     798 </span>            :       return ndt::struct_type::make();
+<span class="lineNum">     799 </span>            :     }
+<span class="lineNum">     800 </span>            :     std::vector&lt;std::string&gt; names;
+<span class="lineNum">     801 </span>            :     std::vector&lt;ndt::type&gt; types;
+<span class="lineNum">     802 </span>            :     for (;;) {
+<span class="lineNum">     803 </span>            :       const char *strbegin, *strend;
+<span class="lineNum">     804 </span>            :       bool escaped;
+<span class="lineNum">     805 </span>            :       skip_whitespace(begin, end);
+<span class="lineNum">     806 </span>            :       if (!parse_doublequote_string_no_ws(begin, end, strbegin, strend, escaped)) {
+<span class="lineNum">     807 </span>            :         throw parse_error(begin, &quot;expected string for name in object dict&quot;);
+<span class="lineNum">     808 </span>            :       }
+<span class="lineNum">     809 </span>            :       names.emplace_back(strbegin, strend - strbegin);
+<span class="lineNum">     810 </span>            :       if (!parse_token(begin, end, &quot;:&quot;)) {
+<span class="lineNum">     811 </span>            :         throw parse_error(begin, &quot;expected ':' separating name from value in object dict&quot;);
+<span class="lineNum">     812 </span>            :       }
+<span class="lineNum">     813 </span>            :       types.push_back(discover_type(begin, end));
+<span class="lineNum">     814 </span>            :       if (!parse_token(begin, end, &quot;,&quot;)) {
+<span class="lineNum">     815 </span>            :         break;
+<span class="lineNum">     816 </span>            :       }
+<span class="lineNum">     817 </span>            :     }
+<span class="lineNum">     818 </span>            :     if (!parse_token(begin, end, &quot;}&quot;)) {
+<span class="lineNum">     819 </span>            :       throw parse_error(begin, &quot;expected object separator ',' or terminator '}'&quot;);
+<span class="lineNum">     820 </span>            :     }
+<span class="lineNum">     821 </span>            :     return ndt::struct_type::make(names, types);
+<span class="lineNum">     822 </span>            :   }
+<span class="lineNum">     823 </span>            :   // Array
+<span class="lineNum">     824 </span>            :   case '[': {
+<span class="lineNum">     825 </span>            :     ++begin;
+<span class="lineNum">     826 </span>            :     if (parse_token(begin, end, &quot;]&quot;)) {
+<span class="lineNum">     827 </span>            :       return ndt::tuple_type::make();
+<span class="lineNum">     828 </span>            :     }
+<span class="lineNum">     829 </span>            :     std::vector&lt;ndt::type&gt; types;
+<span class="lineNum">     830 </span>            :     ndt::type common_tp = discover_type(begin, end);
+<span class="lineNum">     831 </span>            :     types.push_back(common_tp);
+<span class="lineNum">     832 </span>            :     for (;;) {
+<span class="lineNum">     833 </span>            :       if (!parse_token(begin, end, &quot;,&quot;)) {
+<span class="lineNum">     834 </span>            :         break;
+<span class="lineNum">     835 </span>            :       }
+<span class="lineNum">     836 </span>            :       const ndt::type &amp;tp = discover_type(begin, end);
+<span class="lineNum">     837 </span>            :       if (!common_tp.is_null()) {
+<span class="lineNum">     838 </span>            :         common_tp = ndt::common_type(common_tp, tp);
+<span class="lineNum">     839 </span>            :       }
+<span class="lineNum">     840 </span>            :       types.push_back(tp);
+<span class="lineNum">     841 </span>            :     }
+<span class="lineNum">     842 </span>            :     if (!parse_token(begin, end, &quot;]&quot;)) {
+<span class="lineNum">     843 </span>            :       throw parse_error(begin, &quot;expected array separator ',' or terminator ']'&quot;);
+<span class="lineNum">     844 </span>            :     }
+<span class="lineNum">     845 </span>            :     if (common_tp.is_null()) {
+<span class="lineNum">     846 </span>            :       return ndt::tuple_type::make(types);
+<span class="lineNum">     847 </span>            :     }
+<span class="lineNum">     848 </span>            :     return ndt::make_fixed_dim(types.size(), common_tp);
+<span class="lineNum">     849 </span>            :   }
+<span class="lineNum">     850 </span>            :   case '&quot;': {
+<span class="lineNum">     851 </span>            :     const char *strbegin, *strend;
+<span class="lineNum">     852 </span>            :     bool escaped;
+<span class="lineNum">     853 </span>            :     if (!parse_doublequote_string_no_ws(begin, end, strbegin, strend, escaped)) {
+<span class="lineNum">     854 </span>            :       throw parse_error(begin, &quot;invalid string&quot;);
+<span class="lineNum">     855 </span>            :     }
+<span class="lineNum">     856 </span>            :     return ndt::type(string_id);
+<span class="lineNum">     857 </span>            :   }
+<span class="lineNum">     858 </span>            :   case 'T':
+<span class="lineNum">     859 </span>            :   case 't':
+<span class="lineNum">     860 </span>            :     ++begin;
+<span class="lineNum">     861 </span>            :     if (parse_token(begin, end, &quot;rue&quot;)) {
+<span class="lineNum">     862 </span>            :       return ndt::make_type&lt;bool1&gt;();
+<span class="lineNum">     863 </span>            :     }
+<span class="lineNum">     864 </span>            :     throw parse_error(begin, &quot;invalid json value&quot;);
+<span class="lineNum">     865 </span>            :   case 'F':
+<span class="lineNum">     866 </span>            :   case 'f':
+<span class="lineNum">     867 </span>            :     ++begin;
+<span class="lineNum">     868 </span>            :     if (parse_token(begin, end, &quot;alse&quot;)) {
+<span class="lineNum">     869 </span>            :       return ndt::make_type&lt;bool1&gt;();
+<span class="lineNum">     870 </span>            :     }
+<span class="lineNum">     871 </span>            :     throw parse_error(begin, &quot;invalid json value&quot;);
+<span class="lineNum">     872 </span>            :   case 'n':
+<span class="lineNum">     873 </span>            :     if (parse_token(begin, end, &quot;null&quot;)) {
+<span class="lineNum">     874 </span>            :       return ndt::make_type&lt;ndt::option_type&gt;(ndt::type(&quot;Any&quot;));
+<span class="lineNum">     875 </span>            :     }
+<span class="lineNum">     876 </span>            :     throw parse_error(begin, &quot;invalid json value&quot;);
+<span class="lineNum">     877 </span>            :   default:
+<span class="lineNum">     878 </span>            :     if (c == '-' || ('0' &lt;= c &amp;&amp; c &lt;= '9')) {
+<span class="lineNum">     879 </span>            :       const char *nbegin = NULL, *nend = NULL;
+<span class="lineNum">     880 </span>            :       if (!json::parse_number(begin, end, nbegin, nend)) {
+<span class="lineNum">     881 </span>            :         throw parse_error(begin, &quot;invalid number&quot;);
+<span class="lineNum">     882 </span>            :       }
+<span class="lineNum">     883 </span>            :       int64_t int_val;
+<span class="lineNum">     884 </span>            :       try {
+<span class="lineNum">     885 </span>            :         parse_int64(int_val, nbegin, nend);
+<span class="lineNum">     886 </span>            :         return ndt::make_type&lt;int64&gt;();
+<span class="lineNum">     887 </span>            :       }
+<span class="lineNum">     888 </span>            :       catch (...) {
+<span class="lineNum">     889 </span>            :       }
+<span class="lineNum">     890 </span>            :       double float_val;
+<span class="lineNum">     891 </span>            :       if (!parse_double(float_val, nbegin, nend)) {
+<span class="lineNum">     892 </span>            :         return ndt::make_type&lt;double&gt;();
+<span class="lineNum">     893 </span>            :       }
+<span class="lineNum">     894 </span>            :       throw parse_error(begin, &quot;invalid json value&quot;);
+<span class="lineNum">     895 </span>            :     }
+<span class="lineNum">     896 </span>            :     else {
+<span class="lineNum">     897 </span>            :       throw parse_error(begin, &quot;invalid json value&quot;);
+<span class="lineNum">     898 </span>            :     }
+<span class="lineNum">     899 </span>            :   }
+<span class="lineNum">     900 </span>            : 
+<span class="lineNum">     901 </span>            :   throw runtime_error(&quot;json parsing error&quot;);
+<span class="lineNum">     902 </span>            : }
+<span class="lineNum">     903 </span>            : */
+<span class="lineNum">     904 </span>            : 
+<span class="lineNum">     905 </span>            : /*
+<span class="lineNum">     906 </span>            : void ndt::json::discover(ndt::type &amp;res, const char *json_begin, const char *json_end)
+<span class="lineNum">     907 </span>            : {
+<span class="lineNum">     908 </span>            :   try {
+<span class="lineNum">     909 </span>            :     const char *begin = json_begin, *end = json_end;
+<span class="lineNum">     910 </span>            :     res = ::discover_type(begin, end);
+<span class="lineNum">     911 </span>            :     skip_whitespace(begin, end);
+<span class="lineNum">     912 </span>            :     if (begin != end) {
+<span class="lineNum">     913 </span>            :       throw parse_error(begin, &quot;unexpected trailing JSON text&quot;);
+<span class="lineNum">     914 </span>            :     }
+<span class="lineNum">     915 </span>            :   }
+<span class="lineNum">     916 </span>            :   catch (const parse_error &amp;e) {
+<span class="lineNum">     917 </span>            :     stringstream ss;
+<span class="lineNum">     918 </span>            :     std::string line_prev, line_cur;
+<span class="lineNum">     919 </span>            :     int line, column;
+<span class="lineNum">     920 </span>            :     get_error_line_column(json_begin, json_end, e.get_position(), line_prev, line_cur, line, column);
+<span class="lineNum">     921 </span>            :     ss &lt;&lt; &quot;Error validating JSON at line &quot; &lt;&lt; line &lt;&lt; &quot;, column &quot; &lt;&lt; column &lt;&lt; &quot;\n&quot;;
+<span class="lineNum">     922 </span>            :     ss &lt;&lt; &quot;Message: &quot; &lt;&lt; e.what() &lt;&lt; &quot;\n&quot;;
+<span class="lineNum">     923 </span>            :     print_json_parse_error_marker(ss, line_prev, line_cur, line, column);
+<span class="lineNum">     924 </span>            :     throw invalid_argument(ss.str());
+<span class="lineNum">     925 </span>            :   }
+<span class="lineNum">     926 </span>            : }
+<span class="lineNum">     927 </span>            : */
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.10</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

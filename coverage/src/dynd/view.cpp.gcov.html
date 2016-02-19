@@ -1,0 +1,522 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - coverage.info.cleaned - src/dynd/view.cpp</title>
+  <link rel="stylesheet" type="text/css" href="../../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../../index.html">top level</a> - <a href="index.html">src/dynd</a> - view.cpp<span style="font-size: 80%;"> (source / <a href="view.cpp.func.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">coverage.info.cleaned</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">64</td>
+            <td class="headerCovTableEntry">77</td>
+            <td class="headerCovTableEntryMed">83.1 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2016-02-19</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">5</td>
+            <td class="headerCovTableEntry">6</td>
+            <td class="headerCovTableEntryMed">83.3 %</td>
+          </tr>
+          <tr><td><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : //</a>
+<span class="lineNum">       2 </span>            : // Copyright (C) 2011-15 DyND Developers
+<span class="lineNum">       3 </span>            : // BSD 2-Clause License, see LICENSE.txt
+<span class="lineNum">       4 </span>            : //
+<span class="lineNum">       5 </span>            : 
+<span class="lineNum">       6 </span>            : #include &lt;dynd/view.hpp&gt;
+<span class="lineNum">       7 </span>            : #include &lt;dynd/types/fixed_dim_kind_type.hpp&gt;
+<span class="lineNum">       8 </span>            : #include &lt;dynd/types/fixed_dim_type.hpp&gt;
+<span class="lineNum">       9 </span>            : #include &lt;dynd/types/var_dim_type.hpp&gt;
+<span class="lineNum">      10 </span>            : #include &lt;dynd/types/pointer_type.hpp&gt;
+<span class="lineNum">      11 </span>            : #include &lt;dynd/types/bytes_type.hpp&gt;
+<span class="lineNum">      12 </span>            : #include &lt;dynd/shape_tools.hpp&gt;
+<span class="lineNum">      13 </span>            : #include &lt;dynd/types/substitute_shape.hpp&gt;
+<span class="lineNum">      14 </span>            : 
+<span class="lineNum">      15 </span>            : using namespace std;
+<span class="lineNum">      16 </span>            : using namespace dynd;
+<span class="lineNum">      17 </span>            : 
+<span class="lineNum">      18 </span>            : /**
+<span class="lineNum">      19 </span>            :  * Scans through the types, and tries to view data
+<span class="lineNum">      20 </span>            :  * for 'tp'/'arrmeta' as 'view_tp'. For this to be
+<span class="lineNum">      21 </span>            :  * possible, one must be able to construct
+<span class="lineNum">      22 </span>            :  * arrmeta for 'tp' corresponding to the same data.
+<span class="lineNum">      23 </span>            :  *
+<span class="lineNum">      24 </span>            :  * \param tp  The type of the data.
+<span class="lineNum">      25 </span>            :  * \param arrmeta  The array arrmeta of the data.
+<span class="lineNum">      26 </span>            :  * \param view_tp  The type the data should be viewed as.
+<span class="lineNum">      27 </span>            :  * \param view_arrmeta The array arrmeta of the view, which should be populated.
+<span class="lineNum">      28 </span>            :  * \param embedded_reference  The containing memory block in case the data was embedded.
+<span class="lineNum">      29 </span>            :  *
+<a name="30"><span class="lineNum">      30 </span>            :  * \returns If it worked, returns true, otherwise false.</a>
+<span class="lineNum">      31 </span>            :  */
+<span class="lineNum">      32 </span><span class="lineCov">         39 : static bool try_view(const ndt::type &amp;tp, const char *arrmeta, const ndt::type &amp;view_tp, char *view_arrmeta,</span>
+<span class="lineNum">      33 </span>            :                      const intrusive_ptr&lt;memory_block_data&gt; &amp;embedded_reference)
+<span class="lineNum">      34 </span>            : {
+<span class="lineNum">      35 </span><span class="lineCov">         39 :   switch (tp.get_id()) {</span>
+<span class="lineNum">      36 </span>            :   case fixed_dim_id: {
+<span class="lineNum">      37 </span>            :     // All the strided dim types share the same arrmeta, so can be
+<span class="lineNum">      38 </span>            :     // treated uniformly here
+<span class="lineNum">      39 </span><span class="lineCov">         13 :     const ndt::base_dim_type *sdt = tp.extended&lt;ndt::base_dim_type&gt;();</span>
+<span class="lineNum">      40 </span><span class="lineCov">         13 :     const fixed_dim_type_arrmeta *md = reinterpret_cast&lt;const fixed_dim_type_arrmeta *&gt;(arrmeta);</span>
+<span class="lineNum">      41 </span><span class="lineCov">         13 :     switch (view_tp.get_id()) {</span>
+<span class="lineNum">      42 </span>            :     case fixed_dim_id: { // strided as fixed
+<span class="lineNum">      43 </span><span class="lineCov">         13 :       const ndt::fixed_dim_type *view_fdt = view_tp.extended&lt;ndt::fixed_dim_type&gt;();</span>
+<span class="lineNum">      44 </span>            :       // The size must match exactly in this case
+<span class="lineNum">      45 </span><span class="lineCov">         13 :       if (md-&gt;dim_size != view_fdt-&gt;get_fixed_dim_size()) {</span>
+<span class="lineNum">      46 </span><span class="lineCov">          2 :         return false;</span>
+<span class="lineNum">      47 </span>            :       }
+<span class="lineNum">      48 </span><span class="lineCov">         11 :       fixed_dim_type_arrmeta *view_md = reinterpret_cast&lt;fixed_dim_type_arrmeta *&gt;(view_arrmeta);</span>
+<span class="lineNum">      49 </span><span class="lineCov">         11 :       if (try_view(sdt-&gt;get_element_type(), arrmeta + sizeof(fixed_dim_type_arrmeta), view_fdt-&gt;get_element_type(),</span>
+<span class="lineNum">      50 </span>            :                    view_arrmeta + sizeof(fixed_dim_type_arrmeta), embedded_reference)) {
+<span class="lineNum">      51 </span><span class="lineCov">          8 :         *view_md = *md;</span>
+<span class="lineNum">      52 </span><span class="lineCov">          8 :         return true;</span>
+<span class="lineNum">      53 </span>            :       }
+<span class="lineNum">      54 </span>            :       else {
+<span class="lineNum">      55 </span><span class="lineCov">          3 :         return false;</span>
+<span class="lineNum">      56 </span>            :       }
+<span class="lineNum">      57 </span>            :     }
+<span class="lineNum">      58 </span>            :     default: // other cases cannot be handled
+<span class="lineNum">      59 </span><span class="lineNoCov">          0 :       return false;</span>
+<span class="lineNum">      60 </span>            :     }
+<span class="lineNum">      61 </span>            :   }
+<span class="lineNum">      62 </span>            :   default:
+<span class="lineNum">      63 </span><span class="lineCov">         26 :     if (tp == view_tp) {</span>
+<span class="lineNum">      64 </span>            :       // require equal types otherwise
+<span class="lineNum">      65 </span><span class="lineCov">         17 :       if (tp.get_arrmeta_size() &gt; 0) {</span>
+<span class="lineNum">      66 </span><span class="lineCov">          1 :         tp.extended()-&gt;arrmeta_copy_construct(view_arrmeta, arrmeta, embedded_reference);</span>
+<span class="lineNum">      67 </span>            :       }
+<span class="lineNum">      68 </span><span class="lineCov">         17 :       return true;</span>
+<span class="lineNum">      69 </span>            :     }
+<span class="lineNum">      70 </span><span class="lineCov">         17 :     else if (tp.is_pod() &amp;&amp; view_tp.is_pod() &amp;&amp; tp.get_data_size() == view_tp.get_data_size() &amp;&amp;</span>
+<span class="lineNum">      71 </span><span class="lineCov">          8 :              tp.get_data_alignment() &gt;= view_tp.get_data_alignment()) {</span>
+<span class="lineNum">      72 </span>            :       // POD types with matching properties
+<span class="lineNum">      73 </span><span class="lineCov">          8 :       if (view_tp.get_arrmeta_size() &gt; 0) {</span>
+<span class="lineNum">      74 </span><span class="lineNoCov">          0 :         view_tp.extended()-&gt;arrmeta_default_construct(view_arrmeta, true);</span>
+<span class="lineNum">      75 </span>            :       }
+<span class="lineNum">      76 </span><span class="lineCov">          8 :       return true;</span>
+<span class="lineNum">      77 </span>            :     }
+<span class="lineNum">      78 </span>            :     else {
+<span class="lineNum">      79 </span><span class="lineCov">          1 :       return false;</span>
+<span class="lineNum">      80 </span>            :     }
+<span class="lineNum">      81 </span>            :   }
+<span class="lineNum">      82 </span>            : }
+<span class="lineNum">      83 </span>            : 
+<span class="lineNum">      84 </span>            : /*
+<span class="lineNum">      85 </span>            : static void refine_bytes_view(memory_block_ptr &amp;data_ref, char *&amp;data_ptr, ndt::type &amp;data_tp, const char *&amp;data_meta,
+<span class="lineNum">      86 </span>            :                               intptr_t &amp;data_dim_size, intptr_t &amp;data_stride)
+<span class="lineNum">      87 </span>            : {
+<span class="lineNum">      88 </span>            :   // Handle sequence of strided dims
+<span class="lineNum">      89 </span>            :   intptr_t dim_size, stride;
+<span class="lineNum">      90 </span>            :   ndt::type el_tp;
+<span class="lineNum">      91 </span>            :   const char *el_meta;
+<span class="lineNum">      92 </span>            :   if (data_tp.get_as_strided(data_meta, &amp;dim_size, &amp;stride, &amp;el_tp, &amp;el_meta)) {
+<span class="lineNum">      93 </span>            :     dimvector shape(data_tp.get_ndim());
+<span class="lineNum">      94 </span>            :     dimvector strides(data_tp.get_ndim());
+<span class="lineNum">      95 </span>            :     intptr_t ndim = 1;
+<span class="lineNum">      96 </span>            :     shape[0] = dim_size;
+<span class="lineNum">      97 </span>            :     strides[0] = stride;
+<span class="lineNum">      98 </span>            :     bool csorted = true;
+<span class="lineNum">      99 </span>            :     // Get all the strided dimensions we can in a row
+<span class="lineNum">     100 </span>            :     while (el_tp.get_as_strided(el_meta, &amp;dim_size, &amp;stride, &amp;el_tp, &amp;el_meta)) {
+<span class="lineNum">     101 </span>            :       shape[ndim] = dim_size;
+<span class="lineNum">     102 </span>            :       strides[ndim] = stride;
+<span class="lineNum">     103 </span>            :       if (stride &gt; strides[ndim - 1]) {
+<span class="lineNum">     104 </span>            :         csorted = false;
+<span class="lineNum">     105 </span>            :       }
+<span class="lineNum">     106 </span>            :       ++ndim;
+<span class="lineNum">     107 </span>            :     }
+<span class="lineNum">     108 </span>            :     if (!csorted) {
+<span class="lineNum">     109 </span>            :       // If the strides weren't sorted in C order, sort them
+<span class="lineNum">     110 </span>            :       shortvector&lt;int&gt; axis_perm(ndim);
+<span class="lineNum">     111 </span>            :       strides_to_axis_perm(ndim, strides.get(), axis_perm.get());
+<span class="lineNum">     112 </span>            :       dimvector shape_sorted(ndim);
+<span class="lineNum">     113 </span>            :       dimvector strides_sorted(ndim);
+<span class="lineNum">     114 </span>            :       for (intptr_t i = 0; i &lt; ndim; ++i) {
+<span class="lineNum">     115 </span>            :         int i_perm = axis_perm[i];
+<span class="lineNum">     116 </span>            :         shape_sorted[ndim - i - 1] = shape[i_perm];
+<span class="lineNum">     117 </span>            :         strides_sorted[ndim - i - 1] = strides[i_perm];
+<span class="lineNum">     118 </span>            :       }
+<span class="lineNum">     119 </span>            :       shape.swap(shape_sorted);
+<span class="lineNum">     120 </span>            :       strides.swap(strides_sorted);
+<span class="lineNum">     121 </span>            :     }
+<span class="lineNum">     122 </span>            :     // Try to collapse the shape/strides into a single strided array
+<span class="lineNum">     123 </span>            :     intptr_t i = 0;
+<span class="lineNum">     124 </span>            :     while (data_dim_size == -1 &amp;&amp; i &lt; ndim) {
+<span class="lineNum">     125 </span>            :       // If there's not already a dim_size/stride, start one
+<span class="lineNum">     126 </span>            :       if (shape[i] != 1) {
+<span class="lineNum">     127 </span>            :         data_dim_size = shape[i];
+<span class="lineNum">     128 </span>            :         data_stride = strides[i];
+<span class="lineNum">     129 </span>            :       }
+<span class="lineNum">     130 </span>            :       ++i;
+<span class="lineNum">     131 </span>            :     }
+<span class="lineNum">     132 </span>            :     for (; i &lt; ndim; ++i) {
+<span class="lineNum">     133 </span>            :       if (shape[i] != 1) {
+<span class="lineNum">     134 </span>            :         if (shape[i] * strides[i] != data_stride) {
+<span class="lineNum">     135 </span>            :           // Indicate we couldn't view this as bytes
+<span class="lineNum">     136 </span>            :           data_tp = ndt::type();
+<span class="lineNum">     137 </span>            :           data_dim_size = -1;
+<span class="lineNum">     138 </span>            :           return;
+<span class="lineNum">     139 </span>            :         }
+<span class="lineNum">     140 </span>            :         data_dim_size *= shape[i];
+<span class="lineNum">     141 </span>            :         data_stride = strides[i];
+<span class="lineNum">     142 </span>            :       }
+<span class="lineNum">     143 </span>            :     }
+<span class="lineNum">     144 </span>            :     data_tp = el_tp;
+<span class="lineNum">     145 </span>            :     data_meta = el_meta;
+<span class="lineNum">     146 </span>            :     return;
+<span class="lineNum">     147 </span>            :   }
+<span class="lineNum">     148 </span>            : 
+<span class="lineNum">     149 </span>            :   switch (data_tp.get_id()) {
+<span class="lineNum">     150 </span>            :   case var_dim_id: {
+<span class="lineNum">     151 </span>            :     // We can only allow leading var_dim
+<span class="lineNum">     152 </span>            :     if (data_dim_size != -1) {
+<span class="lineNum">     153 </span>            :       data_tp = ndt::type();
+<span class="lineNum">     154 </span>            :       data_dim_size = -1;
+<span class="lineNum">     155 </span>            :       return;
+<span class="lineNum">     156 </span>            :     }
+<span class="lineNum">     157 </span>            :     const ndt::var_dim_type::metadata_type *meta = reinterpret_cast&lt;const ndt::var_dim_type::metadata_type
+<span class="lineNum">     158 </span>            : *&gt;(data_meta);
+<span class="lineNum">     159 </span>            :     if (meta-&gt;blockref != NULL) {
+<span class="lineNum">     160 </span>            :       data_ref = meta-&gt;blockref;
+<span class="lineNum">     161 </span>            :     }
+<span class="lineNum">     162 </span>            :     ndt::var_dim_type::data_type *d = reinterpret_cast&lt;ndt::var_dim_type::data_type *&gt;(data_ptr);
+<span class="lineNum">     163 </span>            :     data_ptr = d-&gt;begin + meta-&gt;offset;
+<span class="lineNum">     164 </span>            :     if (d-&gt;size != 1) {
+<span class="lineNum">     165 </span>            :       data_dim_size = d-&gt;size;
+<span class="lineNum">     166 </span>            :       data_stride = meta-&gt;stride;
+<span class="lineNum">     167 </span>            :     }
+<span class="lineNum">     168 </span>            :     data_tp = data_tp.extended&lt;ndt::var_dim_type&gt;()-&gt;get_element_type();
+<span class="lineNum">     169 </span>            :     data_meta += sizeof(ndt::var_dim_type::metadata_type);
+<span class="lineNum">     170 </span>            :     return;
+<span class="lineNum">     171 </span>            :   }
+<span class="lineNum">     172 </span>            :   case pointer_id: {
+<span class="lineNum">     173 </span>            :     // We can only strip away leading pointers
+<span class="lineNum">     174 </span>            :     if (data_dim_size != -1) {
+<span class="lineNum">     175 </span>            :       data_tp = ndt::type();
+<span class="lineNum">     176 </span>            :       data_dim_size = -1;
+<span class="lineNum">     177 </span>            :       return;
+<span class="lineNum">     178 </span>            :     }
+<span class="lineNum">     179 </span>            :     const pointer_type_arrmeta *meta = reinterpret_cast&lt;const pointer_type_arrmeta *&gt;(data_meta);
+<span class="lineNum">     180 </span>            :     if (meta-&gt;blockref != NULL) {
+<span class="lineNum">     181 </span>            :       data_ref = meta-&gt;blockref;
+<span class="lineNum">     182 </span>            :     }
+<span class="lineNum">     183 </span>            :     data_ptr = *reinterpret_cast&lt;char **&gt;(data_ptr) + meta-&gt;offset;
+<span class="lineNum">     184 </span>            :     data_tp = data_tp.extended&lt;ndt::pointer_type&gt;()-&gt;get_target_type();
+<span class="lineNum">     185 </span>            :     data_meta += sizeof(pointer_type_arrmeta);
+<span class="lineNum">     186 </span>            :     return;
+<span class="lineNum">     187 </span>            :   }
+<span class="lineNum">     188 </span>            :   case string_id: {
+<span class="lineNum">     189 </span>            :     // We can only view leading strings
+<span class="lineNum">     190 </span>            :     if (data_dim_size != -1) {
+<span class="lineNum">     191 </span>            :       data_tp = ndt::type();
+<span class="lineNum">     192 </span>            :       data_dim_size = -1;
+<span class="lineNum">     193 </span>            :       return;
+<span class="lineNum">     194 </span>            :     }
+<span class="lineNum">     195 </span>            :     // Look at the actual string data, not the pointer to it
+<span class="lineNum">     196 </span>            :     if (meta-&gt;blockref != NULL) {
+<span class="lineNum">     197 </span>            :       data_ref = meta-&gt;blockref;
+<span class="lineNum">     198 </span>            :     }
+<span class="lineNum">     199 </span>            :     dynd::string *str_ptr = reinterpret_cast&lt;dynd::string *&gt;(data_ptr);
+<span class="lineNum">     200 </span>            :     data_ptr = str_ptr-&gt;begin();
+<span class="lineNum">     201 </span>            :     data_tp = ndt::type();
+<span class="lineNum">     202 </span>            :     data_dim_size = str_ptr-&gt;end() - str_ptr-&gt;begin();
+<span class="lineNum">     203 </span>            :     data_stride = 1;
+<span class="lineNum">     204 </span>            :     return;
+<span class="lineNum">     205 </span>            :   }
+<span class="lineNum">     206 </span>            :   default:
+<span class="lineNum">     207 </span>            :     break;
+<span class="lineNum">     208 </span>            :   }
+<span class="lineNum">     209 </span>            : 
+<span class="lineNum">     210 </span>            :   // If the data type has a fixed size, check if it fits the strides
+<span class="lineNum">     211 </span>            :   size_t data_tp_size = data_tp.get_data_size();
+<span class="lineNum">     212 </span>            :   if (data_tp_size &gt; 0) {
+<span class="lineNum">     213 </span>            :     if (data_dim_size == -1) {
+<span class="lineNum">     214 </span>            :       // Indicate success (one item)
+<span class="lineNum">     215 </span>            :       data_tp = ndt::type();
+<span class="lineNum">     216 </span>            :       data_dim_size = data_tp_size;
+<span class="lineNum">     217 </span>            :       data_stride = 1;
+<span class="lineNum">     218 </span>            :       return;
+<span class="lineNum">     219 </span>            :     } else if ((intptr_t)data_tp_size == data_stride) {
+<span class="lineNum">     220 </span>            :       data_tp = ndt::type();
+<span class="lineNum">     221 </span>            :       data_dim_size *= data_tp_size;
+<span class="lineNum">     222 </span>            :       data_stride = 1;
+<span class="lineNum">     223 </span>            :       return;
+<span class="lineNum">     224 </span>            :     }
+<span class="lineNum">     225 </span>            :   }
+<span class="lineNum">     226 </span>            : 
+<span class="lineNum">     227 </span>            :   // Indicate we couldn't view this as bytes
+<span class="lineNum">     228 </span>            :   data_tp = ndt::type();
+<span class="lineNum">     229 </span>            :   data_dim_size = -1;
+<span class="lineNum">     230 </span>            : }
+<a name="231"><span class="lineNum">     231 </span>            : */</a>
+<span class="lineNum">     232 </span>            : 
+<span class="lineNum">     233 </span><span class="lineNoCov">          0 : static nd::array view_as_bytes(const nd::array &amp;DYND_UNUSED(arr), const ndt::type &amp;DYND_UNUSED(tp))</span>
+<span class="lineNum">     234 </span>            : {
+<span class="lineNum">     235 </span><span class="lineNoCov">          0 :   throw std::runtime_error(&quot;view_as_bytes is not yet implemented&quot;);</span>
+<span class="lineNum">     236 </span>            : 
+<span class="lineNum">     237 </span>            :   /*
+<span class="lineNum">     238 </span>            :     if (arr.get_type().get_flags() &amp; type_flag_destructor &amp;&amp; (arr.get_dtype().get_id() != string_id)) {
+<span class="lineNum">     239 </span>            :       // Can't view arrays of object type
+<span class="lineNum">     240 </span>            :       return nd::array();
+<span class="lineNum">     241 </span>            :     }
+<span class="lineNum">     242 </span>            : 
+<span class="lineNum">     243 </span>            :     // Get the essential components of the array to analyze
+<span class="lineNum">     244 </span>            :     memory_block_ptr data_ref = arr.get_data_memblock();
+<span class="lineNum">     245 </span>            :     char *data_ptr = arr.get()-&gt;data;
+<span class="lineNum">     246 </span>            :     ndt::type data_tp = arr.get_type();
+<span class="lineNum">     247 </span>            :     const char *data_meta = arr.get()-&gt;metadata();
+<span class="lineNum">     248 </span>            :     intptr_t data_dim_size = -1, data_stride = 0;
+<span class="lineNum">     249 </span>            :     // Repeatedly refine the data
+<span class="lineNum">     250 </span>            :     while (data_tp.get_id() != uninitialized_id) {
+<span class="lineNum">     251 </span>            :       refine_bytes_view(data_ref, data_ptr, data_tp, data_meta, data_dim_size, data_stride);
+<span class="lineNum">     252 </span>            :     }
+<span class="lineNum">     253 </span>            :     // Check that it worked, and that the resulting data pointer is aligned
+<span class="lineNum">     254 </span>            :     if (data_dim_size &lt; 0 ||
+<span class="lineNum">     255 </span>            :         !offset_is_aligned(reinterpret_cast&lt;size_t&gt;(data_ptr), tp.extended&lt;ndt::bytes_type&gt;()-&gt;get_target_alignment()))
+<span class="lineNum">     256 </span>            :   {
+<span class="lineNum">     257 </span>            :       // This signals we could not view the data as a
+<span class="lineNum">     258 </span>            :       // contiguous chunk of bytes
+<span class="lineNum">     259 </span>            :       return nd::array();
+<span class="lineNum">     260 </span>            :     }
+<span class="lineNum">     261 </span>            : 
+<span class="lineNum">     262 </span>            :     char *result_data_ptr = NULL;
+<span class="lineNum">     263 </span>            :     nd::array result(make_array_memory_block(tp.extended()-&gt;get_arrmeta_size(), tp.get_data_size(),
+<span class="lineNum">     264 </span>            :                                              tp.get_data_alignment(), &amp;result_data_ptr));
+<span class="lineNum">     265 </span>            :     // Set the bytes extents
+<span class="lineNum">     266 </span>            :   //  reinterpret_cast&lt;bytes *&gt;(result_data_ptr)-&gt;assign(data_ptr, data_dim_size);
+<span class="lineNum">     267 </span>            :     // Set the array arrmeta
+<span class="lineNum">     268 </span>            :     array_preamble *ndo = result.get();
+<span class="lineNum">     269 </span>            :     ndo-&gt;m_type = ndt::type(tp).release();
+<span class="lineNum">     270 </span>            :     ndo-&gt;data = result_data_ptr;
+<span class="lineNum">     271 </span>            :     ndo-&gt;owner = NULL;
+<span class="lineNum">     272 </span>            :     ndo-&gt;flags = arr.get_flags();
+<span class="lineNum">     273 </span>            :     // Set the bytes arrmeta
+<span class="lineNum">     274 </span>            :     ndo_meta-&gt;blockref = data_ref.release();
+<span class="lineNum">     275 </span>            :     return result;
+<span class="lineNum">     276 </span>            :   */
+<span class="lineNum">     277 </span>            : }
+<span class="lineNum">     278 </span>            : 
+<span class="lineNum">     279 </span>            : /*
+<span class="lineNum">     280 </span>            : static nd::array view_from_bytes(const nd::array &amp;arr, const ndt::type &amp;tp)
+<span class="lineNum">     281 </span>            : {
+<span class="lineNum">     282 </span>            :   if (tp.get_flags() &amp; (type_flag_blockref | type_flag_destructor | type_flag_not_host_readable)) {
+<span class="lineNum">     283 </span>            :     // Bytes cannot be viewed as blockref types, types which require
+<span class="lineNum">     284 </span>            :     // destruction, or types not on host memory.
+<span class="lineNum">     285 </span>            :     return nd::array();
+<span class="lineNum">     286 </span>            :   }
+<span class="lineNum">     287 </span>            : 
+<span class="lineNum">     288 </span>            :   const bytes_type_arrmeta *bytes_meta = reinterpret_cast&lt;const bytes_type_arrmeta *&gt;(arr.get()-&gt;metadata());
+<span class="lineNum">     289 </span>            :   bytes_type_data *bytes_d = reinterpret_cast&lt;bytes_type_data *&gt;(arr.get()-&gt;data);
+<span class="lineNum">     290 </span>            :   memory_block_ptr data_ref;
+<span class="lineNum">     291 </span>            :   if (bytes_meta-&gt;blockref != NULL) {
+<span class="lineNum">     292 </span>            :     data_ref = bytes_meta-&gt;blockref;
+<span class="lineNum">     293 </span>            :   } else {
+<span class="lineNum">     294 </span>            :     data_ref = arr.get_data_memblock();
+<span class="lineNum">     295 </span>            :   }
+<span class="lineNum">     296 </span>            :   char *data_ptr = bytes_d-&gt;begin();
+<span class="lineNum">     297 </span>            :   intptr_t data_size = bytes_d-&gt;end() - data_ptr;
+<span class="lineNum">     298 </span>            : 
+<span class="lineNum">     299 </span>            :   size_t tp_data_size = tp.get_data_size();
+<span class="lineNum">     300 </span>            :   if (tp_data_size &gt; 0) {
+<span class="lineNum">     301 </span>            :     // If the data type has a single chunk of POD memory, it's ok
+<span class="lineNum">     302 </span>            :     if ((intptr_t)tp_data_size == data_size &amp;&amp;
+<span class="lineNum">     303 </span>            :         offset_is_aligned(reinterpret_cast&lt;size_t&gt;(data_ptr), tp.get_data_alignment())) {
+<span class="lineNum">     304 </span>            :       // Allocate a result array to attempt the view in it
+<span class="lineNum">     305 </span>            :       nd::array result(make_array_memory_block(tp.get_arrmeta_size()));
+<span class="lineNum">     306 </span>            :       // Initialize the fields
+<span class="lineNum">     307 </span>            :       result.get()-&gt;data = data_ptr;
+<span class="lineNum">     308 </span>            :       result.get()-&gt;owner = data_ref.release();
+<span class="lineNum">     309 </span>            :       result.get()-&gt;tp = ndt::type(tp).release();
+<span class="lineNum">     310 </span>            :       result.get()-&gt;flags = arr.get()-&gt;flags;
+<span class="lineNum">     311 </span>            :       if (tp.get_arrmeta_size() &gt; 0) {
+<span class="lineNum">     312 </span>            :         tp.extended()-&gt;arrmeta_default_construct(result.get()-&gt;metadata(), true);
+<span class="lineNum">     313 </span>            :       }
+<span class="lineNum">     314 </span>            :       return result;
+<span class="lineNum">     315 </span>            :     }
+<span class="lineNum">     316 </span>            :   } else if (tp.get_id() == fixed_dim_id) {
+<span class="lineNum">     317 </span>            :     ndt::type arr_tp = tp;
+<span class="lineNum">     318 </span>            :     ndt::type el_tp = arr_tp.extended&lt;ndt::base_dim_type&gt;()-&gt;get_element_type();
+<span class="lineNum">     319 </span>            :     size_t el_data_size = el_tp.get_data_size();
+<span class="lineNum">     320 </span>            :     // If the element type has a single chunk of POD memory, and
+<span class="lineNum">     321 </span>            :     // it divides into the memory size, it's ok
+<span class="lineNum">     322 </span>            :     if (data_size % (intptr_t)el_data_size == 0 &amp;&amp;
+<span class="lineNum">     323 </span>            :         offset_is_aligned(reinterpret_cast&lt;size_t&gt;(data_ptr), arr_tp.get_data_alignment())) {
+<span class="lineNum">     324 </span>            :       intptr_t dim_size = data_size / el_data_size;
+<span class="lineNum">     325 </span>            :       if (arr_tp.get_base_id() != ) {
+<span class="lineNum">     326 </span>            :         if (arr_tp.extended&lt;ndt::fixed_dim_type&gt;()-&gt;get_fixed_dim_size() != dim_size) {
+<span class="lineNum">     327 </span>            :           return nd::array();
+<span class="lineNum">     328 </span>            :         }
+<span class="lineNum">     329 </span>            :       } else {
+<span class="lineNum">     330 </span>            :         // Transform the symbolic fixed type into a concrete one
+<span class="lineNum">     331 </span>            :         arr_tp = ndt::make_fixed_dim(dim_size, el_tp);
+<span class="lineNum">     332 </span>            :       }
+<span class="lineNum">     333 </span>            :       // Allocate a result array to attempt the view in it
+<span class="lineNum">     334 </span>            :       nd::array result(make_array_memory_block(arr_tp.get_arrmeta_size()));
+<span class="lineNum">     335 </span>            :       // Initialize the fields
+<span class="lineNum">     336 </span>            :       result.get()-&gt;data = data_ptr;
+<span class="lineNum">     337 </span>            :       result.get()-&gt;owner = data_ref.release();
+<span class="lineNum">     338 </span>            :       result.get()-&gt;tp = ndt::type(arr_tp).release();
+<span class="lineNum">     339 </span>            :       result.get()-&gt;flags = arr.get()-&gt;flags;
+<span class="lineNum">     340 </span>            :       if (el_tp.get_arrmeta_size() &gt; 0) {
+<span class="lineNum">     341 </span>            :         el_tp.extended()-&gt;arrmeta_default_construct(result.get()-&gt;metadata() + sizeof(fixed_dim_type_arrmeta), true);
+<span class="lineNum">     342 </span>            :       }
+<span class="lineNum">     343 </span>            :       fixed_dim_type_arrmeta *fixed_meta = reinterpret_cast&lt;fixed_dim_type_arrmeta *&gt;(result.get()-&gt;metadata());
+<span class="lineNum">     344 </span>            :       fixed_meta-&gt;dim_size = dim_size;
+<span class="lineNum">     345 </span>            :       fixed_meta-&gt;stride = el_data_size;
+<span class="lineNum">     346 </span>            :       return result;
+<span class="lineNum">     347 </span>            :     }
+<span class="lineNum">     348 </span>            :   }
+<span class="lineNum">     349 </span>            : 
+<span class="lineNum">     350 </span>            :   // No view could be produced
+<span class="lineNum">     351 </span>            :   return nd::array();
+<span class="lineNum">     352 </span>            : }
+<a name="353"><span class="lineNum">     353 </span>            : */</a>
+<span class="lineNum">     354 </span>            : 
+<span class="lineNum">     355 </span><span class="lineCov">         28 : static nd::array view_concrete(const nd::array &amp;arr, const ndt::type &amp;tp)</span>
+<span class="lineNum">     356 </span>            : {
+<span class="lineNum">     357 </span>            :   // Allocate a result array to attempt the view in it
+<span class="lineNum">     358 </span><span class="lineCov">         28 :   nd::array result(reinterpret_cast&lt;array_preamble *&gt;(make_array_memory_block(tp.get_arrmeta_size()).get()), true);</span>
+<span class="lineNum">     359 </span>            :   // Copy the fields
+<span class="lineNum">     360 </span><span class="lineCov">         28 :   result.get()-&gt;data = arr.get()-&gt;data;</span>
+<span class="lineNum">     361 </span><span class="lineCov">         28 :   if (!arr.get()-&gt;owner) {</span>
+<span class="lineNum">     362 </span>            :     // Embedded data, need reference to the array
+<span class="lineNum">     363 </span><span class="lineCov">         28 :     result.get()-&gt;owner = arr.get();</span>
+<span class="lineNum">     364 </span>            :   }
+<span class="lineNum">     365 </span>            :   else {
+<span class="lineNum">     366 </span>            :     // Use the same data reference, avoid producing a chain
+<span class="lineNum">     367 </span><span class="lineNoCov">          0 :     result.get()-&gt;owner = arr.get_data_memblock();</span>
+<span class="lineNum">     368 </span>            :   }
+<span class="lineNum">     369 </span><span class="lineCov">         28 :   result.get()-&gt;tp = tp;</span>
+<span class="lineNum">     370 </span><span class="lineCov">         28 :   result.get()-&gt;flags = arr.get()-&gt;flags;</span>
+<span class="lineNum">     371 </span>            :   // First handle a special case of viewing outermost &quot;var&quot; as &quot;fixed[#]&quot;
+<span class="lineNum">     372 </span><span class="lineCov">         28 :   if (arr.get_type().get_id() == var_dim_id &amp;&amp; tp.get_id() == fixed_dim_id) {</span>
+<span class="lineNum">     373 </span>            :     const ndt::var_dim_type::metadata_type *in_am =
+<span class="lineNum">     374 </span><span class="lineCov">         17 :         reinterpret_cast&lt;const ndt::var_dim_type::metadata_type *&gt;(arr.get()-&gt;metadata());</span>
+<span class="lineNum">     375 </span><span class="lineCov">         17 :     const ndt::var_dim_type::data_type *in_dat = reinterpret_cast&lt;const ndt::var_dim_type::data_type *&gt;(arr.cdata());</span>
+<span class="lineNum">     376 </span><span class="lineCov">         17 :     fixed_dim_type_arrmeta *out_am = reinterpret_cast&lt;fixed_dim_type_arrmeta *&gt;(result.get()-&gt;metadata());</span>
+<span class="lineNum">     377 </span><span class="lineCov">         17 :     out_am-&gt;dim_size = tp.extended&lt;ndt::fixed_dim_type&gt;()-&gt;get_fixed_dim_size();</span>
+<span class="lineNum">     378 </span><span class="lineCov">         17 :     out_am-&gt;stride = in_am-&gt;stride;</span>
+<span class="lineNum">     379 </span><span class="lineCov">         17 :     if ((intptr_t)in_dat-&gt;size == out_am-&gt;dim_size) {</span>
+<span class="lineNum">     380 </span>            :       // Use the more specific data reference from the var arrmeta if possible
+<span class="lineNum">     381 </span><span class="lineCov">         17 :       if (in_am-&gt;blockref) {</span>
+<span class="lineNum">     382 </span><span class="lineCov">         17 :         result.get()-&gt;owner = in_am-&gt;blockref;</span>
+<span class="lineNum">     383 </span>            :       }
+<span class="lineNum">     384 </span><span class="lineCov">         17 :       result.get()-&gt;data = in_dat-&gt;begin + in_am-&gt;offset;</span>
+<span class="lineNum">     385 </span>            :       // Try to copy the rest of the arrmeta as a view
+<span class="lineNum">     386 </span><span class="lineCov">         51 :       if (try_view(arr.get_type().extended&lt;ndt::base_dim_type&gt;()-&gt;get_element_type(),</span>
+<span class="lineNum">     387 </span><span class="lineCov">         17 :                    arr.get()-&gt;metadata() + sizeof(ndt::var_dim_type::metadata_type),</span>
+<span class="lineNum">     388 </span><span class="lineCov">         17 :                    tp.extended&lt;ndt::base_dim_type&gt;()-&gt;get_element_type(),</span>
+<span class="lineNum">     389 </span><span class="lineCov">         17 :                    result.get()-&gt;metadata() + sizeof(fixed_dim_type_arrmeta),</span>
+<span class="lineNum">     390 </span><span class="lineCov">         17 :                    intrusive_ptr&lt;memory_block_data&gt;(arr.get(), true))) {</span>
+<span class="lineNum">     391 </span><span class="lineCov">         17 :         return result;</span>
+<span class="lineNum">     392 </span>            :       }
+<span class="lineNum">     393 </span>            :     }
+<span class="lineNum">     394 </span>            :   }
+<span class="lineNum">     395 </span>            :   // Otherwise try to copy the arrmeta as a view
+<span class="lineNum">     396 </span><span class="lineCov">         11 :   else if (try_view(arr.get_type(), arr.get()-&gt;metadata(), tp, result.get()-&gt;metadata(),</span>
+<span class="lineNum">     397 </span><span class="lineCov">         11 :                     intrusive_ptr&lt;memory_block_data&gt;(arr.get(), true))) {</span>
+<span class="lineNum">     398 </span>            :     // If it succeeded, return it
+<span class="lineNum">     399 </span><span class="lineCov">          8 :     return result;</span>
+<span class="lineNum">     400 </span>            :   }
+<span class="lineNum">     401 </span>            : 
+<span class="lineNum">     402 </span><span class="lineCov">          6 :   stringstream ss;</span>
+<span class="lineNum">     403 </span><span class="lineCov">          3 :   ss &lt;&lt; &quot;Unable to view nd::array of type &quot; &lt;&lt; arr.get_type();</span>
+<span class="lineNum">     404 </span><span class="lineCov">          3 :   ss &lt;&lt; &quot; as type &quot; &lt;&lt; tp;</span>
+<span class="lineNum">     405 </span><span class="lineCov">          3 :   throw type_error(ss.str());</span>
+<a name="406"><span class="lineNum">     406 </span>            : }</a>
+<span class="lineNum">     407 </span>            : 
+<span class="lineNum">     408 </span><span class="lineCov">         32 : nd::array nd::view(const nd::array &amp;arr, const ndt::type &amp;tp)</span>
+<span class="lineNum">     409 </span>            : {
+<span class="lineNum">     410 </span><span class="lineCov">         32 :   if (arr.get_type() == tp) {</span>
+<span class="lineNum">     411 </span>            :     // If the types match exactly, simply return 'arr'
+<span class="lineNum">     412 </span><span class="lineCov">          3 :     return arr;</span>
+<span class="lineNum">     413 </span>            :   }
+<span class="lineNum">     414 </span><span class="lineCov">         29 :   else if (tp.get_id() == bytes_id) {</span>
+<span class="lineNum">     415 </span>            :     // If it's a request to view the data as raw bytes
+<span class="lineNum">     416 </span><span class="lineNoCov">          0 :     nd::array result = view_as_bytes(arr, tp);</span>
+<span class="lineNum">     417 </span><span class="lineNoCov">          0 :     if (!result.is_null()) {</span>
+<span class="lineNum">     418 </span><span class="lineNoCov">          0 :       return result;</span>
+<span class="lineNum">     419 </span>            :     }
+<span class="lineNum">     420 </span>            :   }
+<span class="lineNum">     421 </span><span class="lineCov">         29 :   else if (arr.get_type().get_id() == bytes_id) {</span>
+<span class="lineNum">     422 </span>            :     // If it's a request to view raw bytes as something else
+<span class="lineNum">     423 </span>            :     //    nd::array result = view_from_bytes(arr, tp);
+<span class="lineNum">     424 </span>            :     //    if (!result.is_null()) {
+<span class="lineNum">     425 </span>            :     //    return result;
+<span class="lineNum">     426 </span>            :     //}
+<span class="lineNum">     427 </span><span class="lineNoCov">          0 :     return nd::array();</span>
+<span class="lineNum">     428 </span>            :   }
+<span class="lineNum">     429 </span><span class="lineCov">         29 :   else if (arr.get_ndim() == tp.get_ndim()) {</span>
+<span class="lineNum">     430 </span>            :     // If the type is symbolic, e.g. has a &quot;Fixed&quot; symbolic dimension,
+<span class="lineNum">     431 </span>            :     // first substitute in the shape from the array
+<span class="lineNum">     432 </span><span class="lineCov">         29 :     if (tp.is_symbolic()) {</span>
+<span class="lineNum">     433 </span><span class="lineCov">          6 :       dimvector shape(arr.get_ndim());</span>
+<span class="lineNum">     434 </span><span class="lineCov">          3 :       arr.get_shape(shape.get());</span>
+<span class="lineNum">     435 </span><span class="lineCov">          3 :       return view_concrete(arr, substitute_shape(tp, arr.get_ndim(), shape.get()));</span>
+<span class="lineNum">     436 </span>            :     }
+<span class="lineNum">     437 </span>            :     else {
+<span class="lineNum">     438 </span><span class="lineCov">         26 :       return view_concrete(arr, tp);</span>
+<span class="lineNum">     439 </span>            :     }
+<span class="lineNum">     440 </span>            :   }
+<span class="lineNum">     441 </span>            : 
+<span class="lineNum">     442 </span><span class="lineNoCov">          0 :   stringstream ss;</span>
+<span class="lineNum">     443 </span><span class="lineNoCov">          0 :   ss &lt;&lt; &quot;Unable to view nd::array of type &quot; &lt;&lt; arr.get_type();</span>
+<a name="444"><span class="lineNum">     444 </span><span class="lineNoCov">          0 :   ss &lt;&lt; &quot; as type &quot; &lt;&lt; tp;</span></a>
+<span class="lineNum">     445 </span><span class="lineNoCov">          0 :   throw type_error(ss.str());</span>
+<span class="lineNum">     446 </span><span class="lineCov">          3 : }</span>
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.10</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

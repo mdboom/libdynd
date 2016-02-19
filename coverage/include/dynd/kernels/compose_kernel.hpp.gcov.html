@@ -1,0 +1,221 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - coverage.info.cleaned - include/dynd/kernels/compose_kernel.hpp</title>
+  <link rel="stylesheet" type="text/css" href="../../../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../../../index.html">top level</a> - <a href="index.html">include/dynd/kernels</a> - compose_kernel.hpp<span style="font-size: 80%;"> (source / <a href="compose_kernel.hpp.func.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">coverage.info.cleaned</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">44</td>
+            <td class="headerCovTableEntry">70</td>
+            <td class="headerCovTableEntryLo">62.9 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2016-02-19</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">7</td>
+            <td class="headerCovTableEntry">9</td>
+            <td class="headerCovTableEntryMed">77.8 %</td>
+          </tr>
+          <tr><td><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : //</a>
+<span class="lineNum">       2 </span>            : // Copyright (C) 2011-15 DyND Developers
+<span class="lineNum">       3 </span>            : // BSD 2-Clause License, see LICENSE.txt
+<span class="lineNum">       4 </span>            : //
+<span class="lineNum">       5 </span>            : 
+<span class="lineNum">       6 </span>            : #pragma once
+<span class="lineNum">       7 </span>            : 
+<span class="lineNum">       8 </span>            : #include &lt;dynd/arrmeta_holder.hpp&gt;
+<span class="lineNum">       9 </span>            : #include &lt;dynd/callable.hpp&gt;
+<span class="lineNum">      10 </span>            : #include &lt;dynd/kernels/base_kernel.hpp&gt;
+<span class="lineNum">      11 </span>            : #include &lt;dynd/kernels/convert_kernel.hpp&gt;
+<span class="lineNum">      12 </span>            : 
+<span class="lineNum">      13 </span>            : namespace dynd {
+<span class="lineNum">      14 </span>            : namespace nd {
+<span class="lineNum">      15 </span>            :   namespace functional {
+<span class="lineNum">      16 </span>            : 
+<span class="lineNum">      17 </span>            :     /**
+<span class="lineNum">      18 </span>            :      * A kernel for chaining two other kernels, using temporary buffers
+<span class="lineNum">      19 </span>            :      * dynamically allocated on the heap.
+<span class="lineNum">      20 </span>            :      */
+<a name="21"><span class="lineNum">      21 </span>            :     // All methods are inlined, so this does not need to be declared DYND_API.</a>
+<span class="lineNum">      22 </span>            :     struct compose_kernel : base_kernel&lt;compose_kernel, 1&gt; {
+<span class="lineNum">      23 </span><span class="lineCov">          3 :       struct static_data {</span>
+<span class="lineNum">      24 </span>            :         callable first;
+<span class="lineNum">      25 </span>            :         callable second;
+<a name="26"><span class="lineNum">      26 </span>            :         ndt::type buffer_tp;</a>
+<span class="lineNum">      27 </span>            : 
+<span class="lineNum">      28 </span><span class="lineCov">          1 :         static_data(const callable &amp;first, const callable &amp;second, const ndt::type &amp;buffer_tp)</span>
+<span class="lineNum">      29 </span><span class="lineCov">          1 :             : first(first), second(second), buffer_tp(buffer_tp)</span>
+<span class="lineNum">      30 </span>            :         {
+<span class="lineNum">      31 </span><span class="lineCov">          1 :         }</span>
+<span class="lineNum">      32 </span>            :       };
+<span class="lineNum">      33 </span>            : 
+<span class="lineNum">      34 </span>            :       intptr_t second_offset; // The offset to the second child kernel
+<span class="lineNum">      35 </span>            :       ndt::type buffer_tp;
+<span class="lineNum">      36 </span>            :       arrmeta_holder buffer_arrmeta;
+<a name="37"><span class="lineNum">      37 </span>            :       std::vector&lt;intptr_t&gt; buffer_shape;</a>
+<span class="lineNum">      38 </span>            : 
+<span class="lineNum">      39 </span><span class="lineCov">          3 :       compose_kernel(const ndt::type &amp;buffer_tp) : buffer_tp(buffer_tp)</span>
+<span class="lineNum">      40 </span>            :       {
+<span class="lineNum">      41 </span><span class="lineCov">          3 :         arrmeta_holder(this-&gt;buffer_tp).swap(buffer_arrmeta);</span>
+<span class="lineNum">      42 </span><span class="lineCov">          3 :         buffer_arrmeta.arrmeta_default_construct(true);</span>
+<span class="lineNum">      43 </span><span class="lineCov">          3 :         buffer_shape.push_back(DYND_BUFFER_CHUNK_SIZE);</span>
+<a name="44"><span class="lineNum">      44 </span><span class="lineCov">          3 :       }</span></a>
+<span class="lineNum">      45 </span>            : 
+<span class="lineNum">      46 </span><span class="lineCov">          3 :       ~compose_kernel()</span>
+<span class="lineNum">      47 </span><span class="lineCov">          3 :       {</span>
+<span class="lineNum">      48 </span>            :         // The first child ckernel
+<span class="lineNum">      49 </span><span class="lineCov">          3 :         get_child()-&gt;destroy();</span>
+<span class="lineNum">      50 </span>            :         // The second child ckernel
+<span class="lineNum">      51 </span><span class="lineCov">          3 :         get_child(second_offset)-&gt;destroy();</span>
+<a name="52"><span class="lineNum">      52 </span><span class="lineCov">          3 :       }</span></a>
+<span class="lineNum">      53 </span>            : 
+<span class="lineNum">      54 </span><span class="lineCov">          3 :       void single(char *dst, char *const *src)</span>
+<span class="lineNum">      55 </span>            :       {
+<span class="lineNum">      56 </span>            :         // Allocate a temporary buffer on the heap
+<span class="lineNum">      57 </span><span class="lineCov">          6 :         array buffer = empty(buffer_tp);</span>
+<span class="lineNum">      58 </span><span class="lineCov">          3 :         char *buffer_data = buffer.data();</span>
+<span class="lineNum">      59 </span>            : 
+<span class="lineNum">      60 </span><span class="lineCov">          3 :         kernel_prefix *first = get_child();</span>
+<span class="lineNum">      61 </span><span class="lineCov">          3 :         kernel_single_t first_func = first-&gt;get_function&lt;kernel_single_t&gt;();</span>
+<span class="lineNum">      62 </span>            : 
+<span class="lineNum">      63 </span><span class="lineCov">          3 :         kernel_prefix *second = get_child(second_offset);</span>
+<span class="lineNum">      64 </span><span class="lineCov">          3 :         kernel_single_t second_func = second-&gt;get_function&lt;kernel_single_t&gt;();</span>
+<span class="lineNum">      65 </span>            : 
+<span class="lineNum">      66 </span><span class="lineCov">          3 :         first_func(first, buffer_data, src);</span>
+<span class="lineNum">      67 </span><span class="lineCov">          3 :         second_func(second, dst, &amp;buffer_data);</span>
+<a name="68"><span class="lineNum">      68 </span><span class="lineCov">          3 :       }</span></a>
+<span class="lineNum">      69 </span>            : 
+<span class="lineNum">      70 </span><span class="lineNoCov">          0 :       void strided(char *dst, intptr_t dst_stride, char *const *src, const intptr_t *src_stride, size_t count)</span>
+<span class="lineNum">      71 </span>            :       {
+<span class="lineNum">      72 </span>            :         // Allocate a temporary buffer on the heap
+<span class="lineNum">      73 </span><span class="lineNoCov">          0 :         array buffer = empty(buffer_shape[0], buffer_tp);</span>
+<span class="lineNum">      74 </span><span class="lineNoCov">          0 :         char *buffer_data = buffer.data();</span>
+<span class="lineNum">      75 </span><span class="lineNoCov">          0 :         intptr_t buffer_stride = reinterpret_cast&lt;const fixed_dim_type_arrmeta *&gt;(buffer.get()-&gt;metadata())-&gt;stride;</span>
+<span class="lineNum">      76 </span>            : 
+<span class="lineNum">      77 </span><span class="lineNoCov">          0 :         kernel_prefix *first = get_child();</span>
+<span class="lineNum">      78 </span><span class="lineNoCov">          0 :         kernel_strided_t first_func = first-&gt;get_function&lt;kernel_strided_t&gt;();</span>
+<span class="lineNum">      79 </span>            : 
+<span class="lineNum">      80 </span><span class="lineNoCov">          0 :         kernel_prefix *second = get_child(second_offset);</span>
+<span class="lineNum">      81 </span><span class="lineNoCov">          0 :         kernel_strided_t second_func = second-&gt;get_function&lt;kernel_strided_t&gt;();</span>
+<span class="lineNum">      82 </span>            : 
+<span class="lineNum">      83 </span><span class="lineNoCov">          0 :         char *src0 = src[0];</span>
+<span class="lineNum">      84 </span><span class="lineNoCov">          0 :         intptr_t src0_stride = src_stride[0];</span>
+<span class="lineNum">      85 </span>            : 
+<span class="lineNum">      86 </span><span class="lineNoCov">          0 :         size_t chunk_size = std::min(count, static_cast&lt;size_t&gt;(DYND_BUFFER_CHUNK_SIZE));</span>
+<span class="lineNum">      87 </span><span class="lineNoCov">          0 :         first_func(first, buffer_data, buffer_stride, &amp;src0, src_stride, chunk_size);</span>
+<span class="lineNum">      88 </span><span class="lineNoCov">          0 :         second_func(second, dst, dst_stride, &amp;buffer_data, &amp;buffer_stride, chunk_size);</span>
+<span class="lineNum">      89 </span><span class="lineNoCov">          0 :         count -= chunk_size;</span>
+<span class="lineNum">      90 </span><span class="lineNoCov">          0 :         while (count) {</span>
+<span class="lineNum">      91 </span><span class="lineNoCov">          0 :           src0 += chunk_size * src0_stride;</span>
+<span class="lineNum">      92 </span><span class="lineNoCov">          0 :           dst += chunk_size * dst_stride;</span>
+<span class="lineNum">      93 </span><span class="lineNoCov">          0 :           reset_strided_buffer_array(buffer);</span>
+<span class="lineNum">      94 </span><span class="lineNoCov">          0 :           chunk_size = std::min(count, static_cast&lt;size_t&gt;(DYND_BUFFER_CHUNK_SIZE));</span>
+<span class="lineNum">      95 </span><span class="lineNoCov">          0 :           first_func(first, buffer_data, buffer_stride, &amp;src0, src_stride, chunk_size);</span>
+<span class="lineNum">      96 </span><span class="lineNoCov">          0 :           second_func(second, dst, dst_stride, &amp;buffer_data, &amp;buffer_stride, chunk_size);</span>
+<span class="lineNum">      97 </span><span class="lineNoCov">          0 :           count -= chunk_size;</span>
+<span class="lineNum">      98 </span>            :         }
+<a name="99"><span class="lineNum">      99 </span><span class="lineNoCov">          0 :       }</span></a>
+<span class="lineNum">     100 </span>            : 
+<span class="lineNum">     101 </span><span class="lineNoCov">          0 :       static void resolve_dst_type(char *DYND_UNUSED(static_data), char *DYND_UNUSED(data), ndt::type &amp;dst_tp,</span>
+<span class="lineNum">     102 </span>            :                                    intptr_t DYND_UNUSED(nsrc), const ndt::type *DYND_UNUSED(src_tp),
+<span class="lineNum">     103 </span>            :                                    intptr_t DYND_UNUSED(nkwd), const array *DYND_UNUSED(kwds),
+<span class="lineNum">     104 </span>            :                                    const std::map&lt;std::string, ndt::type&gt; &amp;tp_vars)
+<span class="lineNum">     105 </span>            :       {
+<span class="lineNum">     106 </span><span class="lineNoCov">          0 :         dst_tp = ndt::substitute(dst_tp, tp_vars, true);</span>
+<span class="lineNum">     107 </span><span class="lineNoCov">          0 :       }</span>
+<span class="lineNum">     108 </span>            : 
+<span class="lineNum">     109 </span>            :       /**
+<span class="lineNum">     110 </span>            :        * Instantiate the chaining of callables ``first`` and ``second``, using
+<span class="lineNum">     111 </span>            :        * ``buffer_tp`` as the intermediate type, without creating a temporary
+<span class="lineNum">     112 </span>            :        * chained
+<a name="113"><span class="lineNum">     113 </span>            :        * callable.</a>
+<span class="lineNum">     114 </span>            :        */
+<span class="lineNum">     115 </span><span class="lineCov">          3 :       static void instantiate(char *static_data, char *data, kernel_builder *ckb, const ndt::type &amp;dst_tp,</span>
+<span class="lineNum">     116 </span>            :                               const char *dst_arrmeta, intptr_t DYND_UNUSED(nsrc), const ndt::type *src_tp,
+<span class="lineNum">     117 </span>            :                               const char *const *src_arrmeta, kernel_request_t kernreq, intptr_t nkwd,
+<span class="lineNum">     118 </span>            :                               const nd::array *kwds, const std::map&lt;std::string, ndt::type&gt; &amp;tp_vars)
+<span class="lineNum">     119 </span>            :       {
+<span class="lineNum">     120 </span><span class="lineCov">          3 :         intptr_t ckb_offset = ckb-&gt;size();</span>
+<span class="lineNum">     121 </span><span class="lineCov">          3 :         const struct static_data *static_data_x = reinterpret_cast&lt;struct static_data *&gt;(static_data);</span>
+<span class="lineNum">     122 </span>            : 
+<span class="lineNum">     123 </span><span class="lineCov">          3 :         base_callable *first = const_cast&lt;base_callable *&gt;(static_data_x-&gt;first.get());</span>
+<span class="lineNum">     124 </span><span class="lineCov">          3 :         base_callable *second = const_cast&lt;base_callable *&gt;(static_data_x-&gt;second.get());</span>
+<span class="lineNum">     125 </span>            : 
+<span class="lineNum">     126 </span><span class="lineCov">          3 :         const ndt::type &amp;buffer_tp = static_data_x-&gt;buffer_tp;</span>
+<span class="lineNum">     127 </span>            : 
+<span class="lineNum">     128 </span><span class="lineCov">          3 :         intptr_t root_ckb_offset = ckb_offset;</span>
+<span class="lineNum">     129 </span><span class="lineCov">          3 :         ckb-&gt;emplace_back&lt;compose_kernel&gt;(kernreq, static_data_x-&gt;buffer_tp);</span>
+<span class="lineNum">     130 </span><span class="lineCov">          3 :         ckb_offset = ckb-&gt;size();</span>
+<span class="lineNum">     131 </span><span class="lineCov">          3 :         compose_kernel *self = ckb-&gt;get_at&lt;compose_kernel&gt;(root_ckb_offset);</span>
+<span class="lineNum">     132 </span><span class="lineCov">          3 :         first-&gt;instantiate(first-&gt;static_data(), data, ckb, buffer_tp, self-&gt;buffer_arrmeta.get(), 1, src_tp,</span>
+<span class="lineNum">     133 </span><span class="lineCov">          3 :                            src_arrmeta, kernreq | kernel_request_data_only, nkwd, kwds, tp_vars);</span>
+<span class="lineNum">     134 </span><span class="lineCov">          3 :         ckb_offset = ckb-&gt;size();</span>
+<span class="lineNum">     135 </span><span class="lineCov">          3 :         self = ckb-&gt;get_at&lt;compose_kernel&gt;(root_ckb_offset);</span>
+<span class="lineNum">     136 </span><span class="lineCov">          3 :         self-&gt;second_offset = ckb_offset - root_ckb_offset;</span>
+<span class="lineNum">     137 </span><span class="lineCov">          3 :         const char *buffer_arrmeta = self-&gt;buffer_arrmeta.get();</span>
+<span class="lineNum">     138 </span><span class="lineCov">          3 :         second-&gt;instantiate(second-&gt;static_data(), data, ckb, dst_tp, dst_arrmeta, 1, &amp;buffer_tp, &amp;buffer_arrmeta,</span>
+<span class="lineNum">     139 </span><span class="lineCov">          3 :                             kernreq | kernel_request_data_only, nkwd, kwds, tp_vars);</span>
+<span class="lineNum">     140 </span><span class="lineCov">          3 :         ckb_offset = ckb-&gt;size();</span>
+<span class="lineNum">     141 </span><span class="lineCov">          3 :       }</span>
+<span class="lineNum">     142 </span>            :     };
+<span class="lineNum">     143 </span>            :   } // namespace dynd::nd::functional
+<span class="lineNum">     144 </span>            : } // namespace dynd::nd
+<span class="lineNum">     145 </span>            : } // namespace dynd
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.10</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

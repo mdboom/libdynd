@@ -1,0 +1,553 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - coverage.info.cleaned - include/dynd/array_iter.hpp</title>
+  <link rel="stylesheet" type="text/css" href="../../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../../index.html">top level</a> - <a href="index.html">include/dynd</a> - array_iter.hpp<span style="font-size: 80%;"> (source / <a href="array_iter.hpp.func.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">coverage.info.cleaned</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">49</td>
+            <td class="headerCovTableEntry">55</td>
+            <td class="headerCovTableEntryMed">89.1 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2016-02-19</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">10</td>
+            <td class="headerCovTableEntry">10</td>
+            <td class="headerCovTableEntryHi">100.0 %</td>
+          </tr>
+          <tr><td><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : //</a>
+<span class="lineNum">       2 </span>            : // Copyright (C) 2011-15 DyND Developers
+<span class="lineNum">       3 </span>            : // BSD 2-Clause License, see LICENSE.txt
+<span class="lineNum">       4 </span>            : //
+<span class="lineNum">       5 </span>            : 
+<span class="lineNum">       6 </span>            : #pragma once
+<span class="lineNum">       7 </span>            : 
+<span class="lineNum">       8 </span>            : #include &lt;algorithm&gt;
+<span class="lineNum">       9 </span>            : 
+<span class="lineNum">      10 </span>            : #include &lt;dynd/array.hpp&gt;
+<span class="lineNum">      11 </span>            : #include &lt;dynd/shape_tools.hpp&gt;
+<span class="lineNum">      12 </span>            : 
+<span class="lineNum">      13 </span>            : namespace dynd {
+<span class="lineNum">      14 </span>            : 
+<span class="lineNum">      15 </span>            : namespace detail {
+<span class="lineNum">      16 </span>            :   /** A simple metaprogram to indicate whether a value is within the bounds or not */
+<span class="lineNum">      17 </span>            :   template &lt;int V, int V_START, int V_END&gt;
+<span class="lineNum">      18 </span>            :   struct is_value_within_bounds {
+<span class="lineNum">      19 </span>            :     enum { value = (V &gt;= V_START) &amp;&amp; V &lt; V_END };
+<span class="lineNum">      20 </span>            :   };
+<span class="lineNum">      21 </span>            : }
+<span class="lineNum">      22 </span>            : 
+<span class="lineNum">      23 </span>            : template &lt;int Nwrite, int Nread&gt;
+<span class="lineNum">      24 </span>            : class array_iter;
+<span class="lineNum">      25 </span>            : 
+<span class="lineNum">      26 </span>            : template &lt;&gt;
+<span class="lineNum">      27 </span>            : class array_iter&lt;1, 0&gt; {
+<span class="lineNum">      28 </span>            :   intptr_t m_itersize;
+<span class="lineNum">      29 </span>            :   size_t m_iter_ndim;
+<span class="lineNum">      30 </span>            :   dimvector m_iterindex;
+<span class="lineNum">      31 </span>            :   dimvector m_itershape;
+<span class="lineNum">      32 </span>            :   char *m_data;
+<span class="lineNum">      33 </span>            :   const char *m_arrmeta;
+<span class="lineNum">      34 </span>            :   iterdata_common *m_iterdata;
+<span class="lineNum">      35 </span>            :   ndt::type m_array_tp, m_uniform_tp;
+<span class="lineNum">      36 </span>            : 
+<span class="lineNum">      37 </span>            :   inline void init(const ndt::type &amp;tp0, const char *arrmeta0, char *data0)
+<span class="lineNum">      38 </span>            :   {
+<span class="lineNum">      39 </span>            :     m_array_tp = tp0;
+<span class="lineNum">      40 </span>            :     m_iter_ndim = m_array_tp.get_ndim();
+<span class="lineNum">      41 </span>            :     m_itersize = 1;
+<span class="lineNum">      42 </span>            :     if (m_iter_ndim != 0) {
+<span class="lineNum">      43 </span>            :       m_iterindex.init(m_iter_ndim);
+<span class="lineNum">      44 </span>            :       memset(m_iterindex.get(), 0, sizeof(intptr_t) * m_iter_ndim);
+<span class="lineNum">      45 </span>            :       m_itershape.init(m_iter_ndim);
+<span class="lineNum">      46 </span>            :       m_array_tp.extended()-&gt;get_shape(m_iter_ndim, 0, m_itershape.get(), arrmeta0, NULL);
+<span class="lineNum">      47 </span>            : 
+<span class="lineNum">      48 </span>            :       size_t iterdata_size = m_array_tp.extended()-&gt;get_iterdata_size(m_iter_ndim);
+<span class="lineNum">      49 </span>            :       m_iterdata = reinterpret_cast&lt;iterdata_common *&gt;(malloc(iterdata_size));
+<span class="lineNum">      50 </span>            :       if (!m_iterdata) {
+<span class="lineNum">      51 </span>            :         throw std::bad_alloc();
+<span class="lineNum">      52 </span>            :       }
+<span class="lineNum">      53 </span>            :       m_arrmeta = arrmeta0;
+<span class="lineNum">      54 </span>            :       m_array_tp.iterdata_construct(m_iterdata, &amp;m_arrmeta, m_iter_ndim, m_itershape.get(), m_uniform_tp);
+<span class="lineNum">      55 </span>            :       m_data = m_iterdata-&gt;reset(m_iterdata, data0, m_iter_ndim);
+<span class="lineNum">      56 </span>            : 
+<span class="lineNum">      57 </span>            :       for (size_t i = 0, i_end = m_iter_ndim; i != i_end; ++i) {
+<span class="lineNum">      58 </span>            :         m_itersize *= m_itershape[i];
+<span class="lineNum">      59 </span>            :       }
+<span class="lineNum">      60 </span>            :     }
+<span class="lineNum">      61 </span>            :     else {
+<span class="lineNum">      62 </span>            :       m_iterdata = NULL;
+<span class="lineNum">      63 </span>            :       m_uniform_tp = m_array_tp;
+<span class="lineNum">      64 </span>            :       m_data = data0;
+<span class="lineNum">      65 </span>            :       m_arrmeta = arrmeta0;
+<span class="lineNum">      66 </span>            :     }
+<span class="lineNum">      67 </span>            :   }
+<span class="lineNum">      68 </span>            : 
+<span class="lineNum">      69 </span>            : public:
+<span class="lineNum">      70 </span>            :   array_iter(const nd::array &amp;op0) { init(op0.get_type(), op0.get()-&gt;metadata(), op0.data()); }
+<span class="lineNum">      71 </span>            : 
+<span class="lineNum">      72 </span>            :   ~array_iter()
+<span class="lineNum">      73 </span>            :   {
+<span class="lineNum">      74 </span>            :     if (m_iterdata) {
+<span class="lineNum">      75 </span>            :       m_array_tp.extended()-&gt;iterdata_destruct(m_iterdata, m_iter_ndim);
+<span class="lineNum">      76 </span>            :       free(m_iterdata);
+<span class="lineNum">      77 </span>            :     }
+<span class="lineNum">      78 </span>            :   }
+<span class="lineNum">      79 </span>            : 
+<span class="lineNum">      80 </span>            :   size_t itersize() const { return m_itersize; }
+<span class="lineNum">      81 </span>            : 
+<span class="lineNum">      82 </span>            :   bool empty() const { return m_itersize == 0; }
+<span class="lineNum">      83 </span>            : 
+<span class="lineNum">      84 </span>            :   bool next()
+<span class="lineNum">      85 </span>            :   {
+<span class="lineNum">      86 </span>            :     size_t i = m_iter_ndim;
+<span class="lineNum">      87 </span>            :     if (i != 0) {
+<span class="lineNum">      88 </span>            :       do {
+<span class="lineNum">      89 </span>            :         --i;
+<span class="lineNum">      90 </span>            :         if (++m_iterindex[i] != m_itershape[i]) {
+<span class="lineNum">      91 </span>            :           m_data = m_iterdata-&gt;incr(m_iterdata, m_iter_ndim - i - 1);
+<span class="lineNum">      92 </span>            :           return true;
+<span class="lineNum">      93 </span>            :         }
+<span class="lineNum">      94 </span>            :         else {
+<span class="lineNum">      95 </span>            :           m_iterindex[i] = 0;
+<span class="lineNum">      96 </span>            :         }
+<span class="lineNum">      97 </span>            :       } while (i != 0);
+<span class="lineNum">      98 </span>            :     }
+<span class="lineNum">      99 </span>            : 
+<span class="lineNum">     100 </span>            :     return false;
+<span class="lineNum">     101 </span>            :   }
+<span class="lineNum">     102 </span>            : 
+<span class="lineNum">     103 </span>            :   char *data() { return m_data; }
+<span class="lineNum">     104 </span>            : 
+<span class="lineNum">     105 </span>            :   const char *arrmeta() { return m_arrmeta; }
+<span class="lineNum">     106 </span>            : 
+<span class="lineNum">     107 </span>            :   const ndt::type &amp;get_uniform_dtype() const { return m_uniform_tp; }
+<span class="lineNum">     108 </span>            : };
+<span class="lineNum">     109 </span>            : 
+<span class="lineNum">     110 </span>            : template &lt;&gt;
+<span class="lineNum">     111 </span>            : class array_iter&lt;0, 1&gt; {
+<span class="lineNum">     112 </span>            :   intptr_t m_itersize;
+<span class="lineNum">     113 </span>            :   size_t m_iter_ndim;
+<span class="lineNum">     114 </span>            :   dimvector m_iterindex;
+<span class="lineNum">     115 </span>            :   dimvector m_itershape;
+<span class="lineNum">     116 </span>            :   const char *m_data;
+<span class="lineNum">     117 </span>            :   const char *m_arrmeta;
+<span class="lineNum">     118 </span>            :   iterdata_common *m_iterdata;
+<span class="lineNum">     119 </span>            :   ndt::type m_array_tp, m_uniform_tp;
+<span class="lineNum">     120 </span>            : 
+<span class="lineNum">     121 </span>            :   inline void init(const ndt::type &amp;tp0, const char *arrmeta0, const char *data0, size_t ndim)
+<span class="lineNum">     122 </span>            :   {
+<span class="lineNum">     123 </span>            :     m_array_tp = tp0;
+<span class="lineNum">     124 </span>            :     m_iter_ndim = ndim ? ndim : m_array_tp.get_ndim();
+<span class="lineNum">     125 </span>            :     m_itersize = 1;
+<span class="lineNum">     126 </span>            :     if (m_iter_ndim != 0) {
+<span class="lineNum">     127 </span>            :       m_iterindex.init(m_iter_ndim);
+<span class="lineNum">     128 </span>            :       memset(m_iterindex.get(), 0, sizeof(intptr_t) * m_iter_ndim);
+<span class="lineNum">     129 </span>            :       m_itershape.init(m_iter_ndim);
+<span class="lineNum">     130 </span>            :       m_array_tp.extended()-&gt;get_shape(m_iter_ndim, 0, m_itershape.get(), arrmeta0, NULL);
+<span class="lineNum">     131 </span>            : 
+<span class="lineNum">     132 </span>            :       size_t iterdata_size = m_array_tp.extended()-&gt;get_iterdata_size(m_iter_ndim);
+<span class="lineNum">     133 </span>            :       m_iterdata = reinterpret_cast&lt;iterdata_common *&gt;(malloc(iterdata_size));
+<span class="lineNum">     134 </span>            :       if (!m_iterdata) {
+<span class="lineNum">     135 </span>            :         throw std::bad_alloc();
+<span class="lineNum">     136 </span>            :       }
+<span class="lineNum">     137 </span>            :       m_arrmeta = arrmeta0;
+<span class="lineNum">     138 </span>            :       m_array_tp.iterdata_construct(m_iterdata, &amp;m_arrmeta, m_iter_ndim, m_itershape.get(), m_uniform_tp);
+<span class="lineNum">     139 </span>            :       m_data = m_iterdata-&gt;reset(m_iterdata, const_cast&lt;char *&gt;(data0), m_iter_ndim);
+<span class="lineNum">     140 </span>            : 
+<span class="lineNum">     141 </span>            :       for (size_t i = 0, i_end = m_iter_ndim; i != i_end; ++i) {
+<span class="lineNum">     142 </span>            :         m_itersize *= m_itershape[i];
+<span class="lineNum">     143 </span>            :       }
+<span class="lineNum">     144 </span>            :     }
+<span class="lineNum">     145 </span>            :     else {
+<span class="lineNum">     146 </span>            :       m_iterdata = NULL;
+<span class="lineNum">     147 </span>            :       m_uniform_tp = m_array_tp;
+<span class="lineNum">     148 </span>            :       m_data = data0;
+<span class="lineNum">     149 </span>            :       m_arrmeta = arrmeta0;
+<span class="lineNum">     150 </span>            :     }
+<span class="lineNum">     151 </span>            :   }
+<span class="lineNum">     152 </span>            : 
+<span class="lineNum">     153 </span>            : public:
+<span class="lineNum">     154 </span>            :   array_iter(const ndt::type &amp;tp0, const char *arrmeta0, const char *data0, size_t ndim = 0)
+<span class="lineNum">     155 </span>            :   {
+<span class="lineNum">     156 </span>            :     init(tp0, arrmeta0, data0, ndim);
+<span class="lineNum">     157 </span>            :   }
+<span class="lineNum">     158 </span>            : 
+<span class="lineNum">     159 </span>            :   array_iter(const nd::array &amp;op0) { init(op0.get_type(), op0.get()-&gt;metadata(), op0.cdata(), 0); }
+<span class="lineNum">     160 </span>            : 
+<span class="lineNum">     161 </span>            :   ~array_iter()
+<span class="lineNum">     162 </span>            :   {
+<span class="lineNum">     163 </span>            :     if (m_iterdata) {
+<span class="lineNum">     164 </span>            :       m_array_tp.extended()-&gt;iterdata_destruct(m_iterdata, m_iter_ndim);
+<span class="lineNum">     165 </span>            :       free(m_iterdata);
+<span class="lineNum">     166 </span>            :     }
+<span class="lineNum">     167 </span>            :   }
+<span class="lineNum">     168 </span>            : 
+<span class="lineNum">     169 </span>            :   size_t itersize() const { return m_itersize; }
+<span class="lineNum">     170 </span>            : 
+<span class="lineNum">     171 </span>            :   bool empty() const { return m_itersize == 0; }
+<span class="lineNum">     172 </span>            : 
+<span class="lineNum">     173 </span>            :   bool next()
+<span class="lineNum">     174 </span>            :   {
+<span class="lineNum">     175 </span>            :     size_t i = m_iter_ndim;
+<span class="lineNum">     176 </span>            :     if (i != 0) {
+<span class="lineNum">     177 </span>            :       do {
+<span class="lineNum">     178 </span>            :         --i;
+<span class="lineNum">     179 </span>            :         if (++m_iterindex[i] != m_itershape[i]) {
+<span class="lineNum">     180 </span>            :           m_data = m_iterdata-&gt;incr(m_iterdata, m_iter_ndim - i - 1);
+<span class="lineNum">     181 </span>            :           return true;
+<span class="lineNum">     182 </span>            :         }
+<span class="lineNum">     183 </span>            :         else {
+<span class="lineNum">     184 </span>            :           m_iterindex[i] = 0;
+<span class="lineNum">     185 </span>            :         }
+<span class="lineNum">     186 </span>            :       } while (i != 0);
+<span class="lineNum">     187 </span>            :     }
+<span class="lineNum">     188 </span>            : 
+<span class="lineNum">     189 </span>            :     return false;
+<span class="lineNum">     190 </span>            :   }
+<span class="lineNum">     191 </span>            : 
+<span class="lineNum">     192 </span>            :   const char *data() { return m_data; }
+<span class="lineNum">     193 </span>            : 
+<span class="lineNum">     194 </span>            :   const char *arrmeta() { return m_arrmeta; }
+<span class="lineNum">     195 </span>            : 
+<span class="lineNum">     196 </span>            :   const ndt::type &amp;get_uniform_dtype() const { return m_uniform_tp; }
+<span class="lineNum">     197 </span>            : };
+<span class="lineNum">     198 </span>            : 
+<span class="lineNum">     199 </span>            : template &lt;&gt;
+<span class="lineNum">     200 </span>            : class array_iter&lt;1, 1&gt; {
+<span class="lineNum">     201 </span>            : protected:
+<span class="lineNum">     202 </span>            :   intptr_t m_itersize;
+<span class="lineNum">     203 </span>            :   size_t m_iter_ndim[2];
+<span class="lineNum">     204 </span>            :   dimvector m_iterindex;
+<span class="lineNum">     205 </span>            :   dimvector m_itershape;
+<span class="lineNum">     206 </span>            :   char *m_data[2];
+<span class="lineNum">     207 </span>            :   const char *m_arrmeta[2];
+<span class="lineNum">     208 </span>            :   iterdata_common *m_iterdata[2];
+<span class="lineNum">     209 </span>            :   ndt::type m_array_tp[2], m_uniform_tp[2];
+<span class="lineNum">     210 </span>            : 
+<span class="lineNum">     211 </span>            :   array_iter()
+<span class="lineNum">     212 </span>            :   {
+<span class="lineNum">     213 </span>            :     m_iterdata[0] = NULL;
+<span class="lineNum">     214 </span>            :     m_iterdata[1] = NULL;
+<span class="lineNum">     215 </span>            :     m_data[0] = NULL;
+<span class="lineNum">     216 </span>            :     m_data[1] = NULL;
+<span class="lineNum">     217 </span>            :     m_arrmeta[0] = NULL;
+<span class="lineNum">     218 </span>            :     m_arrmeta[1] = NULL;
+<span class="lineNum">     219 </span>            :   }
+<span class="lineNum">     220 </span>            : 
+<span class="lineNum">     221 </span>            :   inline void init(const ndt::type &amp;tp0, const char *arrmeta0, char *data0, const ndt::type &amp;tp1, const char *arrmeta1,
+<span class="lineNum">     222 </span>            :                    const char *data1)
+<span class="lineNum">     223 </span>            :   {
+<span class="lineNum">     224 </span>            :     m_array_tp[0] = tp0;
+<span class="lineNum">     225 </span>            :     m_array_tp[1] = tp1;
+<span class="lineNum">     226 </span>            :     m_itersize = 1;
+<span class="lineNum">     227 </span>            :     // The destination shape
+<span class="lineNum">     228 </span>            :     m_iter_ndim[0] = m_array_tp[0].get_ndim();
+<span class="lineNum">     229 </span>            :     m_itershape.init(m_iter_ndim[0]);
+<span class="lineNum">     230 </span>            :     if (m_iter_ndim[0] &gt; 0) {
+<span class="lineNum">     231 </span>            :       m_array_tp[0].extended()-&gt;get_shape(m_iter_ndim[0], 0, m_itershape.get(), arrmeta0, NULL);
+<span class="lineNum">     232 </span>            :     }
+<span class="lineNum">     233 </span>            :     // The source shape
+<span class="lineNum">     234 </span>            :     dimvector src_shape;
+<span class="lineNum">     235 </span>            :     m_iter_ndim[1] = m_array_tp[1].get_ndim();
+<span class="lineNum">     236 </span>            :     src_shape.init(m_iter_ndim[1]);
+<span class="lineNum">     237 </span>            :     if (m_iter_ndim[1] &gt; 0) {
+<span class="lineNum">     238 </span>            :       m_array_tp[1].extended()-&gt;get_shape(m_iter_ndim[1], 0, src_shape.get(), arrmeta1, NULL);
+<span class="lineNum">     239 </span>            :     }
+<span class="lineNum">     240 </span>            :     // Check that the source shape broadcasts ok
+<span class="lineNum">     241 </span>            :     if (!shape_can_broadcast(m_iter_ndim[0], m_itershape.get(), m_iter_ndim[1], src_shape.get())) {
+<span class="lineNum">     242 </span>            :       throw broadcast_error(m_iter_ndim[0], m_itershape.get(), m_iter_ndim[1], src_shape.get());
+<span class="lineNum">     243 </span>            :     }
+<span class="lineNum">     244 </span>            :     // Allocate and initialize the iterdata
+<span class="lineNum">     245 </span>            :     if (m_iter_ndim[0] != 0) {
+<span class="lineNum">     246 </span>            :       m_iterindex.init(m_iter_ndim[0]);
+<span class="lineNum">     247 </span>            :       memset(m_iterindex.get(), 0, sizeof(intptr_t) * m_iter_ndim[0]);
+<span class="lineNum">     248 </span>            :       // The destination iterdata
+<span class="lineNum">     249 </span>            :       size_t iterdata_size = m_array_tp[0].get_iterdata_size(m_iter_ndim[0]);
+<span class="lineNum">     250 </span>            :       m_iterdata[0] = reinterpret_cast&lt;iterdata_common *&gt;(malloc(iterdata_size));
+<span class="lineNum">     251 </span>            :       if (!m_iterdata[0]) {
+<span class="lineNum">     252 </span>            :         throw std::bad_alloc();
+<span class="lineNum">     253 </span>            :       }
+<span class="lineNum">     254 </span>            :       m_arrmeta[0] = arrmeta0;
+<span class="lineNum">     255 </span>            :       m_array_tp[0].iterdata_construct(m_iterdata[0], &amp;m_arrmeta[0], m_iter_ndim[0], m_itershape.get(),
+<span class="lineNum">     256 </span>            :                                        m_uniform_tp[0]);
+<span class="lineNum">     257 </span>            :       m_data[0] = m_iterdata[0]-&gt;reset(m_iterdata[0], data0, m_iter_ndim[0]);
+<span class="lineNum">     258 </span>            :       // The source iterdata
+<span class="lineNum">     259 </span>            :       iterdata_size = m_array_tp[1].get_broadcasted_iterdata_size(m_iter_ndim[1]);
+<span class="lineNum">     260 </span>            :       m_iterdata[1] = reinterpret_cast&lt;iterdata_common *&gt;(malloc(iterdata_size));
+<span class="lineNum">     261 </span>            :       if (!m_iterdata[1]) {
+<span class="lineNum">     262 </span>            :         throw std::bad_alloc();
+<span class="lineNum">     263 </span>            :       }
+<span class="lineNum">     264 </span>            :       m_arrmeta[1] = arrmeta1;
+<span class="lineNum">     265 </span>            :       m_array_tp[1].broadcasted_iterdata_construct(m_iterdata[1], &amp;m_arrmeta[1], m_iter_ndim[1],
+<span class="lineNum">     266 </span>            :                                                    m_itershape.get() + (m_iter_ndim[0] - m_iter_ndim[1]),
+<span class="lineNum">     267 </span>            :                                                    m_uniform_tp[1]);
+<span class="lineNum">     268 </span>            :       m_data[1] = m_iterdata[1]-&gt;reset(m_iterdata[1], const_cast&lt;char *&gt;(data1), m_iter_ndim[0]);
+<span class="lineNum">     269 </span>            : 
+<span class="lineNum">     270 </span>            :       for (size_t i = 0, i_end = m_iter_ndim[0]; i != i_end; ++i) {
+<span class="lineNum">     271 </span>            :         m_itersize *= m_itershape[i];
+<span class="lineNum">     272 </span>            :       }
+<span class="lineNum">     273 </span>            :     }
+<span class="lineNum">     274 </span>            :     else {
+<span class="lineNum">     275 </span>            :       m_iterdata[0] = NULL;
+<span class="lineNum">     276 </span>            :       m_iterdata[1] = NULL;
+<span class="lineNum">     277 </span>            :       m_uniform_tp[0] = m_array_tp[0];
+<span class="lineNum">     278 </span>            :       m_uniform_tp[1] = m_array_tp[1];
+<span class="lineNum">     279 </span>            :       m_data[0] = data0;
+<span class="lineNum">     280 </span>            :       m_data[1] = const_cast&lt;char *&gt;(data1);
+<span class="lineNum">     281 </span>            :       m_arrmeta[0] = arrmeta0;
+<span class="lineNum">     282 </span>            :       m_arrmeta[1] = arrmeta1;
+<span class="lineNum">     283 </span>            :     }
+<span class="lineNum">     284 </span>            :   }
+<span class="lineNum">     285 </span>            : 
+<span class="lineNum">     286 </span>            : public:
+<span class="lineNum">     287 </span>            :   array_iter(const ndt::type &amp;tp0, const char *arrmeta0, char *data0, const ndt::type &amp;tp1, const char *arrmeta1,
+<span class="lineNum">     288 </span>            :              const char *data1)
+<span class="lineNum">     289 </span>            :   {
+<span class="lineNum">     290 </span>            :     init(tp0, arrmeta0, data0, tp1, arrmeta1, data1);
+<span class="lineNum">     291 </span>            :   }
+<span class="lineNum">     292 </span>            :   array_iter(const nd::array &amp;op0, const nd::array &amp;op1)
+<span class="lineNum">     293 </span>            :   {
+<span class="lineNum">     294 </span>            :     init(op0.get_type(), op0.get()-&gt;metadata(), op0.data(), op1.get_type(), op1.get()-&gt;metadata(), op1.cdata());
+<span class="lineNum">     295 </span>            :   }
+<span class="lineNum">     296 </span>            : 
+<span class="lineNum">     297 </span>            :   ~array_iter()
+<span class="lineNum">     298 </span>            :   {
+<span class="lineNum">     299 </span>            :     if (m_iterdata[0]) {
+<span class="lineNum">     300 </span>            :       m_array_tp[0].iterdata_destruct(m_iterdata[0], m_iter_ndim[0]);
+<span class="lineNum">     301 </span>            :       free(m_iterdata[0]);
+<span class="lineNum">     302 </span>            :     }
+<span class="lineNum">     303 </span>            :     if (m_iterdata[1]) {
+<span class="lineNum">     304 </span>            :       m_array_tp[1].iterdata_destruct(m_iterdata[1], m_iter_ndim[1]);
+<span class="lineNum">     305 </span>            :       free(m_iterdata[1]);
+<span class="lineNum">     306 </span>            :     }
+<span class="lineNum">     307 </span>            :   }
+<span class="lineNum">     308 </span>            : 
+<span class="lineNum">     309 </span>            :   size_t itersize() const { return m_itersize; }
+<span class="lineNum">     310 </span>            : 
+<span class="lineNum">     311 </span>            :   bool empty() const { return m_itersize == 0; }
+<span class="lineNum">     312 </span>            : 
+<span class="lineNum">     313 </span>            :   bool next()
+<span class="lineNum">     314 </span>            :   {
+<span class="lineNum">     315 </span>            :     size_t i = m_iter_ndim[0];
+<span class="lineNum">     316 </span>            :     if (i != 0) {
+<span class="lineNum">     317 </span>            :       do {
+<span class="lineNum">     318 </span>            :         --i;
+<span class="lineNum">     319 </span>            :         if (++m_iterindex[i] != m_itershape[i]) {
+<span class="lineNum">     320 </span>            :           m_data[0] = m_iterdata[0]-&gt;incr(m_iterdata[0], m_iter_ndim[0] - i - 1);
+<span class="lineNum">     321 </span>            :           m_data[1] = m_iterdata[1]-&gt;incr(m_iterdata[1], m_iter_ndim[0] - i - 1);
+<span class="lineNum">     322 </span>            :           return true;
+<span class="lineNum">     323 </span>            :         }
+<span class="lineNum">     324 </span>            :         else {
+<span class="lineNum">     325 </span>            :           m_iterindex[i] = 0;
+<span class="lineNum">     326 </span>            :         }
+<span class="lineNum">     327 </span>            :       } while (i != 0);
+<span class="lineNum">     328 </span>            :     }
+<span class="lineNum">     329 </span>            : 
+<span class="lineNum">     330 </span>            :     return false;
+<span class="lineNum">     331 </span>            :   }
+<span class="lineNum">     332 </span>            : 
+<span class="lineNum">     333 </span>            :   const intptr_t *index() const { return m_iterindex.get(); }
+<span class="lineNum">     334 </span>            : 
+<span class="lineNum">     335 </span>            :   /**
+<span class="lineNum">     336 </span>            :    * Provide non-const access to the 'write' operands.
+<span class="lineNum">     337 </span>            :    */
+<span class="lineNum">     338 </span>            :   template &lt;int K&gt;
+<span class="lineNum">     339 </span>            :   inline typename std::enable_if&lt;detail::is_value_within_bounds&lt;K, 0, 1&gt;::value, char *&gt;::type data()
+<span class="lineNum">     340 </span>            :   {
+<span class="lineNum">     341 </span>            :     return m_data[K];
+<span class="lineNum">     342 </span>            :   }
+<span class="lineNum">     343 </span>            : 
+<span class="lineNum">     344 </span>            :   /**
+<span class="lineNum">     345 </span>            :    * Provide const access to all the operands.
+<span class="lineNum">     346 </span>            :    */
+<span class="lineNum">     347 </span>            :   template &lt;int K&gt;
+<span class="lineNum">     348 </span>            :   inline typename std::enable_if&lt;detail::is_value_within_bounds&lt;K, 0, 2&gt;::value, const char *&gt;::type data() const
+<span class="lineNum">     349 </span>            :   {
+<span class="lineNum">     350 </span>            :     return m_data[K];
+<span class="lineNum">     351 </span>            :   }
+<span class="lineNum">     352 </span>            : 
+<span class="lineNum">     353 </span>            :   template &lt;int K&gt;
+<span class="lineNum">     354 </span>            :   inline typename std::enable_if&lt;detail::is_value_within_bounds&lt;K, 0, 2&gt;::value, const char *&gt;::type arrmeta() const
+<span class="lineNum">     355 </span>            :   {
+<span class="lineNum">     356 </span>            :     return m_arrmeta[K];
+<span class="lineNum">     357 </span>            :   }
+<span class="lineNum">     358 </span>            : 
+<span class="lineNum">     359 </span>            :   template &lt;int K&gt;
+<span class="lineNum">     360 </span>            :   inline typename std::enable_if&lt;detail::is_value_within_bounds&lt;K, 0, 2&gt;::value, const ndt::type &amp;&gt;::type
+<span class="lineNum">     361 </span>            :   get_uniform_dtype() const
+<span class="lineNum">     362 </span>            :   {
+<span class="lineNum">     363 </span>            :     return m_uniform_tp[K];
+<span class="lineNum">     364 </span>            :   }
+<span class="lineNum">     365 </span>            : };
+<span class="lineNum">     366 </span>            : 
+<span class="lineNum">     367 </span>            : template &lt;&gt;
+<span class="lineNum">     368 </span>            : class array_iter&lt;0, 2&gt; {
+<span class="lineNum">     369 </span>            :   intptr_t m_itersize;
+<span class="lineNum">     370 </span>            :   intptr_t m_iter_ndim;
+<span class="lineNum">     371 </span>            :   dimvector m_iterindex;
+<span class="lineNum">     372 </span>            :   dimvector m_itershape;
+<span class="lineNum">     373 </span>            :   char *m_data[2];
+<span class="lineNum">     374 </span>            :   const char *m_arrmeta[2];
+<span class="lineNum">     375 </span>            :   iterdata_common *m_iterdata[2];
+<span class="lineNum">     376 </span>            :   ndt::type m_array_tp[2], m_uniform_tp[2];
+<a name="377"><span class="lineNum">     377 </span>            : </a>
+<span class="lineNum">     378 </span>            : public:
+<span class="lineNum">     379 </span><span class="lineCov">        131 :   array_iter(const nd::array &amp;op0, const nd::array &amp;op1)</span>
+<span class="lineNum">     380 </span><span class="lineCov">        131 :   {</span>
+<span class="lineNum">     381 </span><span class="lineCov">        262 :     nd::array ops[2] = {op0, op1};</span>
+<span class="lineNum">     382 </span><span class="lineCov">        131 :     m_array_tp[0] = op0.get_type();</span>
+<span class="lineNum">     383 </span><span class="lineCov">        131 :     m_array_tp[1] = op1.get_type();</span>
+<span class="lineNum">     384 </span><span class="lineCov">        131 :     m_itersize = 1;</span>
+<span class="lineNum">     385 </span><span class="lineCov">        262 :     shortvector&lt;int&gt; axis_perm; // TODO: Use this to affect the iteration order</span>
+<span class="lineNum">     386 </span><span class="lineCov">        131 :     broadcast_input_shapes(2, ops, m_iter_ndim, m_itershape, axis_perm);</span>
+<span class="lineNum">     387 </span>            :     // Allocate and initialize the iterdata
+<span class="lineNum">     388 </span><span class="lineCov">        131 :     if (m_iter_ndim != 0) {</span>
+<span class="lineNum">     389 </span><span class="lineCov">        131 :       m_iterindex.init(m_iter_ndim);</span>
+<span class="lineNum">     390 </span><span class="lineCov">        131 :       memset(m_iterindex.get(), 0, sizeof(intptr_t) * m_iter_ndim);</span>
+<span class="lineNum">     391 </span>            :       // The op iterdata
+<span class="lineNum">     392 </span><span class="lineCov">        393 :       for (int i = 0; i &lt; 2; ++i) {</span>
+<span class="lineNum">     393 </span><span class="lineCov">        262 :         intptr_t iter_ndim_i = m_array_tp[i].get_ndim();</span>
+<span class="lineNum">     394 </span><span class="lineCov">        262 :         size_t iterdata_size = m_array_tp[i].get_broadcasted_iterdata_size(iter_ndim_i);</span>
+<span class="lineNum">     395 </span><span class="lineCov">        262 :         m_iterdata[i] = reinterpret_cast&lt;iterdata_common *&gt;(malloc(iterdata_size));</span>
+<span class="lineNum">     396 </span><span class="lineCov">        262 :         if (!m_iterdata[i]) {</span>
+<span class="lineNum">     397 </span><span class="lineNoCov">          0 :           throw std::bad_alloc();</span>
+<span class="lineNum">     398 </span>            :         }
+<span class="lineNum">     399 </span><span class="lineCov">        262 :         m_arrmeta[i] = ops[i].get()-&gt;metadata();</span>
+<span class="lineNum">     400 </span><span class="lineCov">        524 :         m_array_tp[i].broadcasted_iterdata_construct(m_iterdata[i], &amp;m_arrmeta[i], iter_ndim_i,</span>
+<span class="lineNum">     401 </span><span class="lineCov">        524 :                                                      m_itershape.get() + (m_iter_ndim - iter_ndim_i), m_uniform_tp[i]);</span>
+<span class="lineNum">     402 </span><span class="lineCov">        262 :         m_data[i] = m_iterdata[i]-&gt;reset(m_iterdata[i], ops[i].get()-&gt;data, m_iter_ndim);</span>
+<span class="lineNum">     403 </span>            :       }
+<span class="lineNum">     404 </span>            : 
+<span class="lineNum">     405 </span><span class="lineCov">        302 :       for (intptr_t i = 0, i_end = m_iter_ndim; i != i_end; ++i) {</span>
+<span class="lineNum">     406 </span><span class="lineCov">        171 :         m_itersize *= m_itershape[i];</span>
+<span class="lineNum">     407 </span>            :       }
+<span class="lineNum">     408 </span>            :     }
+<span class="lineNum">     409 </span>            :     else {
+<span class="lineNum">     410 </span><span class="lineNoCov">          0 :       for (size_t i = 0; i &lt; 2; ++i) {</span>
+<span class="lineNum">     411 </span><span class="lineNoCov">          0 :         m_iterdata[i] = NULL;</span>
+<span class="lineNum">     412 </span><span class="lineNoCov">          0 :         m_uniform_tp[i] = m_array_tp[i];</span>
+<span class="lineNum">     413 </span><span class="lineNoCov">          0 :         m_data[i] = ops[i].get()-&gt;data;</span>
+<span class="lineNum">     414 </span><span class="lineNoCov">          0 :         m_arrmeta[i] = ops[i].get()-&gt;metadata();</span>
+<span class="lineNum">     415 </span>            :       }
+<span class="lineNum">     416 </span>            :     }
+<a name="417"><span class="lineNum">     417 </span><span class="lineCov">        131 :   }</span></a>
+<span class="lineNum">     418 </span>            : 
+<span class="lineNum">     419 </span><span class="lineCov">        131 :   ~array_iter()</span>
+<span class="lineNum">     420 </span><span class="lineCov">        131 :   {</span>
+<span class="lineNum">     421 </span><span class="lineCov">        393 :     for (size_t i = 0; i &lt; 2; ++i) {</span>
+<span class="lineNum">     422 </span><span class="lineCov">        262 :       if (m_iterdata[i]) {</span>
+<span class="lineNum">     423 </span><span class="lineCov">        262 :         m_array_tp[i].iterdata_destruct(m_iterdata[i], m_array_tp[i].get_ndim());</span>
+<span class="lineNum">     424 </span><span class="lineCov">        262 :         free(m_iterdata[i]);</span>
+<span class="lineNum">     425 </span>            :       }
+<span class="lineNum">     426 </span>            :     }
+<span class="lineNum">     427 </span><span class="lineCov">        131 :   }</span>
+<span class="lineNum">     428 </span>            : 
+<a name="429"><span class="lineNum">     429 </span>            :   size_t itersize() const { return m_itersize; }</a>
+<span class="lineNum">     430 </span>            : 
+<a name="431"><span class="lineNum">     431 </span><span class="lineCov">        131 :   bool empty() const { return m_itersize == 0; }</span></a>
+<span class="lineNum">     432 </span>            : 
+<span class="lineNum">     433 </span><span class="lineCov">        759 :   bool next()</span>
+<span class="lineNum">     434 </span>            :   {
+<span class="lineNum">     435 </span><span class="lineCov">        759 :     size_t i = m_iter_ndim;</span>
+<span class="lineNum">     436 </span><span class="lineCov">        759 :     if (i != 0) {</span>
+<span class="lineNum">     437 </span><span class="lineCov">        188 :       do {</span>
+<span class="lineNum">     438 </span><span class="lineCov">        947 :         --i;</span>
+<span class="lineNum">     439 </span><span class="lineCov">        947 :         if (++m_iterindex[i] != m_itershape[i]) {</span>
+<span class="lineNum">     440 </span><span class="lineCov">       1884 :           for (size_t j = 0; j &lt; 2; ++j) {</span>
+<span class="lineNum">     441 </span><span class="lineCov">       1256 :             m_data[j] = m_iterdata[j]-&gt;incr(m_iterdata[j], m_iter_ndim - i - 1);</span>
+<span class="lineNum">     442 </span>            :           }
+<span class="lineNum">     443 </span><span class="lineCov">        628 :           return true;</span>
+<span class="lineNum">     444 </span>            :         }
+<span class="lineNum">     445 </span>            :         else {
+<span class="lineNum">     446 </span><span class="lineCov">        319 :           m_iterindex[i] = 0;</span>
+<span class="lineNum">     447 </span>            :         }
+<span class="lineNum">     448 </span><span class="lineCov">        319 :       } while (i != 0);</span>
+<span class="lineNum">     449 </span>            :     }
+<span class="lineNum">     450 </span>            : 
+<span class="lineNum">     451 </span><span class="lineCov">        131 :     return false;</span>
+<span class="lineNum">     452 </span>            :   }
+<span class="lineNum">     453 </span>            : 
+<span class="lineNum">     454 </span>            :   /**
+<span class="lineNum">     455 </span>            :    * Provide const access to all the operands.
+<a name="456"><span class="lineNum">     456 </span>            :    */</a>
+<span class="lineNum">     457 </span>            :   template &lt;int K&gt;
+<span class="lineNum">     458 </span><span class="lineCov">       1518 :   inline typename std::enable_if&lt;detail::is_value_within_bounds&lt;K, 0, 2&gt;::value, const char *&gt;::type data() const</span>
+<span class="lineNum">     459 </span>            :   {
+<span class="lineNum">     460 </span><span class="lineCov">       1518 :     return m_data[K];</span>
+<span class="lineNum">     461 </span>            :   }
+<a name="462"><span class="lineNum">     462 </span>            : </a>
+<span class="lineNum">     463 </span>            :   template &lt;int K&gt;
+<span class="lineNum">     464 </span><span class="lineCov">       1518 :   inline typename std::enable_if&lt;detail::is_value_within_bounds&lt;K, 0, 2&gt;::value, const char *&gt;::type arrmeta() const</span>
+<span class="lineNum">     465 </span>            :   {
+<span class="lineNum">     466 </span><span class="lineCov">       1518 :     return m_arrmeta[K];</span>
+<span class="lineNum">     467 </span>            :   }
+<span class="lineNum">     468 </span>            : 
+<a name="469"><span class="lineNum">     469 </span>            :   template &lt;int K&gt;</a>
+<span class="lineNum">     470 </span>            :   inline typename std::enable_if&lt;detail::is_value_within_bounds&lt;K, 0, 2&gt;::value, const ndt::type &amp;&gt;::type
+<span class="lineNum">     471 </span><span class="lineCov">       1518 :   get_uniform_dtype() const</span>
+<span class="lineNum">     472 </span>            :   {
+<span class="lineNum">     473 </span><span class="lineCov">       1518 :     return m_uniform_tp[K];</span>
+<span class="lineNum">     474 </span>            :   }
+<span class="lineNum">     475 </span>            : };
+<span class="lineNum">     476 </span>            : 
+<span class="lineNum">     477 </span>            : } // namespace dynd
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.10</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

@@ -1,0 +1,132 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - coverage.info.cleaned - src/dynd/func/comparison.cpp</title>
+  <link rel="stylesheet" type="text/css" href="../../../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../../../index.html">top level</a> - <a href="index.html">src/dynd/func</a> - comparison.cpp<span style="font-size: 80%;"> (source / <a href="comparison.cpp.func.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">coverage.info.cleaned</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">20</td>
+            <td class="headerCovTableEntry">21</td>
+            <td class="headerCovTableEntryHi">95.2 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2016-02-19</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">12</td>
+            <td class="headerCovTableEntry">12</td>
+            <td class="headerCovTableEntryHi">100.0 %</td>
+          </tr>
+          <tr><td><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : //</a>
+<span class="lineNum">       2 </span>            : // Copyright (C) 2011-15 DyND Developers
+<span class="lineNum">       3 </span>            : // BSD 2-Clause License, see LICENSE.txt
+<span class="lineNum">       4 </span>            : //
+<span class="lineNum">       5 </span>            : 
+<span class="lineNum">       6 </span>            : #include &lt;dynd/func/comparison.hpp&gt;
+<span class="lineNum">       7 </span>            : 
+<span class="lineNum">       8 </span>            : using namespace std;
+<span class="lineNum">       9 </span>            : using namespace dynd;
+<span class="lineNum">      10 </span>            : 
+<a name="11"><span class="lineNum">      11 </span>            : DYND_API struct nd::less nd::less;</a>
+<span class="lineNum">      12 </span>            : 
+<span class="lineNum">      13 </span><span class="lineCov">         46 : nd::array nd::operator&lt;(const array &amp;a0, const array &amp;a1) { return less(a0, a1); }</span>
+<span class="lineNum">      14 </span>            : 
+<a name="15"><span class="lineNum">      15 </span>            : DYND_API struct nd::less_equal nd::less_equal;</a>
+<span class="lineNum">      16 </span>            : 
+<span class="lineNum">      17 </span><span class="lineCov">         46 : nd::array nd::operator&lt;=(const array &amp;a0, const array &amp;a1) { return less_equal(a0, a1); }</span>
+<span class="lineNum">      18 </span>            : 
+<a name="19"><span class="lineNum">      19 </span>            : DYND_API struct nd::equal nd::equal;</a>
+<span class="lineNum">      20 </span>            : 
+<span class="lineNum">      21 </span><span class="lineCov">        258 : nd::array nd::operator==(const array &amp;a0, const array &amp;a1) { return equal(a0, a1); }</span>
+<span class="lineNum">      22 </span>            : 
+<a name="23"><span class="lineNum">      23 </span>            : DYND_API struct nd::not_equal nd::not_equal;</a>
+<span class="lineNum">      24 </span>            : 
+<span class="lineNum">      25 </span><span class="lineCov">         58 : nd::array nd::operator!=(const array &amp;a0, const array &amp;a1) { return not_equal(a0, a1); }</span>
+<span class="lineNum">      26 </span>            : 
+<a name="27"><span class="lineNum">      27 </span>            : DYND_API struct nd::greater_equal nd::greater_equal;</a>
+<span class="lineNum">      28 </span>            : 
+<span class="lineNum">      29 </span><span class="lineCov">         46 : nd::array nd::operator&gt;=(const array &amp;a0, const array &amp;a1) { return greater_equal(a0, a1); }</span>
+<span class="lineNum">      30 </span>            : 
+<a name="31"><span class="lineNum">      31 </span>            : DYND_API struct nd::greater nd::greater;</a>
+<span class="lineNum">      32 </span>            : 
+<a name="33"><span class="lineNum">      33 </span><span class="lineCov">         46 : nd::array nd::operator&gt;(const array &amp;a0, const array &amp;a1) { return greater(a0, a1); }</span></a>
+<span class="lineNum">      34 </span>            : 
+<span class="lineNum">      35 </span><span class="lineCov">          1 : nd::callable nd::total_order::make()</span>
+<span class="lineNum">      36 </span>            : {
+<span class="lineNum">      37 </span><span class="lineCov">          2 :   std::map&lt;std::array&lt;type_id_t, 2&gt;, callable&gt; children;</span>
+<span class="lineNum">      38 </span><span class="lineCov">          2 :   children[{{fixed_string_id, fixed_string_id}}] =</span>
+<span class="lineNum">      39 </span><span class="lineCov">          3 :       callable::make&lt;total_order_kernel&lt;fixed_string_id, fixed_string_id&gt;&gt;();</span>
+<span class="lineNum">      40 </span><span class="lineCov">          1 :   children[{{string_id, string_id}}] = callable::make&lt;total_order_kernel&lt;string_id, string_id&gt;&gt;();</span>
+<span class="lineNum">      41 </span><span class="lineCov">          1 :   children[{{int32_id, int32_id}}] = callable::make&lt;total_order_kernel&lt;int32_id, int32_id&gt;&gt;();</span>
+<span class="lineNum">      42 </span><span class="lineCov">          1 :   children[{{bool_id, bool_id}}] = callable::make&lt;total_order_kernel&lt;bool_id, bool_id&gt;&gt;();</span>
+<a name="43"><span class="lineNum">      43 </span>            : </a>
+<a name="44"><span class="lineNum">      44 </span>            :   return functional::dispatch(ndt::type(&quot;(Any, Any) -&gt; Any&quot;),</a>
+<span class="lineNum">      45 </span><span class="lineCov">          3 :                               [children](const ndt::type &amp;DYND_UNUSED(dst_tp), intptr_t DYND_UNUSED(nsrc),</span>
+<span class="lineNum">      46 </span><span class="lineCov">          6 :                                          const ndt::type *src_tp) mutable -&gt; callable &amp; {</span>
+<span class="lineNum">      47 </span><span class="lineCov">          6 :                                 callable &amp;child = children[{{src_tp[0].get_id(), src_tp[1].get_id()}}];</span>
+<span class="lineNum">      48 </span><span class="lineCov">          6 :                                 if (child.is_null()) {</span>
+<span class="lineNum">      49 </span><span class="lineNoCov">          0 :                                   throw std::runtime_error(&quot;no child found&quot;);</span>
+<span class="lineNum">      50 </span>            :                                 }
+<span class="lineNum">      51 </span>            : 
+<span class="lineNum">      52 </span><span class="lineCov">          6 :                                 return child;</span>
+<span class="lineNum">      53 </span><span class="lineCov">          2 :                               });</span>
+<a name="54"><span class="lineNum">      54 </span>            : }</a>
+<span class="lineNum">      55 </span>            : 
+<span class="lineNum">      56 </span><span class="lineCov">          3 : DYND_API struct nd::total_order nd::total_order;</span>
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.10</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

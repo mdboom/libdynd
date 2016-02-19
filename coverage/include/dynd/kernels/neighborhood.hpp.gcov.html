@@ -1,0 +1,307 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - coverage.info.cleaned - include/dynd/kernels/neighborhood.hpp</title>
+  <link rel="stylesheet" type="text/css" href="../../../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../../../index.html">top level</a> - <a href="index.html">include/dynd/kernels</a> - neighborhood.hpp<span style="font-size: 80%;"> (source / <a href="neighborhood.hpp.func.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">coverage.info.cleaned</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntry">101</td>
+            <td class="headerCovTableEntryLo">0.0 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2016-02-19</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntry">11</td>
+            <td class="headerCovTableEntryLo">0.0 %</td>
+          </tr>
+          <tr><td><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : //</a>
+<span class="lineNum">       2 </span>            : // Copyright (C) 2011-15 DyND Developers
+<span class="lineNum">       3 </span>            : // BSD 2-Clause License, see LICENSE.txt
+<span class="lineNum">       4 </span>            : //
+<span class="lineNum">       5 </span>            : 
+<span class="lineNum">       6 </span>            : #pragma once
+<span class="lineNum">       7 </span>            : 
+<span class="lineNum">       8 </span>            : #include &lt;algorithm&gt;
+<span class="lineNum">       9 </span>            : 
+<span class="lineNum">      10 </span>            : #include &lt;dynd/kernels/base_kernel.hpp&gt;
+<span class="lineNum">      11 </span>            : #include &lt;dynd/types/substitute_shape.hpp&gt;
+<span class="lineNum">      12 </span>            : 
+<span class="lineNum">      13 </span>            : namespace dynd {
+<span class="lineNum">      14 </span>            : namespace nd {
+<span class="lineNum">      15 </span>            :   namespace functional {
+<a name="16"><span class="lineNum">      16 </span>            : </a>
+<a name="17"><span class="lineNum">      17 </span>            :     template &lt;int N&gt;</a>
+<span class="lineNum">      18 </span><span class="lineNoCov">          0 :     struct neighborhood_kernel : base_kernel&lt;neighborhood_kernel&lt;N&gt;, N&gt; {</span>
+<span class="lineNum">      19 </span><span class="lineNoCov">          0 :       struct static_data_type {</span>
+<span class="lineNum">      20 </span>            :         callable child;
+<a name="21"><span class="lineNum">      21 </span>            :         callable boundary_child;</a>
+<span class="lineNum">      22 </span>            : 
+<span class="lineNum">      23 </span><span class="lineNoCov">          0 :         static_data_type(const callable &amp;child, const callable &amp;boundary_child)</span>
+<span class="lineNum">      24 </span><span class="lineNoCov">          0 :             : child(child), boundary_child(boundary_child)</span>
+<span class="lineNum">      25 </span>            :         {
+<span class="lineNum">      26 </span><span class="lineNoCov">          0 :         }</span>
+<span class="lineNum">      27 </span>            :       };
+<span class="lineNum">      28 </span>            : 
+<span class="lineNum">      29 </span>            :       struct data_type {
+<span class="lineNum">      30 </span>            :         ndt::type child_src_tp;
+<span class="lineNum">      31 </span>            :         size_stride_t child_src_arrmeta[5];
+<span class="lineNum">      32 </span>            : 
+<span class="lineNum">      33 </span>            :         const ndt::type *src_tp;
+<span class="lineNum">      34 </span>            :         const char *src_arrmeta;
+<span class="lineNum">      35 </span>            : 
+<span class="lineNum">      36 </span>            :         intptr_t ndim;
+<span class="lineNum">      37 </span>            :         intptr_t *shape;
+<span class="lineNum">      38 </span>            :         int *offset;
+<a name="39"><span class="lineNum">      39 </span>            :         std::shared_ptr&lt;bool&gt; out_of_bounds;</a>
+<span class="lineNum">      40 </span>            : 
+<span class="lineNum">      41 </span><span class="lineNoCov">          0 :         data_type(const ndt::type *src_tp, intptr_t ndim, int *shape, int *offset)</span>
+<span class="lineNum">      42 </span><span class="lineNoCov">          0 :             : src_tp(src_tp), src_arrmeta(NULL), ndim(ndim), offset(offset), out_of_bounds(std::make_shared&lt;bool&gt;())</span>
+<span class="lineNum">      43 </span>            :         {
+<span class="lineNum">      44 </span><span class="lineNoCov">          0 :           this-&gt;shape = new intptr_t[ndim];</span>
+<span class="lineNum">      45 </span><span class="lineNoCov">          0 :           for (int i = 0; i &lt; ndim; ++i) {</span>
+<span class="lineNum">      46 </span><span class="lineNoCov">          0 :             this-&gt;shape[i] = shape[i];</span>
+<span class="lineNum">      47 </span>            :           }
+<span class="lineNum">      48 </span>            : 
+<span class="lineNum">      49 </span>            :           /*
+<span class="lineNum">      50 </span>            :                     child_src_arrmeta = new char[ndim * sizeof(size_stride_t)];
+<span class="lineNum">      51 </span>            :                     for (int i = 0; i &lt; ndim; ++i) {
+<span class="lineNum">      52 </span>            :                       (reinterpret_cast&lt;size_stride_t *&gt;(child_src_arrmeta) + i)-&gt;dim_size = shape[i];
+<span class="lineNum">      53 </span>            :                       (reinterpret_cast&lt;size_stride_t *&gt;(child_src_arrmeta) + i)-&gt;stride = sizeof(int);
+<span class="lineNum">      54 </span>            :                     }
+<span class="lineNum">      55 </span>            :           */
+<span class="lineNum">      56 </span>            : 
+<span class="lineNum">      57 </span><span class="lineNoCov">          0 :           if (ndim == 1) {</span>
+<span class="lineNum">      58 </span><span class="lineNoCov">          0 :             child_src_arrmeta[0].dim_size = shape[0];</span>
+<span class="lineNum">      59 </span><span class="lineNoCov">          0 :             child_src_arrmeta[0].stride = sizeof(int);</span>
+<span class="lineNum">      60 </span>            :           }
+<span class="lineNum">      61 </span><span class="lineNoCov">          0 :           else if (ndim == 2) {</span>
+<span class="lineNum">      62 </span><span class="lineNoCov">          0 :             child_src_arrmeta[0].dim_size = shape[0];</span>
+<span class="lineNum">      63 </span><span class="lineNoCov">          0 :             child_src_arrmeta[0].stride = 4 * sizeof(int);</span>
+<span class="lineNum">      64 </span><span class="lineNoCov">          0 :             child_src_arrmeta[1].dim_size = shape[1];</span>
+<span class="lineNum">      65 </span><span class="lineNoCov">          0 :             child_src_arrmeta[1].stride = sizeof(int);</span>
+<span class="lineNum">      66 </span>            :           }
+<span class="lineNum">      67 </span><span class="lineNoCov">          0 :           else if (ndim == 3) {</span>
+<span class="lineNum">      68 </span><span class="lineNoCov">          0 :             child_src_arrmeta[0].dim_size = shape[0];</span>
+<span class="lineNum">      69 </span><span class="lineNoCov">          0 :             child_src_arrmeta[0].stride = 4 * 4 * sizeof(int);</span>
+<span class="lineNum">      70 </span><span class="lineNoCov">          0 :             child_src_arrmeta[1].dim_size = shape[1];</span>
+<span class="lineNum">      71 </span><span class="lineNoCov">          0 :             child_src_arrmeta[1].stride = 4 * sizeof(int);</span>
+<span class="lineNum">      72 </span><span class="lineNoCov">          0 :             child_src_arrmeta[2].dim_size = shape[2];</span>
+<span class="lineNum">      73 </span><span class="lineNoCov">          0 :             child_src_arrmeta[2].stride = sizeof(int);</span>
+<span class="lineNum">      74 </span>            :           }
+<a name="75"><span class="lineNum">      75 </span><span class="lineNoCov">          0 :         }</span></a>
+<span class="lineNum">      76 </span>            : 
+<span class="lineNum">      77 </span><span class="lineNoCov">          0 :         ~data_type()</span>
+<span class="lineNum">      78 </span>            :         {
+<span class="lineNum">      79 </span>            :           //          delete[] child_src_arrmeta;
+<span class="lineNum">      80 </span><span class="lineNoCov">          0 :         }</span>
+<span class="lineNum">      81 </span>            :       };
+<span class="lineNum">      82 </span>            : 
+<span class="lineNum">      83 </span>            :       intptr_t dst_stride;
+<span class="lineNum">      84 </span>            :       intptr_t src0_offset;
+<span class="lineNum">      85 </span>            :       intptr_t src0_stride;
+<span class="lineNum">      86 </span>            :       intptr_t offset;
+<span class="lineNum">      87 </span>            :       intptr_t counts[3];
+<span class="lineNum">      88 </span>            :       std::shared_ptr&lt;bool&gt; out_of_bounds;
+<a name="89"><span class="lineNum">      89 </span>            :       intptr_t boundary_child_offset;</a>
+<span class="lineNum">      90 </span>            : 
+<span class="lineNum">      91 </span><span class="lineNoCov">          0 :       neighborhood_kernel(intptr_t dst_stride, intptr_t src0_size, intptr_t src0_stride, intptr_t size, intptr_t offset,</span>
+<span class="lineNum">      92 </span>            :                           const std::shared_ptr&lt;bool&gt; &amp;out_of_bounds)
+<span class="lineNum">      93 </span>            :           : dst_stride(dst_stride), src0_offset(offset * src0_stride), src0_stride(src0_stride), offset(offset),
+<span class="lineNum">      94 </span><span class="lineNoCov">          0 :             out_of_bounds(out_of_bounds)</span>
+<span class="lineNum">      95 </span>            :       {
+<span class="lineNum">      96 </span><span class="lineNoCov">          0 :         counts[0] = std::min((intptr_t)0, src0_size + offset);</span>
+<span class="lineNum">      97 </span><span class="lineNoCov">          0 :         counts[1] = std::min(src0_size + offset, src0_size - size + 1);</span>
+<span class="lineNum">      98 </span><span class="lineNoCov">          0 :         counts[2] = src0_size + offset;</span>
+<span class="lineNum">      99 </span>            : 
+<span class="lineNum">     100 </span><span class="lineNoCov">          0 :         *out_of_bounds = false;</span>
+<a name="101"><span class="lineNum">     101 </span><span class="lineNoCov">          0 :       }</span></a>
+<span class="lineNum">     102 </span>            : 
+<span class="lineNum">     103 </span><span class="lineNoCov">          0 :       void single(char *dst, char *const *src)</span>
+<span class="lineNum">     104 </span>            :       {
+<span class="lineNum">     105 </span><span class="lineNoCov">          0 :         kernel_prefix *child = this-&gt;get_child();</span>
+<span class="lineNum">     106 </span><span class="lineNoCov">          0 :         kernel_prefix *boundary_child = this-&gt;get_child(boundary_child_offset);</span>
+<span class="lineNum">     107 </span>            : 
+<span class="lineNum">     108 </span><span class="lineNoCov">          0 :         char *src0 = src[0] + src0_offset;</span>
+<span class="lineNum">     109 </span>            : 
+<span class="lineNum">     110 </span><span class="lineNoCov">          0 :         intptr_t i = offset;</span>
+<span class="lineNum">     111 </span><span class="lineNoCov">          0 :         bool old_out_of_bounds = *out_of_bounds;</span>
+<span class="lineNum">     112 </span>            : 
+<span class="lineNum">     113 </span><span class="lineNoCov">          0 :         *out_of_bounds = true;</span>
+<span class="lineNum">     114 </span><span class="lineNoCov">          0 :         while (i &lt; counts[0]) {</span>
+<span class="lineNum">     115 </span><span class="lineNoCov">          0 :           boundary_child-&gt;single(dst, &amp;src0);</span>
+<span class="lineNum">     116 </span><span class="lineNoCov">          0 :           ++i;</span>
+<span class="lineNum">     117 </span><span class="lineNoCov">          0 :           dst += dst_stride;</span>
+<span class="lineNum">     118 </span><span class="lineNoCov">          0 :           src0 += src0_stride;</span>
+<span class="lineNum">     119 </span>            :         };
+<span class="lineNum">     120 </span>            : 
+<span class="lineNum">     121 </span><span class="lineNoCov">          0 :         *out_of_bounds = old_out_of_bounds;</span>
+<span class="lineNum">     122 </span><span class="lineNoCov">          0 :         while (i &lt; counts[1]) {</span>
+<span class="lineNum">     123 </span><span class="lineNoCov">          0 :           if (*out_of_bounds) {</span>
+<span class="lineNum">     124 </span><span class="lineNoCov">          0 :             boundary_child-&gt;single(dst, &amp;src0);</span>
+<span class="lineNum">     125 </span>            :           }
+<span class="lineNum">     126 </span>            :           else {
+<span class="lineNum">     127 </span><span class="lineNoCov">          0 :             child-&gt;single(dst, &amp;src0);</span>
+<span class="lineNum">     128 </span>            :           }
+<span class="lineNum">     129 </span><span class="lineNoCov">          0 :           ++i;</span>
+<span class="lineNum">     130 </span><span class="lineNoCov">          0 :           dst += dst_stride;</span>
+<span class="lineNum">     131 </span><span class="lineNoCov">          0 :           src0 += src0_stride;</span>
+<span class="lineNum">     132 </span>            :         }
+<span class="lineNum">     133 </span>            : 
+<span class="lineNum">     134 </span><span class="lineNoCov">          0 :         *out_of_bounds = true;</span>
+<span class="lineNum">     135 </span><span class="lineNoCov">          0 :         while (i &lt; counts[2]) {</span>
+<span class="lineNum">     136 </span><span class="lineNoCov">          0 :           boundary_child-&gt;single(dst, &amp;src0);</span>
+<span class="lineNum">     137 </span><span class="lineNoCov">          0 :           ++i;</span>
+<span class="lineNum">     138 </span><span class="lineNoCov">          0 :           dst += dst_stride;</span>
+<span class="lineNum">     139 </span><span class="lineNoCov">          0 :           src0 += src0_stride;</span>
+<span class="lineNum">     140 </span>            :         }
+<span class="lineNum">     141 </span>            : 
+<span class="lineNum">     142 </span><span class="lineNoCov">          0 :         *out_of_bounds = old_out_of_bounds;</span>
+<a name="143"><span class="lineNum">     143 </span><span class="lineNoCov">          0 :       }</span></a>
+<span class="lineNum">     144 </span>            : 
+<span class="lineNum">     145 </span><span class="lineNoCov">          0 :       static char *data_init(char *static_data, const ndt::type &amp;DYND_UNUSED(dst_tp), intptr_t DYND_UNUSED(nsrc),</span>
+<span class="lineNum">     146 </span>            :                              const ndt::type *src_tp, intptr_t DYND_UNUSED(nkwd), const array *kwds,
+<span class="lineNum">     147 </span>            :                              const std::map&lt;std::string, ndt::type&gt; &amp;DYND_UNUSED(tp_vars))
+<span class="lineNum">     148 </span>            :       {
+<span class="lineNum">     149 </span>            :         char *data = reinterpret_cast&lt;char *&gt;(
+<span class="lineNum">     150 </span>            :             new data_type(src_tp, kwds[0].get_dim_size(), reinterpret_cast&lt;int *&gt;(kwds[0].data()),
+<span class="lineNum">     151 </span><span class="lineNoCov">          0 :                           kwds[1].is_na() ? NULL : reinterpret_cast&lt;int *&gt;(kwds[1].data())));</span>
+<span class="lineNum">     152 </span>            : 
+<span class="lineNum">     153 </span><span class="lineNoCov">          0 :         reinterpret_cast&lt;data_type *&gt;(data)-&gt;child_src_tp = ndt::substitute_shape(</span>
+<span class="lineNum">     154 </span><span class="lineNoCov">          0 :             reinterpret_cast&lt;callable *&gt;(static_data)-&gt;get_arg_type(0), reinterpret_cast&lt;data_type *&gt;(data)-&gt;ndim,</span>
+<span class="lineNum">     155 </span>            :             reinterpret_cast&lt;data_type *&gt;(data)-&gt;shape);
+<span class="lineNum">     156 </span>            : 
+<span class="lineNum">     157 </span><span class="lineNoCov">          0 :         return data;</span>
+<a name="158"><span class="lineNum">     158 </span>            :       }</a>
+<span class="lineNum">     159 </span>            : 
+<span class="lineNum">     160 </span><span class="lineNoCov">          0 :       static void resolve_dst_type(char *DYND_UNUSED(static_data), char *DYND_UNUSED(data), ndt::type &amp;dst_tp,</span>
+<span class="lineNum">     161 </span>            :                                    intptr_t DYND_UNUSED(nsrc), const ndt::type *src_tp, intptr_t DYND_UNUSED(nkwd),
+<span class="lineNum">     162 </span>            :                                    const array *DYND_UNUSED(kwds),
+<span class="lineNum">     163 </span>            :                                    const std::map&lt;std::string, ndt::type&gt; &amp;DYND_UNUSED(tp_vars))
+<span class="lineNum">     164 </span>            :       {
+<span class="lineNum">     165 </span>            :         // swap in the input dimension values for the Fixed**N
+<span class="lineNum">     166 </span><span class="lineNoCov">          0 :         intptr_t ndim = src_tp[0].get_ndim();</span>
+<span class="lineNum">     167 </span><span class="lineNoCov">          0 :         dimvector shape(ndim);</span>
+<span class="lineNum">     168 </span><span class="lineNoCov">          0 :         src_tp[0].extended()-&gt;get_shape(ndim, 0, shape.get(), NULL, NULL);</span>
+<span class="lineNum">     169 </span><span class="lineNoCov">          0 :         dst_tp = ndt::substitute_shape(dst_tp, ndim, shape.get());</span>
+<a name="170"><span class="lineNum">     170 </span><span class="lineNoCov">          0 :       }</span></a>
+<span class="lineNum">     171 </span>            : 
+<span class="lineNum">     172 </span><span class="lineNoCov">          0 :       static void instantiate(char *static_data, char *data, kernel_builder *ckb, const ndt::type &amp;dst_tp,</span>
+<span class="lineNum">     173 </span>            :                               const char *dst_arrmeta, intptr_t nsrc, const ndt::type *src_tp,
+<span class="lineNum">     174 </span>            :                               const char *const *src_arrmeta, kernel_request_t kernreq, intptr_t nkwd,
+<span class="lineNum">     175 </span>            :                               const nd::array *kwds, const std::map&lt;std::string, ndt::type&gt; &amp;tp_vars)
+<span class="lineNum">     176 </span>            :       {
+<span class="lineNum">     177 </span><span class="lineNoCov">          0 :         intptr_t neighborhood_offset = ckb-&gt;size();</span>
+<span class="lineNum">     178 </span><span class="lineNoCov">          0 :         ckb-&gt;emplace_back&lt;neighborhood_kernel&gt;(</span>
+<span class="lineNum">     179 </span>            :             kernreq, reinterpret_cast&lt;const fixed_dim_type_arrmeta *&gt;(dst_arrmeta)-&gt;stride,
+<span class="lineNum">     180 </span>            :             reinterpret_cast&lt;const fixed_dim_type_arrmeta *&gt;(src_arrmeta[0])-&gt;dim_size,
+<span class="lineNum">     181 </span>            :             reinterpret_cast&lt;const fixed_dim_type_arrmeta *&gt;(src_arrmeta[0])-&gt;stride,
+<span class="lineNum">     182 </span><span class="lineNoCov">          0 :             reinterpret_cast&lt;data_type *&gt;(data)-&gt;shape[0],</span>
+<span class="lineNum">     183 </span><span class="lineNoCov">          0 :             (reinterpret_cast&lt;data_type *&gt;(data)-&gt;offset == NULL) ? 0 : reinterpret_cast&lt;data_type *&gt;(data)-&gt;offset[0],</span>
+<span class="lineNum">     184 </span>            :             reinterpret_cast&lt;data_type *&gt;(data)-&gt;out_of_bounds);
+<span class="lineNum">     185 </span>            : 
+<span class="lineNum">     186 </span><span class="lineNoCov">          0 :         const ndt::type &amp;child_dst_tp = dst_tp.extended&lt;ndt::fixed_dim_type&gt;()-&gt;get_element_type();</span>
+<span class="lineNum">     187 </span><span class="lineNoCov">          0 :         const char *child_dst_arrmeta = dst_arrmeta + sizeof(fixed_dim_type_arrmeta);</span>
+<span class="lineNum">     188 </span>            : 
+<span class="lineNum">     189 </span><span class="lineNoCov">          0 :         reinterpret_cast&lt;data_type *&gt;(data)-&gt;ndim -= 1;</span>
+<span class="lineNum">     190 </span><span class="lineNoCov">          0 :         reinterpret_cast&lt;data_type *&gt;(data)-&gt;shape += 1;</span>
+<span class="lineNum">     191 </span><span class="lineNoCov">          0 :         if (reinterpret_cast&lt;data_type *&gt;(data)-&gt;offset != NULL) {</span>
+<span class="lineNum">     192 </span><span class="lineNoCov">          0 :           reinterpret_cast&lt;data_type *&gt;(data)-&gt;offset += 1;</span>
+<span class="lineNum">     193 </span>            :         }
+<span class="lineNum">     194 </span>            : 
+<span class="lineNum">     195 </span><span class="lineNoCov">          0 :         if (reinterpret_cast&lt;data_type *&gt;(data)-&gt;ndim == 0) {</span>
+<span class="lineNum">     196 </span><span class="lineNoCov">          0 :           const callable &amp;child = *reinterpret_cast&lt;callable *&gt;(static_data);</span>
+<span class="lineNum">     197 </span><span class="lineNoCov">          0 :           const callable &amp;boundary_child = reinterpret_cast&lt;static_data_type *&gt;(static_data)-&gt;boundary_child;</span>
+<span class="lineNum">     198 </span>            : 
+<span class="lineNum">     199 </span>            :           const char *child_src_arrmeta =
+<span class="lineNum">     200 </span><span class="lineNoCov">          0 :               reinterpret_cast&lt;char *&gt;(reinterpret_cast&lt;data_type *&gt;(data)-&gt;child_src_arrmeta);</span>
+<span class="lineNum">     201 </span><span class="lineNoCov">          0 :           child.get()-&gt;instantiate(child.get()-&gt;static_data(), NULL, ckb, child_dst_tp, child_dst_arrmeta, nsrc,</span>
+<span class="lineNum">     202 </span>            :                                    &amp;reinterpret_cast&lt;data_type *&gt;(data)-&gt;child_src_tp, &amp;child_src_arrmeta,
+<span class="lineNum">     203 </span>            :                                    kernel_request_single, nkwd - 3, kwds + 3, tp_vars);
+<span class="lineNum">     204 </span><span class="lineNoCov">          0 :           ckb-&gt;get_at&lt;neighborhood_kernel&gt;(neighborhood_offset)-&gt;boundary_child_offset =</span>
+<span class="lineNum">     205 </span><span class="lineNoCov">          0 :               ckb-&gt;size() - neighborhood_offset;</span>
+<span class="lineNum">     206 </span>            : 
+<span class="lineNum">     207 </span><span class="lineNoCov">          0 :           boundary_child.get()-&gt;instantiate(boundary_child.get()-&gt;static_data(), NULL, ckb, child_dst_tp,</span>
+<span class="lineNum">     208 </span>            :                                             child_dst_arrmeta, 0, NULL, NULL, kernel_request_single, nkwd - 3, kwds + 3,
+<span class="lineNum">     209 </span>            :                                             tp_vars);
+<span class="lineNum">     210 </span>            : 
+<span class="lineNum">     211 </span><span class="lineNoCov">          0 :           delete reinterpret_cast&lt;data_type *&gt;(data);</span>
+<span class="lineNum">     212 </span><span class="lineNoCov">          0 :           return;</span>
+<span class="lineNum">     213 </span>            :         }
+<span class="lineNum">     214 </span>            : 
+<span class="lineNum">     215 </span><span class="lineNoCov">          0 :         ndt::type child_src_tp[N];</span>
+<span class="lineNum">     216 </span>            :         const char *child_src_arrmeta[N];
+<span class="lineNum">     217 </span><span class="lineNoCov">          0 :         for (int i = 0; i &lt; N; ++i) {</span>
+<span class="lineNum">     218 </span><span class="lineNoCov">          0 :           child_src_tp[i] = src_tp[i].extended&lt;ndt::fixed_dim_type&gt;()-&gt;get_element_type();</span>
+<span class="lineNum">     219 </span><span class="lineNoCov">          0 :           child_src_arrmeta[i] = src_arrmeta[i] + sizeof(fixed_dim_type_arrmeta);</span>
+<span class="lineNum">     220 </span>            :         }
+<span class="lineNum">     221 </span>            : 
+<span class="lineNum">     222 </span><span class="lineNoCov">          0 :         ckb-&gt;get_at&lt;neighborhood_kernel&gt;(neighborhood_offset)-&gt;boundary_child_offset = sizeof(neighborhood_kernel);</span>
+<span class="lineNum">     223 </span>            : 
+<span class="lineNum">     224 </span>            :         return instantiate(static_data, data, ckb, child_dst_tp, child_dst_arrmeta, nsrc, child_src_tp,
+<span class="lineNum">     225 </span><span class="lineNoCov">          0 :                            child_src_arrmeta, kernel_request_single, nkwd, kwds, tp_vars);</span>
+<span class="lineNum">     226 </span>            :       }
+<span class="lineNum">     227 </span>            :     };
+<span class="lineNum">     228 </span>            : 
+<span class="lineNum">     229 </span>            :   } // namespace dynd::nd::functional
+<span class="lineNum">     230 </span>            : } // namespace dynd::nd
+<span class="lineNum">     231 </span>            : } // namespace dynd
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.10</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

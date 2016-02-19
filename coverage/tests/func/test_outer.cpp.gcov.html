@@ -1,0 +1,128 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - coverage.info.cleaned - tests/func/test_outer.cpp</title>
+  <link rel="stylesheet" type="text/css" href="../../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../../index.html">top level</a> - <a href="index.html">tests/func</a> - test_outer.cpp<span style="font-size: 80%;"> (source / <a href="test_outer.cpp.func.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">coverage.info.cleaned</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">21</td>
+            <td class="headerCovTableEntry">21</td>
+            <td class="headerCovTableEntryHi">100.0 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2016-02-19</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">7</td>
+            <td class="headerCovTableEntry">7</td>
+            <td class="headerCovTableEntryHi">100.0 %</td>
+          </tr>
+          <tr><td><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : //</a>
+<span class="lineNum">       2 </span>            : // Copyright (C) 2011-15 DyND Developers
+<span class="lineNum">       3 </span>            : // BSD 2-Clause License, see LICENSE.txt
+<span class="lineNum">       4 </span>            : //
+<span class="lineNum">       5 </span>            : 
+<span class="lineNum">       6 </span>            : #include &lt;iostream&gt;
+<span class="lineNum">       7 </span>            : #include &lt;stdexcept&gt;
+<span class="lineNum">       8 </span>            : #include &lt;algorithm&gt;
+<span class="lineNum">       9 </span>            : #include &lt;cmath&gt;
+<span class="lineNum">      10 </span>            : 
+<span class="lineNum">      11 </span>            : #include &quot;inc_gtest.hpp&quot;
+<span class="lineNum">      12 </span>            : 
+<span class="lineNum">      13 </span>            : #include &lt;dynd/func/elwise.hpp&gt;
+<span class="lineNum">      14 </span>            : #include &lt;dynd/func/outer.hpp&gt;
+<span class="lineNum">      15 </span>            : #include &lt;dynd/func/random.hpp&gt;
+<span class="lineNum">      16 </span>            : 
+<span class="lineNum">      17 </span>            : using namespace std;
+<a name="18"><span class="lineNum">      18 </span>            : using namespace dynd;</a>
+<span class="lineNum">      19 </span>            : 
+<a name="20"><span class="lineNum">      20 </span><span class="lineCov">       1512 : static double func0(double x, double y, double z) { return x + y + z; }</span></a>
+<span class="lineNum">      21 </span>            : 
+<span class="lineNum">      22 </span><span class="lineCov">          5 : TEST(Outer, 1D)</span>
+<span class="lineNum">      23 </span>            : {
+<span class="lineNum">      24 </span><span class="lineCov">          2 :   nd::array x, y, z, res;</span>
+<span class="lineNum">      25 </span><span class="lineCov">          2 :   nd::callable af = nd::functional::outer(nd::functional::apply(&amp;func0));</span>
+<span class="lineNum">      26 </span>            : 
+<span class="lineNum">      27 </span><span class="lineCov">          1 :   x = nd::random::uniform({}, {{&quot;dst_tp&quot;, ndt::make_fixed_dim(10, ndt::make_type&lt;double&gt;())}});</span>
+<span class="lineNum">      28 </span><span class="lineCov">          1 :   y = nd::random::uniform({}, {{&quot;dst_tp&quot;, ndt::make_fixed_dim(10, ndt::make_type&lt;double&gt;())}});</span>
+<span class="lineNum">      29 </span><span class="lineCov">          1 :   z = nd::random::uniform({}, {{&quot;dst_tp&quot;, ndt::make_fixed_dim(10, ndt::make_type&lt;double&gt;())}});</span>
+<span class="lineNum">      30 </span>            : 
+<span class="lineNum">      31 </span><span class="lineCov">          1 :   res = af(x, y, z);</span>
+<span class="lineNum">      32 </span><span class="lineCov">         11 :   for (intptr_t i = 0; i &lt; x.get_dim_size(); ++i) {</span>
+<span class="lineNum">      33 </span><span class="lineCov">        110 :     for (intptr_t j = 0; j &lt; y.get_dim_size(); ++j) {</span>
+<span class="lineNum">      34 </span><span class="lineCov">       1100 :       for (intptr_t k = 0; k &lt; z.get_dim_size(); ++k) {</span>
+<span class="lineNum">      35 </span><span class="lineCov">       1000 :         EXPECT_EQ(x(i).as&lt;double&gt;() + y(j).as&lt;double&gt;() + z(k).as&lt;double&gt;(), res(i, j, k).as&lt;double&gt;());</span>
+<span class="lineNum">      36 </span>            :       }
+<span class="lineNum">      37 </span>            :     }
+<span class="lineNum">      38 </span>            :   }
+<span class="lineNum">      39 </span>            : 
+<span class="lineNum">      40 </span><span class="lineCov">          1 :   x = nd::random::uniform({}, {{&quot;dst_tp&quot;, ndt::make_fixed_dim(4, ndt::make_type&lt;double&gt;())}});</span>
+<span class="lineNum">      41 </span><span class="lineCov">          1 :   y = nd::random::uniform({}, {{&quot;dst_tp&quot;, ndt::make_fixed_dim(16, ndt::make_type&lt;double&gt;())}});</span>
+<span class="lineNum">      42 </span><span class="lineCov">          1 :   z = nd::random::uniform({}, {{&quot;dst_tp&quot;, ndt::make_fixed_dim(8, ndt::make_type&lt;double&gt;())}});</span>
+<span class="lineNum">      43 </span>            : 
+<span class="lineNum">      44 </span><span class="lineCov">          1 :   res = af(x, y, z);</span>
+<span class="lineNum">      45 </span><span class="lineCov">          5 :   for (intptr_t i = 0; i &lt; x.get_dim_size(); ++i) {</span>
+<span class="lineNum">      46 </span><span class="lineCov">         68 :     for (intptr_t j = 0; j &lt; y.get_dim_size(); ++j) {</span>
+<span class="lineNum">      47 </span><span class="lineCov">        576 :       for (intptr_t k = 0; k &lt; z.get_dim_size(); ++k) {</span>
+<span class="lineNum">      48 </span><span class="lineCov">        512 :         EXPECT_EQ(x(i).as&lt;double&gt;() + y(j).as&lt;double&gt;() + z(k).as&lt;double&gt;(), res(i, j, k).as&lt;double&gt;());</span>
+<span class="lineNum">      49 </span>            :       }
+<a name="50"><span class="lineNum">      50 </span>            :     }</a>
+<span class="lineNum">      51 </span>            :   }
+<span class="lineNum">      52 </span><span class="lineCov">          4 : }</span>
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.10</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

@@ -1,0 +1,132 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - coverage.info.cleaned - include/dynd/types/c_contiguous_type.hpp</title>
+  <link rel="stylesheet" type="text/css" href="../../../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../../../index.html">top level</a> - <a href="index.html">include/dynd/types</a> - c_contiguous_type.hpp<span style="font-size: 80%;"> (source / <a href="c_contiguous_type.hpp.func.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">coverage.info.cleaned</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">2</td>
+            <td class="headerCovTableEntry">3</td>
+            <td class="headerCovTableEntryLo">66.7 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2016-02-19</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">3</td>
+            <td class="headerCovTableEntry">4</td>
+            <td class="headerCovTableEntryMed">75.0 %</td>
+          </tr>
+          <tr><td><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : //</a>
+<span class="lineNum">       2 </span>            : // Copyright (C) 2011-15 DyND Developers
+<span class="lineNum">       3 </span>            : // BSD 2-Clause License, see LICENSE.txt
+<span class="lineNum">       4 </span>            : //
+<span class="lineNum">       5 </span>            : 
+<span class="lineNum">       6 </span>            : #pragma once
+<span class="lineNum">       7 </span>            : 
+<span class="lineNum">       8 </span>            : #include &lt;dynd/types/base_type.hpp&gt;
+<span class="lineNum">       9 </span>            : #include &lt;dynd/type.hpp&gt;
+<span class="lineNum">      10 </span>            : 
+<span class="lineNum">      11 </span>            : namespace dynd {
+<a name="12"><span class="lineNum">      12 </span>            : namespace ndt {</a>
+<span class="lineNum">      13 </span>            : 
+<span class="lineNum">      14 </span><span class="lineCov">         40 :   class DYND_API c_contiguous_type : public base_type {</span>
+<span class="lineNum">      15 </span>            :     type m_child_tp;
+<span class="lineNum">      16 </span>            : 
+<span class="lineNum">      17 </span>            :   public:
+<a name="18"><span class="lineNum">      18 </span>            :     c_contiguous_type(const type &amp;child_tp);</a>
+<span class="lineNum">      19 </span>            : 
+<span class="lineNum">      20 </span><span class="lineNoCov">          0 :     const type &amp;get_child_type() const { return m_child_tp; }</span>
+<span class="lineNum">      21 </span>            : 
+<span class="lineNum">      22 </span>            :     void print_data(std::ostream &amp;o, const char *arrmeta, const char *data) const;
+<span class="lineNum">      23 </span>            : 
+<span class="lineNum">      24 </span>            :     void print_type(std::ostream &amp;o) const;
+<span class="lineNum">      25 </span>            : 
+<span class="lineNum">      26 </span>            :     void get_shape(intptr_t ndim, intptr_t i, intptr_t *out_shape, const char *arrmeta, const char *data) const;
+<span class="lineNum">      27 </span>            : 
+<span class="lineNum">      28 </span>            :     type apply_linear_index(intptr_t nindices, const irange *indices, size_t current_i, const type &amp;root_tp,
+<span class="lineNum">      29 </span>            :                             bool leading_dimension) const;
+<span class="lineNum">      30 </span>            : 
+<span class="lineNum">      31 </span>            :     intptr_t apply_linear_index(intptr_t nindices, const irange *indices, const char *arrmeta, const type &amp;result_type,
+<span class="lineNum">      32 </span>            :                                 char *out_arrmeta, const intrusive_ptr&lt;memory_block_data&gt; &amp;embedded_reference,
+<span class="lineNum">      33 </span>            :                                 size_t current_i, const type &amp;root_tp, bool leading_dimension, char **inout_data,
+<span class="lineNum">      34 </span>            :                                 intrusive_ptr&lt;memory_block_data&gt; &amp;inout_dataref) const;
+<span class="lineNum">      35 </span>            : 
+<span class="lineNum">      36 </span>            :     type at_single(intptr_t i0, const char **inout_arrmeta, const char **inout_data) const;
+<span class="lineNum">      37 </span>            : 
+<span class="lineNum">      38 </span>            :     type get_type_at_dimension(char **inout_arrmeta, intptr_t i, intptr_t total_ndim = 0) const;
+<span class="lineNum">      39 </span>            : 
+<span class="lineNum">      40 </span>            :     bool is_c_contiguous(const char *arrmeta) const;
+<span class="lineNum">      41 </span>            : 
+<span class="lineNum">      42 </span>            :     bool operator==(const base_type &amp;rhs) const;
+<span class="lineNum">      43 </span>            : 
+<span class="lineNum">      44 </span>            :     virtual void arrmeta_default_construct(char *arrmeta, bool blockref_alloc) const;
+<span class="lineNum">      45 </span>            :     virtual void arrmeta_copy_construct(char *dst_arrmeta, const char *src_arrmeta,
+<span class="lineNum">      46 </span>            :                                         const intrusive_ptr&lt;memory_block_data&gt; &amp;embedded_reference) const;
+<span class="lineNum">      47 </span>            :     virtual void arrmeta_destruct(char *arrmeta) const;
+<span class="lineNum">      48 </span>            : 
+<span class="lineNum">      49 </span>            :     virtual bool match(const char *arrmeta, const type &amp;candidate_tp, const char *candidate_arrmeta,
+<a name="50"><span class="lineNum">      50 </span>            :                        std::map&lt;std::string, type&gt; &amp;tp_vars) const;</a>
+<span class="lineNum">      51 </span>            : 
+<span class="lineNum">      52 </span><span class="lineCov">         21 :     static type make(const type &amp;child_tp) { return type(new c_contiguous_type(child_tp), false); }</span>
+<span class="lineNum">      53 </span>            :   };
+<span class="lineNum">      54 </span>            : 
+<span class="lineNum">      55 </span>            : } // namespace dynd::ndt
+<span class="lineNum">      56 </span>            : } // namespace dynd
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.10</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

@@ -1,0 +1,246 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - coverage.info.cleaned - src/dynd/types/typevar_type.cpp</title>
+  <link rel="stylesheet" type="text/css" href="../../../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../../../index.html">top level</a> - <a href="index.html">src/dynd/types</a> - typevar_type.cpp<span style="font-size: 80%;"> (source / <a href="typevar_type.cpp.func.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">coverage.info.cleaned</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">53</td>
+            <td class="headerCovTableEntry">78</td>
+            <td class="headerCovTableEntryLo">67.9 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2016-02-19</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">10</td>
+            <td class="headerCovTableEntry">18</td>
+            <td class="headerCovTableEntryLo">55.6 %</td>
+          </tr>
+          <tr><td><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : //</a>
+<span class="lineNum">       2 </span>            : // Copyright (C) 2011-15 DyND Developers
+<span class="lineNum">       3 </span>            : // BSD 2-Clause License, see LICENSE.txt
+<span class="lineNum">       4 </span>            : //
+<span class="lineNum">       5 </span>            : 
+<span class="lineNum">       6 </span>            : #include &lt;dynd/callable.hpp&gt;
+<span class="lineNum">       7 </span>            : #include &lt;dynd/types/typevar_type.hpp&gt;
+<span class="lineNum">       8 </span>            : 
+<span class="lineNum">       9 </span>            : using namespace std;
+<a name="10"><span class="lineNum">      10 </span>            : using namespace dynd;</a>
+<span class="lineNum">      11 </span>            : 
+<span class="lineNum">      12 </span><span class="lineCov">        269 : ndt::typevar_type::typevar_type(const std::string &amp;name)</span>
+<span class="lineNum">      13 </span><span class="lineCov">        274 :     : base_type(typevar_id, pattern_kind, 0, 1, type_flag_symbolic, 0, 0, 0), m_name(name)</span>
+<span class="lineNum">      14 </span>            : {
+<span class="lineNum">      15 </span><span class="lineCov">        269 :   if (m_name.empty()) {</span>
+<span class="lineNum">      16 </span><span class="lineCov">          1 :     throw type_error(&quot;dynd typevar name cannot be null&quot;);</span>
+<span class="lineNum">      17 </span>            :   }
+<span class="lineNum">      18 </span><span class="lineCov">        268 :   else if (!is_valid_typevar_name(m_name.c_str(), m_name.c_str() + m_name.size())) {</span>
+<span class="lineNum">      19 </span><span class="lineCov">          8 :     stringstream ss;</span>
+<span class="lineNum">      20 </span><span class="lineCov">          4 :     ss &lt;&lt; &quot;dynd typevar name &quot;;</span>
+<span class="lineNum">      21 </span><span class="lineCov">          4 :     print_escaped_utf8_string(ss, m_name);</span>
+<span class="lineNum">      22 </span><span class="lineCov">          4 :     ss &lt;&lt; &quot; is not valid, it must be alphanumeric and begin with a capital&quot;;</span>
+<span class="lineNum">      23 </span><span class="lineCov">          4 :     throw type_error(ss.str());</span>
+<span class="lineNum">      24 </span>            :   }
+<a name="25"><span class="lineNum">      25 </span><span class="lineCov">        264 : }</span></a>
+<span class="lineNum">      26 </span>            : 
+<a name="27"><span class="lineNum">      27 </span><span class="lineNoCov">          0 : void ndt::typevar_type::get_vars(std::unordered_set&lt;std::string&gt; &amp;vars) const { vars.insert(m_name); }</span></a>
+<span class="lineNum">      28 </span>            : 
+<span class="lineNum">      29 </span><span class="lineNoCov">          0 : void ndt::typevar_type::print_data(std::ostream &amp;DYND_UNUSED(o), const char *DYND_UNUSED(arrmeta),</span>
+<span class="lineNum">      30 </span>            :                                    const char *DYND_UNUSED(data)) const
+<span class="lineNum">      31 </span>            : {
+<span class="lineNum">      32 </span><span class="lineNoCov">          0 :   throw type_error(&quot;Cannot store data of typevar type&quot;);</span>
+<a name="33"><span class="lineNum">      33 </span>            : }</a>
+<span class="lineNum">      34 </span>            : 
+<span class="lineNum">      35 </span><span class="lineCov">          7 : void ndt::typevar_type::print_type(std::ostream &amp;o) const</span>
+<span class="lineNum">      36 </span>            : {
+<span class="lineNum">      37 </span>            :   // Type variables are barewords starting with a capital letter
+<span class="lineNum">      38 </span><span class="lineCov">          7 :   o &lt;&lt; m_name;</span>
+<a name="39"><span class="lineNum">      39 </span><span class="lineCov">          7 : }</span></a>
+<span class="lineNum">      40 </span>            : 
+<span class="lineNum">      41 </span><span class="lineNoCov">          0 : ndt::type ndt::typevar_type::apply_linear_index(intptr_t DYND_UNUSED(nindices), const irange *DYND_UNUSED(indices),</span>
+<span class="lineNum">      42 </span>            :                                                 size_t DYND_UNUSED(current_i), const type &amp;DYND_UNUSED(root_tp),
+<span class="lineNum">      43 </span>            :                                                 bool DYND_UNUSED(leading_dimension)) const
+<span class="lineNum">      44 </span>            : {
+<span class="lineNum">      45 </span><span class="lineNoCov">          0 :   throw type_error(&quot;Cannot store data of typevar type&quot;);</span>
+<a name="46"><span class="lineNum">      46 </span>            : }</a>
+<span class="lineNum">      47 </span>            : 
+<span class="lineNum">      48 </span><span class="lineNoCov">          0 : intptr_t ndt::typevar_type::apply_linear_index(intptr_t DYND_UNUSED(nindices), const irange *DYND_UNUSED(indices),</span>
+<span class="lineNum">      49 </span>            :                                                const char *DYND_UNUSED(arrmeta), const type &amp;DYND_UNUSED(result_tp),
+<span class="lineNum">      50 </span>            :                                                char *DYND_UNUSED(out_arrmeta),
+<span class="lineNum">      51 </span>            :                                                const intrusive_ptr&lt;memory_block_data&gt; &amp;DYND_UNUSED(embedded_reference),
+<span class="lineNum">      52 </span>            :                                                size_t DYND_UNUSED(current_i), const type &amp;DYND_UNUSED(root_tp),
+<span class="lineNum">      53 </span>            :                                                bool DYND_UNUSED(leading_dimension), char **DYND_UNUSED(inout_data),
+<span class="lineNum">      54 </span>            :                                                intrusive_ptr&lt;memory_block_data&gt; &amp;DYND_UNUSED(inout_dataref)) const
+<span class="lineNum">      55 </span>            : {
+<span class="lineNum">      56 </span><span class="lineNoCov">          0 :   throw type_error(&quot;Cannot store data of typevar type&quot;);</span>
+<a name="57"><span class="lineNum">      57 </span>            : }</a>
+<span class="lineNum">      58 </span>            : 
+<span class="lineNum">      59 </span><span class="lineNoCov">          0 : bool ndt::typevar_type::is_lossless_assignment(const type &amp;dst_tp, const type &amp;src_tp) const</span>
+<span class="lineNum">      60 </span>            : {
+<span class="lineNum">      61 </span><span class="lineNoCov">          0 :   if (dst_tp.extended() == this) {</span>
+<span class="lineNum">      62 </span><span class="lineNoCov">          0 :     if (src_tp.extended() == this) {</span>
+<span class="lineNum">      63 </span><span class="lineNoCov">          0 :       return true;</span>
+<span class="lineNum">      64 </span>            :     }
+<span class="lineNum">      65 </span><span class="lineNoCov">          0 :     else if (src_tp.get_id() == typevar_id) {</span>
+<span class="lineNum">      66 </span><span class="lineNoCov">          0 :       return *dst_tp.extended() == *src_tp.extended();</span>
+<span class="lineNum">      67 </span>            :     }
+<span class="lineNum">      68 </span>            :   }
+<span class="lineNum">      69 </span>            : 
+<span class="lineNum">      70 </span><span class="lineNoCov">          0 :   return false;</span>
+<a name="71"><span class="lineNum">      71 </span>            : }</a>
+<span class="lineNum">      72 </span>            : 
+<span class="lineNum">      73 </span><span class="lineCov">         15 : bool ndt::typevar_type::operator==(const base_type &amp;rhs) const</span>
+<span class="lineNum">      74 </span>            : {
+<span class="lineNum">      75 </span><span class="lineCov">         15 :   if (this == &amp;rhs) {</span>
+<span class="lineNum">      76 </span><span class="lineNoCov">          0 :     return true;</span>
+<span class="lineNum">      77 </span>            :   }
+<span class="lineNum">      78 </span><span class="lineCov">         15 :   else if (rhs.get_id() != typevar_id) {</span>
+<span class="lineNum">      79 </span><span class="lineNoCov">          0 :     return false;</span>
+<span class="lineNum">      80 </span>            :   }
+<span class="lineNum">      81 </span>            :   else {
+<span class="lineNum">      82 </span><span class="lineCov">         15 :     const typevar_type *tvt = static_cast&lt;const typevar_type *&gt;(&amp;rhs);</span>
+<span class="lineNum">      83 </span><span class="lineCov">         15 :     return m_name == tvt-&gt;m_name;</span>
+<span class="lineNum">      84 </span>            :   }
+<a name="85"><span class="lineNum">      85 </span>            : }</a>
+<span class="lineNum">      86 </span>            : 
+<span class="lineNum">      87 </span><span class="lineNoCov">          0 : void ndt::typevar_type::arrmeta_default_construct(char *DYND_UNUSED(arrmeta), bool DYND_UNUSED(blockref_alloc)) const</span>
+<span class="lineNum">      88 </span>            : {
+<span class="lineNum">      89 </span><span class="lineNoCov">          0 :   throw type_error(&quot;Cannot store data of typevar type&quot;);</span>
+<a name="90"><span class="lineNum">      90 </span>            : }</a>
+<span class="lineNum">      91 </span>            : 
+<span class="lineNum">      92 </span><span class="lineNoCov">          0 : void ndt::typevar_type::arrmeta_copy_construct(</span>
+<span class="lineNum">      93 </span>            :     char *DYND_UNUSED(dst_arrmeta), const char *DYND_UNUSED(src_arrmeta),
+<span class="lineNum">      94 </span>            :     const intrusive_ptr&lt;memory_block_data&gt; &amp;DYND_UNUSED(embedded_reference)) const
+<span class="lineNum">      95 </span>            : {
+<span class="lineNum">      96 </span><span class="lineNoCov">          0 :   throw type_error(&quot;Cannot store data of typevar type&quot;);</span>
+<a name="97"><span class="lineNum">      97 </span>            : }</a>
+<span class="lineNum">      98 </span>            : 
+<span class="lineNum">      99 </span><span class="lineNoCov">          0 : void ndt::typevar_type::arrmeta_destruct(char *DYND_UNUSED(arrmeta)) const</span>
+<span class="lineNum">     100 </span>            : {
+<span class="lineNum">     101 </span><span class="lineNoCov">          0 :   throw type_error(&quot;Cannot store data of typevar type&quot;);</span>
+<a name="102"><span class="lineNum">     102 </span>            : }</a>
+<span class="lineNum">     103 </span>            : 
+<span class="lineNum">     104 </span><span class="lineCov">        192 : bool ndt::typevar_type::match(const char *DYND_UNUSED(arrmeta), const type &amp;candidate_tp,</span>
+<span class="lineNum">     105 </span>            :                               const char *DYND_UNUSED(candidate_arrmeta), std::map&lt;std::string, type&gt; &amp;tp_vars) const
+<span class="lineNum">     106 </span>            : {
+<span class="lineNum">     107 </span><span class="lineCov">        192 :   if (candidate_tp.get_id() == typevar_id) {</span>
+<span class="lineNum">     108 </span><span class="lineNoCov">          0 :     return *this == *candidate_tp.extended();</span>
+<span class="lineNum">     109 </span>            :   }
+<span class="lineNum">     110 </span>            : 
+<span class="lineNum">     111 </span><span class="lineCov">        192 :   if (candidate_tp.get_ndim() &gt; 0 || candidate_tp.get_id() == any_kind_id) {</span>
+<span class="lineNum">     112 </span><span class="lineCov">          2 :     return false;</span>
+<span class="lineNum">     113 </span>            :   }
+<span class="lineNum">     114 </span>            : 
+<span class="lineNum">     115 </span><span class="lineCov">        190 :   type &amp;tv_type = tp_vars[m_name];</span>
+<span class="lineNum">     116 </span><span class="lineCov">        190 :   if (tv_type.is_null()) {</span>
+<span class="lineNum">     117 </span>            :     // This typevar hasn't been seen yet
+<span class="lineNum">     118 </span><span class="lineCov">        152 :     tv_type = candidate_tp;</span>
+<span class="lineNum">     119 </span><span class="lineCov">        152 :     return true;</span>
+<span class="lineNum">     120 </span>            :   }
+<span class="lineNum">     121 </span>            :   else {
+<span class="lineNum">     122 </span>            :     // Make sure the type matches previous
+<span class="lineNum">     123 </span>            :     // instances of the type var
+<span class="lineNum">     124 </span><span class="lineCov">         38 :     return candidate_tp == tv_type;</span>
+<span class="lineNum">     125 </span>            :   }
+<a name="126"><span class="lineNum">     126 </span>            : }</a>
+<span class="lineNum">     127 </span>            : 
+<span class="lineNum">     128 </span><span class="lineCov">          1 : std::map&lt;std::string, nd::callable&gt; ndt::typevar_type::get_dynamic_type_properties() const</span>
+<a name="129"><span class="lineNum">     129 </span>            : {</a>
+<span class="lineNum">     130 </span><span class="lineCov">          1 :   std::map&lt;std::string, nd::callable&gt; properties;</span>
+<span class="lineNum">     131 </span><span class="lineCov">          2 :   properties[&quot;name&quot;] = nd::callable([](type self) -&gt; string { return self.extended&lt;typevar_type&gt;()-&gt;get_name(); });</span>
+<span class="lineNum">     132 </span>            : 
+<span class="lineNum">     133 </span><span class="lineCov">          1 :   return properties;</span>
+<a name="134"><span class="lineNum">     134 </span>            : }</a>
+<span class="lineNum">     135 </span>            : 
+<span class="lineNum">     136 </span><span class="lineCov">       1436 : bool ndt::is_valid_typevar_name(const char *begin, const char *end)</span>
+<span class="lineNum">     137 </span>            : {
+<span class="lineNum">     138 </span><span class="lineCov">       1436 :   if (begin != end) {</span>
+<span class="lineNum">     139 </span><span class="lineCov">       1436 :     if (*begin &lt; 'A' || *begin &gt; 'Z') {</span>
+<span class="lineNum">     140 </span><span class="lineCov">          6 :       return false;</span>
+<span class="lineNum">     141 </span>            :     }
+<span class="lineNum">     142 </span><span class="lineCov">       1430 :     ++begin;</span>
+<span class="lineNum">     143 </span><span class="lineCov">       7878 :     while (begin &lt; end) {</span>
+<span class="lineNum">     144 </span><span class="lineCov">       3230 :       char c = *begin;</span>
+<span class="lineNum">     145 </span><span class="lineCov">       3230 :       if ((c &lt; 'a' || c &gt; 'z') &amp;&amp; (c &lt; 'A' || c &gt; 'Z') &amp;&amp; (c &lt; '0' || c &gt; '9') &amp;&amp; c != '_') {</span>
+<span class="lineNum">     146 </span><span class="lineCov">          6 :         return false;</span>
+<span class="lineNum">     147 </span>            :       }
+<span class="lineNum">     148 </span><span class="lineCov">       3224 :       ++begin;</span>
+<span class="lineNum">     149 </span>            :     }
+<span class="lineNum">     150 </span><span class="lineCov">       1424 :     return true;</span>
+<span class="lineNum">     151 </span>            :   }
+<span class="lineNum">     152 </span>            :   else {
+<span class="lineNum">     153 </span><span class="lineNoCov">          0 :     return false;</span>
+<span class="lineNum">     154 </span>            :   }
+<a name="155"><span class="lineNum">     155 </span>            : }</a>
+<span class="lineNum">     156 </span>            : 
+<span class="lineNum">     157 </span><span class="lineCov">         25 : std::vector&lt;ndt::type&gt; ndt::make_typevar_range(const char *name, intptr_t count)</span>
+<span class="lineNum">     158 </span>            : {
+<span class="lineNum">     159 </span><span class="lineCov">         25 :   std::vector&lt;ndt::type&gt; result(count);</span>
+<span class="lineNum">     160 </span><span class="lineCov">         50 :   std::string s(name);</span>
+<span class="lineNum">     161 </span><span class="lineCov">         25 :   s += '0';</span>
+<span class="lineNum">     162 </span><span class="lineCov">         25 :   if (count &gt; 10) {</span>
+<span class="lineNum">     163 </span><span class="lineNoCov">          0 :     throw runtime_error(&quot;TODO: extend make_typevar_range&quot;);</span>
+<span class="lineNum">     164 </span>            :   }
+<span class="lineNum">     165 </span><span class="lineCov">         61 :   for (int i = 0; i &lt; count; ++i) {</span>
+<span class="lineNum">     166 </span><span class="lineCov">         36 :     result[i] = typevar_type::make(s);</span>
+<span class="lineNum">     167 </span><span class="lineCov">         36 :     s[s.size() - 1]++;</span>
+<a name="168"><span class="lineNum">     168 </span>            :   }</a>
+<span class="lineNum">     169 </span><span class="lineCov">         50 :   return result;</span>
+<span class="lineNum">     170 </span><span class="lineCov">          3 : }</span>
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.10</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

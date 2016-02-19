@@ -1,0 +1,180 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - coverage.info.cleaned - include/dynd/types/categorical_type.hpp</title>
+  <link rel="stylesheet" type="text/css" href="../../../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../../../index.html">top level</a> - <a href="index.html">include/dynd/types</a> - categorical_type.hpp<span style="font-size: 80%;"> (source / <a href="categorical_type.hpp.func.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">coverage.info.cleaned</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntry">11</td>
+            <td class="headerCovTableEntryLo">0.0 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2016-02-19</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntry">6</td>
+            <td class="headerCovTableEntryLo">0.0 %</td>
+          </tr>
+          <tr><td><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : //</a>
+<span class="lineNum">       2 </span>            : // Copyright (C) 2011-15 DyND Developers
+<span class="lineNum">       3 </span>            : // BSD 2-Clause License, see LICENSE.txt
+<span class="lineNum">       4 </span>            : //
+<span class="lineNum">       5 </span>            : // The categorical type always represents categorical data
+<span class="lineNum">       6 </span>            : //
+<span class="lineNum">       7 </span>            : 
+<span class="lineNum">       8 </span>            : #pragma once
+<span class="lineNum">       9 </span>            : 
+<span class="lineNum">      10 </span>            : #include &lt;dynd/type.hpp&gt;
+<span class="lineNum">      11 </span>            : #include &lt;dynd/array.hpp&gt;
+<span class="lineNum">      12 </span>            : #include &lt;dynd/types/fixed_dim_type.hpp&gt;
+<span class="lineNum">      13 </span>            : 
+<span class="lineNum">      14 </span>            : namespace {
+<span class="lineNum">      15 </span>            : 
+<span class="lineNum">      16 </span>            : struct assign_to_same_category_type;
+<span class="lineNum">      17 </span>            : 
+<span class="lineNum">      18 </span>            : } // anonymous namespace
+<span class="lineNum">      19 </span>            : 
+<span class="lineNum">      20 </span>            : namespace dynd {
+<span class="lineNum">      21 </span>            : namespace ndt {
+<span class="lineNum">      22 </span>            : 
+<span class="lineNum">      23 </span>            :   class DYND_API categorical_type : public base_type {
+<span class="lineNum">      24 </span>            :     // The data type of the category
+<span class="lineNum">      25 </span>            :     type m_category_tp;
+<span class="lineNum">      26 </span>            :     // The integer type used for storage
+<span class="lineNum">      27 </span>            :     type m_storage_type;
+<span class="lineNum">      28 </span>            :     // list of categories, in sorted order
+<span class="lineNum">      29 </span>            :     nd::array m_categories;
+<span class="lineNum">      30 </span>            :     // mapping from category indices to values
+<span class="lineNum">      31 </span>            :     nd::array m_category_index_to_value;
+<span class="lineNum">      32 </span>            :     // mapping from values to category indices
+<span class="lineNum">      33 </span>            :     nd::array m_value_to_category_index;
+<span class="lineNum">      34 </span>            : 
+<span class="lineNum">      35 </span>            :   public:
+<a name="36"><span class="lineNum">      36 </span>            :     categorical_type(const nd::array &amp;categories, bool presorted = false);</a>
+<span class="lineNum">      37 </span>            : 
+<span class="lineNum">      38 </span><span class="lineNoCov">          0 :     virtual ~categorical_type() {}</span>
+<span class="lineNum">      39 </span>            : 
+<span class="lineNum">      40 </span>            :     void print_data(std::ostream &amp;o, const char *arrmeta, const char *data) const;
+<span class="lineNum">      41 </span>            : 
+<span class="lineNum">      42 </span>            :     void print_type(std::ostream &amp;o) const;
+<span class="lineNum">      43 </span>            : 
+<a name="44"><span class="lineNum">      44 </span>            :     void get_shape(intptr_t ndim, intptr_t i, intptr_t *out_shape, const char *arrmeta, const char *data) const;</a>
+<span class="lineNum">      45 </span>            : 
+<span class="lineNum">      46 </span><span class="lineNoCov">          0 :     size_t get_category_count() const</span>
+<span class="lineNum">      47 </span>            :     {
+<span class="lineNum">      48 </span><span class="lineNoCov">          0 :       return (size_t) reinterpret_cast&lt;const fixed_dim_type_arrmeta *&gt;(m_categories.get()-&gt;metadata())-&gt;dim_size;</span>
+<span class="lineNum">      49 </span>            :     }
+<span class="lineNum">      50 </span>            : 
+<span class="lineNum">      51 </span>            :     /**
+<a name="52"><span class="lineNum">      52 </span>            :      * Returns the type of the category values.</a>
+<span class="lineNum">      53 </span>            :      */
+<span class="lineNum">      54 </span><span class="lineNoCov">          0 :     const type &amp;get_category_type() const { return m_category_tp; }</span>
+<span class="lineNum">      55 </span>            : 
+<span class="lineNum">      56 </span>            :     /**
+<span class="lineNum">      57 </span>            :      * Return the type of the underlying integer used
+<a name="58"><span class="lineNum">      58 </span>            :      * to index the category list.</a>
+<span class="lineNum">      59 </span>            :      */
+<span class="lineNum">      60 </span><span class="lineNoCov">          0 :     const type &amp;get_storage_type() const { return m_storage_type; }</span>
+<span class="lineNum">      61 </span>            : 
+<span class="lineNum">      62 </span>            :     uint32_t get_value_from_category(const char *category_arrmeta, const char *category_data) const;
+<a name="63"><span class="lineNum">      63 </span>            :     uint32_t get_value_from_category(const nd::array &amp;category) const;</a>
+<span class="lineNum">      64 </span>            : 
+<span class="lineNum">      65 </span><span class="lineNoCov">          0 :     const char *get_category_data_from_value(uint32_t value) const</span>
+<span class="lineNum">      66 </span>            :     {
+<span class="lineNum">      67 </span><span class="lineNoCov">          0 :       if (value &gt;= get_category_count()) {</span>
+<span class="lineNum">      68 </span><span class="lineNoCov">          0 :         throw std::runtime_error(&quot;category value is out of bounds&quot;);</span>
+<span class="lineNum">      69 </span>            :       }
+<span class="lineNum">      70 </span><span class="lineNoCov">          0 :       return m_categories.cdata() +</span>
+<span class="lineNum">      71 </span><span class="lineNoCov">          0 :              unchecked_fixed_dim_get&lt;intptr_t&gt;(m_value_to_category_index, value) *</span>
+<span class="lineNum">      72 </span><span class="lineNoCov">          0 :                  reinterpret_cast&lt;const fixed_dim_type_arrmeta *&gt;(m_categories.get()-&gt;metadata())-&gt;stride;</span>
+<span class="lineNum">      73 </span>            :     }
+<span class="lineNum">      74 </span>            :     /** Returns the arrmeta corresponding to data from
+<span class="lineNum">      75 </span>            :      * get_category_data_from_value */
+<span class="lineNum">      76 </span>            :     const char *get_category_arrmeta() const;
+<span class="lineNum">      77 </span>            : 
+<span class="lineNum">      78 </span>            :     /** Returns the categories as an immutable nd::array */
+<span class="lineNum">      79 </span>            :     nd::array get_categories() const;
+<span class="lineNum">      80 </span>            : 
+<span class="lineNum">      81 </span>            :     bool is_lossless_assignment(const type &amp;dst_tp, const type &amp;src_tp) const;
+<span class="lineNum">      82 </span>            : 
+<span class="lineNum">      83 </span>            :     bool operator==(const base_type &amp;rhs) const;
+<span class="lineNum">      84 </span>            : 
+<span class="lineNum">      85 </span>            :     void arrmeta_default_construct(char *arrmeta, bool blockref_alloc) const;
+<span class="lineNum">      86 </span>            :     void arrmeta_copy_construct(char *dst_arrmeta, const char *src_arrmeta,
+<span class="lineNum">      87 </span>            :                                 const intrusive_ptr&lt;memory_block_data&gt; &amp;embedded_reference) const;
+<span class="lineNum">      88 </span>            :     void arrmeta_destruct(char *arrmeta) const;
+<span class="lineNum">      89 </span>            :     void arrmeta_debug_print(const char *arrmeta, std::ostream &amp;o, const std::string &amp;indent) const;
+<span class="lineNum">      90 </span>            : 
+<span class="lineNum">      91 </span>            :     std::map&lt;std::string, nd::callable&gt; get_dynamic_type_properties() const;
+<span class="lineNum">      92 </span>            :     std::map&lt;std::string, nd::callable&gt; get_dynamic_array_properties() const;
+<span class="lineNum">      93 </span>            : 
+<span class="lineNum">      94 </span>            :     friend struct assign_to_same_category_type;
+<span class="lineNum">      95 </span>            :     friend struct assign_from_same_category_type;
+<span class="lineNum">      96 </span>            :     friend struct assign_from_commensurate_category_type;
+<span class="lineNum">      97 </span>            : 
+<span class="lineNum">      98 </span>            :     static type make(const nd::array &amp;values) { return type(new categorical_type(values), false); }
+<span class="lineNum">      99 </span>            :   };
+<span class="lineNum">     100 </span>            : 
+<span class="lineNum">     101 </span>            :   DYND_API type factor_categorical(const nd::array &amp;values);
+<span class="lineNum">     102 </span>            : 
+<span class="lineNum">     103 </span>            : } // namespace dynd::ndt
+<span class="lineNum">     104 </span>            : } // namespace dynd
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.10</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

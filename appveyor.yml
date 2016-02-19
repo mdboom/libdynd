@@ -1,0 +1,45 @@
+# branches to build
+branches:
+  only:
+    - master
+clone_depth: 1
+
+# Do not build on tags (GitHub only)
+skip_tags: true
+
+matrix:
+  fast_finish: true     # immediately finish build once one of the jobs fails.
+
+os: Visual Studio 2015
+
+environment:
+  global:
+    appveyor_token:
+      secure: GvR4dCHoeYM712VDQYvSuNzFu+rZfo/zdns7xGlFPGOKfFvBmVCXTX6iuHmMpUeP
+  matrix:
+    - PYTHON_ARCH: "x86_64"
+      platform: x64
+    - PYTHON_ARCH: "x86"
+      platform: Win32
+
+configuration: Release
+
+build_script:
+  - ps: Start-FileDownload "https://repo.continuum.io/miniconda/Miniconda3-latest-Windows-$env:PYTHON_ARCH.exe" C:\Miniconda.exe; echo "Finished downloading miniconda"
+  - cmd: C:\Miniconda.exe /S /D=C:\Py
+  - SET PATH=C:\Py;C:\Py\Scripts;C:\Py\Library\bin;%PATH%
+  - conda config --set always_yes yes
+  - conda update conda
+  - conda install conda-build
+  - ps: if(-not $env:APPVEYOR_PULL_REQUEST_NUMBER) { conda install anaconda-client }
+  - conda-build conda.recipe
+
+on_success:
+  # Redirect output from stderr to stdout to avoid having the command for uploading
+  # the conda package fail in powershell in spite of a successful upload.
+  # This happens when an executable writes to stderr while still executing successfully.
+  # See http://stackoverflow.com/a/22615314/1935144
+  # See also http://stackoverflow.com/a/2095623/1935144
+  # Route command back through cmd to avoid the powershell bug entirely.
+  # See https://connect.microsoft.com/PowerShell/feedback/details/645954
+  - ps: if(-not $env:APPVEYOR_PULL_REQUEST_NUMBER) { cmd /C anaconda --token $env:appveyor_token upload (conda build --output conda.recipe) --user dynd --channel dev "2>&1" }

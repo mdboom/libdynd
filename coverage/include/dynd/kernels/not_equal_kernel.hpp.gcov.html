@@ -1,0 +1,173 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - coverage.info.cleaned - include/dynd/kernels/not_equal_kernel.hpp</title>
+  <link rel="stylesheet" type="text/css" href="../../../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../../../index.html">top level</a> - <a href="index.html">include/dynd/kernels</a> - not_equal_kernel.hpp<span style="font-size: 80%;"> (source / <a href="not_equal_kernel.hpp.func.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">coverage.info.cleaned</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">31</td>
+            <td class="headerCovTableEntry">31</td>
+            <td class="headerCovTableEntryHi">100.0 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2016-02-19</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">153</td>
+            <td class="headerCovTableEntry">254</td>
+            <td class="headerCovTableEntryLo">60.2 %</td>
+          </tr>
+          <tr><td><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : //</a>
+<span class="lineNum">       2 </span>            : // Copyright (C) 2011-15 DyND Developers
+<span class="lineNum">       3 </span>            : // BSD 2-Clause License, see LICENSE.txt
+<span class="lineNum">       4 </span>            : //
+<span class="lineNum">       5 </span>            : 
+<span class="lineNum">       6 </span>            : #pragma once
+<span class="lineNum">       7 </span>            : 
+<span class="lineNum">       8 </span>            : #include &lt;dynd/kernels/base_kernel.hpp&gt;
+<span class="lineNum">       9 </span>            : #include &lt;dynd/types/callable_type.hpp&gt;
+<span class="lineNum">      10 </span>            : 
+<span class="lineNum">      11 </span>            : namespace dynd {
+<span class="lineNum">      12 </span>            : namespace nd {
+<span class="lineNum">      13 </span>            : 
+<span class="lineNum">      14 </span>            :   template &lt;type_id_t I0, type_id_t I1&gt;
+<span class="lineNum">      15 </span>            :   struct not_equal_kernel : base_kernel&lt;not_equal_kernel&lt;I0, I1&gt;, 2&gt; {
+<span class="lineNum">      16 </span>            :     typedef typename type_of&lt;I0&gt;::type A0;
+<span class="lineNum">      17 </span>            :     typedef typename type_of&lt;I1&gt;::type A1;
+<a name="18"><span class="lineNum">      18 </span>            :     typedef typename std::common_type&lt;A0, A1&gt;::type T;</a>
+<span class="lineNum">      19 </span>            : 
+<span class="lineNum">      20 </span><span class="lineCov">         28 :     void single(char *dst, char *const *src)</span>
+<span class="lineNum">      21 </span>            :     {
+<span class="lineNum">      22 </span><span class="lineCov">         56 :       *reinterpret_cast&lt;bool1 *&gt;(dst) =</span>
+<span class="lineNum">      23 </span><span class="lineCov">         28 :           static_cast&lt;T&gt;(*reinterpret_cast&lt;A0 *&gt;(src[0])) != static_cast&lt;T&gt;(*reinterpret_cast&lt;A1 *&gt;(src[1]));</span>
+<span class="lineNum">      24 </span><span class="lineCov">         28 :     }</span>
+<span class="lineNum">      25 </span>            :   };
+<span class="lineNum">      26 </span>            : 
+<span class="lineNum">      27 </span>            :   template &lt;type_id_t Arg0ID&gt;
+<span class="lineNum">      28 </span>            :   struct not_equal_kernel&lt;Arg0ID, Arg0ID&gt; : base_kernel&lt;not_equal_kernel&lt;Arg0ID, Arg0ID&gt;, 2&gt; {
+<a name="29"><span class="lineNum">      29 </span>            :     typedef typename type_of&lt;Arg0ID&gt;::type arg0_type;</a>
+<span class="lineNum">      30 </span>            : 
+<span class="lineNum">      31 </span><span class="lineCov">        812 :     void single(char *res, char *const *args)</span>
+<span class="lineNum">      32 </span>            :     {
+<span class="lineNum">      33 </span><span class="lineCov">       1335 :       *reinterpret_cast&lt;bool1 *&gt;(res) =</span>
+<span class="lineNum">      34 </span><span class="lineCov">        812 :           *reinterpret_cast&lt;arg0_type *&gt;(args[0]) != *reinterpret_cast&lt;arg0_type *&gt;(args[1]);</span>
+<span class="lineNum">      35 </span><span class="lineCov">        812 :     }</span>
+<span class="lineNum">      36 </span>            :   };
+<span class="lineNum">      37 </span>            : 
+<span class="lineNum">      38 </span>            :   template &lt;&gt;
+<span class="lineNum">      39 </span>            :   struct not_equal_kernel&lt;tuple_id, tuple_id&gt; : base_kernel&lt;not_equal_kernel&lt;tuple_id, tuple_id&gt;, 2&gt; {
+<span class="lineNum">      40 </span>            :     size_t field_count;
+<span class="lineNum">      41 </span>            :     const size_t *src0_data_offsets, *src1_data_offsets;
+<span class="lineNum">      42 </span>            :     // After this are field_count sorting_less kernel offsets, for
+<span class="lineNum">      43 </span>            :     // src0.field_i &lt;op&gt; src1.field_i
+<a name="44"><span class="lineNum">      44 </span>            :     // with each 0 &lt;= i &lt; field_count</a>
+<span class="lineNum">      45 </span>            : 
+<span class="lineNum">      46 </span><span class="lineCov">         16 :     not_equal_kernel(size_t field_count, const size_t *src0_data_offsets, const size_t *src1_data_offsets)</span>
+<span class="lineNum">      47 </span><span class="lineCov">         16 :         : field_count(field_count), src0_data_offsets(src0_data_offsets), src1_data_offsets(src1_data_offsets)</span>
+<span class="lineNum">      48 </span>            :     {
+<a name="49"><span class="lineNum">      49 </span><span class="lineCov">         16 :     }</span></a>
+<span class="lineNum">      50 </span>            : 
+<span class="lineNum">      51 </span><span class="lineCov">         16 :     ~not_equal_kernel()</span>
+<span class="lineNum">      52 </span><span class="lineCov">         16 :     {</span>
+<span class="lineNum">      53 </span><span class="lineCov">         16 :       size_t *kernel_offsets = reinterpret_cast&lt;size_t *&gt;(this + 1);</span>
+<span class="lineNum">      54 </span><span class="lineCov">         64 :       for (size_t i = 0; i != field_count; ++i) {</span>
+<span class="lineNum">      55 </span><span class="lineCov">         48 :         get_child(kernel_offsets[i])-&gt;destroy();</span>
+<span class="lineNum">      56 </span>            :       }
+<a name="57"><span class="lineNum">      57 </span><span class="lineCov">         16 :     }</span></a>
+<span class="lineNum">      58 </span>            : 
+<span class="lineNum">      59 </span><span class="lineCov">         16 :     void single(char *dst, char *const *src)</span>
+<span class="lineNum">      60 </span>            :     {
+<span class="lineNum">      61 </span><span class="lineCov">         16 :       const size_t *kernel_offsets = reinterpret_cast&lt;const size_t *&gt;(this + 1);</span>
+<span class="lineNum">      62 </span>            :       char *child_src[2];
+<span class="lineNum">      63 </span><span class="lineCov">         40 :       for (size_t i = 0; i != field_count; ++i) {</span>
+<span class="lineNum">      64 </span><span class="lineCov">         36 :         kernel_prefix *echild = reinterpret_cast&lt;kernel_prefix *&gt;(reinterpret_cast&lt;char *&gt;(this) + kernel_offsets[i]);</span>
+<span class="lineNum">      65 </span><span class="lineCov">         36 :         kernel_single_t opchild = echild-&gt;get_function&lt;kernel_single_t&gt;();</span>
+<span class="lineNum">      66 </span>            :         // if (src0.field_i &lt; src1.field_i) return true
+<span class="lineNum">      67 </span><span class="lineCov">         36 :         child_src[0] = src[0] + src0_data_offsets[i];</span>
+<span class="lineNum">      68 </span><span class="lineCov">         36 :         child_src[1] = src[1] + src1_data_offsets[i];</span>
+<span class="lineNum">      69 </span><span class="lineCov">         36 :         bool1 child_dst;</span>
+<span class="lineNum">      70 </span><span class="lineCov">         36 :         opchild(echild, reinterpret_cast&lt;char *&gt;(&amp;child_dst), child_src);</span>
+<span class="lineNum">      71 </span><span class="lineCov">         36 :         if (child_dst) {</span>
+<span class="lineNum">      72 </span><span class="lineCov">         12 :           *reinterpret_cast&lt;bool1 *&gt;(dst) = true;</span>
+<span class="lineNum">      73 </span><span class="lineCov">         12 :           return;</span>
+<span class="lineNum">      74 </span>            :         }
+<span class="lineNum">      75 </span>            :       }
+<span class="lineNum">      76 </span><span class="lineCov">          4 :       *reinterpret_cast&lt;bool1 *&gt;(dst) = false;</span>
+<span class="lineNum">      77 </span>            :     }
+<span class="lineNum">      78 </span>            : 
+<span class="lineNum">      79 </span>            :     static void instantiate(char *static_data, char *DYND_UNUSED(data), kernel_builder *ckb,
+<span class="lineNum">      80 </span>            :                             const ndt::type &amp;DYND_UNUSED(dst_tp), const char *DYND_UNUSED(dst_arrmeta),
+<span class="lineNum">      81 </span>            :                             intptr_t DYND_UNUSED(nsrc), const ndt::type *src_tp, const char *const *src_arrmeta,
+<span class="lineNum">      82 </span>            :                             kernel_request_t DYND_UNUSED(kernreq), intptr_t DYND_UNUSED(nkwd),
+<span class="lineNum">      83 </span>            :                             const nd::array *DYND_UNUSED(kwds),
+<span class="lineNum">      84 </span>            :                             const std::map&lt;std::string, ndt::type&gt; &amp;DYND_UNUSED(tp_vars));
+<span class="lineNum">      85 </span>            :   };
+<span class="lineNum">      86 </span>            : 
+<span class="lineNum">      87 </span>            : } // namespace dynd::nd
+<span class="lineNum">      88 </span>            : 
+<span class="lineNum">      89 </span>            : namespace ndt {
+<span class="lineNum">      90 </span>            : 
+<a name="91"><span class="lineNum">      91 </span>            :   template &lt;type_id_t Src0TypeID, type_id_t Src1TypeID&gt;</a>
+<span class="lineNum">      92 </span>            :   struct traits&lt;nd::not_equal_kernel&lt;Src0TypeID, Src1TypeID&gt;&gt; {
+<span class="lineNum">      93 </span><span class="lineCov">        127 :     static type equivalent() { return callable_type::make(make_type&lt;bool1&gt;(), {type(Src0TypeID), type(Src1TypeID)}); }</span>
+<span class="lineNum">      94 </span>            :   };
+<span class="lineNum">      95 </span>            : 
+<span class="lineNum">      96 </span>            : } // namespace dynd::ndt
+<span class="lineNum">      97 </span>            : } // namespace dynd
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.10</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

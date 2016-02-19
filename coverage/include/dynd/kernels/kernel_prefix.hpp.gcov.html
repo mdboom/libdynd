@@ -1,0 +1,254 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - coverage.info.cleaned - include/dynd/kernels/kernel_prefix.hpp</title>
+  <link rel="stylesheet" type="text/css" href="../../../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../../../index.html">top level</a> - <a href="index.html">include/dynd/kernels</a> - kernel_prefix.hpp<span style="font-size: 80%;"> (source / <a href="kernel_prefix.hpp.func.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">coverage.info.cleaned</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">18</td>
+            <td class="headerCovTableEntry">18</td>
+            <td class="headerCovTableEntryHi">100.0 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2016-02-19</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">10</td>
+            <td class="headerCovTableEntry">10</td>
+            <td class="headerCovTableEntryHi">100.0 %</td>
+          </tr>
+          <tr><td><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : //</a>
+<span class="lineNum">       2 </span>            : // Copyright (C) 2011-15 DyND Developers
+<span class="lineNum">       3 </span>            : // BSD 2-Clause License, see LICENSE.txt
+<span class="lineNum">       4 </span>            : //
+<span class="lineNum">       5 </span>            : 
+<span class="lineNum">       6 </span>            : #pragma once
+<span class="lineNum">       7 </span>            : 
+<span class="lineNum">       8 </span>            : #include &lt;iostream&gt;
+<span class="lineNum">       9 </span>            : #include &lt;sstream&gt;
+<span class="lineNum">      10 </span>            : #include &lt;stdexcept&gt;
+<span class="lineNum">      11 </span>            : 
+<span class="lineNum">      12 </span>            : #include &lt;dynd/config.hpp&gt;
+<span class="lineNum">      13 </span>            : #include &lt;dynd/diagnostics.hpp&gt;
+<span class="lineNum">      14 </span>            : #include &lt;dynd/kernels/kernel_builder.hpp&gt;
+<span class="lineNum">      15 </span>            : 
+<span class="lineNum">      16 </span>            : namespace dynd {
+<span class="lineNum">      17 </span>            : namespace nd {
+<span class="lineNum">      18 </span>            : 
+<span class="lineNum">      19 </span>            :   class array;
+<span class="lineNum">      20 </span>            : 
+<span class="lineNum">      21 </span>            : } // namespace dynd::nd
+<span class="lineNum">      22 </span>            : 
+<span class="lineNum">      23 </span>            : namespace eval {
+<span class="lineNum">      24 </span>            : 
+<span class="lineNum">      25 </span>            :   struct DYND_API eval_context;
+<span class="lineNum">      26 </span>            :   extern DYND_API eval_context default_eval_context;
+<span class="lineNum">      27 </span>            : 
+<span class="lineNum">      28 </span>            : } // namespace dynd::eval
+<span class="lineNum">      29 </span>            : 
+<span class="lineNum">      30 </span>            : namespace ndt {
+<span class="lineNum">      31 </span>            : 
+<span class="lineNum">      32 </span>            :   class type;
+<span class="lineNum">      33 </span>            : 
+<span class="lineNum">      34 </span>            : } // namespace dynd::ndt
+<span class="lineNum">      35 </span>            : 
+<span class="lineNum">      36 </span>            : typedef void (*kernel_call_t)(nd::kernel_prefix *self, const nd::array *dst, const nd::array *src);
+<span class="lineNum">      37 </span>            : typedef void (*kernel_single_t)(nd::kernel_prefix *self, char *dst, char *const *src);
+<span class="lineNum">      38 </span>            : typedef void (*kernel_strided_t)(nd::kernel_prefix *self, char *dst, intptr_t dst_stride, char *const *src,
+<span class="lineNum">      39 </span>            :                                  const intptr_t *src_stride, size_t count);
+<span class="lineNum">      40 </span>            : 
+<span class="lineNum">      41 </span>            : struct kernel_targets_t {
+<span class="lineNum">      42 </span>            :   void *single;
+<span class="lineNum">      43 </span>            :   void *contiguous;
+<span class="lineNum">      44 </span>            :   void *strided;
+<span class="lineNum">      45 </span>            : };
+<span class="lineNum">      46 </span>            : 
+<span class="lineNum">      47 </span>            : /**
+<span class="lineNum">      48 </span>            :  * Definition for kernel request parameters.
+<span class="lineNum">      49 </span>            :  */
+<span class="lineNum">      50 </span>            : enum {
+<span class="lineNum">      51 </span>            :   /** Kernel function in host memory */
+<span class="lineNum">      52 </span>            :   kernel_request_host = 0x00000000,
+<span class="lineNum">      53 </span>            : 
+<span class="lineNum">      54 </span>            :   kernel_request_call = 0x00000000,
+<span class="lineNum">      55 </span>            :   kernel_request_single = 0x00000001,
+<span class="lineNum">      56 </span>            :   kernel_request_strided = 0x00000003,
+<span class="lineNum">      57 </span>            : 
+<span class="lineNum">      58 </span>            :   kernel_request_data_only = 0x00000001
+<span class="lineNum">      59 </span>            : };
+<span class="lineNum">      60 </span>            : typedef uint32_t kernel_request_t;
+<span class="lineNum">      61 </span>            : 
+<span class="lineNum">      62 </span>            : namespace nd {
+<span class="lineNum">      63 </span>            : 
+<span class="lineNum">      64 </span>            :   /**
+<span class="lineNum">      65 </span>            :    * This is the struct which begins the memory layout
+<span class="lineNum">      66 </span>            :    * of all ckernels. First comes the function pointer,
+<span class="lineNum">      67 </span>            :    * which has a context-specific prototype, such as
+<span class="lineNum">      68 </span>            :    * `kernel_single_t`, and then comes the
+<span class="lineNum">      69 </span>            :    * destructor.
+<span class="lineNum">      70 </span>            :    *
+<span class="lineNum">      71 </span>            :    * The ckernel is defined in terms of a C ABI definition,
+<span class="lineNum">      72 </span>            :    * and must satisfy alignments, movability, and
+<span class="lineNum">      73 </span>            :    * concurrency requirements to be valid. See the
+<a name="74"><span class="lineNum">      74 </span>            :    * document</a>
+<span class="lineNum">      75 </span>            :    */
+<span class="lineNum">      76 </span><span class="lineCov">       1947 :   struct DYND_API kernel_prefix {</span>
+<span class="lineNum">      77 </span>            :     typedef void (*destructor_fn_t)(kernel_prefix *);
+<span class="lineNum">      78 </span>            : 
+<span class="lineNum">      79 </span>            :     void (*destructor)(kernel_prefix *self);
+<span class="lineNum">      80 </span>            :     void *function;
+<span class="lineNum">      81 </span>            : 
+<span class="lineNum">      82 </span>            :     /**
+<span class="lineNum">      83 </span>            :      * Call to get the kernel function pointer, whose type
+<span class="lineNum">      84 </span>            :      * must be known by the context.
+<span class="lineNum">      85 </span>            :      *
+<span class="lineNum">      86 </span>            :      *      kdp-&gt;get_function&lt;kernel_single_t&gt;()
+<a name="87"><span class="lineNum">      87 </span>            :      */</a>
+<span class="lineNum">      88 </span>            :     template &lt;typename T&gt;
+<span class="lineNum">      89 </span><span class="lineCov">       5047 :     DYND_CUDA_HOST_DEVICE T get_function() const</span>
+<span class="lineNum">      90 </span>            :     {
+<span class="lineNum">      91 </span><span class="lineCov">       5047 :       return reinterpret_cast&lt;T&gt;(function);</span>
+<span class="lineNum">      92 </span>            :     }
+<span class="lineNum">      93 </span>            : 
+<span class="lineNum">      94 </span>            :     /**
+<span class="lineNum">      95 </span>            :      * Calls the destructor of the ckernel if it is
+<a name="96"><span class="lineNum">      96 </span>            :      * non-NULL.</a>
+<span class="lineNum">      97 </span>            :      */
+<span class="lineNum">      98 </span><span class="lineCov">       5004 :     DYND_CUDA_HOST_DEVICE void destroy()</span>
+<span class="lineNum">      99 </span>            :     {
+<span class="lineNum">     100 </span><span class="lineCov">       5004 :       if (destructor != NULL) {</span>
+<span class="lineNum">     101 </span><span class="lineCov">       5002 :         destructor(this);</span>
+<span class="lineNum">     102 </span>            :       }
+<a name="103"><span class="lineNum">     103 </span><span class="lineCov">       5004 :     }</span></a>
+<span class="lineNum">     104 </span>            : 
+<span class="lineNum">     105 </span><span class="lineCov">       1820 :     DYND_CUDA_HOST_DEVICE void single(char *dst, char *const *src)</span>
+<span class="lineNum">     106 </span>            :     {
+<span class="lineNum">     107 </span><span class="lineCov">       1820 :       (*reinterpret_cast&lt;kernel_single_t&gt;(function))(this, dst, src);</span>
+<a name="108"><span class="lineNum">     108 </span><span class="lineCov">       1820 :     }</span></a>
+<span class="lineNum">     109 </span>            : 
+<span class="lineNum">     110 </span><span class="lineCov">        121 :     DYND_CUDA_HOST_DEVICE void strided(char *dst, intptr_t dst_stride, char *const *src, const intptr_t *src_stride,</span>
+<span class="lineNum">     111 </span>            :                                        size_t count)
+<span class="lineNum">     112 </span>            :     {
+<span class="lineNum">     113 </span><span class="lineCov">        121 :       (*reinterpret_cast&lt;kernel_strided_t&gt;(function))(this, dst, dst_stride, src, src_stride, count);</span>
+<span class="lineNum">     114 </span><span class="lineCov">        121 :     }</span>
+<span class="lineNum">     115 </span>            : 
+<span class="lineNum">     116 </span>            :     /**
+<span class="lineNum">     117 </span>            :      * Returns the pointer to a child ckernel at the provided
+<a name="118"><span class="lineNum">     118 </span>            :      * offset.</a>
+<span class="lineNum">     119 </span>            :      */
+<span class="lineNum">     120 </span><span class="lineCov">       4355 :     DYND_CUDA_HOST_DEVICE kernel_prefix *get_child(intptr_t offset)</span>
+<span class="lineNum">     121 </span>            :     {
+<span class="lineNum">     122 </span><span class="lineCov">       4355 :       return reinterpret_cast&lt;kernel_prefix *&gt;(reinterpret_cast&lt;char *&gt;(this) + kernel_builder::aligned_size(offset));</span>
+<span class="lineNum">     123 </span>            :     }
+<span class="lineNum">     124 </span>            : 
+<span class="lineNum">     125 </span>            :     /**
+<a name="126"><span class="lineNum">     126 </span>            :      * Returns a pointer to the list of child offsets.</a>
+<span class="lineNum">     127 </span>            :      */
+<span class="lineNum">     128 </span><span class="lineCov">         96 :     size_t *get_offsets() { return reinterpret_cast&lt;size_t *&gt;(this + 1); }</span>
+<span class="lineNum">     129 </span>            : 
+<span class="lineNum">     130 </span>            :     static kernel_prefix *init(kernel_prefix *self, void *func)
+<span class="lineNum">     131 </span>            :     {
+<span class="lineNum">     132 </span>            :       self-&gt;function = func;
+<span class="lineNum">     133 </span>            :       self-&gt;destructor = NULL;
+<span class="lineNum">     134 </span>            :       return self;
+<a name="135"><span class="lineNum">     135 </span>            :     }</a>
+<span class="lineNum">     136 </span>            : 
+<span class="lineNum">     137 </span><span class="lineCov">       3701 :     static char *data_init(char *DYND_UNUSED(static_data), const ndt::type &amp;DYND_UNUSED(dst_tp),</span>
+<span class="lineNum">     138 </span>            :                            intptr_t DYND_UNUSED(nsrc), const ndt::type *DYND_UNUSED(src_tp), intptr_t DYND_UNUSED(nkwd),
+<span class="lineNum">     139 </span>            :                            const array *DYND_UNUSED(kwds), const std::map&lt;std::string, ndt::type&gt; &amp;DYND_UNUSED(tp_vars))
+<span class="lineNum">     140 </span>            :     {
+<span class="lineNum">     141 </span><span class="lineCov">       3701 :       return NULL;</span>
+<span class="lineNum">     142 </span>            :     }
+<span class="lineNum">     143 </span>            : 
+<span class="lineNum">     144 </span>            :     static void resolve_dst_type(char *DYND_UNUSED(static_data), char *DYND_UNUSED(data), ndt::type &amp;dst_tp,
+<span class="lineNum">     145 </span>            :                                  intptr_t DYND_UNUSED(nsrc), const ndt::type *DYND_UNUSED(src_tp),
+<span class="lineNum">     146 </span>            :                                  intptr_t DYND_UNUSED(nkwd), const array *DYND_UNUSED(kwds),
+<span class="lineNum">     147 </span>            :                                  const std::map&lt;std::string, ndt::type&gt; &amp;tp_vars);
+<span class="lineNum">     148 </span>            : 
+<span class="lineNum">     149 </span>            :     static void instantiate(char *static_data, char *DYND_UNUSED(data), kernel_builder *ckb,
+<span class="lineNum">     150 </span>            :                             const ndt::type &amp;DYND_UNUSED(dst_tp), const char *DYND_UNUSED(dst_arrmeta),
+<span class="lineNum">     151 </span>            :                             intptr_t DYND_UNUSED(nsrc), const ndt::type *DYND_UNUSED(src_tp),
+<span class="lineNum">     152 </span>            :                             const char *const *DYND_UNUSED(src_arrmeta), kernel_request_t kernreq,
+<span class="lineNum">     153 </span>            :                             intptr_t DYND_UNUSED(nkwd), const array *DYND_UNUSED(kwds),
+<span class="lineNum">     154 </span>            :                             const std::map&lt;std::string, ndt::type&gt; &amp;DYND_UNUSED(tp_vars))
+<span class="lineNum">     155 </span>            :     {
+<span class="lineNum">     156 </span>            :       void *func;
+<span class="lineNum">     157 </span>            :       switch (kernreq) {
+<span class="lineNum">     158 </span>            :       case kernel_request_single:
+<span class="lineNum">     159 </span>            :         func = reinterpret_cast&lt;kernel_targets_t *&gt;(static_data)-&gt;single;
+<span class="lineNum">     160 </span>            :         break;
+<span class="lineNum">     161 </span>            :       case kernel_request_strided:
+<span class="lineNum">     162 </span>            :         func = reinterpret_cast&lt;kernel_targets_t *&gt;(static_data)-&gt;strided;
+<span class="lineNum">     163 </span>            :         break;
+<span class="lineNum">     164 </span>            :       default:
+<span class="lineNum">     165 </span>            :         throw std::invalid_argument(&quot;unrecognized kernel request&quot;);
+<span class="lineNum">     166 </span>            :         break;
+<span class="lineNum">     167 </span>            :       }
+<span class="lineNum">     168 </span>            : 
+<span class="lineNum">     169 </span>            :       if (func == NULL) {
+<span class="lineNum">     170 </span>            :         throw std::invalid_argument(&quot;no kernel request&quot;);
+<span class="lineNum">     171 </span>            :       }
+<span class="lineNum">     172 </span>            : 
+<span class="lineNum">     173 </span>            :       ckb-&gt;emplace_back&lt;kernel_prefix&gt;(func);
+<span class="lineNum">     174 </span>            :     }
+<span class="lineNum">     175 </span>            :   };
+<span class="lineNum">     176 </span>            : 
+<span class="lineNum">     177 </span>            : } // namespace dynd::nd
+<span class="lineNum">     178 </span>            : } // namespace dynd
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../../../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.10</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>
